@@ -7,3 +7,4 @@ __pycache__/
 /data/blast_db/
 .DS_Store
 Thumbs.db
+.sync/

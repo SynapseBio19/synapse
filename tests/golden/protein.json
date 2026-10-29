@@ -1,0 +1,36 @@
+{
+ "gug_start": "VKF",
+ "translated_reference": "MKRADFGDAYRKGPELLTVDELKAGAYGDLIAE",
+ "ubiquitin": {
+  "aliphatic_index": 100.0,
+  "aromaticity": 0.039474,
+  "charges": {
+   "5.0": 2.753132,
+   "7.0": -0.398037,
+   "7.4": -0.689673,
+   "9.0": -1.720185
+  },
+  "extinction_coefficient": {
+   "cysteine": 0,
+   "disulfide_pairs": 0,
+   "oxidized_cysteine": 1490,
+   "reduced_cysteine": 1490,
+   "tryptophan": 0,
+   "tyrosine": 1,
+   "units": "M^-1 cm^-1",
+   "unpaired_cysteine": 0,
+   "wavelength_nm": 280
+  },
+  "gravy": -0.489474,
+  "instability_index": 36.055263,
+  "length": 76,
+  "molecular_weight": {
+   "ambiguous": false,
+   "known_mass": 8564.84484,
+   "max": 8564.84484,
+   "min": 8564.84484,
+   "undetermined": false
+  },
+  "pI": 6.561596
+ }
+}

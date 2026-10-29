@@ -1,0 +1,38 @@
+{
+ "merged": [
+  [
+   "CRISPR screening in yeast",
+   "1",
+   "10.1/a",
+   [
+    "Anna B. Smith"
+   ]
+  ],
+  [
+   "CRISPR screening in yeast",
+   "2",
+   null,
+   []
+  ],
+  [
+   "Untitled other study",
+   null,
+   null,
+   []
+  ]
+ ],
+ "ranked_scores": [
+  [
+   "CRISPR screening in yeast",
+   50.0
+  ],
+  [
+   "CRISPR screening in yeast",
+   50.0
+  ],
+  [
+   "Untitled other study",
+   23.33
+  ]
+ ]
+}

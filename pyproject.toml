@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "synapse"
+version = "0.2.0.dev0"
+description = "Transparent, sequence-centric DNA analysis workbench (research/teaching software, not experimentally validated)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Proprietary - all rights reserved (decision pending)" }
+authors = [{ name = "Onur Bayraktar" }]
+# The scientific core deliberately uses only the Python standard library.
+dependencies = []
+
+[project.optional-dependencies]
+# Independent reference implementations used for cross-validation only.
+reference = ["biopython>=1.81", "primer3-py>=2.0"]
+dev = ["pytest>=7"]
+
+[tool.setuptools]
+packages = ["analyses", "core", "data", "fileio", "ui"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

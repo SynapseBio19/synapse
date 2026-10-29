@@ -1,0 +1,35 @@
+{
+ "au_content": 49.494949,
+ "feature_score": {
+  "classification": "High",
+  "reasons": [
+   "No IUPAC ambiguity detected.",
+   "High sequence complexity.",
+   "No long homopolymers detected.",
+   "Candidate stem-loop motifs detected; thermodynamic stability not calculated.",
+   "1 AUG start codon(s) detected.",
+   "11 stop codon(s) detected."
+  ],
+  "score": 100
+ },
+ "frames": [
+  [
+   1,
+   "MKRADFGDAYRKGPELLTVDELKAGAYGDLIAE",
+   false
+  ],
+  [
+   2,
+   "",
+   true
+  ],
+  [
+   3,
+   "ETC",
+   true
+  ]
+ ],
+ "gc_content": 50.505051,
+ "hairpin_count": 58,
+ "rna": "AUGAAACGUGCUGACUUUGGUGACGCUUACCGUAAAGGUCCUGAACUGCUGACCGUUGACGAACUGAAAGCUGGUGCUUACGGUGACCUGAUCGCUGAA"
+}

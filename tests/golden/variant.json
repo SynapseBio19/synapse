@@ -1,0 +1,69 @@
+{
+ "normalize_7_AG_A": [
+  4,
+  "AA",
+  "A"
+ ],
+ "statistics": {
+  "chromosomes_affected": 2,
+  "complex": 0,
+  "consequence_counts": {},
+  "deletions": 1,
+  "failed_filters": 1,
+  "genes_affected": 0,
+  "indels": 2,
+  "insertions": 1,
+  "max_quality": 100.0,
+  "mean_allele_frequency": 0.2,
+  "mean_quality": 83.75,
+  "median_allele_frequency": 0.2,
+  "median_quality": 87.5,
+  "min_quality": 60.0,
+  "missing_quality": 0,
+  "mnvs": 0,
+  "passed_filters": 3,
+  "rare_variants": 0,
+  "snvs": 2,
+  "symbolic": 0,
+  "total_variants": 4,
+  "transition_count": 2,
+  "transition_transversion_ratio": "Infinity",
+  "transversion_count": 0,
+  "unique_variants": 4,
+  "unknown": 0
+ },
+ "variants": [
+  [
+   "chr1",
+   100,
+   "G",
+   "A",
+   "SNV",
+   "PASS"
+  ],
+  [
+   "chr1",
+   200,
+   "A",
+   "AT",
+   "INSERTION",
+   "PASS"
+  ],
+  [
+   "chr1",
+   300,
+   "AT",
+   "A",
+   "DELETION",
+   "PASS"
+  ],
+  [
+   "chr2",
+   150,
+   "A",
+   "G",
+   "SNV",
+   "UNFILTERED"
+  ]
+ ]
+}

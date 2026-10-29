@@ -1,0 +1,291 @@
+{
+ "TEST_8_AMBIGUOUS": {
+  "coding": {
+   "frameshift": false,
+   "missense_count": 0,
+   "nonsense_count": 0,
+   "premature_stop_position": null,
+   "start_loss_count": 0,
+   "stop_loss_count": 0,
+   "synonymous_count": 0
+  },
+  "identity": 98.989899,
+  "mutations": [
+   [
+    55,
+    "G",
+    "R",
+    "Substitution"
+   ]
+  ]
+ },
+ "TEST_8_COMPOUND": {
+  "coding": {
+   "frameshift": false,
+   "missense_count": 0,
+   "nonsense_count": 0,
+   "premature_stop_position": null,
+   "start_loss_count": 0,
+   "stop_loss_count": 0,
+   "synonymous_count": 0
+  },
+  "identity": 97.979798,
+  "mutations": [
+   [
+    34,
+    "",
+    "GCC",
+    "Insertion"
+   ],
+   [
+    82,
+    "G",
+    "C",
+    "SNP"
+   ],
+   [
+    96,
+    "T",
+    "C",
+    "SNP"
+   ]
+  ]
+ },
+ "TEST_8_FRAMESHIFT_DELETION": {
+  "coding": {
+   "frameshift": true,
+   "missense_count": 0,
+   "nonsense_count": 0,
+   "premature_stop_position": 22,
+   "start_loss_count": 0,
+   "stop_loss_count": 0,
+   "synonymous_count": 0
+  },
+  "identity": 100.0,
+  "mutations": [
+   [
+    52,
+    "A",
+    "",
+    "Deletion"
+   ]
+  ]
+ },
+ "TEST_8_FRAMESHIFT_INSERTION": {
+  "coding": {
+   "frameshift": true,
+   "missense_count": 0,
+   "nonsense_count": 0,
+   "premature_stop_position": 15,
+   "start_loss_count": 0,
+   "stop_loss_count": 0,
+   "synonymous_count": 0
+  },
+  "identity": 100.0,
+  "mutations": [
+   [
+    34,
+    "",
+    "G",
+    "Insertion"
+   ]
+  ]
+ },
+ "TEST_8_INFRAME_DELETION": {
+  "coding": {
+   "frameshift": false,
+   "missense_count": 0,
+   "nonsense_count": 0,
+   "premature_stop_position": null,
+   "start_loss_count": 0,
+   "stop_loss_count": 0,
+   "synonymous_count": 0
+  },
+  "identity": 100.0,
+  "mutations": [
+   [
+    79,
+    "TAC",
+    "",
+    "Deletion"
+   ]
+  ]
+ },
+ "TEST_8_INFRAME_INSERTION": {
+  "coding": {
+   "frameshift": false,
+   "missense_count": 0,
+   "nonsense_count": 0,
+   "premature_stop_position": null,
+   "start_loss_count": 0,
+   "stop_loss_count": 0,
+   "synonymous_count": 0
+  },
+  "identity": 100.0,
+  "mutations": [
+   [
+    34,
+    "",
+    "GCC",
+    "Insertion"
+   ]
+  ]
+ },
+ "TEST_8_MULTI_SNP": {
+  "coding": {
+   "frameshift": false,
+   "missense_count": 1,
+   "nonsense_count": 0,
+   "premature_stop_position": null,
+   "start_loss_count": 0,
+   "stop_loss_count": 0,
+   "synonymous_count": 2
+  },
+  "identity": 96.969697,
+  "mutations": [
+   [
+    6,
+    "A",
+    "G",
+    "SNP"
+   ],
+   [
+    82,
+    "G",
+    "C",
+    "SNP"
+   ],
+   [
+    96,
+    "T",
+    "C",
+    "SNP"
+   ]
+  ]
+ },
+ "TEST_8_REVERSE": {
+  "coding": {
+   "frameshift": false,
+   "missense_count": 0,
+   "nonsense_count": 0,
+   "premature_stop_position": null,
+   "start_loss_count": 0,
+   "stop_loss_count": 0,
+   "synonymous_count": 0
+  },
+  "identity": 100.0,
+  "mutations": []
+ },
+ "TEST_8_SNP_MISSENSE": {
+  "coding": {
+   "frameshift": false,
+   "missense_count": 1,
+   "nonsense_count": 0,
+   "premature_stop_position": null,
+   "start_loss_count": 0,
+   "stop_loss_count": 0,
+   "synonymous_count": 0
+  },
+  "identity": 98.989899,
+  "mutations": [
+   [
+    82,
+    "G",
+    "C",
+    "SNP"
+   ]
+  ]
+ },
+ "TEST_8_SNP_NONSENSE": {
+  "coding": {
+   "frameshift": false,
+   "missense_count": 0,
+   "nonsense_count": 1,
+   "premature_stop_position": 15,
+   "start_loss_count": 0,
+   "stop_loss_count": 0,
+   "synonymous_count": 0
+  },
+  "identity": 98.989899,
+  "mutations": [
+   [
+    43,
+    "G",
+    "T",
+    "SNP"
+   ]
+  ]
+ },
+ "TEST_8_SNP_SYNONYMOUS": {
+  "coding": {
+   "frameshift": false,
+   "missense_count": 0,
+   "nonsense_count": 0,
+   "premature_stop_position": null,
+   "start_loss_count": 0,
+   "stop_loss_count": 0,
+   "synonymous_count": 1
+  },
+  "identity": 98.989899,
+  "mutations": [
+   [
+    6,
+    "A",
+    "G",
+    "SNP"
+   ]
+  ]
+ },
+ "TEST_8_TRANSITIONS": {
+  "coding": {
+   "frameshift": false,
+   "missense_count": 0,
+   "nonsense_count": 0,
+   "premature_stop_position": null,
+   "start_loss_count": 0,
+   "stop_loss_count": 0,
+   "synonymous_count": 2
+  },
+  "identity": 97.979798,
+  "mutations": [
+   [
+    6,
+    "A",
+    "G",
+    "SNP"
+   ],
+   [
+    21,
+    "T",
+    "C",
+    "SNP"
+   ]
+  ]
+ },
+ "TEST_8_TRANSVERSIONS": {
+  "coding": {
+   "frameshift": false,
+   "missense_count": 2,
+   "nonsense_count": 0,
+   "premature_stop_position": null,
+   "start_loss_count": 0,
+   "stop_loss_count": 0,
+   "synonymous_count": 0
+  },
+  "identity": 97.979798,
+  "mutations": [
+   [
+    82,
+    "G",
+    "C",
+    "SNP"
+   ],
+   [
+    99,
+    "A",
+    "T",
+    "SNP"
+   ]
+  ]
+ }
+}

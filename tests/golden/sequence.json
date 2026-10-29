@@ -1,0 +1,97 @@
+{
+ "ambiguous_bases": {
+  "N": 2,
+  "R": 1,
+  "Y": 1
+ },
+ "at_content": 47.869674,
+ "at_skew": 0.13089,
+ "average_molecular_weight": 265980.0,
+ "cpg": {
+  "ambiguous_contexts": 2,
+  "count": 22,
+  "density": 5.459057,
+  "oe_ratio": 0.819787
+ },
+ "cpg_islands": [
+  {
+   "cpg_count": 15,
+   "criteria": {
+    "min_gc_content": 50.0,
+    "min_length": 200,
+    "min_oe_ratio": 0.6
+   },
+   "end": 402,
+   "end_1_based": 403,
+   "gc_content": 52.666667,
+   "length": 300,
+   "oe_ratio": 0.722892,
+   "start": 103,
+   "start_1_based": 104
+  }
+ ],
+ "gc_content": 52.130326,
+ "gc_content_range": {
+  "ambiguous": true,
+  "at_max": 48.387097,
+  "at_min": 47.394541,
+  "evaluated_length": 403,
+  "gc_max": 52.605459,
+  "gc_min": 51.612903
+ },
+ "gc_skew": -0.009615,
+ "homopolymers": [
+  {
+   "base": "G",
+   "end": 121,
+   "end_1_based": 122,
+   "length": 4,
+   "start": 118,
+   "start_1_based": 119
+  },
+  {
+   "base": "C",
+   "end": 130,
+   "end_1_based": 131,
+   "length": 6,
+   "start": 125,
+   "start_1_based": 126
+  },
+  {
+   "base": "C",
+   "end": 195,
+   "end_1_based": 196,
+   "length": 7,
+   "start": 189,
+   "start_1_based": 190
+  },
+  {
+   "base": "C",
+   "end": 383,
+   "end_1_based": 384,
+   "length": 4,
+   "start": 380,
+   "start_1_based": 381
+  }
+ ],
+ "length": 403,
+ "molecular_weight": {
+  "ambiguous": true,
+  "ds_max": 249023.99,
+  "ds_min": 249020.07,
+  "evaluated_positions": 403,
+  "max": 249023.99,
+  "method": "Composition-based nucleotide residue estimate",
+  "min": 249020.07,
+  "ss_max": 124639.64,
+  "ss_min": 124528.56
+ },
+ "nucleotide_counts": {
+  "A": 108,
+  "C": 105,
+  "G": 103,
+  "T": 83
+ },
+ "reverse_complement": "TGCATGAGTGGTCCTGCCAGGGGTATGTCGGGTGCAGTGGTGCGAATTCTAATAGATAATCTGTCCTGGCCCGGAAGAGCTCCTAAGCCTCCTTCCCTCTTCACGACCTAGCTCTGTTGCTGCGCAGCTACGCATACTTATTGTCCTGGTGACGCGCCCGTATCAATGTGTGCTTGAAAGGGTATTAAAGTCATCATTGAGTTGTTTGGGGGGGAGACGACGTCTGCATATCACGCTTCCCGGAACCCGCAAGTCTATGCAGTTTAATGTCAGGGGGGTGTCCCCACTTTCGGTATCACTRYNNTTCAGCGATCAGGTCACCGTAAGCACCAGCTTTCAGTTCGTCAACGGTCAGCAGTTCAGGACCTTTACGGTAAGCGTCACCAAAGTCAGCACGTTTCAT",
+ "sequence_complexity": 0.996361
+}

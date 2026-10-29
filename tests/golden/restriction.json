@@ -1,0 +1,111 @@
+{
+ "circular": {
+  "cut_positions": [
+   201,
+   258,
+   378,
+   407,
+   539,
+   613
+  ],
+  "fragments": [
+   [
+    202,
+    258,
+    57
+   ],
+   [
+    259,
+    378,
+    120
+   ],
+   [
+    379,
+    407,
+    29
+   ],
+   [
+    408,
+    539,
+    132
+   ],
+   [
+    540,
+    613,
+    74
+   ],
+   [
+    614,
+    201,
+    206
+   ]
+  ]
+ },
+ "clai_site": {
+  "ambiguity_dependent": false,
+  "bottom_cut": 10,
+  "bottom_cut_0based": 9,
+  "cut_type": "Sticky",
+  "enzyme": "ClaI",
+  "is_blunt": false,
+  "match_status": "CONFIRMED",
+  "overhang_length": 4,
+  "overhang_sequence": "TCGA",
+  "overhang_type": "5_prime",
+  "recognition_sequence": "ATCGAT",
+  "site_end": 10,
+  "site_end_1based": 10,
+  "site_position": 5,
+  "site_position_0based": 4,
+  "top_cut": 6,
+  "top_cut_0based": 5
+ },
+ "linear": {
+  "cut_positions": [
+   201,
+   258,
+   378,
+   407,
+   539,
+   613
+  ],
+  "fragments": [
+   [
+    1,
+    201,
+    201
+   ],
+   [
+    202,
+    258,
+    57
+   ],
+   [
+    259,
+    378,
+    120
+   ],
+   [
+    379,
+    407,
+    29
+   ],
+   [
+    408,
+    539,
+    132
+   ],
+   [
+    540,
+    613,
+    74
+   ],
+   [
+    614,
+    618,
+    5
+   ]
+  ]
+ },
+ "n_run_digest_cuts": 17
+}
