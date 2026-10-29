@@ -1,8 +1,11 @@
+import logging
 import os
 
 from core.pipeline import SynapsePipeline
+from core.models import SequenceRecord
+from core.logging_setup import configure_logging
 
-from fileio.fasta import load_fasta
+from fileio.loader import load_sequences
 
 from core.validation import (
     validate_dna,
@@ -70,14 +73,32 @@ from ui.report import print_results
 from ui.menu import select_gene, show_menu
 
 
+LOG_PATH = configure_logging()
+logger = logging.getLogger("synapse.main")
+
+
+def report_error(title, error):
+    """Show an actionable error and keep the full traceback in the log file."""
+    logger.exception("%s", title)
+    print()
+    print("=" * 68)
+    print(title)
+    print("=" * 68)
+    print()
+    print(f"{type(error).__name__}: {error}")
+    print()
+    print(f"Details (traceback) were written to: {LOG_PATH}")
+    input("\nPress Enter to continue...")
+
+
 # ============================================================
 # MAIN PROGRAM
 # ============================================================
 
 
-current_folder = os.path.dirname(__file__)
+current_folder = os.path.dirname(os.path.abspath(__file__))
 
-fasta_file = os.path.join(
+default_sequence_file = os.path.join(
     current_folder,
     "examples",
     "dna.fasta",
@@ -85,33 +106,51 @@ fasta_file = os.path.join(
 
 
 # ============================================================
-# LOAD FASTA FILE
+# LOAD SEQUENCE FILE (FASTA or GenBank)
 # ============================================================
 
 
-try:
+def choose_sequence_file():
+    """Ask for a FASTA/GenBank file; Enter loads the bundled example."""
 
-    sequences = load_fasta(
-        fasta_file
-    )
+    while True:
 
-except ValueError as error:
+        print()
+        print("=" * 60)
+        print("SYNAPSE - LOAD SEQUENCE FILE")
+        print("=" * 60)
+        print("FASTA (.fasta/.fa) or GenBank (.gb/.gbk).")
+        print("FASTA headers may contain topology=circular.")
+        print(f"Press Enter for the example: {default_sequence_file}")
+        print("Type Q to quit.")
 
-    print()
-    print("=" * 60)
-    print("FASTA FILE ERROR")
-    print("=" * 60)
+        raw = input("\nFile path: ").strip().strip('"')
 
-    print(f"\n{error}")
+        if raw.upper() == "Q":
+            raise SystemExit
 
-    print()
-    print("=" * 60)
+        path = raw or default_sequence_file
 
-    input(
-        "\nPress Enter to exit..."
-    )
+        if not os.path.isabs(path):
+            candidate = os.path.join(current_folder, path)
+            if not os.path.exists(path) and os.path.exists(candidate):
+                path = candidate
 
-    raise SystemExit
+        try:
+            loaded = load_sequences(path)
+            logger.info("Loaded %d record(s) from %s", len(loaded), path)
+            return loaded
+
+        except (OSError, ValueError) as error:
+            logger.warning("Could not load %s: %s", path, error)
+            print()
+            print("=" * 60)
+            print("SEQUENCE FILE ERROR")
+            print("=" * 60)
+            print(f"\n{error}")
+
+
+sequences = choose_sequence_file()
 
 
 # ============================================================
@@ -124,6 +163,10 @@ while True:
     selected_index, record = (
         select_gene(sequences)
     )
+
+    if record is None:
+        sequences = choose_sequence_file()
+        continue
 
     header = record["header"]
     dna = record["sequence"]
@@ -145,6 +188,16 @@ while True:
         sequence_id=selected_index,
         topology=topology,
     )
+
+    try:
+        pipeline.attach_record(
+            SequenceRecord.from_legacy_dict(record, selected_index)
+        )
+    except ValueError as error:
+        logger.warning("Provenance not attached: %s", error)
+
+    for note in record.get("notes", []):
+        print(f"\nNote: {note}")
 
     # Selected ORF is shared by ORF -> RNA -> Protein.
     selected_orf = None
@@ -389,6 +442,14 @@ while True:
                         selected_orf
                     )
 
+                    pipeline.store(
+                        "orf",
+                        selected_orf,
+                        parameters=selected_orf.get(
+                            "search_parameters", {}
+                        ),
+                    )
+
                     print()
                     print("=" * 68)
                     print("ORF CONNECTED TO PIPELINE")
@@ -403,6 +464,11 @@ while True:
                     print(
                         f"Protein:  {selected_orf['protein_length']} aa"
                     )
+                    print(
+                        f"Location: {selected_orf['start'] + 1}-"
+                        f"{selected_orf['stop'] + 1} "
+                        f"({selected_orf['strand']} strand, 1-based)"
+                    )
                     print()
                     print("✓ ORF stored in pipeline")
                     print("✓ RNA can use this ORF")
@@ -415,18 +481,7 @@ while True:
 
             except Exception as error:
 
-                print()
-                print("=" * 68)
-                print("ORF ANALYSIS ERROR")
-                print("=" * 68)
-                print()
-                print(
-                    f"{type(error).__name__}: {error}"
-                )
-
-                input(
-                    "\nPress Enter to continue..."
-                )
+                report_error("ORF ANALYSIS ERROR", error)
 
 
         # ====================================================
@@ -445,60 +500,17 @@ while True:
                     header=header,
                 )
 
+                # The RNA module prints the pipeline connection itself and
+                # stores the result (core.pipeline.store_rna_analysis).
                 if rna_analysis is not None:
-
-                    print()
-                    print("=" * 68)
-                    print("RNA CONNECTED TO PIPELINE")
-                    print("=" * 68)
-                    print()
-
-                    source = (
-                        rna_analysis
-                        .get("pipeline_input", {})
-                        .get("source", "Unknown")
-                    )
-
-                    print(
-                        f"Source: {source}"
-                    )
-
-                    print(
-                        f"RNA Length: "
-                        f"{len(rna_analysis.get('rna', ''))} nt"
-                    )
-
-                    print(
-                        "✓ RNA analysis stored in pipeline"
-                    )
-
-                    if selected_orf is not None:
-                        print(
-                            "✓ Selected ORF was used as RNA input"
-                        )
-                    else:
-                        print(
-                            "✓ Full DNA sequence was used as RNA input"
-                        )
-
-                    input(
-                        "\nPress Enter to continue..."
+                    logger.info(
+                        "RNA analysis stored (source: %s)",
+                        rna_analysis.get("pipeline_input", {}).get("source"),
                     )
 
             except Exception as error:
 
-                print()
-                print("=" * 68)
-                print("RNA ANALYSIS ERROR")
-                print("=" * 68)
-                print()
-                print(
-                    f"{type(error).__name__}: {error}"
-                )
-
-                input(
-                    "\nPress Enter to continue..."
-                )
+                report_error("RNA ANALYSIS ERROR", error)
 
 
         # ====================================================
@@ -570,22 +582,12 @@ while True:
                     strand=strand,
                     reading_frame=reading_frame,
                     orf_status=orf_status,
+                    pipeline=pipeline,
                 )
 
             except Exception as error:
 
-                print()
-                print("=" * 68)
-                print("PROTEIN ANALYSIS ERROR")
-                print("=" * 68)
-                print()
-                print(
-                    f"{type(error).__name__}: {error}"
-                )
-
-                input(
-                    "\nPress Enter to continue..."
-                )
+                report_error("PROTEIN ANALYSIS ERROR", error)
 
 
         # ====================================================
@@ -607,18 +609,7 @@ while True:
 
             except Exception as error:
 
-                print()
-                print("=" * 68)
-                print("RESTRICTION & CLONING ERROR")
-                print("=" * 68)
-                print()
-                print(
-                    f"{type(error).__name__}: {error}"
-                )
-
-                input(
-                    "\nPress Enter to continue..."
-                )
+                report_error("RESTRICTION & CLONING ERROR", error)
 
 
         # ====================================================
@@ -638,18 +629,7 @@ while True:
 
             except Exception as error:
 
-                print()
-                print("=" * 68)
-                print("PRIMER DESIGN ERROR")
-                print("=" * 68)
-                print()
-                print(
-                    f"{type(error).__name__}: {error}"
-                )
-
-                input(
-                    "\nPress Enter to continue..."
-                )
+                report_error("PRIMER DESIGN ERROR", error)
 
 
         # ====================================================
@@ -670,18 +650,7 @@ while True:
 
             except Exception as error:
 
-                print()
-                print("=" * 68)
-                print("MUTATION & VARIANT ANALYSIS ERROR")
-                print("=" * 68)
-                print()
-                print(
-                    f"{type(error).__name__}: {error}"
-                )
-
-                input(
-                    "\nPress Enter to continue..."
-                )
+                report_error("MUTATION & VARIANT ANALYSIS ERROR", error)
 
 
         # ====================================================
@@ -693,26 +662,35 @@ while True:
 
             try:
 
-                crispr_menu(
+                crispr_result = crispr_menu(
                     sequence=dna,
                     sequence_name=header,
                     selected_orf=selected_orf,
                 )
 
+                if crispr_result is not None:
+                    pipeline.store(
+                        "crispr",
+                        crispr_result,
+                        parameters={
+                            "system": crispr_result.system.name,
+                            "region": (
+                                f"{crispr_result.region.start}-"
+                                f"{crispr_result.region.end}"
+                            ),
+                            "feature_type": crispr_result.region.feature_type,
+                        },
+                        limitations=[
+                            "Guide ranking is a sequence-level heuristic, "
+                            "not an editing-efficiency prediction.",
+                            "Off-target screening covers only supplied "
+                            "sequences, not a genome.",
+                        ],
+                    )
+
             except Exception as error:
 
-                print()
-                print("=" * 68)
-                print("CRISPR GUIDE DESIGN ERROR")
-                print("=" * 68)
-                print()
-                print(
-                    f"{type(error).__name__}: {error}"
-                )
-
-                input(
-                    "\nPress Enter to continue..."
-                )
+                report_error("CRISPR GUIDE DESIGN ERROR", error)
 
 
         # ====================================================
@@ -724,26 +702,28 @@ while True:
 
             try:
 
-                blast_menu(
+                blast_run = blast_menu(
                     sequence=dna,
                     sequence_name=header,
                     selected_orf=selected_orf,
                 )
 
+                if blast_run is not None:
+                    from dataclasses import asdict as _asdict
+
+                    pipeline.store(
+                        "blast",
+                        blast_run,
+                        parameters=_asdict(blast_run.metadata),
+                        limitations=[
+                            "BLAST hits show sequence similarity; they do "
+                            "not prove function, orthology or identity.",
+                        ],
+                    )
+
             except Exception as error:
 
-                print()
-                print("=" * 68)
-                print("BLAST SEARCH ERROR")
-                print("=" * 68)
-                print()
-                print(
-                    f"{type(error).__name__}: {error}"
-                )
-
-                input(
-                    "\nPress Enter to continue..."
-                )
+                report_error("BLAST SEARCH ERROR", error)
 
 
         # ====================================================
@@ -759,18 +739,7 @@ while True:
 
             except Exception as error:
 
-                print()
-                print("=" * 68)
-                print("LITERATURE SEARCH ERROR")
-                print("=" * 68)
-                print()
-                print(
-                    f"{type(error).__name__}: {error}"
-                )
-
-                input(
-                    "\nPress Enter to continue..."
-                )
+                report_error("LITERATURE SEARCH ERROR", error)
 
 
         # ====================================================
@@ -784,6 +753,20 @@ while True:
                 "\nAI Experiment Planner "
                 "is coming soon."
             )
+
+            input(
+                "\nPress Enter to continue..."
+            )
+
+
+        # ====================================================
+        # P - PIPELINE STATUS
+        # ====================================================
+
+
+        elif choice == "P":
+
+            pipeline.print_status()
 
             input(
                 "\nPress Enter to continue..."

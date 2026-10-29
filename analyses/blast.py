@@ -4018,7 +4018,7 @@ def blast_menu(
     sequence: Optional[str] = None,
     sequence_name: str = "Selected Sequence",
     selected_orf: Optional[Any] = None,
-) -> None:
+) -> Optional[BlastRun]:
     """
     Interactive Synapse BLAST Search menu.
 
@@ -4093,7 +4093,8 @@ def blast_menu(
         choice = input("Selection: ").strip()
 
         if choice == "0":
-            return
+            # Returned to main.py so the run can be stored in the pipeline.
+            return last_run
 
         if choice == "1":
             print("\r\nQUERY SOURCE")

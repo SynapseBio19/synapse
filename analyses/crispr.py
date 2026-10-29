@@ -2135,8 +2135,8 @@ def crispr_menu(
     sequence: Optional[str] = None,
     sequence_name: str = "Selected Sequence",
     selected_orf: Optional[Any] = None,
-) -> None:
-    """Interactive Synapse CRISPR menu.
+) -> Optional[DesignResult]:
+    """Interactive Synapse CRISPR menu. Returns the last design result (or None).
 
     The analysis engine remains fully featured, while the user interface groups
     closely related operations into a smaller set of professional workflows.
@@ -2452,7 +2452,8 @@ def crispr_menu(
         choice = input("Selection: ").strip()
 
         if choice == "0":
-            return
+            # Returned to main.py so the result can be stored in the pipeline.
+            return last_result
 
         if choice == "1":
             sequence_context_menu()

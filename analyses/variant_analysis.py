@@ -2182,7 +2182,7 @@ def run_variant_analysis_ui(
             return None
         last_result = analyze_variants(working, name=name)
         if pipeline is not None:
-            _store_variant_pipeline_result(pipeline, "variant_analysis", last_result.to_dict())
+            _store_variant_pipeline_result(pipeline, "variant", last_result.to_dict())
         return last_result
 
     while True:
@@ -2419,6 +2419,10 @@ def run_variant_analysis_ui(
 
 def _store_variant_pipeline_result(pipeline, key: str, value: object) -> None:
     """Store a result without making the pipeline a hard dependency."""
+    import logging
+    logger = logging.getLogger("synapse.variant")
+    if pipeline is None:
+        return
     try:
         if hasattr(pipeline, "store") and callable(pipeline.store):
             pipeline.store(key, value)
@@ -2426,9 +2430,12 @@ def _store_variant_pipeline_result(pipeline, key: str, value: object) -> None:
             pipeline.results[key] = value
         elif isinstance(pipeline, dict):
             pipeline[key] = value
+        else:
+            logger.warning("Pipeline object has no result store; %s result not stored.", key)
     except Exception:
-        # Analysis success must not be lost because pipeline integration differs.
-        pass
+        # Analysis success must not be lost because pipeline integration
+        # differs, but the failure is logged (audit Phase V).
+        logger.exception("Could not store %s result in the pipeline.", key)
 
 
 # ============================================================================

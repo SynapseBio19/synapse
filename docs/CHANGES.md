@@ -144,3 +144,39 @@ literature and primer did not change.
   "Heuristic score" (it is not a probability).
 - Visible consequence: short ORFs (< 75 nt, e.g. TEST_8_SNP_NONSENSE, 45 nt)
   are no longer listed unless the minimum length is lowered.
+
+## Stage 2 – shared data model, visible result storage, input, logging (2026-10-30)
+
+No scientific algorithm changed in this stage; all golden snapshots are
+unchanged.
+
+- `core/models.py`: `Interval` (0-based half-open + strand, with explicit
+  1-based conversions), `Feature`, `SequenceRecord` (sequence + provenance:
+  file path, format, file SHA-256, sequence SHA-256, topology) and
+  `AnalysisResult` (module, data, parameters, input hash, warnings,
+  limitations, timestamp, Synapse and Python version).
+- `core/seqtools.py`: shared reverse complement / IUPAC helpers and NCBI
+  genetic codes 1, 2, 4 and 11 in NCBI's compact table format. Table 1 is
+  verified against all four independently written codon tables already in
+  the project (test). Not yet used by the older modules (Stage 4).
+- `core/pipeline.py`: generic result store (`store`, `store_result`,
+  `latest`, `results`), `store_primer_analysis`, provenance via
+  `attach_record`; changing the selected ORF invalidates ORF-dependent
+  results (RNA, protein, CRISPR, BLAST). Status view lists all 12 modules,
+  the sequence SHA-256 and the source file.
+- Results that were previously discarded are now stored: primer, mutation,
+  variant (wrong method/keys before), protein (no pipeline passed), CRISPR
+  and BLAST (menus now return their last result to `main.py`).
+- Silent `except: pass` around result storage replaced by logged warnings.
+- `fileio/loader.py` + `fileio/genbank.py`: load FASTA or GenBank chosen by
+  the user (previously only `examples/dna.fasta`). GenBank topology from
+  LOCUS; FASTA `topology=circular` header token; file SHA-256 recorded.
+  GenBank location parsing covers simple spans, complement and join; other
+  forms keep only the raw string (documented limitation).
+- `core/logging_setup.py`: rotating log file `logs/synapse.log`; `main.py`
+  errors show a short message and write the traceback to the log.
+- UI: sequence list shows length and topology; `[F]` loads another file;
+  `[P]` shows pipeline status; ORF confirmation shows the 1-based location
+  and strand; duplicated "RNA CONNECTED" message removed from `main.py`.
+- Tests: `tests/test_stage2_foundation.py` (15 tests) and an end-to-end
+  menu test `tests/test_main_smoke.py` (ORF -> RNA -> protein -> status).

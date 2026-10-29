@@ -25,6 +25,7 @@ def show_menu():
 
     print("-" * 60)
 
+    print("[P] Pipeline Status & Stored Results")
     print("[S] Select Another Sequence")
 
     print("-" * 60)
@@ -43,11 +44,18 @@ def select_gene(sequences):
     print("\nLoaded Genes\n")
 
     for index, record in enumerate(sequences, start=1):
-        print(f"[{index}] {record['header']}")
+        topology = record.get("topology", "linear")
+        length = len(record.get("sequence", ""))
+        print(f"[{index}] {record['header']}  ({length} bp, {topology})")
+
+    print("\n[F] Load another file")
 
     while True:
 
-        choice = input("\nSelect a gene: ")
+        choice = input("\nSelect a sequence: ").strip()
+
+        if choice.upper() == "F":
+            return None, None
 
         if choice.isdigit():
 

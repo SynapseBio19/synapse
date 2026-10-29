@@ -16,8 +16,17 @@
 #
 # ============================================================
 
+import logging
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any, Dict, List, Optional
+
+from core.models import AnalysisResult, SequenceRecord, sha256_text
+
+logger = logging.getLogger("synapse.pipeline")
+
+# Modules whose results depend on the selected ORF; they are invalidated when
+# the ORF selection changes.
+ORF_DEPENDENT_MODULES = ("rna", "protein", "crispr", "blast")
 
 
 # ============================================================
@@ -40,6 +49,10 @@ class PipelineContext:
     header: str = ""
     sequence_id: Optional[int] = None
     topology: str = "linear"
+    record: Optional[SequenceRecord] = None
+
+    # Generic result store: module key -> list of AnalysisResult (newest last).
+    results: Dict[str, List[AnalysisResult]] = field(default_factory=dict)
 
     # --------------------------------------------------------
     # ANALYSIS RESULTS
@@ -107,6 +120,7 @@ class PipelineContext:
         self.header = header
         self.sequence_id = sequence_id
         self.topology = topology
+        self.record = None
 
         self.clear_results()
 
@@ -136,6 +150,8 @@ class PipelineContext:
         self.protein_source = None
         self.rna_source = None
 
+        self.results = {}
+
         self.completed = {
             "sequence": False,
             "orf": False,
@@ -160,12 +176,59 @@ class PipelineContext:
     # SEQUENCE
     # ========================================================
 
+    # ========================================================
+    # GENERIC RESULT STORE
+    # ========================================================
+
+    @property
+    def sequence_sha256(self) -> Optional[str]:
+        return sha256_text(self.sequence) if self.sequence else None
+
+    def store_result(self, result: AnalysisResult) -> AnalysisResult:
+        """Store an AnalysisResult under its module key (newest last)."""
+        if result.input_sequence_sha256 is None:
+            result.input_sequence_sha256 = self.sequence_sha256
+        if not result.input_description:
+            result.input_description = self.header
+        self.results.setdefault(result.module, []).append(result)
+        self.completed[result.module] = True
+        logger.info("Stored %s result (%d total)", result.module, len(self.results[result.module]))
+        return result
+
+    def store(
+        self,
+        module: str,
+        data: Any,
+        parameters: Optional[Dict[str, Any]] = None,
+        warnings: Optional[List[str]] = None,
+        limitations: Optional[List[str]] = None,
+    ) -> AnalysisResult:
+        """Wrap ``data`` in an AnalysisResult and store it."""
+        return self.store_result(
+            AnalysisResult(
+                module=str(module),
+                data=data,
+                parameters=dict(parameters or {}),
+                warnings=list(warnings or []),
+                limitations=list(limitations or []),
+            )
+        )
+
+    def latest(self, module: str) -> Optional[AnalysisResult]:
+        entries = self.results.get(module) or []
+        return entries[-1] if entries else None
+
+    # ========================================================
+    # SEQUENCE
+    # ========================================================
+
     def store_sequence_analysis(
         self,
         result: Any
     ):
         self.sequence_analysis = result
         self.completed["sequence"] = True
+        self.store("sequence", result)
 
     # ========================================================
     # ORF
@@ -177,6 +240,7 @@ class PipelineContext:
     ):
         self.orf_analysis = result
         self.completed["orf"] = True
+        self.store("orf", result, parameters=(result or {}).get("parameters", {}) if isinstance(result, dict) else {})
 
     def set_selected_orf(
         self,
@@ -203,6 +267,10 @@ class PipelineContext:
         self.completed["rna"] = False
         self.completed["protein"] = False
 
+        for module in ORF_DEPENDENT_MODULES:
+            if self.results.pop(module, None):
+                logger.info("ORF selection changed: cleared stored %s results", module)
+
     # ========================================================
     # RNA
     # ========================================================
@@ -215,6 +283,8 @@ class PipelineContext:
         self.rna_analysis = result
         self.rna_sequence = rna_sequence
         self.completed["rna"] = True
+        source = (result or {}).get("pipeline_input", {}).get("source") if isinstance(result, dict) else None
+        self.store("rna", result, parameters={"source": source or self.rna_source})
 
     # ========================================================
     # PROTEIN
@@ -228,6 +298,7 @@ class PipelineContext:
         self.protein_analysis = result
         self.protein_sequence = protein_sequence
         self.completed["protein"] = True
+        self.store("protein", result, parameters={"source": self.protein_source})
 
     # ========================================================
     # RESTRICTION
@@ -239,6 +310,7 @@ class PipelineContext:
     ):
         self.restriction_analysis = result
         self.completed["restriction"] = True
+        self.store("restriction", result)
 
     # ========================================================
     # CLONING
@@ -250,6 +322,7 @@ class PipelineContext:
     ):
         self.cloning_analysis = result
         self.completed["cloning"] = True
+        self.store("cloning", result)
 
     def store_cloning_planner(
         self,
@@ -257,6 +330,29 @@ class PipelineContext:
     ):
         self.cloning_planner = result
         self.completed["cloning"] = True
+        self.store("cloning", result, parameters={"mode": "automatic planner"})
+
+    # ========================================================
+    # PRIMER (called by analyses.primer UI)
+    # ========================================================
+
+    def store_primer_analysis(
+        self,
+        result: Any
+    ):
+        parameters = {}
+        for name in ("tm_method", "target_start", "target_end"):
+            if hasattr(result, name):
+                parameters[name] = getattr(result, name)
+        conditions = getattr(result, "thermodynamic_conditions", None)
+        if conditions is not None:
+            try:
+                from dataclasses import asdict as _asdict
+                parameters["thermodynamic_conditions"] = _asdict(conditions)
+            except TypeError:
+                parameters["thermodynamic_conditions"] = conditions
+        warnings = list(getattr(result, "warnings", []) or [])
+        self.store("primer", result, parameters=parameters, warnings=warnings)
 
     # ========================================================
     # STATUS
@@ -330,6 +426,12 @@ class PipelineContext:
             "protein": "Protein Analysis",
             "restriction": "Restriction Analysis",
             "cloning": "Cloning Analysis",
+            "primer": "Primer Design",
+            "mutation": "Mutation Analysis",
+            "variant": "Variant Analysis",
+            "crispr": "CRISPR Guide Design",
+            "blast": "BLAST Search",
+            "literature": "Literature Search",
         }
 
         print()
@@ -355,6 +457,18 @@ class PipelineContext:
             f"Topology:     "
             f"{self.topology}"
         )
+
+        if self.sequence:
+            print(
+                f"SHA-256:      "
+                f"{self.sequence_sha256[:16]}..."
+            )
+
+        if self.record is not None and self.record.source_path:
+            print(
+                f"Source file:  "
+                f"{self.record.source_path}"
+            )
 
         if self.selected_orf is not None:
 
@@ -383,9 +497,10 @@ class PipelineContext:
 
         for key, label in labels.items():
 
+            count = len(self.results.get(key, []))
             state = (
-                "COMPLETED"
-                if self.completed[key]
+                f"COMPLETED ({count} stored)"
+                if count
                 else "NOT RUN"
             )
 
@@ -428,6 +543,30 @@ class SynapsePipeline:
                 sequence_id=sequence_id,
                 topology=topology,
             )
+
+    # ========================================================
+    # RESULT STORE (delegates to the context)
+    # ========================================================
+
+    def attach_record(self, record: SequenceRecord) -> None:
+        """Attach provenance (file, hash, topology) for the loaded sequence."""
+        if record.sequence != self.context.sequence:
+            raise ValueError("SequenceRecord does not match the loaded sequence.")
+        self.context.record = record
+        self.context.topology = record.topology
+
+    def store(self, module: str, data: Any, **kwargs) -> AnalysisResult:
+        return self.context.store(module, data, **kwargs)
+
+    def store_result(self, result: AnalysisResult) -> AnalysisResult:
+        return self.context.store_result(result)
+
+    @property
+    def results(self) -> Dict[str, List[AnalysisResult]]:
+        return self.context.results
+
+    def latest(self, module: str) -> Optional[AnalysisResult]:
+        return self.context.latest(module)
 
     # ========================================================
     # LOAD SEQUENCE

@@ -3742,8 +3742,19 @@ def _store_pipeline_result(
 
             pipeline[key] = value
 
+        else:
+            import logging
+            logging.getLogger("synapse.mutation").warning(
+                "Pipeline object has no result store; %s result not stored.", key
+            )
+
     except Exception:
-        pass
+        # Storing must never destroy a finished analysis, but the failure
+        # is logged instead of being hidden (audit Phase V).
+        import logging
+        logging.getLogger("synapse.mutation").exception(
+            "Could not store %s result in the pipeline.", key
+        )
 
 
 # ============================================================================
@@ -3883,7 +3894,7 @@ def run_mutation_analysis_ui(
 
                 _store_pipeline_result(
                     pipeline,
-                    "mutation_analysis",
+                    "mutation",
                     last_result.to_dict(),
                 )
 

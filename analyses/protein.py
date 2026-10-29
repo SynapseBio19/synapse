@@ -4696,9 +4696,13 @@ def run_protein_analysis_from_orf(
     strand=None,
     reading_frame=None,
     orf_status=None,
+    pipeline=None,
 ):
     """
     Start Protein Analysis from exactly one selected ORF.
+
+    When a pipeline is given, the complete protein analysis (computed with the
+    initiator-Met rule) is stored before the interactive menu opens.
 
     The complete DNA sequence is never used as a fallback.
     """
@@ -4772,6 +4776,19 @@ def run_protein_analysis_from_orf(
         )
 
         return
+
+    if pipeline is not None:
+        context = getattr(pipeline, "context", None)
+        try:
+            analysis = analyze_complete_protein("", rna=rna, initiator_start=True)
+            if context is not None:
+                context.protein_source = "Selected ORF"
+                context.store_protein_analysis(analysis, protein_sequence=analysis.get("protein", ""))
+        except Exception:
+            import logging
+            logging.getLogger("synapse.protein").exception(
+                "Could not store protein result in the pipeline."
+            )
 
     protein_analysis_menu(
         protein=protein,

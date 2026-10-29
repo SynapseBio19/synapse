@@ -4422,13 +4422,17 @@ def _primer_ui_store_result(pipeline, result):
     if pipeline is None:
         return
 
+    import logging
+    logger = logging.getLogger("synapse.primer")
     try:
         context = getattr(pipeline, "context", None)
         store = getattr(context, "store_primer_analysis", None)
         if callable(store):
             store(result)
+        else:
+            logger.warning("Pipeline has no store_primer_analysis(); primer result not stored.")
     except Exception:
-        pass
+        logger.exception("Could not store primer result in the pipeline.")
 
 
 def _primer_ui_read_target(sequence):
