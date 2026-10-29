@@ -541,6 +541,11 @@ class BlastRunMetadata:
     warnings: List[str] = field(default_factory=list)
     engine: str = "NCBI Remote"
     local_database_path: Optional[str] = None
+    # Effective parameters as reported by BLAST in its XML output
+    # (expect, scoring, gap costs, filter) - the values actually used.
+    reported_parameters: Dict[str, Any] = field(default_factory=dict)
+    # Database provenance (local: blastdbcmd -info; remote: NCBI statistics).
+    database_details: Dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -1063,6 +1068,7 @@ class LocalBlastDatabase:
     sequence_count: Optional[int] = None
     total_length: Optional[int] = None
     blastdb_version: Optional[str] = None
+    database_date: Optional[str] = None
     volumes: List[str] = field(default_factory=list)
     volume_paths: List[str] = field(default_factory=list)
     volume_count: int = 0
@@ -1226,8 +1232,13 @@ def _parse_blastdbcmd_info(output: str) -> Dict[str, Any]:
         "sequence_count": None,
         "total_length": None,
         "blastdb_version": None,
+        "database_date": None,
         "volumes": [],
     }
+
+    date_match = re.search(r"^\s*Date:\s*(.+?)(?:\t|\s{2,}Longest|$)", text, re.MULTILINE)
+    if date_match:
+        info["database_date"] = date_match.group(1).strip()
 
     database_match = re.search(r"^Database:\s*(.+)$", text, re.MULTILINE)
     if database_match:
@@ -2075,6 +2086,7 @@ class LocalBlastDatabaseManager:
             database.sequence_count = parsed["sequence_count"]
             database.total_length = parsed["total_length"]
             database.blastdb_version = parsed["blastdb_version"]
+            database.database_date = parsed.get("database_date")
             database.volumes = parsed["volumes"]
             database.verification_status = "VERIFIED"
             database.verification_message = output.strip() or "blastdbcmd verification succeeded."
@@ -2718,6 +2730,16 @@ class LocalBlastEngine:
         run.metadata.engine = "Local BLAST+"
         run.metadata.local_database_path = database.path
         run.metadata.ncbi_status = "LOCAL_COMPLETE"
+        run.metadata.database_details = {
+            "name": database.name,
+            "title": database.title,
+            "database_date": database.database_date,
+            "blastdb_version": database.blastdb_version,
+            "sequence_count": database.sequence_count,
+            "total_length": database.total_length,
+            "files_modified_at": database.modified_at,
+            "verification_status": database.verification_status,
+        }
         if stderr:
             run.metadata.warnings.append(stderr[-2000:])
         run.interpretation_notes.append(
@@ -2975,6 +2997,8 @@ def parse_blast_xml(
     for hit_element in _descendants(root, "Hit"):
         hits.append(_parse_hit(hit_element, query_length=query.length))
 
+    statistics = _parse_database_statistics(root)
+
     metadata = BlastRunMetadata(
         rid=rid,
         submitted_at_utc=submitted_at,
@@ -2992,6 +3016,16 @@ def parse_blast_xml(
         ncbi_status="READY",
         ncbi_version=version,
         ncbi_database_reported=database_reported,
+        reported_parameters=_parse_parameters(root),
+        database_details={
+            "reported_name": database_reported,
+            "sequence_count": statistics.get("db-num"),
+            "total_length": statistics.get("db-len"),
+            "note": (
+                "BLAST XML does not state the database release date; the "
+                "search timestamp identifies the database state for remote runs."
+            ),
+        },
     )
 
     notes = [
@@ -3007,7 +3041,7 @@ def parse_blast_xml(
         metadata=metadata,
         query=query,
         hits=hits,
-        database_statistics=_parse_database_statistics(root),
+        database_statistics=statistics,
         interpretation_notes=notes,
     )
 
@@ -4322,6 +4356,16 @@ def blast_menu(
                     )
                 else:
                     normalized = parameters.normalized()
+                    print("\r\nPRIVACY NOTICE")
+                    print(
+                        "The query sequence will be sent to NCBI (blast.ncbi.nlm.nih.gov) "
+                        "and processed on NCBI servers. Do not submit confidential or "
+                        "unpublished sequences unless this is acceptable."
+                    )
+                    confirm = input("Send this query to NCBI? [y/N]: ").strip().lower()
+                    if confirm not in {"y", "yes", "j", "ja"}:
+                        print("Remote search cancelled.")
+                        continue
                     print("\r\nSubmitting BLAST search to NCBI...")
                     print("The search may take several seconds or longer.")
                     client = NCBIBlastClient(

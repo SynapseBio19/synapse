@@ -171,37 +171,105 @@ class Variant:
         return asdict(self)
 
 
+# VCF 4.3 reserved field cardinalities (spec sections 1.6.1 and 1.6.2). Used
+# when the file header does not declare a field.
+RESERVED_INFO_NUMBER = {
+    "AA": "1", "AC": "A", "AD": "R", "ADF": "R", "ADR": "R", "AF": "A",
+    "AN": "1", "BQ": "1", "CIGAR": "A", "DB": "0", "DP": "1", "END": "1",
+    "H2": "0", "H3": "0", "MQ": "1", "MQ0": "1", "NS": "1", "SB": "4",
+    "SOMATIC": "0", "VALIDATED": "0", "1000G": "0",
+}
+RESERVED_FORMAT_NUMBER = {
+    "AD": "R", "ADF": "R", "ADR": "R", "DP": "1", "EC": "A", "FT": "1",
+    "GL": "G", "GP": "G", "GQ": "1", "GT": "1", "HQ": "2", "MQ": "1",
+    "PL": "G", "PQ": "1", "PS": "1",
+}
+
+_HEADER_FIELD_RE = re.compile(r"^##(INFO|FORMAT)=<(.*)>$")
+
+
+def parse_vcf_header_numbers(metadata: Sequence[str]) -> Dict[str, Dict[str, str]]:
+    """Return {"INFO": {ID: Number}, "FORMAT": {ID: Number}} from ## header lines."""
+    numbers: Dict[str, Dict[str, str]] = {"INFO": {}, "FORMAT": {}}
+    for line in metadata:
+        match = _HEADER_FIELD_RE.match(line.strip())
+        if not match:
+            continue
+        section, body = match.groups()
+        fields = dict(
+            (key.strip(), value.strip())
+            for key, _, value in (
+                part.partition("=") for part in re.split(r",(?=[A-Za-z]+=)", body)
+            )
+        )
+        if "ID" in fields and "Number" in fields:
+            numbers[section][fields["ID"]] = fields["Number"]
+    return numbers
+
+
+def _field_number(section: str, key: str, header_numbers: Optional[Mapping[str, Mapping[str, str]]]) -> Optional[str]:
+    if header_numbers and key in header_numbers.get(section, {}):
+        return header_numbers[section][key]
+    reserved = RESERVED_INFO_NUMBER if section == "INFO" else RESERVED_FORMAT_NUMBER
+    return reserved.get(key)
+
+
+def _genotype_index(j: int, k: int) -> int:
+    """VCF ordering of diploid genotype j/k (j <= k): F(j,k) = k(k+1)/2 + j."""
+    return k * (k + 1) // 2 + j
+
+
 def _select_allele_specific_info(
     info: Mapping[str, Any],
     alt_index: int,
     alt_count: int,
+    header_numbers: Optional[Mapping[str, Mapping[str, str]]] = None,
 ) -> Dict[str, Any]:
     """Select allele-specific INFO values when splitting a multi-allelic record.
 
-    For standard VCF ``Number=A`` fields, values are stored once per ALT allele.
-    This helper handles list-valued fields conservatively: when the list length
-    matches the number of ALT alleles, the value for the selected ALT is used.
-    Other list-valued fields are retained unchanged because their cardinality
-    cannot safely be inferred without the VCF header definitions.
+    Cardinality comes from the ``##INFO`` header or, for reserved keys, the
+    VCF 4.3 specification: Number=A keeps the selected ALT's value, Number=R
+    keeps [REF, selected ALT]. Undeclared list fields fall back to the
+    previous heuristic (list length == ALT count -> treated as Number=A).
     """
     selected: Dict[str, Any] = {}
     for key, value in info.items():
-        if isinstance(value, (list, tuple)) and len(value) == alt_count:
-            selected[key] = value[alt_index - 1]
+        if not isinstance(value, (list, tuple)):
+            selected[key] = value
+            continue
+        values = list(value)
+        number = _field_number("INFO", key, header_numbers)
+        if number == "A" and len(values) == alt_count:
+            selected[key] = values[alt_index - 1]
+        elif number == "R" and len(values) == alt_count + 1:
+            selected[key] = [values[0], values[alt_index]]
+        elif number is None and len(values) == alt_count:
+            selected[key] = values[alt_index - 1]
         else:
-            selected[key] = list(value) if isinstance(value, tuple) else value
+            selected[key] = values
     return selected
 
 
 def _remap_sample_data_for_alt(
     values: Mapping[str, str],
     alt_index: int,
+    alt_count: Optional[int] = None,
+    header_numbers: Optional[Mapping[str, Mapping[str, str]]] = None,
 ) -> Dict[str, str]:
-    """Remap GT and common allele-specific sample fields for one ALT allele."""
+    """Remap GT and allele-specific sample fields for one ALT allele.
+
+    GT: the selected ALT becomes 1; REF stays 0; every other ALT is shown as
+    0 (REF-masked, the same convention as ``bcftools norm -m-``).
+    Number=R fields (e.g. AD) keep [REF, ALT]; Number=A keep the ALT value;
+    Number=G fields (e.g. PL, GL, GP) keep the genotypes 0/0, 0/a, a/a for a
+    diploid call (or 0, a for a haploid call), using the VCF genotype order.
+    """
     remapped = dict(values)
+    ploidy = None
     gt = values.get("GT")
     if gt not in (None, "", "."):
         tokens = GT_ALLELE_SEPARATOR_RE.split(gt)
+        ploidy = len(tokens)
         separator = "|" if "|" in gt else "/"
         new_tokens: List[str] = []
         for token in tokens:
@@ -221,12 +289,25 @@ def _remap_sample_data_for_alt(
                     new_tokens.append("0")
         remapped["GT"] = separator.join(new_tokens)
 
-    # AD is conventionally REF, ALT1, ALT2, ... . After splitting, keep REF
-    # and the selected ALT depth. This is safe for the common diploid VCF case.
-    if "AD" in values and isinstance(values["AD"], str) and values["AD"] not in ("", "."):
-        parts = values["AD"].split(",")
-        if len(parts) > alt_index:
-            remapped["AD"] = f"{parts[0]},{parts[alt_index]}"
+    for key, raw in values.items():
+        if key == "GT" or not isinstance(raw, str) or raw in ("", "."):
+            continue
+        number = _field_number("FORMAT", key, header_numbers)
+        parts = raw.split(",")
+        if number == "R" and len(parts) > alt_index:
+            remapped[key] = f"{parts[0]},{parts[alt_index]}"
+        elif number == "A" and alt_count and len(parts) == alt_count:
+            remapped[key] = parts[alt_index - 1]
+        elif number == "G" and alt_count:
+            if ploidy == 1 and len(parts) == alt_count + 1:
+                remapped[key] = f"{parts[0]},{parts[alt_index]}"
+            elif ploidy in (None, 2) and len(parts) == _genotype_index(alt_count, alt_count) + 1:
+                keep = (
+                    _genotype_index(0, 0),
+                    _genotype_index(0, alt_index),
+                    _genotype_index(alt_index, alt_index),
+                )
+                remapped[key] = ",".join(parts[i] for i in keep)
 
     return remapped
 
@@ -245,6 +326,7 @@ class VariantRecord:
     info: Dict[str, Any] = field(default_factory=dict)
     format_keys: List[str] = field(default_factory=list)
     sample_data: Dict[str, Dict[str, str]] = field(default_factory=dict)
+    header_numbers: Optional[Dict[str, Dict[str, str]]] = None
 
     def split(self) -> List[Variant]:
         """Split a multi-allelic record into independent biallelic variants.
@@ -258,9 +340,13 @@ class VariantRecord:
         for alt_index, alt in enumerate(self.alternatives, start=1):
             if not alt or alt == ".":
                 continue
-            info = _select_allele_specific_info(self.info, alt_index, len(self.alternatives))
+            info = _select_allele_specific_info(
+                self.info, alt_index, len(self.alternatives), self.header_numbers
+            )
             sample_data = {
-                sample: _remap_sample_data_for_alt(values, alt_index)
+                sample: _remap_sample_data_for_alt(
+                    values, alt_index, len(self.alternatives), self.header_numbers
+                )
                 for sample, values in self.sample_data.items()
             }
             variants.append(
@@ -327,6 +413,7 @@ class VariantStatistics:
     unknown: int = 0
     passed_filters: int = 0
     failed_filters: int = 0
+    unfiltered: int = 0
     missing_quality: int = 0
     mean_quality: Optional[float] = None
     median_quality: Optional[float] = None
@@ -625,6 +712,7 @@ def parse_vcf(
     variants: List[Variant] = []
     metadata: List[str] = []
     sample_names: List[str] = []
+    header_numbers: Optional[Dict[str, Dict[str, str]]] = None
 
     for raw_line in text.splitlines():
         line = raw_line.rstrip("\n\r")
@@ -639,6 +727,7 @@ def parse_vcf(
             columns = line.split("\t")
             if len(columns) > 9:
                 sample_names = columns[9:]
+            header_numbers = parse_vcf_header_numbers(metadata)
             continue
 
         if line.startswith("#"):
@@ -683,6 +772,7 @@ def parse_vcf(
             info=info,
             format_keys=format_keys,
             sample_data=sample_data,
+            header_numbers=header_numbers,
         )
 
         if split_multiallelic:
@@ -707,6 +797,14 @@ def parse_vcf(
 
 
 def parse_vcf_file(path: str, *, split_multiallelic: bool = True):
+    """Parse a VCF file; ``.gz``/BGZF-compressed files are read transparently."""
+    import gzip
+
+    with open(path, "rb") as probe:
+        magic = probe.read(2)
+    if magic == b"\x1f\x8b":
+        with gzip.open(path, "rt", encoding="utf-8") as handle:
+            return parse_vcf(handle.read(), split_multiallelic=split_multiallelic)
     with open(path, "r", encoding="utf-8") as handle:
         return parse_vcf(handle.read(), split_multiallelic=split_multiallelic)
 
@@ -861,11 +959,50 @@ def normalize_variants(
     variants: Sequence[Variant],
     *,
     reference_sequence: Optional[str] = None,
+    contig_references: Optional[Mapping[str, str]] = None,
 ) -> List[Variant]:
-    return [
-        left_normalize_variant(v, reference_sequence=reference_sequence)
-        for v in variants
-    ]
+    """Normalize variants.
+
+    ``contig_references`` maps CHROM names to reference sequences; variants on
+    an unmapped contig are only trimmed (no repeat-aware shift, no REF check).
+    ``reference_sequence`` applies one reference to every variant (legacy use).
+    """
+    normalized = []
+    for v in variants:
+        reference = reference_sequence
+        if contig_references is not None:
+            reference = contig_references.get(v.chromosome)
+        normalized.append(left_normalize_variant(v, reference_sequence=reference))
+    return normalized
+
+
+def check_reference_alleles(
+    variants: Sequence[Variant],
+    contig_references: Mapping[str, str],
+) -> Dict[str, Any]:
+    """Compare REF alleles with reference sequences (1-based VCF positions).
+
+    Returns counts and the list of mismatching variant keys; mismatches are
+    flagged in ``variant.annotation["validation_flags"]``.
+    """
+    checked = mismatched = unmapped = 0
+    mismatches: List[Tuple[str, int, str, str]] = []
+    for variant in variants:
+        reference = contig_references.get(variant.chromosome)
+        if reference is None or not validate_allele(variant.reference, allow_symbolic=False):
+            unmapped += 1
+            continue
+        reference = reference.upper()
+        observed = reference[variant.position - 1:variant.position - 1 + len(variant.reference)]
+        checked += 1
+        if len(observed) != len(variant.reference) or not _reference_allele_matches(variant.reference, observed):
+            mismatched += 1
+            mismatches.append(variant.key)
+            flags = variant.annotation.setdefault("validation_flags", [])
+            if "REF_MISMATCH" not in flags:
+                flags.append("REF_MISMATCH")
+    return {"checked": checked, "mismatched": mismatched, "not_checked": unmapped,
+            "mismatches": mismatches}
 
 
 # ============================================================================
@@ -1125,8 +1262,12 @@ def calculate_variant_statistics(
         else:
             stats.unknown += 1
 
+        # VCF FILTER: "PASS" = passed all filters; "." = filters not
+        # applied (not a failure); anything else names failed filters.
         if variant.filter_status == "PASS":
             stats.passed_filters += 1
+        elif variant.filter_status in {"UNFILTERED", "UNKNOWN", "."}:
+            stats.unfiltered += 1
         else:
             stats.failed_filters += 1
 
@@ -1606,7 +1747,8 @@ def build_variant_report(
         "QUALITY",
         "-" * 70,
         f"PASS:              {s.passed_filters}",
-        f"Non-PASS:          {s.failed_filters}",
+        f"Failed filters:    {s.failed_filters}",
+        f"Not filtered (.):  {s.unfiltered}",
         f"Missing QUAL:      {s.missing_quality}",
         f"Mean QUAL:         {'.' if s.mean_quality is None else f'{s.mean_quality:.2f}'}",
         f"Median QUAL:       {'.' if s.median_quality is None else f'{s.median_quality:.2f}'}",
@@ -2144,6 +2286,12 @@ def _print_filter_result(result: VariantFilterResult) -> None:
 
 def _load_vcf_text_interactive() -> Tuple[List[Variant], List[str], List[str]]:
     print()
+    path = input("VCF file path (.vcf or .vcf.gz; Enter to paste text instead): ").strip().strip('"')
+    if path:
+        try:
+            return parse_vcf_file(path)
+        except OSError as error:
+            raise VariantAnalysisError(f"Could not read VCF file: {error}") from error
     print("Paste VCF text. Enter an empty line to finish.")
     lines: List[str] = []
     while True:
@@ -2154,6 +2302,28 @@ def _load_vcf_text_interactive() -> Tuple[List[Variant], List[str], List[str]]:
     if not lines:
         raise VariantAnalysisError("No VCF text supplied.")
     return parse_vcf("\n".join(lines))
+
+
+def _prompt_contig_reference(pipeline, variants: Sequence[Variant]) -> Dict[str, str]:
+    """Optionally map one VCF contig to the sequence loaded in Synapse."""
+    context = getattr(pipeline, "context", None)
+    sequence = getattr(context, "sequence", "") if context is not None else ""
+    if not sequence:
+        print("No Synapse sequence loaded: variants are trimmed only (no REF check, no repeat shift).")
+        return {}
+    contigs = sorted({v.chromosome for v in variants})
+    header = getattr(context, "header", "") or "loaded sequence"
+    print()
+    print(f"Loaded Synapse sequence: {header} ({len(sequence)} bp)")
+    print(f"Contigs in the VCF: {', '.join(contigs)}")
+    print("VCF positions must be 1-based positions on this exact sequence.")
+    choice = input("Contig to map onto the loaded sequence (Enter = none): ").strip()
+    if not choice:
+        return {}
+    if choice not in contigs:
+        print(f"Contig '{choice}' is not in the VCF; no mapping used.")
+        return {}
+    return {choice: sequence}
 
 
 def run_variant_analysis_ui(
@@ -2361,7 +2531,14 @@ def run_variant_analysis_ui(
                 print("No variants loaded.")
                 continue
             try:
-                working = normalize_variants(working)
+                contig_map = _prompt_contig_reference(pipeline, working)
+                if contig_map:
+                    report = check_reference_alleles(working, contig_map)
+                    print(
+                        f"REF check against the loaded sequence: {report['checked']} checked, "
+                        f"{report['mismatched']} mismatch(es), {report['not_checked']} not checked."
+                    )
+                working = normalize_variants(working, contig_references=contig_map or {})
                 working = synchronize_variant_fields(working)
                 filtered_view = None
                 last_filter_result = None

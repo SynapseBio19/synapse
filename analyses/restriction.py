@@ -131,9 +131,17 @@ def recognition_site_matches(sequence, position, recognition_sequence):
     )
 
 
-def find_restriction_site_matches(sequence, enzyme_name):
-    """Return all sequence-compatible sites with CONFIRMED/POSSIBLE status."""
+def find_restriction_site_matches(sequence, enzyme_name, topology="linear"):
+    """Return all sequence-compatible sites with CONFIRMED/POSSIBLE status.
+
+    topology="circular" also finds recognition sites that span the origin
+    (end -> start junction); such sites have "wraps_origin": True and a
+    0-based "position" near the end of the sequence. Sites are searched on
+    the forward strand, which is complete for the palindromic enzymes in the
+    Synapse database.
+    """
     sequence = _require_valid_restriction_sequence(sequence)
+    circular = str(topology).lower() == "circular"
     enzyme = get_restriction_enzyme(enzyme_name)
 
     if enzyme is None:
@@ -148,10 +156,16 @@ def find_restriction_site_matches(sequence, enzyme_name):
 
     matches = []
 
+    search_space = sequence
+    last_start = len(sequence) - len(recognition)
+    if circular and len(sequence) >= len(recognition):
+        search_space = sequence + sequence[:len(recognition) - 1]
+        last_start = len(sequence) - 1
+
     for position in range(
-        len(sequence) - len(recognition) + 1
+        last_start + 1
     ):
-        fragment = sequence[
+        fragment = search_space[
             position:position + len(recognition)
         ]
 
@@ -178,6 +192,7 @@ def find_restriction_site_matches(sequence, enzyme_name):
             "ambiguous_offsets": ambiguous_offsets,
             "sequence": fragment,
             "recognition_sequence": recognition,
+            "wraps_origin": position + len(recognition) > len(sequence),
         })
 
     return matches
@@ -487,7 +502,7 @@ def create_restriction_map(sequence, enzyme_names=None):
     return sites
 
 
-def get_cut_positions(sequence, enzyme_names, include_possible=False):
+def get_cut_positions(sequence, enzyme_names, include_possible=False, topology="linear"):
     """Collect enzyme cut events while preserving staggered-cut metadata.
 
     Only CONFIRMED sites (no IUPAC ambiguity inside the recognition site)
@@ -511,6 +526,7 @@ def get_cut_positions(sequence, enzyme_names, include_possible=False):
         for match in find_restriction_site_matches(
             sequence,
             enzyme_name,
+            topology=topology,
         ):
             if match["status"] != "CONFIRMED" and not include_possible:
                 continue
@@ -521,10 +537,16 @@ def get_cut_positions(sequence, enzyme_names, include_possible=False):
                 enzyme,
             )
 
+            # On a circular molecule a cut beyond the last base belongs at
+            # the start (origin-spanning site).
+            physical_cut = cut_info["top_cut"]
+            if str(topology).lower() == "circular":
+                physical_cut %= len(sequence)
+
             cuts.append({
-                "position": cut_info["top_cut"],
-                "position_0based": cut_info["top_cut"],
-                "position_1based": cut_info["top_cut"] + 1,
+                "position": physical_cut,
+                "position_0based": physical_cut,
+                "position_1based": physical_cut + 1,
                 "enzyme": enzyme_name,
                 "site_position": position,
                 "site_position_1based": position + 1,
@@ -534,6 +556,7 @@ def get_cut_positions(sequence, enzyme_names, include_possible=False):
                 "bottom_cut_1based": cut_info["bottom_cut_1based"],
                 "cut_info": cut_info,
                 "status": match["status"],
+                "wraps_origin": match.get("wraps_origin", False),
             })
 
     cuts.sort(
@@ -676,6 +699,7 @@ def perform_digest(sequence, enzyme_names, topology="linear", include_possible=F
         sequence,
         enzyme_names,
         include_possible=include_possible,
+        topology=topology,
     )
 
     possible_cuts = [
@@ -684,6 +708,7 @@ def perform_digest(sequence, enzyme_names, topology="linear", include_possible=F
             sequence,
             enzyme_names,
             include_possible=True,
+            topology=topology,
         )
         if cut["status"] != "CONFIRMED"
     ]

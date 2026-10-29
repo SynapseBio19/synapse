@@ -292,7 +292,46 @@ class LiteratureSearchResult:
 
     message: str = ""
 
+# Minimum interval between requests to the same host (seconds). NCBI
+# E-utilities allow 3 requests/s without an API key and 10/s with one
+# (SYNAPSE_NCBI_API_KEY); the other services ask for moderate, polite use.
+MIN_REQUEST_INTERVAL_SECONDS = {
+    "eutils.ncbi.nlm.nih.gov": 0.34,
+    "www.ebi.ac.uk": 0.2,
+    "api.openalex.org": 0.2,
+    "api.crossref.org": 0.2,
+}
+RETRY_STATUS_CODES = {429, 500, 502, 503, 504}
+MAX_REQUEST_ATTEMPTS = 3
+_LAST_REQUEST_AT: dict[str, float] = {}
+
+
+def _ncbi_api_key() -> Optional[str]:
+    key = os.getenv("SYNAPSE_NCBI_API_KEY", "").strip()
+    return key or None
+
+
+def _throttle(host: str) -> None:
+    interval = MIN_REQUEST_INTERVAL_SECONDS.get(host, 0.2)
+    if host == "eutils.ncbi.nlm.nih.gov" and _ncbi_api_key():
+        interval = 0.1
+    last = _LAST_REQUEST_AT.get(host)
+    if last is not None:
+        wait = interval - (time.monotonic() - last)
+        if wait > 0:
+            time.sleep(wait)
+    _LAST_REQUEST_AT[host] = time.monotonic()
+
+
+def _retry_delay(exc: urllib.error.HTTPError, attempt: int) -> float:
+    retry_after = exc.headers.get("Retry-After") if exc.headers else None
+    if retry_after and retry_after.strip().isdigit():
+        return min(30.0, float(retry_after))
+    return min(30.0, 2.0 ** attempt)
+
+
 def _request_text(url: str, timeout: int = DEFAULT_TIMEOUT, headers: Optional[dict[str, str]] = None) -> str:
+    """GET a URL with per-host throttling and bounded retry on 429/5xx."""
 
     request_headers = {"User-Agent": USER_AGENT, "Accept": "*/*"}
 
@@ -300,29 +339,60 @@ def _request_text(url: str, timeout: int = DEFAULT_TIMEOUT, headers: Optional[di
 
         request_headers.update(headers)
 
-    request = urllib.request.Request(url, headers=request_headers)
+    host = urllib.parse.urlsplit(url).netloc
 
-    try:
+    for attempt in range(1, MAX_REQUEST_ATTEMPTS + 1):
 
-        with urllib.request.urlopen(request, timeout=timeout) as response:
+        _throttle(host)
 
-            charset = response.headers.get_content_charset() or "utf-8"
+        request = urllib.request.Request(url, headers=request_headers)
 
-            return response.read().decode(charset, errors="replace")
+        try:
 
-    except urllib.error.HTTPError as exc:
+            with urllib.request.urlopen(request, timeout=timeout) as response:
 
-        raise LiteratureSourceError(
+                charset = response.headers.get_content_charset() or "utf-8"
 
-            f"HTTP {exc.code} from {urllib.parse.urlsplit(url).netloc}; "
+                return response.read().decode(charset, errors="replace")
 
-            "the source may be rate-limiting requests or temporarily unavailable."
+        except urllib.error.HTTPError as exc:
 
-        ) from exc
+            if exc.code in RETRY_STATUS_CODES and attempt < MAX_REQUEST_ATTEMPTS:
 
-    except (urllib.error.URLError, TimeoutError, OSError) as exc:
+                time.sleep(_retry_delay(exc, attempt))
 
-        raise LiteratureSourceError(f"Request failed for {urllib.parse.urlsplit(url).netloc}: {exc}") from exc
+                continue
+
+            raise LiteratureSourceError(
+
+                f"HTTP {exc.code} from {host} after {attempt} attempt(s); "
+
+                "the source may be rate-limiting requests or temporarily unavailable."
+
+            ) from exc
+
+        except (urllib.error.URLError, TimeoutError, OSError) as exc:
+
+            raise LiteratureSourceError(f"Request failed for {host}: {exc}") from exc
+
+    raise LiteratureSourceError(f"Request failed for {host}.")
+
+
+def _date_bound(value: Optional[str], upper: bool) -> Optional[str]:
+    """Expand YYYY / YYYY-MM / YYYY-MM-DD to a full ISO date (range start or end)."""
+    if not value:
+        return None
+    import calendar
+    parts = [int(p) for p in value.split("-")]
+    year = parts[0]
+    if len(parts) == 1:
+        month, day = (12, 31) if upper else (1, 1)
+    elif len(parts) == 2:
+        month = parts[1]
+        day = calendar.monthrange(year, month)[1] if upper else 1
+    else:
+        month, day = parts[1], parts[2]
+    return f"{year:04d}-{month:02d}-{day:02d}"
 
 def _request_json(url: str, timeout: int = DEFAULT_TIMEOUT, headers: Optional[dict[str, str]] = None) -> dict[str, Any]:
 
@@ -623,17 +693,19 @@ def search_pubmed(query: str, max_results: int = 30, date_from: Optional[str] = 
 
         raise ValueError(f"max_results must be between 1 and {MAX_RESULTS_LIMIT}.")
 
-    common = {"db": "pubmed", "tool": "Synapse", "email": email or os.getenv("SYNAPSE_NCBI_EMAIL")}
+    common = {"db": "pubmed", "tool": "Synapse", "email": email or os.getenv("SYNAPSE_NCBI_EMAIL"),
+              "api_key": _ncbi_api_key()}
 
     params = {**common, "term": query.strip(), "retmax": max_results, "retmode": "json", "sort": "relevance"}
 
+    # E-utilities expect YYYY, YYYY/MM or YYYY/MM/DD.
     if date_from:
 
-        params.update({"mindate": date_from, "datetype": "pdat"})
+        params.update({"mindate": date_from.replace("-", "/"), "datetype": "pdat"})
 
     if date_to:
 
-        params.update({"maxdate": date_to, "datetype": "pdat"})
+        params.update({"maxdate": date_to.replace("-", "/"), "datetype": "pdat"})
 
     search_data = _request_json(_url("https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi", params))
 
@@ -765,11 +837,11 @@ def search_europe_pmc(query: str, max_results: int = 30, date_from: Optional[str
 
     if date_from:
 
-        parts.append(f"FIRST_PDATE:[{date_from} TO *]")
+        parts.append(f"FIRST_PDATE:[{_date_bound(date_from, upper=False)} TO *]")
 
     if date_to:
 
-        parts.append(f"FIRST_PDATE:[* TO {date_to}]")
+        parts.append(f"FIRST_PDATE:[* TO {_date_bound(date_to, upper=True)}]")
 
     if open_access_only:
 
@@ -841,13 +913,15 @@ def search_openalex(query: str, max_results: int = 30, date_from: Optional[str] 
 
     filters: list[str] = []
 
+    # OpenAlex needs full YYYY-MM-DD dates. Previously "YYYY-MM" became the
+    # invalid "YYYY-MM-01-01" (audit finding); _date_bound expands correctly.
     if date_from:
 
-        filters.append(f"from_publication_date:{date_from[:10] if len(date_from) >= 10 else date_from + '-01-01'}")
+        filters.append(f"from_publication_date:{_date_bound(date_from, upper=False)}")
 
     if date_to:
 
-        filters.append(f"to_publication_date:{date_to[:10] if len(date_to) >= 10 else date_to + '-12-31'}")
+        filters.append(f"to_publication_date:{_date_bound(date_to, upper=True)}")
 
     params: dict[str, Any] = {"search": query.strip(), "per-page": max_results, "sort": "relevance_score:desc"}
 
@@ -2091,7 +2165,27 @@ def self_test() -> bool:
 
     return all(ok for _, ok in tests)
 
-def _interactive_menu() -> None:
+def build_sequence_literature_context(header: Optional[str] = None, orf: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+    """Derive an optional search suggestion from the active sequence.
+
+    Only the free-text sequence header (and the ORF label, if any) is used;
+    no sequence data leaves the program. The suggestion is shown to the user
+    and is never submitted without their confirmation.
+    """
+    context: dict[str, Any] = {}
+    words = [w for w in re.split(r"[\s|,;_]+", (header or "").strip()) if w]
+    words = [w for w in words if not re.fullmatch(r"(?i)(topology|len|length)=.*|\d+", w)]
+    if words:
+        context["sequence_header"] = header.strip()
+        context["suggested_query"] = " ".join(words[:6])
+    if orf:
+        context["orf"] = f"rank {orf.get('rank', '?')} frame {orf.get('frame', '?')}"
+    return context
+
+
+def _interactive_menu(context: Optional[dict[str, Any]] = None) -> None:
+    context = dict(context or {})
+    suggested = str(context.get("suggested_query") or "").strip()
 
     print(f"\n{MODULE_NAME} v{MODULE_VERSION}")
 
@@ -2153,7 +2247,11 @@ def _interactive_menu() -> None:
 
         print("Example: BRCA1 DNA repair breast cancer Homo sapiens")
 
-        search_text = input("Search query (Boolean terms supported by each source): ").strip()
+        if suggested:
+            print(f"Suggestion from the active sequence header: {suggested}")
+            search_text = input("Search query [Enter = use suggestion]: ").strip() or suggested
+        else:
+            search_text = input("Search query (Boolean terms supported by each source): ").strip()
 
         if not search_text:
 
@@ -2193,7 +2291,8 @@ def _interactive_menu() -> None:
 
             sort = input("Sort [relevance/date/citations] (relevance): ").strip().lower() or "relevance"
 
-            query = LiteratureQuery(search_text, selected, max_results, date_from, date_to, oa, sort)
+            query = LiteratureQuery(search_text, selected, max_results, date_from, date_to, oa, sort,
+                                    biological_context={k: v for k, v in context.items() if k == "sequence_header"})
 
             query.validate()
 
@@ -2255,7 +2354,10 @@ def _interactive_menu() -> None:
 
                 print(f"Export failed: {exc}")
 
-def main() -> int:
+def main(context: Optional[dict[str, Any]] = None) -> int:
+    if context is not None:
+        _interactive_menu(context)
+        return 0
 
     if len(sys.argv) > 1 and sys.argv[1] in {"--self-test", "--test"}:
 

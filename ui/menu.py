@@ -26,6 +26,7 @@ def show_menu():
     print("-" * 60)
 
     print("[P] Pipeline Status & Stored Results")
+    print("[R] Export Analysis Report (JSON / Markdown)")
     print("[S] Select Another Sequence")
 
     print("-" * 60)

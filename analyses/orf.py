@@ -168,6 +168,55 @@ def expand_iupac_codon(codon):
     ]
 
 
+def _stop_codons_of(codon_table):
+    if codon_table is None:
+        return STANDARD_STOP_CODONS
+    return {codon for codon, aa in codon_table.items() if aa == "STOP"}
+
+
+def codon_table_for(genetic_code=1):
+    """Return the local codon->amino-acid dict ('STOP' for stops) for an NCBI table.
+
+    Table 1 returns the module's own GENETIC_CODE (cross-checked against
+    core.seqtools in the test suite); other tables come from core.seqtools.
+    """
+    if genetic_code in (None, 1):
+        return GENETIC_CODE
+    from core.seqtools import get_genetic_code
+    table = get_genetic_code(int(genetic_code))
+    return {codon: ("STOP" if aa == "*" else aa) for codon, aa in table.codons.items()}
+
+
+def start_codons_for(genetic_code=1, start_codon_policy=None):
+    """Start codons for a genetic code and a start-codon policy.
+
+    Table 1 keeps the historical Synapse policies (ATG, or ATG+GTG+TTG).
+    For any table, "atg_only" means ATG. For tables other than 1,
+    "atg_and_alternative" uses the start codons NCBI lists for that table;
+    "table_starts" does so for every table (table 1: TTG, CTG, ATG).
+    """
+    policy = start_codon_policy or DEFAULT_START_CODON_POLICY
+    if policy not in START_CODON_POLICIES and policy != "table_starts":
+        raise ValueError(
+            f"Unknown start codon policy '{policy}'. "
+            f"Use one of: {', '.join(list(START_CODON_POLICIES) + ['table_starts'])}."
+        )
+    if policy == "atg_only":
+        return set(STANDARD_START_CODONS)
+    if policy == "table_starts" or genetic_code not in (None, 1):
+        from core.seqtools import get_genetic_code
+        return set(get_genetic_code(int(genetic_code or 1)).start_codons)
+    return set(START_CODON_POLICIES[policy])
+
+
+def _genetic_code_name(genetic_code=1):
+    if genetic_code in (None, 1):
+        return "NCBI translation table 1 (standard)"
+    from core.seqtools import get_genetic_code
+    table = get_genetic_code(int(genetic_code))
+    return f"NCBI translation table {table.table_id} ({table.name})"
+
+
 def analyze_codon_identity(
     codon,
     target_codons
@@ -225,9 +274,8 @@ def classify_start_codon(codon):
 # ORF AMBIGUITY ANALYSIS
 # ============================================================
 
-def analyze_orf_ambiguity(
-    orf_sequence
-):
+def analyze_orf_ambiguity(orf_sequence, codon_table=None):
+    codon_table = GENETIC_CODE if codon_table is None else codon_table
 
     ambiguous_codons = []
     deterministic_ambiguous_codons = []
@@ -268,7 +316,7 @@ def analyze_orf_ambiguity(
             expanded_codons
         ):
 
-            amino_acid = GENETIC_CODE.get(
+            amino_acid = codon_table.get(
                 expanded_codon
             )
 
@@ -377,9 +425,8 @@ def analyze_orf_ambiguity(
 # CODON STATISTICS
 # ============================================================
 
-def analyze_codon_usage(
-    coding_sequence
-):
+def analyze_codon_usage(coding_sequence, codon_table=None):
+    stop_codons = _stop_codons_of(codon_table)
 
     codons = []
 
@@ -397,7 +444,7 @@ def analyze_codon_usage(
         if len(codon) < 3:
             continue
 
-        if codon in STANDARD_STOP_CODONS:
+        if codon in stop_codons:
             break
 
         codons.append(codon)
@@ -462,13 +509,9 @@ def analyze_codon_usage(
 # CODON DIVERSITY
 # ============================================================
 
-def calculate_codon_diversity(
-    coding_sequence
-):
+def calculate_codon_diversity(coding_sequence, codon_table=None):
 
-    usage = analyze_codon_usage(
-        coding_sequence
-    )
+    usage = analyze_codon_usage(coding_sequence, codon_table)
 
     total = usage["total_codons"]
     unique = usage["unique_codons"]
@@ -963,6 +1006,7 @@ def find_orfs(
     start_codon_policy=None,
     nested=DEFAULT_REPORT_NESTED,
     ranking=DEFAULT_RANKING,
+    genetic_code=1,
 ):
     """Find open reading frames on both strands.
 
@@ -989,13 +1033,17 @@ def find_orfs(
             f"ranking must be one of {ORF_RANKING_MODES}."
         )
 
+    codon_table = codon_table_for(genetic_code)
+    if start_codons is None and (genetic_code not in (None, 1) or start_codon_policy == "table_starts"):
+        start_codons = start_codons_for(genetic_code, start_codon_policy)
+
     start_codons = resolve_start_codons(
         start_codons,
         start_codon_policy,
     )
 
     if stop_codons is None:
-        stop_codons = STANDARD_STOP_CODONS
+        stop_codons = _stop_codons_of(codon_table)
 
     start_codons = set(
         start_codons
@@ -1153,7 +1201,7 @@ def find_orfs(
 
                             ambiguity = (
                                 analyze_orf_ambiguity(
-                                    orf_sequence
+                                    orf_sequence, codon_table=codon_table
                                 )
                             )
 
@@ -1181,11 +1229,13 @@ def find_orfs(
 
                             codon_usage = (
                                 analyze_codon_usage(
-                                    orf_sequence
+                                    orf_sequence, codon_table=codon_table
                                 )
                             )
 
                             orf = {
+                                "genetic_code":
+                                    genetic_code,
                                 "strand":
                                     strand,
 
@@ -1266,7 +1316,7 @@ def find_orfs(
 
                                 "codon_diversity":
                                     calculate_codon_diversity(
-                                        orf_sequence
+                                        orf_sequence, codon_table=codon_table
                                     )
                             }
 
@@ -1349,7 +1399,7 @@ def find_orfs(
 
                                 ambiguity = (
                                     analyze_orf_ambiguity(
-                                        orf_sequence
+                                        orf_sequence, codon_table=codon_table
                                     )
                                 )
 
@@ -1377,11 +1427,13 @@ def find_orfs(
 
                                 codon_usage = (
                                     analyze_codon_usage(
-                                        orf_sequence
+                                        orf_sequence, codon_table=codon_table
                                     )
                                 )
 
                                 orf = {
+                                    "genetic_code":
+                                        genetic_code,
                                     "strand":
                                         strand,
 
@@ -1462,7 +1514,7 @@ def find_orfs(
 
                                     "codon_diversity":
                                         calculate_codon_diversity(
-                                            orf_sequence
+                                            orf_sequence, codon_table=codon_table
                                         )
                                 }
 
@@ -1791,6 +1843,7 @@ def analyze_orfs(
     start_codon_policy=None,
     nested=DEFAULT_REPORT_NESTED,
     ranking=DEFAULT_RANKING,
+    genetic_code=1,
 ):
 
     """
@@ -1807,6 +1860,7 @@ def analyze_orfs(
         start_codon_policy=start_codon_policy,
         nested=nested,
         ranking=ranking,
+        genetic_code=genetic_code,
     )
 
     summary = summarize_orfs(
@@ -1828,11 +1882,12 @@ def analyze_orfs(
             "min_length_nt": min_length,
             "include_partial": include_partial,
             "start_codon_policy": start_codon_policy or DEFAULT_START_CODON_POLICY,
-            "start_codons": sorted(resolve_start_codons(None, start_codon_policy)),
-            "stop_codons": sorted(STANDARD_STOP_CODONS),
+            "start_codons": sorted(start_codons_for(genetic_code, start_codon_policy)),
+            "stop_codons": sorted(_stop_codons_of(codon_table_for(genetic_code))),
             "nested": nested,
             "ranking": ranking,
-            "genetic_code": "NCBI translation table 1 (standard)",
+            "genetic_code": _genetic_code_name(genetic_code),
+            "genetic_code_table": int(genetic_code or 1),
         },
 
         "orfs":
@@ -2625,7 +2680,7 @@ def compare_orf_candidates(orfs, top_n=5, ranking=None):
 # ORF TRANSLATION PREVIEW
 # ============================================================
 
-def translate_orf_sequence(orf_sequence, initiator_start=True):
+def translate_orf_sequence(orf_sequence, initiator_start=True, genetic_code=1):
     """
     Translate an ORF using the local genetic code.
 
@@ -2635,8 +2690,11 @@ def translate_orf_sequence(orf_sequence, initiator_start=True):
 
     initiator_start=True (default, because every Synapse ORF begins at its
     start codon): a definite start codon in position 1 -- ATG, GTG or TTG --
-    is decoded as methionine, as initiator tRNA does (audit P0-8).
+    is decoded as methionine, as initiator tRNA does (audit P0-8). For
+    genetic_code != 1, the NCBI start codons of that table are used.
     """
+    codon_table = codon_table_for(genetic_code)
+    initiators = ALL_START_CODONS if genetic_code in (None, 1) else start_codons_for(genetic_code, "table_starts")
     protein = []
 
     for position in range(0, len(orf_sequence) - 2, 3):
@@ -2645,7 +2703,7 @@ def translate_orf_sequence(orf_sequence, initiator_start=True):
         if (
             position == 0
             and initiator_start
-            and codon in ALL_START_CODONS
+            and codon in initiators
         ):
             protein.append("M")
             continue
@@ -2656,9 +2714,9 @@ def translate_orf_sequence(orf_sequence, initiator_start=True):
 
         expanded = expand_iupac_codon(codon)
         translations = {
-            GENETIC_CODE.get(expanded_codon)
+            codon_table.get(expanded_codon)
             for expanded_codon in expanded
-            if GENETIC_CODE.get(expanded_codon) is not None
+            if codon_table.get(expanded_codon) is not None
         }
 
         if translations == {"STOP"}:
@@ -2674,7 +2732,7 @@ def translate_orf_sequence(orf_sequence, initiator_start=True):
 
 def analyze_selected_orf(orf):
     """Return a focused downstream-ready analysis for one selected ORF."""
-    protein = translate_orf_sequence(orf["sequence"])
+    protein = translate_orf_sequence(orf["sequence"], genetic_code=orf.get("genetic_code", 1))
 
     return {
         "rank": orf["rank"],
@@ -2758,6 +2816,7 @@ def analyze_orfs_enhanced(
     start_codon_policy=None,
     nested=DEFAULT_REPORT_NESTED,
     ranking=DEFAULT_RANKING,
+    genetic_code=1,
 ):
     """
     Full ORF analysis with ranking, candidate comparison, overlap/nesting
@@ -2770,6 +2829,7 @@ def analyze_orfs_enhanced(
         start_codon_policy=start_codon_policy,
         nested=nested,
         ranking=ranking,
+        genetic_code=genetic_code,
     )
 
     ranked = rank_orf_candidates(result["orfs"], ranking=ranking)
@@ -3146,6 +3206,7 @@ def _orf_settings_menu(settings):
         print(f"[3] Nested ORFs:         {'reported' if settings['nested'] else 'longest per stop only'}")
         print(f"[4] Ranking:             {settings['ranking']}")
         print(f"[5] Partial ORFs:        {'included' if settings['include_partial'] else 'excluded'}")
+        print(f"[8] Genetic code:        {_genetic_code_name(settings.get('genetic_code', 1))}")
         print("[6] Restore Synapse defaults (ORFfinder-style)")
         print("[7] Restore legacy settings (before 2026-10-29)")
         print("[0] Apply and return")
@@ -3187,9 +3248,22 @@ def _orf_settings_menu(settings):
                 start_codon_policy=DEFAULT_START_CODON_POLICY,
                 nested=DEFAULT_REPORT_NESTED,
                 ranking=DEFAULT_RANKING,
+                genetic_code=1,
             )
         elif choice == "7":
             settings.update(LEGACY_ORF_SETTINGS)
+            settings["genetic_code"] = 1
+        elif choice == "8":
+            from core.seqtools import available_genetic_codes
+            for table in available_genetic_codes():
+                print(f"  {table.table_id:>2}  {table.name}")
+            raw = input("NCBI table number [1]: ").strip()
+            try:
+                value = int(raw) if raw else 1
+                _genetic_code_name(value)
+                settings["genetic_code"] = value
+            except ValueError as exc:
+                print(f"Not available: {exc}")
         else:
             print("Invalid option.")
 
@@ -3201,6 +3275,7 @@ def run_orf_analysis_ui(
     start_codon_policy=None,
     nested=DEFAULT_REPORT_NESTED,
     ranking=DEFAULT_RANKING,
+    genetic_code=1,
 ):
     """
     Professional ORF module.
@@ -3217,6 +3292,7 @@ def run_orf_analysis_ui(
         "start_codon_policy": start_codon_policy or DEFAULT_START_CODON_POLICY,
         "nested": nested,
         "ranking": ranking,
+        "genetic_code": genetic_code,
     }
 
     def run_search():
@@ -3227,6 +3303,7 @@ def run_orf_analysis_ui(
             start_codon_policy=settings["start_codon_policy"],
             nested=settings["nested"],
             ranking=settings["ranking"],
+            genetic_code=settings["genetic_code"],
         )
 
     analysis = run_search()
@@ -3242,6 +3319,9 @@ def run_orf_analysis_ui(
             f"{'nested' if settings['nested'] else 'longest per stop'}, "
             f"ranked by {settings['ranking']}"
         )
+
+        if settings["genetic_code"] != 1:
+            print(f"Genetic code:    {_genetic_code_name(settings['genetic_code'])}")
 
         top = analysis.get("top_candidate")
 

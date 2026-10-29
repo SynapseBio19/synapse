@@ -2054,6 +2054,15 @@ def compare_sequences(
         variant_name
     )
 
+    longest = max(result.reference_length, result.variant_length)
+    if longest > MAX_RECOMMENDED_ALIGNMENT_LENGTH:
+        result.notes.append(
+            f"Sequences up to {longest} nt were aligned globally "
+            f"(recommended maximum {MAX_RECOMMENDED_ALIGNMENT_LENGTH} nt): "
+            "runtime and memory grow with the product of both lengths. For "
+            "genome-scale comparisons use VCF-based variant analysis."
+        )
+
     return result
 
 
@@ -2716,12 +2725,97 @@ def normalize_indel_left(
 
 
 # ============================================================================
+# CODING-FRAME ASSUMPTIONS (audit P1-10)
+# ============================================================================
+
+# Global alignment needs O(n*m) time and memory. Above this length a warning
+# is attached; the analysis still runs. The figure is a practical limit for an
+# interactive pure-Python tool, not a scientific threshold.
+MAX_RECOMMENDED_ALIGNMENT_LENGTH = 2000
+
+CODING_FRAME_ASSUMPTION = (
+    "Coding consequences assume that position 1 of the reference is the first "
+    "base of codon 1 (CDS coordinates). For a genomic or non-coding sequence "
+    "this assumption is wrong and amino-acid effects are meaningless."
+)
+
+
+def assess_coding_frame(cds: str) -> List[str]:
+    """Return warnings when a sequence does not look like a CDS in frame +1.
+
+    These checks are plausibility checks, not CDS validation: a sequence can
+    pass all of them and still not be the real coding sequence.
+    """
+    seq = normalize_iupac_sequence(cds)
+    warnings: List[str] = []
+    if len(seq) % 3:
+        warnings.append(
+            f"Length {len(seq)} is not a multiple of 3; the last "
+            f"{len(seq) % 3} base(s) do not form a codon."
+        )
+    if len(seq) >= 3 and seq[:3] not in {"ATG", "GTG", "TTG", "CTG"}:
+        warnings.append(
+            f"Does not begin with a start codon ({seq[:3]}); "
+            "frame +1 may not be the coding frame."
+        )
+    codons = [seq[i:i + 3] for i in range(0, len(seq) - 2, 3)]
+    internal_stops = [
+        index + 1
+        for index, codon in enumerate(codons[:-1])
+        if codon in {"TAA", "TAG", "TGA"}
+    ]
+    if internal_stops:
+        shown = ", ".join(str(i) for i in internal_stops[:5])
+        warnings.append(
+            f"{len(internal_stops)} in-frame stop codon(s) before the end "
+            f"(codon {shown}{', ...' if len(internal_stops) > 5 else ''}); "
+            "frame +1 is probably not the coding frame."
+        )
+    if codons and codons[-1] not in {"TAA", "TAG", "TGA"}:
+        warnings.append("Does not end with a stop codon (possibly partial CDS).")
+    return warnings
+
+
+def orf_reference_cds(orf: Any, reference: str, variant: str) -> Tuple[str, Optional[str], str]:
+    """Derive reference/variant CDS from a pipeline ORF.
+
+    Returns (reference_cds, variant_cds or None, description). The variant
+    CDS is only derived when the variant has the reference length (pure
+    substitutions), because only then do ORF coordinates carry over directly.
+    """
+    from core.orf_context import resolve_orf_region
+
+    region = resolve_orf_region(orf, reference)
+    if not region.validated or region.start_1based is None:
+        raise MutationAnalysisError(
+            "The selected ORF could not be located on the reference sequence."
+        )
+    ref_cds = region.coding_sequence
+    description = (
+        f"{region.name}: {region.start_1based}-{region.end_1based} "
+        f"({region.strand} strand)"
+    )
+    var_cds = None
+    if len(variant) == len(reference):
+        forward = variant[region.start_1based - 1:region.end_1based]
+        var_cds = reverse_complement_iupac(forward) if region.strand == "-" else forward
+    return ref_cds, var_cds, description
+
+
+# ============================================================================
 # HGVS-LIKE NOTATION
 # ============================================================================
 
 def mutation_hgvs_c(
     mutation: Mutation,
 ) -> str:
+    """HGVS-like coding notation ("c." + Synapse notation).
+
+    Not validated against the HGVS specification or a tool such as
+    Mutalyzer. Position 1 is the first base of the supplied sequence, which
+    equals HGVS c. numbering only if that sequence is the CDS starting at
+    the A of the start codon.
+    """
 
     return (
         "c."
@@ -2732,6 +2826,11 @@ def mutation_hgvs_c(
 def mutation_hgvs_p(
     mutation: Mutation,
 ) -> Optional[str]:
+    """HGVS-like protein notation with one-letter amino-acid codes.
+
+    Not validated against the HGVS specification; predicted consequences
+    would conventionally be written in parentheses, e.g. p.(R12C).
+    """
 
     if (
         mutation.reference_amino_acid
@@ -4069,7 +4168,27 @@ def run_mutation_analysis_ui(
                         variant_name=var_name,
                     )
 
-                ref_cds = input(
+                orf_ref_cds = orf_var_cds = None
+                selected_orf = getattr(
+                    getattr(pipeline, "context", None), "selected_orf", None
+                )
+                if selected_orf and dna:
+                    use_orf = input(
+                        "Use the selected pipeline ORF as CDS? (Y/n): "
+                    ).strip().lower()
+                    if use_orf in ("", "y", "yes"):
+                        reference_plain = last_result.aligned_reference.replace("-", "")
+                        variant_plain = last_result.aligned_variant.replace("-", "")
+                        orf_ref_cds, orf_var_cds, orf_text = orf_reference_cds(
+                            selected_orf, reference_plain, variant_plain
+                        )
+                        print(f"CDS from {orf_text}")
+                        if orf_var_cds is None:
+                            print(
+                                "Variant length differs from the reference: enter the "
+                                "variant CDS explicitly (ORF coordinates do not carry over)."
+                            )
+                ref_cds = orf_ref_cds or input(
                     "Reference CDS "
                     "(press Enter to use reference sequence): "
                 ).strip()
@@ -4085,7 +4204,7 @@ def run_mutation_analysis_ui(
                         )
                     )
 
-                var_cds = input(
+                var_cds = orf_var_cds or input(
                     "Variant CDS "
                     "(press Enter to use variant sequence): "
                 ).strip()
@@ -4109,6 +4228,16 @@ def run_mutation_analysis_ui(
                     )
                 )
 
+                frame_warnings = assess_coding_frame(ref_cds)
+                coding.notes.append(CODING_FRAME_ASSUMPTION)
+                coding.notes.extend(
+                    f"Reference CDS: {warning}" for warning in frame_warnings
+                )
+                if frame_warnings:
+                    print()
+                    print("WARNING - coding frame assumption:")
+                    for warning in frame_warnings:
+                        print(f"  - {warning}")
                 last_result.coding_analysis = (
                     coding
                 )

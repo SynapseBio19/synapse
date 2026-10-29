@@ -1,8 +1,10 @@
 import logging
 import os
+from datetime import datetime
 
 from core.pipeline import SynapsePipeline
 from core.models import SequenceRecord
+from core.report import export_analysis_report
 from core.logging_setup import configure_logging
 
 from fileio.loader import load_sequences
@@ -67,6 +69,7 @@ from analyses.blast import (
 
 from analyses.literature import (
     main as literature_main,
+    build_sequence_literature_context,
 )
 
 from ui.report import print_results
@@ -474,6 +477,12 @@ while True:
                     print("✓ RNA can use this ORF")
                     print("✓ Protein can use this ORF")
                     print("✓ CRISPR Guide Design can use this ORF")
+                    if selected_orf.get("genetic_code", 1) != 1:
+                        print(
+                            "! ORF found with NCBI table "
+                            f"{selected_orf['genetic_code']}; the RNA and Protein "
+                            "modules still translate with the standard code (table 1)."
+                        )
 
                     input(
                         "\nPress Enter to continue..."
@@ -735,7 +744,9 @@ while True:
 
             try:
 
-                literature_main()
+                literature_main(build_sequence_literature_context(
+                    pipeline.context.header,
+                    pipeline.context.selected_orf if isinstance(pipeline.context.selected_orf, dict) else None))
 
             except Exception as error:
 
@@ -763,6 +774,30 @@ while True:
         # P - PIPELINE STATUS
         # ====================================================
 
+
+        elif choice == "R":
+            default_report = os.path.join(
+                current_folder,
+                "exports",
+                "synapse_report_"
+                + datetime.now().strftime("%Y%m%d_%H%M%S")
+                + ".json",
+            )
+            print("\nReport of all results stored in this session.")
+            print("Use .json (complete) or .md (summary).")
+            raw_path = input(
+                f"Path [Enter = {default_report}]: "
+            ).strip().strip('"')
+            try:
+                saved = export_analysis_report(
+                    pipeline, raw_path or default_report
+                )
+                print(f"Report written: {saved.resolve()}")
+            except (OSError, ValueError) as error:
+                report_error("REPORT EXPORT ERROR", error)
+            input(
+                "\nPress Enter to continue..."
+            )
 
         elif choice == "P":
 

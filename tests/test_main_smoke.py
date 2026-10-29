@@ -42,6 +42,27 @@ class MainMenuSmokeTest(unittest.TestCase):
             self.assertRegex(output, rf"{label}\s+COMPLETED \(1 stored\)")
         self.assertIn("Selected ORF was used as RNA input", output)
 
+    def test_report_export_from_menu(self):
+        import json
+        from pathlib import Path
+        with tempfile.TemporaryDirectory() as tmp:
+            report = Path(tmp) / "report.json"
+            script = f"\n1\n2\n5\n1\n\nR\n{report}\n\n0\n"
+            env = dict(os.environ, SYNAPSE_LOG_DIR=tmp, PYTHONIOENCODING="utf-8")
+            completed = subprocess.run(
+                [sys.executable, "main.py"], cwd=PROJECT_ROOT, input=script,
+                capture_output=True, text=True, encoding="utf-8", timeout=120, env=env,
+            )
+            output = completed.stdout + completed.stderr
+            self.assertEqual(completed.returncode, 0, output[-2000:])
+            self.assertNotIn("Traceback", output)
+            data = json.loads(report.read_text(encoding="utf-8"))
+        modules = {entry["module"] for entry in data["analyses"]}
+        self.assertIn("orf", modules)
+        self.assertEqual(data["input"]["header"], "TEST_8_REFERENCE")
+        orf_entry = next(e for e in data["analyses"] if e["module"] == "orf")
+        self.assertEqual(orf_entry["parameters"]["min_length_nt"], 75)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -9,7 +9,7 @@
   "complex": 0,
   "consequence_counts": {},
   "deletions": 1,
-  "failed_filters": 1,
+  "failed_filters": 0,
   "genes_affected": 0,
   "indels": 2,
   "insertions": 1,
@@ -29,6 +29,7 @@
   "transition_count": 2,
   "transition_transversion_ratio": "Infinity",
   "transversion_count": 0,
+  "unfiltered": 1,
   "unique_variants": 4,
   "unknown": 0
  },

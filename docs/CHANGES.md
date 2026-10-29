@@ -180,3 +180,115 @@ unchanged.
   and strand; duplicated "RNA CONNECTED" message removed from `main.py`.
 - Tests: `tests/test_stage2_foundation.py` (15 tests) and an end-to-end
   menu test `tests/test_main_smoke.py` (ORF -> RNA -> protein -> status).
+
+## Stage 3 – P1 scientific improvements and reproducibility (2026-10-30)
+
+### Primer melting temperature (`analyses/primer.py`) – output changes
+
+- Default nearest-neighbor parameters: SantaLucia (1998) unified set with
+  the terminal-AT/GC initiation terms, the 0.368·(N−1)·ln[Na⁺eq] entropy salt
+  correction, C/4 (C for self-complementary oligos) and the −1.4 e.u.
+  symmetry term. This is the model documented for Primer3
+  (`PRIMER_TM_FORMULA=1`, `PRIMER_SALT_CORRECTIONS=1`).
+- Divalent cations: [Na⁺eq] = [Na⁺] + 120·√([Mg²⁺] − [dNTP]) (von Ahsen et al.
+  2001), replacing the previous ad-hoc rule [Na⁺] + 4·([Mg²⁺] − [dNTP]).
+- Selectable alternatives: `nn_parameter_set` = `santalucia_1998` (default),
+  `santalucia_2004`, `synapse_legacy`; `salt_model` =
+  `monovalent_equivalent` (default, von Ahsen), `na_only`,
+  `synapse_legacy_4x`. `synapse_legacy` + `synapse_legacy_4x` reproduce the
+  previous values to 5 decimals (test).
+- Verification: Primer3 manual worked example (CGTGACGTGACGGACT, 50 mM Na⁺,
+  50 nM): ΔH −128.8 kcal/mol and salt-corrected ΔS −361.736 cal/(mol·K)
+  reproduced exactly; Tm 50.550 °C vs. 50.554 °C in the manual (the manual
+  uses R = 1.987). An independent re-implementation of the published
+  equations in the test file agrees to 1e-6 °C for 6 primers × 4 buffer
+  conditions. Running the Primer3 or Biopython executables was not possible
+  in this environment, so no cross-tool run is claimed.
+- Visible consequence (golden `primer.json` regenerated): with 1.5 mM Mg²⁺ /
+  0.2 mM dNTP the calculated Tm is ~6–7 °C higher than before, so the
+  designer selects shorter primers (18–20 nt instead of 20–24 nt) for the
+  same 60 °C target. Neither value is an experimental measurement; real
+  annealing temperatures must be determined empirically.
+
+### Variant analysis (`analyses/variant_analysis.py`)
+
+- Multi-allelic splitting reads `Number=` from the `##INFO`/`##FORMAT`
+  header (VCF 4.3 reserved keys as fallback): `A` keeps the selected ALT,
+  `R` keeps [REF, ALT], `G` (PL/GL/GP) keeps genotypes 0/0, 0/a, a/a using
+  F(j,k) = k(k+1)/2 + j. Previously only list length was used.
+- GT of other ALT alleles is set to 0 (convention of `bcftools norm -m-`).
+- `.vcf.gz` (gzip/BGZF) files are read; the UI accepts a VCF file path.
+- FILTER "." now counts as `unfiltered` and no longer as `failed_filters`
+  (VCF: "." = filters not applied). Golden `variant.json` regenerated; the
+  only differences are `failed_filters` 1 → 0 and the new `unfiltered: 1`.
+- `check_reference_alleles()` compares REF with a supplied reference per
+  contig and flags `REF_MISMATCH`; `normalize_variants(contig_references=)`
+  normalizes each contig against its own sequence.
+- Not done: a comparison against `bcftools norm` output (tool not available
+  here). Recommended validation for a later phase.
+
+### Restriction analysis (`analyses/restriction.py`)
+
+- `topology="circular"` finds sites spanning the origin (`wraps_origin`)
+  and maps cut positions modulo the sequence length. Linear behavior is
+  unchanged (golden unchanged).
+
+### BLAST (`analyses/blast.py`)
+
+- Search parameters reported by BLAST in the XML output are stored
+  (`reported_parameters`), plus database provenance (`database_details`;
+  local databases: title, date, version, counts from `blastdbcmd -info`).
+- Remote searches ask for confirmation before the query sequence is sent to
+  NCBI (privacy). Nothing changes for local searches.
+- Not done: resuming a remote search from a saved RID (deferred).
+- Local BLAST against `data/blast_db/` could not be run (databases are
+  intentionally excluded from this copy); only parsing is tested.
+
+### Literature (`analyses/literature.py`)
+
+- Per-host request throttling (NCBI: 3 req/s, 10 req/s with
+  `SYNAPSE_NCBI_API_KEY`) and up to 3 attempts on HTTP 429/5xx, honoring
+  `Retry-After`.
+- Partial dates are expanded correctly (YYYY-MM → last day of the month for
+  upper bounds). Bug fixed: OpenAlex received `YYYY-MM-01-01`.
+- PubMed date filters use `YYYY/MM/DD`; optional `api_key`.
+- When opened from the main menu, the sequence header is offered as a
+  search suggestion (shown and only used after the user presses Enter); no
+  sequence data are sent.
+
+### ORF genetic code (`analyses/orf.py`) – P1-9
+
+- New option `genetic_code` (NCBI tables 1, 2, 4, 11; menu [8] in ORF search
+  settings). Default 1, so existing results are unchanged (golden
+  unchanged). Stop codons, translation, ambiguity and codon usage follow the
+  selected table; `atg_only` keeps ATG, `atg_and_alternative` uses the
+  NCBI start codons of the selected table; new policy `table_starts`.
+- ORFs carry `genetic_code`; parameters record `genetic_code_table`.
+- Limitation: the RNA and protein modules still translate with table 1;
+  `main.py` prints a warning when an ORF from another table is selected.
+  5′-partial ORFs and ORFs across the origin of circular sequences are not
+  implemented (deferred).
+
+### Mutation analysis (`analyses/mutation.py`) – P1-10
+
+- The coding-consequence step can take the CDS from the selected pipeline
+  ORF (both strands; the variant CDS is derived only when the variant has
+  the reference length).
+- `assess_coding_frame()` warns when the reference CDS is not a multiple of
+  3, does not start with a start codon, contains in-frame stops or lacks a
+  terminal stop; the frame assumption is recorded in the result notes.
+- Comparisons longer than 2,000 nt get a note (O(n·m) global alignment).
+- `mutation_hgvs_c/p` are documented as HGVS-like and not validated
+  against the HGVS specification.
+
+### Reproducible analysis report (`core/report.py`, menu `[R]`) – P1-12
+
+- Exports all results stored in the session as JSON (complete payloads) or
+  Markdown (summary): input provenance and sequence SHA-256, per analysis
+  the parameters, warnings, limitations, timestamp, versions and a SHA-256
+  of the canonical JSON payload.
+
+### Tests
+
+- `tests/test_primer_thermodynamics.py` (7), `tests/test_stage3_additions.py`
+  (21) and a menu test for `[R]` in `tests/test_main_smoke.py`.

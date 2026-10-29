@@ -1448,6 +1448,77 @@ TERMINAL_AT_ENTROPY = 6.9
 SYMMETRY_ENTROPY = -1.4
 
 
+# ----------------------------------------------------------------------------
+# Consistent nearest-neighbor parameter sets (2026-10-30, Stage 3)
+# ----------------------------------------------------------------------------
+# Until 2026-10-29 Synapse combined the SantaLucia (1998) stack parameters
+# with the SantaLucia & Hicks (2004) initiation terms, i.e. two different
+# published parameter sets. The default is now the internally consistent
+# SantaLucia (1998) unified set with terminal-specific initiation, the set
+# used by Primer3's recommended default (PRIMER_TM_FORMULA=1). The previous
+# combination remains available as "synapse_legacy" for reproducibility.
+#
+# Values: (delta_H kcal/mol, delta_S cal/(mol*K)).
+_SANTALUCIA_2004_STACKS = dict(NEAREST_NEIGHBOR_PARAMETERS)
+_SANTALUCIA_2004_STACKS.update({
+    "AA": (-7.6, -21.3),
+    "TT": (-7.6, -21.3),
+})
+
+NN_PARAMETER_SETS = {
+    "santalucia_1998": {
+        "reference": "SantaLucia JR (1998) PNAS 95:1460-1465 (unified parameters)",
+        "stacks": dict(NEAREST_NEIGHBOR_PARAMETERS),
+        "initiation": (0.0, 0.0),
+        "terminal": {"GC": (0.1, -2.8), "AT": (2.3, 4.1)},
+        "salt_phosphates": "n_minus_1",
+        "self_complementary_concentration_divisor": 1.0,
+    },
+    "santalucia_2004": {
+        "reference": "SantaLucia JR, Hicks D (2004) Annu Rev Biophys Biomol Struct 33:415-440",
+        "stacks": _SANTALUCIA_2004_STACKS,
+        "initiation": (0.2, -5.7),
+        "terminal": {"GC": (0.0, 0.0), "AT": (2.2, 6.9)},
+        "salt_phosphates": "n_minus_1",
+        "self_complementary_concentration_divisor": 1.0,
+    },
+    "synapse_legacy": {
+        "reference": "Synapse before 2026-10-30: 1998 stacks + 2004 initiation (mixed)",
+        "stacks": dict(NEAREST_NEIGHBOR_PARAMETERS),
+        "initiation": (INITIATION_ENTHALPY, INITIATION_ENTROPY),
+        "terminal": {"GC": (0.0, 0.0), "AT": (TERMINAL_AT_ENTHALPY, TERMINAL_AT_ENTROPY)},
+        "salt_phosphates": "n",
+        "self_complementary_concentration_divisor": 2.0,
+    },
+}
+
+DEFAULT_NN_PARAMETER_SET = "santalucia_1998"
+
+# Divalent-cation handling. "monovalent_equivalent" now uses the published
+# conversion of von Ahsen et al. (2001), Clin Chem 47:1956-1961, as used by
+# Primer3 (oligotm.c divalent_to_monovalent) and Biopython (salt_correction):
+#     [Na_eq] (mM) = [Na+] + 120 * sqrt([Mg2+] - [dNTP]),  0 if dNTP >= Mg2+.
+# "synapse_legacy_4x" is the previous ad-hoc rule [Na+] + 4 * ([Mg2+] - [dNTP]).
+SALT_MODELS = ("monovalent_equivalent", "na_only", "synapse_legacy_4x")
+
+
+def _nn_parameter_set(name: str) -> dict:
+    try:
+        return NN_PARAMETER_SETS[name]
+    except KeyError:
+        raise ValueError(
+            f"Unknown nearest-neighbor parameter set '{name}'. "
+            f"Use one of: {', '.join(NN_PARAMETER_SETS)}."
+        ) from None
+
+
+def _salt_phosphate_count(sequence: str, parameter_set: str) -> int:
+    """Number of phosphates per strand used in the SantaLucia salt term (N - 1)."""
+    if _nn_parameter_set(parameter_set)["salt_phosphates"] == "n":
+        return len(sequence)
+    return len(sequence) - 1
+
+
 # ============================================================================
 # THERMODYNAMIC DATA MODELS
 # ============================================================================
@@ -1476,6 +1547,7 @@ class ThermodynamicConfig:
     temperature_reference_C: float = 25.0
 
     salt_model: str = "monovalent_equivalent"
+    nn_parameter_set: str = DEFAULT_NN_PARAMETER_SET
 
     def validate(self) -> None:
         validate_thermodynamic_conditions(self)
@@ -1575,13 +1647,12 @@ def validate_thermodynamic_conditions(
             "dna_concentration_mode must be 'duplex' or 'strand'."
         )
 
-    if conditions.salt_model.lower() not in {
-        "monovalent_equivalent",
-        "na_only",
-    }:
+    if conditions.salt_model.lower() not in SALT_MODELS:
         raise ValueError(
-            "salt_model must be 'monovalent_equivalent' or 'na_only'."
+            f"salt_model must be one of: {', '.join(SALT_MODELS)}."
         )
+
+    _nn_parameter_set(conditions.nn_parameter_set)
 
 
 # ============================================================================
@@ -1628,21 +1699,24 @@ def calculate_effective_ionic_strength(
     if model == "na_only":
         return float(sodium_mM)
 
-    if model != "monovalent_equivalent":
+    if model not in SALT_MODELS:
         raise ValueError(
             "Unknown salt model."
         )
 
-    # Approximate free Mg2+ after simple dNTP complexation.
+    # Free Mg2+ after complexation by dNTPs (1:1 approximation).
     free_mg = max(
         0.0,
         magnesium_mM - dntp_mM,
     )
 
-    # A modest 4x conversion gives a transparent monovalent-equivalent
-    # screening term while avoiding the overly aggressive conversion used
-    # in some simplistic implementations.
-    magnesium_equivalent = 4.0 * free_mg
+    if model == "synapse_legacy_4x":
+        # Pre-2026-10-30 Synapse rule, kept only for reproducibility; it has
+        # no published basis and underestimates the Mg2+ effect.
+        magnesium_equivalent = 4.0 * free_mg
+    else:
+        # von Ahsen et al. (2001); identical to Primer3 and Biopython.
+        magnesium_equivalent = 120.0 * sqrt(free_mg)
 
     effective = (
         float(sodium_mM)
@@ -1718,9 +1792,11 @@ def _terminal_at_count(
 
 def _nearest_neighbor_sum(
     sequence: str,
+    parameter_set: str = DEFAULT_NN_PARAMETER_SET,
 ) -> tuple[float, float]:
     """
-    Sum nearest-neighbor ΔH and ΔS values.
+    Sum nearest-neighbor ΔH and ΔS values (1 M NaCl) for one parameter set,
+    including initiation, terminal and symmetry terms.
     """
 
     sequence = normalize_dna_sequence(
@@ -1732,8 +1808,10 @@ def _nearest_neighbor_sum(
             "Nearest-neighbor thermodynamics requires at least 2 bases."
         )
 
-    delta_h = INITIATION_ENTHALPY
-    delta_s = INITIATION_ENTROPY
+    parameters = _nn_parameter_set(parameter_set)
+    stacks = parameters["stacks"]
+
+    delta_h, delta_s = parameters["initiation"]
 
     for left, right in zip(
         sequence,
@@ -1741,31 +1819,21 @@ def _nearest_neighbor_sum(
     ):
         key = left + right
 
-        if key not in NEAREST_NEIGHBOR_PARAMETERS:
+        if key not in stacks:
             raise ValueError(
                 f"No nearest-neighbor parameter for dinucleotide {key}."
             )
 
-        step_h, step_s = (
-            NEAREST_NEIGHBOR_PARAMETERS[key]
-        )
+        step_h, step_s = stacks[key]
 
         delta_h += step_h
         delta_s += step_s
 
-    terminal_at = _terminal_at_count(
-        sequence
-    )
-
-    delta_h += (
-        terminal_at
-        * TERMINAL_AT_ENTHALPY
-    )
-
-    delta_s += (
-        terminal_at
-        * TERMINAL_AT_ENTROPY
-    )
+    for terminal_base in (sequence[0], sequence[-1]):
+        kind = "AT" if terminal_base in "AT" else "GC"
+        term_h, term_s = parameters["terminal"][kind]
+        delta_h += term_h
+        delta_s += term_s
 
     if _is_self_complementary(
         sequence
@@ -1783,6 +1851,7 @@ def calculate_duplex_concentration_term(
     *,
     self_complementary: bool = False,
     mode: str = "duplex",
+    parameter_set: str = DEFAULT_NN_PARAMETER_SET,
 ) -> float:
     """
     Calculate the concentration-dependent logarithmic entropy term.
@@ -1818,8 +1887,13 @@ def calculate_duplex_concentration_term(
         )
 
     if self_complementary:
+        # SantaLucia (1998): CT for self-complementary duplexes (Primer3
+        # "Equation A"); the legacy set used CT/2.
+        divisor = _nn_parameter_set(parameter_set)[
+            "self_complementary_concentration_divisor"
+        ]
         concentration_term = log(
-            concentration_M / 2.0
+            concentration_M / divisor
         )
 
     return concentration_term
@@ -1838,6 +1912,7 @@ def calculate_tm_nearest_neighbor(
     primer_nM: float = 250.0,
     dna_concentration_mode: str = "duplex",
     salt_model: str = "monovalent_equivalent",
+    nn_parameter_set: str = DEFAULT_NN_PARAMETER_SET,
 ) -> float:
     """
     Calculate a nearest-neighbor DNA/DNA duplex Tm.
@@ -1877,6 +1952,7 @@ def calculate_tm_nearest_neighbor(
         primer_nM=primer_nM,
         dna_concentration_mode=dna_concentration_mode,
         salt_model=salt_model,
+        nn_parameter_set=nn_parameter_set,
     )
 
     conditions.validate()
@@ -1887,7 +1963,8 @@ def calculate_tm_nearest_neighbor(
 
     delta_h, delta_s = (
         _nearest_neighbor_sum(
-            sequence
+            sequence,
+            nn_parameter_set,
         )
     )
 
@@ -1908,7 +1985,7 @@ def calculate_tm_nearest_neighbor(
 
     corrected_delta_s = (
         delta_s
-        + len(sequence)
+        + _salt_phosphate_count(sequence, nn_parameter_set)
         * salt_correction
     )
 
@@ -1923,6 +2000,7 @@ def calculate_tm_nearest_neighbor(
             primer_nM,
             self_complementary=self_complementary,
             mode=dna_concentration_mode,
+            parameter_set=nn_parameter_set,
         )
     )
 
@@ -1966,6 +2044,7 @@ def calculate_duplex_thermodynamics(
     dna_concentration_mode: str = "duplex",
     salt_model: str = "monovalent_equivalent",
     reference_temperature_C: float = 25.0,
+    nn_parameter_set: str = DEFAULT_NN_PARAMETER_SET,
 ) -> DuplexThermodynamics:
     """
     Return the full nearest-neighbor thermodynamic profile.
@@ -1979,6 +2058,7 @@ def calculate_duplex_thermodynamics(
         dna_concentration_mode=dna_concentration_mode,
         temperature_reference_C=reference_temperature_C,
         salt_model=salt_model,
+        nn_parameter_set=nn_parameter_set,
     )
 
     conditions.validate()
@@ -1989,7 +2069,8 @@ def calculate_duplex_thermodynamics(
 
     delta_h, delta_s = (
         _nearest_neighbor_sum(
-            sequence
+            sequence,
+            nn_parameter_set,
         )
     )
 
@@ -2010,7 +2091,7 @@ def calculate_duplex_thermodynamics(
 
     corrected_delta_s = (
         delta_s
-        + len(sequence)
+        + _salt_phosphate_count(sequence, nn_parameter_set)
         * salt_correction
     )
 
@@ -2025,6 +2106,7 @@ def calculate_duplex_thermodynamics(
             primer_nM,
             self_complementary=self_complementary,
             mode=dna_concentration_mode,
+            parameter_set=nn_parameter_set,
         )
     )
 
@@ -2181,6 +2263,7 @@ def calculate_primer_thermodynamics(
             reference_temperature_C=(
                 conditions.temperature_reference_C
             ),
+            nn_parameter_set=conditions.nn_parameter_set,
         )
     )
 
@@ -2281,6 +2364,9 @@ def calculate_tm_advanced(
             ),
             salt_model=(
                 thermodynamic_config.salt_model
+            ),
+            nn_parameter_set=(
+                thermodynamic_config.nn_parameter_set
             ),
         )
 
@@ -3008,6 +3094,17 @@ def _print_thermodynamic_conditions(
     print(
         f"Salt model:             "
         f"{conditions.salt_model}"
+        + (
+            " (von Ahsen et al. 2001: Na + 120*sqrt(Mg - dNTP))"
+            if conditions.salt_model == "monovalent_equivalent"
+            else ""
+        )
+    )
+
+    print(
+        f"NN parameters:          "
+        f"{conditions.nn_parameter_set} - "
+        f"{NN_PARAMETER_SETS[conditions.nn_parameter_set]['reference']}"
     )
 
 
@@ -4295,6 +4392,7 @@ def calculate_tm_nearest_neighbor(
     primer_concentration_nM: Optional[float] = None,
     include_symmetry_correction: bool = True,
     return_details: bool = False,
+    nn_parameter_set: str = DEFAULT_NN_PARAMETER_SET,
 ) -> float | NearestNeighborTmResult:
     """
     Backward-compatible nearest-neighbor Tm API.
@@ -4321,6 +4419,15 @@ def calculate_tm_nearest_neighbor(
             primer_concentration_nM
         )
 
+    if not include_symmetry_correction:
+        # The symmetry term only matters for self-complementary oligos; it
+        # cannot be switched off in the consistent parameter sets.
+        import logging
+        logging.getLogger("synapse.primer").info(
+            "include_symmetry_correction=False is ignored; the symmetry term "
+            "is part of the nearest-neighbor model."
+        )
+
     tm = _calculate_tm_nearest_neighbor_v3_raw(
         sequence,
         sodium_mM=sodium_mM,
@@ -4329,6 +4436,7 @@ def calculate_tm_nearest_neighbor(
         primer_nM=primer_nM,
         dna_concentration_mode=dna_concentration_mode,
         salt_model=salt_model,
+        nn_parameter_set=nn_parameter_set,
     )
 
     if not return_details:
@@ -4342,6 +4450,7 @@ def calculate_tm_nearest_neighbor(
         primer_nM=primer_nM,
         dna_concentration_mode=dna_concentration_mode,
         salt_model=salt_model,
+        nn_parameter_set=nn_parameter_set,
     )
 
     return NearestNeighborTmResult(
