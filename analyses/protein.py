@@ -3944,23 +3944,17 @@ def _print_physicochemical_structural(analysis):
     print()
     print(
         f"Hydropathy:          "
-        f"{_hydropathy_interpretation(
-            analysis['gravy']
-        )}"
+        f"{_hydropathy_interpretation(analysis['gravy'])}"
     )
 
     print(
         f"Charge:              "
-        f"{_charge_interpretation(
-            analysis
-        )}"
+        f"{_charge_interpretation(analysis)}"
     )
 
     print(
         f"Stability:           "
-        f"{_stability_interpretation(
-            analysis
-        )}"
+        f"{_stability_interpretation(analysis)}"
     )
 
     print()
@@ -4258,9 +4252,7 @@ def _print_complete_protein_report(
     else:
         print(
             f"Reading frame:       "
-            f"{_frame_display(
-                translation['reading_frame']
-            )}"
+            f"{_frame_display(translation['reading_frame'])}"
         )
 
         print(
@@ -4342,23 +4334,17 @@ def _print_complete_protein_report(
 
     print(
         f"Hydropathy:          "
-        f"{_hydropathy_interpretation(
-            analysis['gravy']
-        )}"
+        f"{_hydropathy_interpretation(analysis['gravy'])}"
     )
 
     print(
         f"Charge:              "
-        f"{_charge_interpretation(
-            analysis
-        )}"
+        f"{_charge_interpretation(analysis)}"
     )
 
     print(
         f"Stability:           "
-        f"{_stability_interpretation(
-            analysis
-        )}"
+        f"{_stability_interpretation(analysis)}"
     )
 
     print()
