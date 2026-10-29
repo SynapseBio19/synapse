@@ -201,38 +201,56 @@ def get_overhang(enzyme_name):
     if value is not None:
         return str(value).upper()
 
-    # Conservative fallback for the standard enzyme set used by
-    # Synapse. This is only used when the database does not expose
-    # the overhang explicitly.
-    fallback = {
-        "EcoRI": "AATT",
-        "BamHI": "GATC",
-        "HindIII": "AGCT",
-        "XhoI": "TCGA",
-        "SalI": "TCGA",
-        "PstI": "TGCA",
-        "KpnI": "GTAC",
-        "SacI": "AGCT",
-        "SphI": "CATG",
-        "NdeI": "CATATG",
-        "NcoI": "CATG",
-        "XbaI": "CTAG",
-        "SpeI": "CTAG",
-        "ClaI": "TCGA",
-        "EcoRV": "",
-        "SmaI": "",
-        "AluI": "",
-        "HaeIII": "",
-        "MspI": "CG",
-        "HpaII": "CG",
-        "TaqI": "CG",
-        "DpnI": "",
-    }
+    # Derive the single-stranded overhang from the database cut positions.
+    # For the palindromic Type II enzymes in the Synapse database the
+    # overhang, read 5'->3' on the top strand, is the part of the
+    # recognition site between the two strand cuts (G^AATT_C -> AATT,
+    # CA^TA_TG -> TA, CTGCA^G with bottom cut at 1 -> TGCA).
+    # This replaces a hand-written fallback table that contained errors
+    # (NdeI "CATATG", ClaI "TCGA"); see docs/CHANGES.md, audit P0-4.
+    recognition = get_recognition_sequence(enzyme_name)
+    try:
+        top = int(enzyme["cut_top"])
+        bottom = int(enzyme["cut_bottom"])
+    except (KeyError, TypeError, ValueError):
+        return ""
 
-    return fallback.get(
-        enzyme_name,
-        "",
+    if top == bottom:
+        return ""
+
+    start, end = min(top, bottom), max(top, bottom)
+    if start < 0 or end > len(recognition):
+        return ""
+
+    return recognition[start:end]
+
+
+def get_overhang_polarity(enzyme_name):
+    """Return '5_prime', '3_prime' or 'blunt' for an enzyme's DNA ends.
+
+    The polarity is part of end chemistry: a 5' AGCT overhang (HindIII)
+    cannot anneal to a 3' AGCT overhang (SacI) although the letters agree.
+    """
+    enzyme = get_enzyme_data(
+        enzyme_name
     )
+
+    if enzyme.get("is_blunt", False):
+        return "blunt"
+
+    try:
+        top = int(enzyme["cut_top"])
+        bottom = int(enzyme["cut_bottom"])
+    except (KeyError, TypeError, ValueError):
+        declared = str(enzyme.get("overhang_type", "")).lower()
+        if declared in {"5_prime", "3_prime", "blunt"}:
+            return declared
+        return "unknown"
+
+    if top == bottom:
+        return "blunt"
+
+    return "5_prime" if top < bottom else "3_prime"
 
 
 def is_blunt_enzyme(enzyme_name):
@@ -331,6 +349,9 @@ def analyze_enzyme(
         ),
         "overhang_length": len(
             overhang
+        ),
+        "overhang_polarity": get_overhang_polarity(
+            enzyme_name
         ),
         "is_blunt": is_blunt_enzyme(
             enzyme_name
@@ -475,6 +496,10 @@ def make_site(
             "overhang_length",
             0,
         ),
+        "overhang_polarity": analysis.get(
+            "overhang_polarity",
+            "unknown",
+        ),
         "is_blunt": bool(
             analysis.get(
                 "is_blunt",
@@ -512,6 +537,10 @@ def make_missing_site(
         "overhang_length": analysis.get(
             "overhang_length",
             0,
+        ),
+        "overhang_polarity": analysis.get(
+            "overhang_polarity",
+            "unknown",
         ),
         "is_blunt": bool(
             analysis.get(
@@ -563,7 +592,25 @@ def _end_signature(site):
         "known": True,
         "kind": "COHESIVE",
         "overhang": overhang,
+        "polarity": _site_polarity(site),
     }
+
+
+def _site_polarity(site):
+    """Overhang polarity of a site dict ('5_prime', '3_prime', 'blunt', 'unknown').
+
+    Sites created before polarity was recorded fall back to the enzyme
+    database entry.
+    """
+    polarity = str(site.get("overhang_polarity") or "").lower()
+    if polarity in {"5_prime", "3_prime", "blunt"}:
+        return polarity
+
+    enzyme_name = site.get("enzyme")
+    if enzyme_name in RESTRICTION_ENZYMES:
+        return get_overhang_polarity(enzyme_name)
+
+    return "unknown"
 
 
 def ends_compatible(
@@ -611,6 +658,18 @@ def ends_compatible(
 
     if not first_overhang or not second_overhang:
         return None
+
+    # End chemistry: a 5' overhang can only anneal to a 5' overhang and a
+    # 3' overhang only to a 3' overhang (e.g. HindIII 5'-AGCT is NOT
+    # compatible with SacI 3'-AGCT). Unknown polarity -> undetermined.
+    first_polarity = first_signature.get("polarity", "unknown")
+    second_polarity = second_signature.get("polarity", "unknown")
+
+    if "unknown" in (first_polarity, second_polarity):
+        return None
+
+    if first_polarity != second_polarity:
+        return False
 
     return (
         first_overhang == second_overhang

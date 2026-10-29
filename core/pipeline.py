@@ -820,6 +820,7 @@ class SynapsePipeline:
             rna, source_name = (
                 self.get_protein_source_rna()
             )
+            initiator_start = source_name == "Selected ORF"
 
         else:
 
@@ -834,10 +835,12 @@ class SynapsePipeline:
             source_name = (
                 "Selected DNA"
             )
+            initiator_start = False
 
         result = analyze_complete_protein(
             protein="",
-            rna=rna
+            rna=rna,
+            initiator_start=initiator_start,
         )
 
         protein = result.get(

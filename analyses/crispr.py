@@ -1457,6 +1457,30 @@ def extract_orf_context(orf: Any) -> Optional[Tuple[str, int, str]]:
     return seq, max(1, start), name
 
 
+def orf_target_context(orf: Any, parent_sequence: Optional[str]) -> Optional[Tuple[str, int, str, str]]:
+    """Return (forward-strand target, 1-based start, name, ORF strand) for an ORF.
+
+    The target is the ORF's genomic region on the FORWARD strand of the parent
+    sequence, so guides found on both strands are reported in parent-sequence
+    coordinates with their true strand (audit P0-2). Without a parent
+    sequence that matches the ORF, the ORF sequence itself is used and
+    coordinates are relative to the ORF (stated in the region name).
+    """
+    from core.orf_context import resolve_orf_region
+
+    region = resolve_orf_region(orf, parent_sequence)
+    if region is None:
+        return None
+    if region.validated and region.forward_region:
+        name = f"{region.name} ({region.strand} strand, {region.start_1based}-{region.end_1based})"
+        return region.forward_region, region.start_1based, name, region.strand
+    try:
+        coding = normalize_sequence(region.coding_sequence)
+    except CRISPRAnalysisError:
+        return None
+    return coding, 1, f"{region.name} (ORF-relative coordinates)", "+"
+
+
 def build_target_region(
     sequence: str,
     *,
@@ -1572,11 +1596,12 @@ def run_crispr_analysis(
     region_start = 1
     region_name = "Selected Region"
     feature_type = "sequence"
+    feature_strand = "+"
     target = sequence
     if selected_orf is not None:
-        extracted = extract_orf_context(selected_orf)
-        if extracted is not None:
-            target, region_start, region_name = extracted
+        context = orf_target_context(selected_orf, sequence)
+        if context is not None:
+            target, region_start, region_name, feature_strand = context
             feature_type = "ORF"
     return design_guides(
         target,
@@ -1587,6 +1612,7 @@ def run_crispr_analysis(
         region_source="ORF" if feature_type == "ORF" else "sequence",
         feature_type=feature_type,
         feature_name=region_name,
+        feature_strand=feature_strand,
         config=config or DesignConfig(system=system),
     )
 
@@ -2132,9 +2158,9 @@ def crispr_menu(
     config = DesignConfig()
 
     if selected_orf is not None:
-        extracted = extract_orf_context(selected_orf)
+        extracted = orf_target_context(selected_orf, base_sequence)
         if extracted is not None:
-            orf_seq, orf_start, orf_name = extracted
+            orf_seq, orf_start, orf_name, _orf_strand = extracted
             base_sequence = orf_seq
             current_name = orf_name
             region_start = orf_start
@@ -2178,10 +2204,13 @@ def crispr_menu(
                     continue
                 try:
                     selected_seq, start, end, name, _source = _load_orf_or_region(base_sequence)
+                    # start/end are 1-based within the CURRENT base sequence,
+                    # which may itself be a region; keep parent coordinates.
+                    offset = region_start - 1
                     base_sequence = selected_seq
-                    region_start = start
-                    region_end = end
-                    region_name = name
+                    region_start = start + offset
+                    region_end = end + offset
+                    region_name = f"Region {region_start}-{region_end}"
                     feature_type = "region"
                     last_result = None
                     print(f"Selected {region_name} ({len(base_sequence)} bp).")

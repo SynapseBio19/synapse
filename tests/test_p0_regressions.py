@@ -1,9 +1,8 @@
 """Known-answer regression tests for the nine P0 findings of the 2026-10-29 audit.
 
-Each test states the scientifically expected behavior. Before a fix lands the
-test is decorated with ``unittest.expectedFailure`` so the suite documents the
-open defect without hiding it; the decorator is removed in the commit that
-fixes the defect.
+Each test states the scientifically expected behavior. In Stage 0 these tests
+were marked ``expectedFailure`` (they reproduced the defects); since Stage 1
+they must pass.
 """
 
 from __future__ import annotations
@@ -54,7 +53,7 @@ class P01BlastCoverageAndEvidence(unittest.TestCase):
         hsp = data["hits"][0]["hsps"][0]
         self.assertEqual(hsp["alignment_length"], 32)
         hit = B.BlastHit(hit_id="h", accession="h", definition="", length=None,
-                         hsps=[B.BlastHSP(**{k: hsp[k] for k in B.BlastHSP.__dataclass_fields__})],
+                         hsps=[B.BlastHSP(**{k: hsp[k] for k in B.BlastHSP.__dataclass_fields__ if k in hsp})],
                          query_length=99)
         self.assertAlmostEqual(hit.best_coverage_percent, 32.323, places=2)
 
@@ -156,6 +155,16 @@ class P07VariantNormalization(unittest.TestCase):
     def test_deletion_in_run_is_left_shifted_with_anchor(self):
         self.assertEqual(self._norm(6, "AA", "A"), (3, "CA", "C"))
 
+    def test_mnv_and_snv_unchanged(self):
+        self.assertEqual(self._norm(2, "G", "T"), (2, "G", "T"))
+        self.assertEqual(self._norm(4, "AA", "TT"), (4, "AA", "TT"))
+
+    def test_deletion_reaching_sequence_start_is_right_anchored(self):
+        # Reference AAAC...: deleting one A of the leading run.
+        from analyses import variant_analysis as V
+        v = V.left_normalize_variant(V.Variant("chr1", 2, "AA", "A"), reference_sequence="AAACGT")
+        self.assertEqual((v.position, v.reference, v.alternative), (1, "AA", "A"))
+
     def test_reference_mismatch_is_reported(self):
         from analyses import variant_analysis as V
         v = V.left_normalize_variant(V.Variant("chr1", 2, "T", "C"), reference_sequence=self.REF)
@@ -189,27 +198,8 @@ class P09OrfDefaults(unittest.TestCase):
         self.assertTrue(all(o["start_codon"] == "ATG" for o in orfs))
 
 
-# Mark every open defect. The decorators are removed as each fix lands.
-_OPEN = [
-    (P01BlastCoverageAndEvidence, ["test_query_coverage_is_fraction_of_query",
-                                   "test_non_significant_hit_gets_no_evidence_band",
-                                   "test_stored_test8_result_recomputed"]),
-    (P02CrisprOrfCoordinates, ["test_plus_strand_orf", "test_minus_strand_orf"]),
-    (P03CloningEndPolarity, ["test_same_sequence_opposite_polarity_is_incompatible"]),
-    (P04EnzymeData, ["test_clai_cuts_at_ct_cgat_with_cg_overhang", "test_cloning_overhangs_derive_from_cut_positions"]),
-    (P05AmbiguousSitesNotCut, ["test_n_run_produces_no_physical_cut"]),
-    (P06StartLoss, ["test_internal_met_change_is_missense"]),
-    (P07VariantNormalization, ["test_non_repeat_deletion_keeps_identity",
-                               "test_insertion_in_run_is_left_shifted_with_anchor",
-                               "test_deletion_in_run_is_left_shifted_with_anchor",
-                               "test_reference_mismatch_is_reported"]),
-    (P08AlternativeStartTranslation, ["test_orf_translation_uses_initiator_met",
-                                      "test_protein_translation_from_orf_start"]),
-    (P09OrfDefaults, ["test_reference_cds_ranks_first", "test_default_minimum_length_is_75_nt"]),
-]
-for _cls, _names in _OPEN:
-    for _n in _names:
-        setattr(_cls, _n, unittest.expectedFailure(getattr(_cls, _n)))
+# All nine P0 defects were fixed in Stage 1 (2026-10-29); no test is marked
+# expectedFailure any more. See docs/CHANGES.md.
 
 
 if __name__ == "__main__":

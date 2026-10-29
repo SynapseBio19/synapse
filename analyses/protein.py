@@ -651,7 +651,15 @@ def translate_protein(rna):
 
 
 
-def analyze_translation(rna):
+def analyze_translation(rna, initiator_start=False):
+    """Translate RNA in frame +1 with the standard genetic code.
+
+    initiator_start=True states that the first codon is the selected start
+    codon of an ORF. Alternative initiation codons (GUG, UUG, ...) are then
+    decoded as methionine, because initiator tRNA inserts (formyl-)Met at
+    the start codon (audit P0-8). For arbitrary sequence windows leave it
+    False: the first codon is translated with the elongation code.
+    """
 
     if not isinstance(rna, str):
         return {
@@ -715,6 +723,17 @@ def analyze_translation(rna):
             codon
         )
 
+        initiator = False
+        if (
+            initiator_start
+            and codon_index == 0
+            and result["status"] == "resolved"
+        ):
+            result = dict(result)
+            result["amino_acid"] = "M"
+            result["possibilities"] = ["M"]
+            initiator = True
+
         iupac_ambiguous = any(
             base not in "AUCG"
             for base in codon
@@ -742,6 +761,8 @@ def analyze_translation(rna):
                 result["contains_stop"],
             "iupac_ambiguous":
                 iupac_ambiguous,
+            "initiator":
+                initiator,
         }
 
         records.append(record)
@@ -834,6 +855,9 @@ def analyze_translation(rna):
 
         "invalid_codon_count":
             invalid_codons,
+
+        "initiator_start":
+            bool(initiator_start),
     }
 
 
@@ -2113,7 +2137,8 @@ def analyze_protein_properties(
 
 def analyze_complete_protein(
     protein,
-    rna=None
+    rna=None,
+    initiator_start=False,
 ):
 
     if not isinstance(protein, str):
@@ -2128,7 +2153,8 @@ def analyze_complete_protein(
     if rna is not None:
 
         translation = analyze_translation(
-            rna
+            rna,
+            initiator_start=initiator_start,
         )
 
         protein = translation[
@@ -4512,6 +4538,7 @@ def protein_analysis_menu(
     strand=None,
     reading_frame=None,
     orf_status=None,
+    initiator_start=False,
 ):
     """
     Main Protein Analysis UI.
@@ -4523,7 +4550,8 @@ def protein_analysis_menu(
     if rna is not None:
 
         translation = analyze_translation(
-            rna
+            rna,
+            initiator_start=initiator_start,
         )
 
         # Preserve the biological frame from the selected ORF.
@@ -4718,8 +4746,11 @@ def run_protein_analysis_from_orf(
         "U"
     )
 
+    # Every Synapse ORF begins at its start codon, so the first codon is
+    # decoded as initiator Met (also for GTG/TTG starts).
     translation = analyze_translation(
-        rna
+        rna,
+        initiator_start=True,
     )
 
     if reading_frame is not None:
@@ -4755,4 +4786,5 @@ def run_protein_analysis_from_orf(
             else "+1"
         ),
         orf_status=orf_status,
+        initiator_start=True,
     )

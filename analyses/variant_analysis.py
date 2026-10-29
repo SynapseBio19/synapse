@@ -742,6 +742,11 @@ def trim_common_bases(
     return pos, ref, alt
 
 
+def _reference_allele_matches(allele: str, observed: str) -> bool:
+    """REF allele vs. reference bases; N in either matches any base."""
+    return all(a == b or a == "N" or b == "N" for a, b in zip(allele, observed))
+
+
 def left_normalize_variant(
     variant: Variant,
     reference_sequence: Optional[str] = None,
@@ -781,32 +786,61 @@ def left_normalize_variant(
         annotation=dict(variant.annotation),
     )
 
-    pos, ref, alt = trim_common_bases(
-        new.position, new.reference, new.alternative
-    )
+    if new.variant_type == "SYMBOLIC" or new.alternative == "*" or not validate_allele(
+        new.reference, allow_symbolic=False
+    ) or not validate_allele(new.alternative, allow_symbolic=False):
+        new.normalization_notes.append(
+            "Symbolic, spanning-deletion or non-ACGTN allele: not normalized."
+        )
+        return new
+
+    pos, ref, alt = new.position, new.reference, new.alternative
+
+    reference_checked = False
+    if reference_sequence is not None:
+        reference_sequence = str(reference_sequence).upper()
+        observed = reference_sequence[pos - 1:pos - 1 + len(ref)]
+        if len(observed) != len(ref) or not _reference_allele_matches(ref, observed):
+            flags = new.annotation.setdefault("validation_flags", [])
+            if "REF_MISMATCH" not in flags:
+                flags.append("REF_MISMATCH")
+            new.normalization_notes.append(
+                f"REF allele '{ref}' does not match the reference sequence "
+                f"('{observed or 'out of range'}') at position {pos}; "
+                "repeat-aware shifting was not applied."
+            )
+            reference_sequence = None
+        else:
+            reference_checked = True
 
     if reference_sequence is not None and len(ref) != len(alt):
-        reference_sequence = str(reference_sequence).upper()
-        while pos > 1:
-            previous_index = pos - 2
-            if previous_index >= len(reference_sequence):
-                break
-            previous_base = reference_sequence[previous_index]
-
-            if ref and alt:
-                if ref[-1] != previous_base and alt[-1] != previous_base:
-                    break
-                ref = previous_base + ref[:-1]
-                alt = previous_base + alt[:-1]
-            elif ref:
-                if ref[-1] != previous_base:
-                    break
-                ref = previous_base + ref[:-1]
-            elif alt:
-                if alt[-1] != previous_base:
-                    break
-                alt = previous_base + alt[:-1]
-            pos -= 1
+        # Tan, Abecasis & Kang (2015), Bioinformatics 31:2202, Algorithm 1:
+        # repeat: (1) drop an identical last base from both alleles;
+        #         (2) if an allele became empty, prepend the preceding
+        #             reference base to both and move one position left;
+        # until neither applies. Then trim identical leading bases while
+        # both alleles are longer than one base.
+        changed = True
+        while changed:
+            changed = False
+            if ref and alt and ref[-1] == alt[-1]:
+                ref, alt = ref[:-1], alt[:-1]
+                changed = True
+            if (not ref or not alt) and pos > 1:
+                previous = reference_sequence[pos - 2]
+                ref, alt = previous + ref, previous + alt
+                pos -= 1
+                changed = True
+        if (not ref or not alt) and pos == 1:
+            # VCF 4.3: an indel at position 1 is anchored on the base AFTER
+            # the event.
+            following = reference_sequence[len(ref):len(ref) + 1]
+            ref, alt = ref + following, alt + following
+        while len(ref) > 1 and len(alt) > 1 and ref[0] == alt[0]:
+            ref, alt = ref[1:], alt[1:]
+            pos += 1
+    else:
+        pos, ref, alt = trim_common_bases(pos, ref, alt)
 
     new.position = pos
     new.reference = ref
@@ -815,8 +849,11 @@ def left_normalize_variant(
     new.end_position = pos + max(0, len(ref) - 1)
     new.normalized = True
     new.normalization_notes.append("Common bases trimmed.")
-    if reference_sequence is not None:
-        new.normalization_notes.append("Repeat-aware left shifting applied where possible.")
+    if reference_checked:
+        new.normalization_notes.append(
+            "REF allele verified against the reference; left-aligned and "
+            "parsimonious (Tan et al. 2015)."
+        )
     return new
 
 

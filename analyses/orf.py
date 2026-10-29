@@ -31,7 +31,35 @@ STANDARD_STOP_CODONS = {
     "TGA"
 }
 
-DEFAULT_MIN_ORF_LENGTH = 10
+# ------------------------------------------------------------
+# Default search policy (audit P0-9, 2026-10-29)
+# ------------------------------------------------------------
+# Defaults follow NCBI ORFfinder conventions: minimal ORF length 75 nt
+# (stop codon included), ATG-only start codons, and one ORF per stop codon
+# (the longest, i.e. outermost in-frame start). These are screening
+# conventions, not biological thresholds: short ORFs, non-ATG starts and
+# nested ORFs exist and can be enabled explicitly.
+#
+# Previous defaults (still selectable): min length 10 nt, starts
+# ATG/GTG/TTG, every in-frame start reported, heuristic score ranking.
+DEFAULT_MIN_ORF_LENGTH = 75
+
+START_CODON_POLICIES = {
+    "atg_only": frozenset(STANDARD_START_CODONS),
+    "atg_and_alternative": frozenset(ALL_START_CODONS),
+}
+
+DEFAULT_START_CODON_POLICY = "atg_only"
+DEFAULT_REPORT_NESTED = False
+DEFAULT_RANKING = "length"
+ORF_RANKING_MODES = ("length", "heuristic")
+
+LEGACY_ORF_SETTINGS = {
+    "min_length": 10,
+    "start_codon_policy": "atg_and_alternative",
+    "nested": True,
+    "ranking": "heuristic",
+}
 
 
 DNA_IUPAC = {
@@ -882,16 +910,89 @@ def calculate_orf_confidence(
 # ORF FINDER
 # ============================================================
 
+def resolve_start_codons(start_codons=None, start_codon_policy=None):
+    """Return the start-codon set from an explicit set or a named policy."""
+    if start_codons is not None:
+        return set(start_codons)
+    policy = start_codon_policy or DEFAULT_START_CODON_POLICY
+    if policy not in START_CODON_POLICIES:
+        raise ValueError(
+            f"Unknown start codon policy '{policy}'. "
+            f"Use one of: {', '.join(START_CODON_POLICIES)}."
+        )
+    return set(START_CODON_POLICIES[policy])
+
+
+def _orf_sort_key(orf, ranking):
+    if ranking == "heuristic":
+        return (
+            orf["confidence"]["score"],
+            orf["cds_quality"]["score"],
+            orf["length"],
+            orf["status"] == "Complete",
+            orf["start_type"] == "Canonical",
+        )
+    # "length": longest ORF first (ORFfinder-style); ties broken by
+    # completeness, canonical start and then the heuristic score.
+    return (
+        orf["length"],
+        orf["status"] == "Complete",
+        orf["start_type"] == "Canonical",
+        orf["confidence"]["score"],
+    )
+
+
+def _keep_longest_per_stop(orfs):
+    """Keep only the outermost ORF for each (strand, frame, 3' end)."""
+    best = {}
+    for orf in orfs:
+        three_prime = orf["stop"] if orf["strand"] == "+" else orf["start"]
+        key = (orf["strand"], orf["frame"], three_prime, orf["status"])
+        current = best.get(key)
+        if current is None or orf["length"] > current["length"]:
+            best[key] = orf
+    return list(best.values())
+
+
 def find_orfs(
     dna,
     include_partial=True,
     min_length=DEFAULT_MIN_ORF_LENGTH,
     start_codons=None,
-    stop_codons=None
+    stop_codons=None,
+    start_codon_policy=None,
+    nested=DEFAULT_REPORT_NESTED,
+    ranking=DEFAULT_RANKING,
 ):
+    """Find open reading frames on both strands.
 
-    if start_codons is None:
-        start_codons = ALL_START_CODONS
+    Parameters
+    ----------
+    min_length:
+        Minimum ORF length in nucleotides, stop codon included.
+    start_codon_policy:
+        "atg_only" (default) or "atg_and_alternative" (ATG/GTG/TTG). Ignored
+        when ``start_codons`` is given explicitly.
+    nested:
+        False (default): report only the longest ORF per stop codon.
+        True: report every in-frame start as its own (nested) ORF.
+    ranking:
+        "length" (default, longest first) or "heuristic" (legacy
+        confidence score).
+
+    Coordinates in the result are 0-based and inclusive on the forward
+    strand ("start" <= "stop"), for both strands.
+    """
+
+    if ranking not in ORF_RANKING_MODES:
+        raise ValueError(
+            f"ranking must be one of {ORF_RANKING_MODES}."
+        )
+
+    start_codons = resolve_start_codons(
+        start_codons,
+        start_codon_policy,
+    )
 
     if stop_codons is None:
         stop_codons = STANDARD_STOP_CODONS
@@ -1381,17 +1482,15 @@ def find_orfs(
 
                 position += 3
 
+    if not nested:
+        orfs = _keep_longest_per_stop(orfs)
+
     # ========================================================
     # RANK ORFS
     # ========================================================
 
     orfs.sort(
-        key=lambda orf: (
-            orf["confidence"]["score"],
-            orf["cds_quality"]["score"],
-            orf["length"],
-            orf["status"] == "Complete"
-        ),
+        key=lambda orf: _orf_sort_key(orf, ranking),
         reverse=True
     )
 
@@ -1688,20 +1787,26 @@ def summarize_orfs(
 def analyze_orfs(
     dna,
     include_partial=True,
-    min_length=DEFAULT_MIN_ORF_LENGTH
+    min_length=DEFAULT_MIN_ORF_LENGTH,
+    start_codon_policy=None,
+    nested=DEFAULT_REPORT_NESTED,
+    ranking=DEFAULT_RANKING,
 ):
 
     """
     Unified high-level ORF analysis.
 
     Returns all ORFs together with summary, frame statistics,
-    density and ranked candidates.
+    density, ranked candidates and the search parameters used.
     """
 
     orfs = find_orfs(
         dna,
         include_partial=include_partial,
-        min_length=min_length
+        min_length=min_length,
+        start_codon_policy=start_codon_policy,
+        nested=nested,
+        ranking=ranking,
     )
 
     summary = summarize_orfs(
@@ -1718,6 +1823,17 @@ def analyze_orfs(
 
         "include_partial":
             include_partial,
+
+        "parameters": {
+            "min_length_nt": min_length,
+            "include_partial": include_partial,
+            "start_codon_policy": start_codon_policy or DEFAULT_START_CODON_POLICY,
+            "start_codons": sorted(resolve_start_codons(None, start_codon_policy)),
+            "stop_codons": sorted(STANDARD_STOP_CODONS),
+            "nested": nested,
+            "ranking": ranking,
+            "genetic_code": "NCBI translation table 1 (standard)",
+        },
 
         "orfs":
             orfs,
@@ -2007,7 +2123,7 @@ def print_orf_report(
         print("-" * 45)
 
         print(
-            f"Confidence:          "
+            f"Heuristic score:     "
             f"{orf['confidence']['score']}/100 "
             f"({orf['confidence']['classification']})"
         )
@@ -2459,17 +2575,13 @@ def analyze_orf_relationships(orfs):
 # ORF RANKING / COMPARISON
 # ============================================================
 
-def rank_orf_candidates(orfs):
-    """Return ORFs ranked by the existing heuristic confidence model."""
+def rank_orf_candidates(orfs, ranking=DEFAULT_RANKING):
+    """Return ORFs ranked by length (default) or the heuristic score."""
+    if ranking not in ORF_RANKING_MODES:
+        raise ValueError(f"ranking must be one of {ORF_RANKING_MODES}.")
     ranked = sorted(
         orfs,
-        key=lambda orf: (
-            orf["confidence"]["score"],
-            orf["cds_quality"]["score"],
-            orf["length"],
-            orf["status"] == "Complete",
-            orf["start_type"] == "Canonical",
-        ),
+        key=lambda orf: _orf_sort_key(orf, ranking),
         reverse=True,
     )
 
@@ -2479,9 +2591,16 @@ def rank_orf_candidates(orfs):
     return ranked
 
 
-def compare_orf_candidates(orfs, top_n=5):
-    """Create a compact comparison table for the best ORF candidates."""
-    ranked = rank_orf_candidates(orfs)
+def compare_orf_candidates(orfs, top_n=5, ranking=None):
+    """Create a compact comparison table for the best ORF candidates.
+
+    ranking=None keeps the existing ranks (no re-ranking); pass "length" or
+    "heuristic" to re-rank.
+    """
+    if ranking is None and all("rank" in orf for orf in orfs):
+        ranked = sorted(orfs, key=lambda orf: orf["rank"])
+    else:
+        ranked = rank_orf_candidates(orfs, ranking=ranking or DEFAULT_RANKING)
     return [
         {
             "rank": orf["rank"],
@@ -2506,18 +2625,30 @@ def compare_orf_candidates(orfs, top_n=5):
 # ORF TRANSLATION PREVIEW
 # ============================================================
 
-def translate_orf_sequence(orf_sequence):
+def translate_orf_sequence(orf_sequence, initiator_start=True):
     """
     Translate an ORF using the local genetic code.
 
     Ambiguous codons are translated as '?' when they do not resolve to a
     single amino acid. STOP terminates the returned protein and is not added
     as an amino-acid character.
+
+    initiator_start=True (default, because every Synapse ORF begins at its
+    start codon): a definite start codon in position 1 -- ATG, GTG or TTG --
+    is decoded as methionine, as initiator tRNA does (audit P0-8).
     """
     protein = []
 
     for position in range(0, len(orf_sequence) - 2, 3):
         codon = orf_sequence[position:position + 3].upper()
+
+        if (
+            position == 0
+            and initiator_start
+            and codon in ALL_START_CODONS
+        ):
+            protein.append("M")
+            continue
 
         if any(base not in DNA_IUPAC for base in codon):
             protein.append("?")
@@ -2624,6 +2755,9 @@ def analyze_orfs_enhanced(
     include_partial=True,
     min_length=DEFAULT_MIN_ORF_LENGTH,
     top_n=5,
+    start_codon_policy=None,
+    nested=DEFAULT_REPORT_NESTED,
+    ranking=DEFAULT_RANKING,
 ):
     """
     Full ORF analysis with ranking, candidate comparison, overlap/nesting
@@ -2633,15 +2767,19 @@ def analyze_orfs_enhanced(
         dna,
         include_partial=include_partial,
         min_length=min_length,
+        start_codon_policy=start_codon_policy,
+        nested=nested,
+        ranking=ranking,
     )
 
-    ranked = rank_orf_candidates(result["orfs"])
+    ranked = rank_orf_candidates(result["orfs"], ranking=ranking)
     relationships = analyze_orf_relationships(ranked)
 
     result["orfs"] = ranked
     result["top_candidates"] = compare_orf_candidates(
         ranked,
         top_n=top_n,
+        ranking=ranking,
     )
     result["relationships"] = relationships
     result["feature_summary"] = calculate_orf_feature_summary(ranked)
@@ -2676,7 +2814,7 @@ def print_orf_candidate_comparison(orfs, top_n=5):
             f"{candidate['protein_length']} aa | "
             f"{candidate['start_codon']} | "
             f"{candidate['status']} | "
-            f"Confidence {candidate['confidence_score']}/100 | "
+            f"Heuristic {candidate['confidence_score']}/100 | "
             f"CDS {candidate['cds_quality_score']}/100"
         )
 
@@ -2732,7 +2870,7 @@ def print_orf_summary_card(analysis):
     if top:
         print(f"Best candidate:        ORF #{top['rank']}")
         print(
-            f"Confidence:            {top['confidence']['score']}/100 "
+            f"Heuristic score:       {top['confidence']['score']}/100 "
             f"({top['confidence']['classification']})"
         )
         print(
@@ -2804,7 +2942,7 @@ def print_orf_candidate_details(orf):
     print("\nQuality")
     print("-" * 42)
     print(
-        f"Confidence:            {orf['confidence']['score']}/100 "
+        f"Heuristic score:       {orf['confidence']['score']}/100 "
         f"({orf['confidence']['classification']})"
     )
     print(
@@ -2862,7 +3000,7 @@ def print_orf_comparison_table(orfs, top_n=5):
         ("Protein", lambda c: f"{c['protein_length']} aa"),
         ("Start codon", lambda c: c["start_codon"]),
         ("Status", lambda c: c["status"]),
-        ("Confidence", lambda c: f"{c['confidence_score']}/100"),
+        ("Heuristic score", lambda c: f"{c['confidence_score']}/100"),
         ("CDS quality", lambda c: f"{c['cds_quality_score']}/100"),
         (
             "Translation safe",
@@ -2944,7 +3082,7 @@ def select_orf(orfs):
             f"{orf['protein_length']} aa | "
             f"{orf['start_codon']} | "
             f"{orf['status']} | "
-            f"Confidence {orf['confidence']['score']}/100"
+            f"Heuristic {orf['confidence']['score']}/100"
         )
 
     print("\n[0] Back")
@@ -2975,7 +3113,7 @@ def select_orf(orfs):
                 print(f"Start codon:           {selected['start_codon']}")
                 print(f"Status:                {selected['status']}")
                 print(
-                    f"Confidence:            "
+                    f"Heuristic score:       "
                     f"{selected['confidence']['score']}/100"
                 )
                 print(
@@ -2998,30 +3136,112 @@ def select_orf(orfs):
         )
 
 
+def _orf_settings_menu(settings):
+    """Let the user change the ORF search policy. Returns updated settings."""
+    settings = dict(settings)
+    while True:
+        _print_orf_header("ORF SEARCH SETTINGS")
+        print(f"[1] Minimum ORF length:  {settings['min_length']} nt (stop codon included)")
+        print(f"[2] Start codons:        {settings['start_codon_policy']}")
+        print(f"[3] Nested ORFs:         {'reported' if settings['nested'] else 'longest per stop only'}")
+        print(f"[4] Ranking:             {settings['ranking']}")
+        print(f"[5] Partial ORFs:        {'included' if settings['include_partial'] else 'excluded'}")
+        print("[6] Restore Synapse defaults (ORFfinder-style)")
+        print("[7] Restore legacy settings (before 2026-10-29)")
+        print("[0] Apply and return")
+        print()
+        print("Defaults follow NCBI ORFfinder conventions (75 nt, ATG only,")
+        print("one ORF per stop). They are screening conventions, not")
+        print("biological thresholds; adjust them to your organism and question.")
+
+        choice = input("\nSelect option: ").strip()
+
+        if choice == "0":
+            return settings
+        if choice == "1":
+            raw = input("Minimum length in nt [75]: ").strip()
+            try:
+                value = int(raw) if raw else 75
+                if value < 3:
+                    raise ValueError
+                settings["min_length"] = value
+            except ValueError:
+                print("Please enter an integer >= 3.")
+        elif choice == "2":
+            settings["start_codon_policy"] = (
+                "atg_and_alternative"
+                if settings["start_codon_policy"] == "atg_only"
+                else "atg_only"
+            )
+        elif choice == "3":
+            settings["nested"] = not settings["nested"]
+        elif choice == "4":
+            settings["ranking"] = (
+                "heuristic" if settings["ranking"] == "length" else "length"
+            )
+        elif choice == "5":
+            settings["include_partial"] = not settings["include_partial"]
+        elif choice == "6":
+            settings.update(
+                min_length=DEFAULT_MIN_ORF_LENGTH,
+                start_codon_policy=DEFAULT_START_CODON_POLICY,
+                nested=DEFAULT_REPORT_NESTED,
+                ranking=DEFAULT_RANKING,
+            )
+        elif choice == "7":
+            settings.update(LEGACY_ORF_SETTINGS)
+        else:
+            print("Invalid option.")
+
+
 def run_orf_analysis_ui(
     dna,
     include_partial=True,
     min_length=DEFAULT_MIN_ORF_LENGTH,
+    start_codon_policy=None,
+    nested=DEFAULT_REPORT_NESTED,
+    ranking=DEFAULT_RANKING,
 ):
     """
     Professional ORF module.
 
     Workflow:
-        Discovery -> Candidates -> Compare -> Relationships -> Select
+        Settings -> Discovery -> Candidates -> Compare -> Relationships -> Select
 
-    Returns the selected ORF or None.
+    Returns the selected ORF or None. The selected ORF carries the search
+    parameters that produced it under "search_parameters".
     """
-    analysis = analyze_orfs_enhanced(
-        dna,
-        include_partial=include_partial,
-        min_length=min_length,
-    )
+    settings = {
+        "include_partial": include_partial,
+        "min_length": min_length,
+        "start_codon_policy": start_codon_policy or DEFAULT_START_CODON_POLICY,
+        "nested": nested,
+        "ranking": ranking,
+    }
+
+    def run_search():
+        return analyze_orfs_enhanced(
+            dna,
+            include_partial=settings["include_partial"],
+            min_length=settings["min_length"],
+            start_codon_policy=settings["start_codon_policy"],
+            nested=settings["nested"],
+            ranking=settings["ranking"],
+        )
+
+    analysis = run_search()
 
     while True:
         _print_orf_header("ORF ANALYSIS")
 
         print(f"Sequence length: {analysis['sequence_length']} bp")
         print(f"ORF candidates:  {analysis['candidate_count']}")
+        print(
+            f"Search:          >= {settings['min_length']} nt, "
+            f"{settings['start_codon_policy']}, "
+            f"{'nested' if settings['nested'] else 'longest per stop'}, "
+            f"ranked by {settings['ranking']}"
+        )
 
         top = analysis.get("top_candidate")
 
@@ -3029,7 +3249,7 @@ def run_orf_analysis_ui(
             print(
                 f"Best candidate:  "
                 f"ORF-{top['rank']:03d} "
-                f"({top['confidence']['score']}/100)"
+                f"({top['length']} bp, {top['start_codon']}, {top['status']})"
             )
         else:
             print("Best candidate:  None")
@@ -3040,6 +3260,7 @@ def run_orf_analysis_ui(
         print("[3] Compare ORFs")
         print("[4] ORF Relationships")
         print("[5] Select ORF")
+        print("[6] Search Settings")
         print("[0] Back")
 
         choice = input("\nSelect option: ").strip()
@@ -3047,7 +3268,7 @@ def run_orf_analysis_ui(
         if choice == "1":
             print_orf_report(
                 analysis["orfs"],
-                min_length=min_length,
+                min_length=settings["min_length"],
             )
             input("\nPress Enter to continue...")
 
@@ -3067,13 +3288,18 @@ def run_orf_analysis_ui(
         elif choice == "5":
             selected = select_orf(analysis["orfs"])
             if selected is not None:
+                selected["search_parameters"] = dict(analysis.get("parameters", {}))
                 return selected
+
+        elif choice == "6":
+            settings = _orf_settings_menu(settings)
+            analysis = run_search()
 
         elif choice == "0":
             return None
 
         else:
-            print("\nInvalid option. Please choose 0-5.")
+            print("\nInvalid option. Please choose 0-6.")
 
 
 # Backward-compatible UI aliases

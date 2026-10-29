@@ -4,6 +4,23 @@
 # ============================================================
 # RESTRICTION ENZYME DATABASE
 # ============================================================
+#
+# Coordinate convention:
+#   cut_top    = number of bases of the recognition site 5' of the
+#                top-strand cut (G^AATTC -> 1).
+#   cut_bottom = same position measured on the top-strand coordinate for
+#                the bottom-strand cut (G^AATTC -> 5).
+#   cut_top < cut_bottom  -> 5' overhang; cut_top > cut_bottom -> 3' overhang.
+#
+# Source and review: recognition sites and cut positions follow REBASE /
+# manufacturer documentation for these commercially standard enzymes.
+# Reviewed 2026-10-29 (Synapse audit): ClaI corrected from A^TCGAT to
+# AT^CGAT (2-nt 5' overhang CG). All other entries unchanged.
+#
+# Methylation is not modelled by the digest engine. Entries with a known
+# methylation dependence carry a "methylation_note" for display.
+
+ENZYME_DATABASE_VERSION = "synapse-2026-10-29"
 
 RESTRICTION_ENZYMES = {
 
@@ -135,6 +152,7 @@ RESTRICTION_ENZYMES = {
     "XbaI": {
         "name": "XbaI",
         "recognition_sequence": "TCTAGA",
+        "methylation_note": "Blocked by overlapping Dam methylation (TCTAGATC / GATCTAGA).",
         "cut_top": 1,
         "cut_bottom": 5,
         "overhang_type": "5_prime",
@@ -157,10 +175,11 @@ RESTRICTION_ENZYMES = {
     "ClaI": {
         "name": "ClaI",
         "recognition_sequence": "ATCGAT",
-        "cut_top": 1,
-        "cut_bottom": 5,
+        "cut_top": 2,
+        "cut_bottom": 4,
         "overhang_type": "5_prime",
-        "overhang_length": 4,
+        "overhang_length": 2,
+        "methylation_note": "Blocked by overlapping Dam methylation (GATCGAT / ATCGATC).",
         "is_blunt": False,
         "source_organism": "Caryophanon latum",
     },
@@ -233,6 +252,7 @@ RESTRICTION_ENZYMES = {
         "overhang_length": 2,
         "is_blunt": False,
         "source_organism": "Haemophilus parainfluenzae",
+        "methylation_note": "Blocked by CpG methylation (CmCGG); MspI is the insensitive isoschizomer.",
     },
 
     "TaqI": {
@@ -255,6 +275,7 @@ RESTRICTION_ENZYMES = {
         "overhang_length": 0,
         "is_blunt": True,
         "source_organism": "Diplococcus pneumoniae",
+        "methylation_note": "Cleaves only Dam-methylated GATC (Gm6ATC); unmethylated PCR products are not cut.",
     },
 }
 

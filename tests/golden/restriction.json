@@ -43,22 +43,22 @@
  },
  "clai_site": {
   "ambiguity_dependent": false,
-  "bottom_cut": 10,
-  "bottom_cut_0based": 9,
+  "bottom_cut": 9,
+  "bottom_cut_0based": 8,
   "cut_type": "Sticky",
   "enzyme": "ClaI",
   "is_blunt": false,
   "match_status": "CONFIRMED",
-  "overhang_length": 4,
-  "overhang_sequence": "TCGA",
+  "overhang_length": 2,
+  "overhang_sequence": "CG",
   "overhang_type": "5_prime",
   "recognition_sequence": "ATCGAT",
   "site_end": 10,
   "site_end_1based": 10,
   "site_position": 5,
   "site_position_0based": 4,
-  "top_cut": 6,
-  "top_cut_0based": 5
+  "top_cut": 7,
+  "top_cut_0based": 6
  },
  "linear": {
   "cut_positions": [
@@ -107,5 +107,5 @@
    ]
   ]
  },
- "n_run_digest_cuts": 17
+ "n_run_digest_cuts": 0
 }

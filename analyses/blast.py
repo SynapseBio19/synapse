@@ -92,6 +92,13 @@ DEFAULT_POLL_INTERVAL_SECONDS = NCBI_MIN_POLL_INTERVAL_SECONDS
 DEFAULT_MAX_WAIT_SECONDS = 300.0
 DEFAULT_MAX_HITS = 50
 
+# Evidence bands are assigned only to hits whose best E-value is at or below
+# this threshold (audit P0-1). 1e-3 is a common, conservative convention for
+# inferring homology from a single search; it is NOT universally valid. The
+# E-value depends on database size and query length, so the threshold is a
+# parameter of calculate_evidence_score()/build_evidence_profile().
+DEFAULT_EVIDENCE_EVALUE_THRESHOLD = 1e-3
+
 
 # Local BLAST database storage. The path can be moved without changing Synapse
 # code by setting SYNAPSE_BLAST_DB_ROOT in the environment.
@@ -368,6 +375,7 @@ class BlastHSP:
     query_sequence: str
     subject_sequence: str
     midline: str
+    query_length: Optional[int] = None
 
     @property
     def identity_percent(self) -> float:
@@ -388,7 +396,32 @@ class BlastHSP:
         return 100.0 * self.gaps / self.alignment_length
 
     @property
+    def query_interval(self) -> Tuple[int, int]:
+        """1-based inclusive query interval covered by this HSP."""
+        low, high = sorted((self.query_start, self.query_end))
+        return low, high
+
+    @property
     def query_coverage(self) -> float:
+        """Percent of the QUERY covered by this HSP (NCBI definition).
+
+        Before 2026-10-29 this property returned the non-gap fraction of the
+        alignment, which is 100 % for every gap-free HSP regardless of how
+        much of the query aligns (audit P0-1). That value is still available
+        as ``alignment_nongap_percent``. Returns NaN when the query length is
+        unknown.
+        """
+        if not self.query_length:
+            return math.nan
+        low, high = self.query_interval
+        if low < 1:
+            return math.nan
+        covered = high - low + 1
+        return min(100.0, 100.0 * covered / self.query_length)
+
+    @property
+    def alignment_nongap_percent(self) -> float:
+        """Percent of aligned query columns that are not gaps."""
         if not self.query_sequence:
             return 0.0
         non_gap = sum(base != "-" for base in self.query_sequence)
@@ -406,6 +439,33 @@ class BlastHit:
     hsps: List[BlastHSP] = field(default_factory=list)
     scientific_names: List[str] = field(default_factory=list)
     taxonomy_ids: List[str] = field(default_factory=list)
+    query_length: Optional[int] = None
+
+    def __post_init__(self) -> None:
+        if self.query_length:
+            for hsp in self.hsps:
+                if not hsp.query_length:
+                    hsp.query_length = self.query_length
+
+    @property
+    def combined_query_coverage_percent(self) -> float:
+        """Percent of the query covered by the union of all HSPs (NCBI "Query cover")."""
+        length = self.query_length or next(
+            (h.query_length for h in self.hsps if h.query_length), None
+        )
+        if not length or not self.hsps:
+            return math.nan if not length else 0.0
+        intervals = sorted(h.query_interval for h in self.hsps)
+        covered = 0
+        current_low, current_high = intervals[0]
+        for low, high in intervals[1:]:
+            if low <= current_high + 1:
+                current_high = max(current_high, high)
+            else:
+                covered += current_high - current_low + 1
+                current_low, current_high = low, high
+        covered += current_high - current_low + 1
+        return min(100.0, 100.0 * covered / length)
 
     @property
     def best_hsp(self) -> Optional[BlastHSP]:
@@ -427,6 +487,15 @@ class BlastHit:
 
     @property
     def best_coverage_percent(self) -> float:
+        """Query coverage of the hit: union of all HSPs over the query length.
+
+        This matches NCBI's "Query cover". The best single HSP's coverage is
+        ``best_hsp_coverage_percent``.
+        """
+        return self.combined_query_coverage_percent if self.hsps else 0.0
+
+    @property
+    def best_hsp_coverage_percent(self) -> float:
         return self.best_hsp.query_coverage if self.best_hsp else 0.0
 
     @property
@@ -2802,7 +2871,7 @@ def _taxonomy_source(hit: BlastHit) -> str:
     return "not available"
 
 
-def _parse_hit(hit_element: ET.Element) -> BlastHit:
+def _parse_hit(hit_element: ET.Element, query_length: Optional[int] = None) -> BlastHit:
     hsp_container = next(
         (node for node in hit_element if _local_tag(node) == "Hit_hsps"),
         None,
@@ -2845,6 +2914,7 @@ def _parse_hit(hit_element: ET.Element) -> BlastHit:
         hsps=hsps,
         scientific_names=scientific_names,
         taxonomy_ids=taxonomy_ids,
+        query_length=query_length,
     )
 
 def _parse_parameters(root: ET.Element) -> Dict[str, Any]:
@@ -2903,7 +2973,7 @@ def parse_blast_xml(
     # Legacy XML has Iteration -> Iteration_hits -> Hit.
     # Search generically to remain tolerant of wrapper/container differences.
     for hit_element in _descendants(root, "Hit"):
-        hits.append(_parse_hit(hit_element))
+        hits.append(_parse_hit(hit_element, query_length=query.length))
 
     metadata = BlastRunMetadata(
         rid=rid,
@@ -2946,12 +3016,21 @@ def parse_blast_xml(
 # HIT ANALYSIS
 # ============================================================================
 
-def calculate_evidence_score(hit: BlastHit) -> HitEvidence:
+def calculate_evidence_score(
+    hit: BlastHit,
+    *,
+    significance_evalue: float = DEFAULT_EVIDENCE_EVALUE_THRESHOLD,
+) -> HitEvidence:
     """
     Transparent heuristic evidence profile.
 
     This is NOT a BLAST score and must not be interpreted as experimental
     confidence. It summarizes returned alignment evidence for Synapse display.
+
+    Evidence bands are assigned only when the best E-value is <=
+    ``significance_evalue``; otherwise the band is "NOT_SIGNIFICANT" whatever
+    the identity and coverage (audit P0-1). Coverage is the NCBI-style query
+    coverage of the union of all HSPs.
     """
     hsp = hit.best_hsp
     if hsp is None:
@@ -2968,8 +3047,12 @@ def calculate_evidence_score(hit: BlastHit) -> HitEvidence:
             notes=["No HSP was returned for this hit."],
         )
 
+    coverage_value = hit.best_coverage_percent
+    if coverage_value != coverage_value:  # NaN: query length unknown
+        coverage_value = 0.0
+
     identity_component = min(100.0, max(0.0, hsp.identity_percent))
-    coverage_component = min(100.0, max(0.0, hsp.query_coverage))
+    coverage_component = min(100.0, max(0.0, coverage_value))
 
     if hsp.evalue <= 0:
         evalue_component = 100.0
@@ -2983,7 +3066,11 @@ def calculate_evidence_score(hit: BlastHit) -> HitEvidence:
     )
     score = round(min(100.0, max(0.0, score)), 2)
 
-    if score >= 90:
+    significant = hsp.evalue <= significance_evalue
+
+    if not significant:
+        band = "NOT_SIGNIFICANT"
+    elif score >= 90:
         band = "VERY_STRONG_SEQUENCE_EVIDENCE"
     elif score >= 75:
         band = "STRONG_SEQUENCE_EVIDENCE"
@@ -2995,13 +3082,20 @@ def calculate_evidence_score(hit: BlastHit) -> HitEvidence:
     notes = [
         "Evidence profile summarizes sequence-level BLAST output.",
         "It is not a probability, experimental efficacy score or functional annotation.",
+        f"Bands require E-value <= {significance_evalue:g} (configurable convention, "
+        "not a universal threshold).",
     ]
+    if not significant:
+        notes.append(
+            f"Best E-value {hsp.evalue:g} exceeds {significance_evalue:g}: a match of "
+            "this quality is expected by chance in a database of this size."
+        )
 
     return HitEvidence(
         hit_id=hit.hit_id,
         accession=hit.accession,
         identity_percent=round(hsp.identity_percent, 3),
-        query_coverage_percent=round(hsp.query_coverage, 3),
+        query_coverage_percent=round(coverage_value, 3),
         evalue=hsp.evalue,
         bit_score=hsp.bit_score,
         alignment_length=hsp.alignment_length,
@@ -3033,8 +3127,15 @@ def rank_hits(hits: Sequence[BlastHit]) -> List[BlastHit]:
     )
 
 
-def build_evidence_profile(run: BlastRun) -> List[HitEvidence]:
-    return [calculate_evidence_score(hit) for hit in rank_hits(run.hits)]
+def build_evidence_profile(
+    run: BlastRun,
+    *,
+    significance_evalue: float = DEFAULT_EVIDENCE_EVALUE_THRESHOLD,
+) -> List[HitEvidence]:
+    return [
+        calculate_evidence_score(hit, significance_evalue=significance_evalue)
+        for hit in rank_hits(run.hits)
+    ]
 
 
 def group_hits_by_taxonomy(hits: Sequence[BlastHit]) -> Dict[str, int]:
@@ -3138,21 +3239,40 @@ def build_orf_query(
     orf: Any,
     *,
     sequence_name: str = "Selected Sequence",
+    parent_sequence: Optional[str] = None,
 ) -> BlastQuery:
-    extracted = extract_orf_context(orf)
-    if extracted is None:
+    """Build a BLAST query from a selected ORF.
+
+    The query is the ORF in its coding orientation. region_start/region_end
+    are 1-based forward-strand positions on the parent sequence (Synapse ORF
+    dicts store 0-based starts; audit P0-2). The strand is recorded in
+    ``feature_name``.
+    """
+    from core.orf_context import resolve_orf_region
+
+    region = resolve_orf_region(orf, parent_sequence)
+    if region is None:
         raise BlastAnalysisError("The selected ORF could not be extracted.")
 
-    sequence, start, name = extracted
+    try:
+        sequence = normalize_sequence(region.coding_sequence, "DNA")
+    except BlastAnalysisError as exc:
+        raise BlastAnalysisError(f"The selected ORF could not be extracted: {exc}") from exc
+
+    start = region.start_1based or 1
+    feature_name = region.name
+    if region.start_1based is not None:
+        feature_name = f"{region.name} ({region.strand} strand)"
+
     return build_query(
         sequence,
-        name=name,
+        name=region.name,
         sequence_type="DNA",
         source="Selected ORF",
         region_start=start,
         region_end=start + len(sequence) - 1,
         feature_type="ORF",
-        feature_name=name,
+        feature_name=feature_name,
     )
 
 
@@ -3188,6 +3308,7 @@ def run_blast_analysis(
         query = build_orf_query(
             selected_orf,
             sequence_name=sequence_name,
+            parent_sequence=sequence,
         )
     else:
         query = build_query(
@@ -3273,6 +3394,7 @@ def hsp_to_dict(hsp: BlastHSP) -> Dict[str, Any]:
     data["positive_percent"] = hsp.positive_percent
     data["gap_percent"] = hsp.gap_percent
     data["query_coverage"] = hsp.query_coverage
+    data["alignment_nongap_percent"] = hsp.alignment_nongap_percent
     return data
 
 
@@ -3282,6 +3404,7 @@ def hit_to_dict(hit: BlastHit) -> Dict[str, Any]:
     data["best_evalue"] = hit.best_evalue
     data["best_identity_percent"] = hit.best_identity_percent
     data["best_coverage_percent"] = hit.best_coverage_percent
+    data["best_hsp_coverage_percent"] = hit.best_hsp_coverage_percent
     data["total_alignment_length"] = hit.total_alignment_length
     data["hsps"] = [hsp_to_dict(hsp) for hsp in hit.hsps]
     return data
@@ -3927,7 +4050,7 @@ def blast_menu(
             print(f"Query length:     {active_query.length} {active_query.sequence_type.lower()}")
         elif current_orf is not None:
             try:
-                orf_query = build_orf_query(current_orf, sequence_name=current_name)
+                orf_query = build_orf_query(current_orf, sequence_name=current_name, parent_sequence=base_sequence)
                 print(f"Query context:    Selected ORF ({orf_query.name})")
                 print(f"Query length:     {orf_query.length} bp")
             except BlastAnalysisError:
@@ -3995,6 +4118,7 @@ def blast_menu(
                         search_query = build_orf_query(
                             current_orf,
                             sequence_name=current_name,
+                            parent_sequence=base_sequence,
                         )
                     else:
                         selected_type = infer_sequence_type(base_sequence or "")
@@ -4579,7 +4703,9 @@ def _test_hit_ranking() -> None:
 
 
 def _test_evidence_profile() -> None:
-    query = build_query("ACGT", name="Q", sequence_type="DNA")
+    # SAMPLE_XML aligns query positions 1-20; a 20-nt query keeps the
+    # fixture consistent with the query-coverage definition.
+    query = build_query("ATGCGTACGTACGTACGTAC", name="Q", sequence_type="DNA")
     params = BlastParameters(program="blastn", database="nt")
     run = parse_blast_xml(
         SAMPLE_XML,

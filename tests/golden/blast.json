@@ -1,6 +1,6 @@
 {
- "band": "VERY_STRONG_SEQUENCE_EVIDENCE",
- "coverage": 100.0,
- "evidence_score": 97.75,
+ "band": "MODERATE_SEQUENCE_EVIDENCE",
+ "coverage": 20.0,
+ "evidence_score": 69.75,
  "identity": 95.0
 }

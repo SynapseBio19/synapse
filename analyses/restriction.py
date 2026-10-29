@@ -487,8 +487,15 @@ def create_restriction_map(sequence, enzyme_names=None):
     return sites
 
 
-def get_cut_positions(sequence, enzyme_names):
-    """Collect enzyme cut events while preserving staggered-cut metadata."""
+def get_cut_positions(sequence, enzyme_names, include_possible=False):
+    """Collect enzyme cut events while preserving staggered-cut metadata.
+
+    Only CONFIRMED sites (no IUPAC ambiguity inside the recognition site)
+    produce cut events by default. A POSSIBLE site, e.g. a run of N, is not
+    evidence of a physical cut and would otherwise create phantom fragments
+    (audit P0-5). Pass include_possible=True for a worst-case view; each
+    event carries its "status".
+    """
     sequence = _require_valid_restriction_sequence(sequence)
 
     if isinstance(enzyme_names, str):
@@ -501,10 +508,14 @@ def get_cut_positions(sequence, enzyme_names):
         if enzyme is None:
             continue
 
-        for position in find_restriction_sites(
+        for match in find_restriction_site_matches(
             sequence,
             enzyme_name,
         ):
+            if match["status"] != "CONFIRMED" and not include_possible:
+                continue
+
+            position = match["position"]
             cut_info = calculate_cut_positions(
                 position,
                 enzyme,
@@ -522,6 +533,7 @@ def get_cut_positions(sequence, enzyme_names):
                 "top_cut_1based": cut_info["top_cut_1based"],
                 "bottom_cut_1based": cut_info["bottom_cut_1based"],
                 "cut_info": cut_info,
+                "status": match["status"],
             })
 
     cuts.sort(
@@ -630,8 +642,12 @@ def calculate_circular_fragments(sequence_length, cut_positions):
     return fragments
 
 
-def perform_digest(sequence, enzyme_names, topology="linear"):
-    """Perform an in-silico digest with physical-boundary accounting."""
+def perform_digest(sequence, enzyme_names, topology="linear", include_possible=False):
+    """Perform an in-silico digest with physical-boundary accounting.
+
+    Ambiguity-dependent (POSSIBLE) sites are reported in "possible_cuts" but
+    do not define fragments unless include_possible=True.
+    """
     sequence = _require_valid_restriction_sequence(sequence)
 
     topology = str(topology).lower()
@@ -659,7 +675,18 @@ def perform_digest(sequence, enzyme_names, topology="linear"):
     cuts = get_cut_positions(
         sequence,
         enzyme_names,
+        include_possible=include_possible,
     )
+
+    possible_cuts = [
+        cut
+        for cut in get_cut_positions(
+            sequence,
+            enzyme_names,
+            include_possible=True,
+        )
+        if cut["status"] != "CONFIRMED"
+    ]
 
     # The top-strand cut coordinate represents the physical fragment
     # boundary for standard bp-length reporting. Multiple enzymes at the
@@ -753,6 +780,8 @@ def perform_digest(sequence, enzyme_names, topology="linear"):
         "fragment_count": len(fragments),
         "fragments": fragments,
         "has_cut": bool(cuts),
+        "possible_cuts": possible_cuts,
+        "possible_cuts_included": bool(include_possible),
     }
 
 
@@ -900,6 +929,25 @@ def get_sticky_end_sequence(site):
     return site.get("overhang_sequence", "") or None
 
 
+def _site_overhang_polarity(site):
+    """Return '5_prime', '3_prime', 'blunt' or 'unknown' for a site dict."""
+    if site.get("is_blunt", False):
+        return "blunt"
+    top = site.get("top_cut_0based")
+    bottom = site.get("bottom_cut_0based")
+    if isinstance(top, int) and isinstance(bottom, int) and top != bottom:
+        return "5_prime" if top < bottom else "3_prime"
+    declared = str(site.get("overhang_type", "")).lower()
+    if declared in {"5_prime", "3_prime", "blunt"}:
+        return declared
+    enzyme = get_restriction_enzyme(site.get("enzyme")) if site.get("enzyme") else None
+    if enzyme:
+        declared = str(enzyme.get("overhang_type", "")).lower()
+        if declared in {"5_prime", "3_prime", "blunt"}:
+            return declared
+    return "unknown"
+
+
 def sticky_ends_are_compatible(first_site, second_site):
     """Evaluate sticky-end compatibility with explicit orientation handling."""
     first_blunt = bool(
@@ -935,6 +983,17 @@ def sticky_ends_are_compatible(first_site, second_site):
         return False
 
     if len(first) != len(second):
+        return False
+
+    # 5' and 3' overhangs never anneal to each other, even with identical
+    # letters (HindIII 5'-AGCT vs SacI 3'-AGCT). Audit P0-3.
+    first_polarity = _site_overhang_polarity(first_site)
+    second_polarity = _site_overhang_polarity(second_site)
+    if (
+        first_polarity in {"5_prime", "3_prime"}
+        and second_polarity in {"5_prime", "3_prime"}
+        and first_polarity != second_polarity
+    ):
         return False
 
     # Depending on how a database stores the forward-strand overhang,
@@ -2352,6 +2411,20 @@ def _restriction_digest_gel_ui(dna, topology="linear"):
         print(f"Cut events:     {digest['cut_count']}")
         print(f"Cut boundaries: {digest['unique_cut_count']}")
         print(f"Fragments:      {digest['fragment_count']}")
+
+        possible = digest.get("possible_cuts", [])
+        if possible:
+            print(
+                f"\nNote: {len(possible)} ambiguity-dependent site(s) "
+                "(IUPAC symbols such as N inside the recognition "
+                "sequence) were NOT counted as cuts."
+            )
+
+        for enzyme_name in enzymes:
+            enzyme = get_restriction_enzyme(enzyme_name) or {}
+            note = enzyme.get("methylation_note")
+            if note:
+                print(f"Methylation note ({enzyme_name}): {note}")
 
         print("\nFragments")
         print("-" * 60)

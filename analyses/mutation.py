@@ -1502,7 +1502,15 @@ def detect_mutations(
 def classify_coding_substitution(
     reference_codon: str,
     alternative_codon: str,
+    codon_index: Optional[int] = None,
 ) -> str:
+    """Classify a codon substitution (standard genetic code).
+
+    ``codon_index`` is the 1-based codon number within the CDS. "Start-loss"
+    applies only to codon 1 (the initiator); a Met->X change at any other
+    codon is an ordinary missense change (audit P0-6). When ``codon_index``
+    is None the position is unknown and Met->X is reported as "Missense".
+    """
 
     ref = normalize_dna(
         reference_codon,
@@ -1538,7 +1546,7 @@ def classify_coding_substitution(
     if ref_aa == "*" and alt_aa != "*":
         return "Stop-loss"
 
-    if ref_aa == "M" and alt_aa != "M":
+    if codon_index == 1 and ref_aa == "M" and alt_aa != "M":
         return "Start-loss"
 
     return "Missense"
@@ -1688,6 +1696,7 @@ def analyze_coding_consequences(
             effect = classify_coding_substitution(
                 ref_codon,
                 alt_codon,
+                codon_index=codon_zero + 1,
             )
 
             coding.affected_codons.append(codon_zero + 1)
@@ -1866,6 +1875,7 @@ def annotate_mutations_with_coding_consequences(
         effect = classify_coding_substitution(
             ref_codon,
             alt_codon,
+            codon_index=codon_zero + 1,
         )
         mutation.effect = effect
         mutation.consequence = effect
