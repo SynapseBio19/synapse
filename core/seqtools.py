@@ -148,3 +148,17 @@ def get_genetic_code(table_id: int = 1) -> GeneticCode:
 
 def available_genetic_codes() -> Iterable[GeneticCode]:
     return [GENETIC_CODES[k] for k in sorted(GENETIC_CODES)]
+
+
+def codon_dict(table_id: int = 1, *, rna: bool = False, stop_symbol: str = "*") -> Dict[str, str]:
+    """Plain codon -> amino-acid dict in the formats the analysis modules use.
+
+    ``rna=True`` writes U instead of T; ``stop_symbol`` replaces "*" (several
+    modules use "STOP"). Returns a new dict on every call.
+    """
+    table = get_genetic_code(table_id)
+    result: Dict[str, str] = {}
+    for codon, amino_acid in table.codons.items():
+        key = codon.replace("T", "U") if rna else codon
+        result[key] = stop_symbol if amino_acid == "*" else amino_acid
+    return result

@@ -10,14 +10,20 @@ from tests._support import FIXTURES_DIR, PROJECT_ROOT
 
 
 class GeneticCodeTests(unittest.TestCase):
-    def test_table1_matches_all_existing_module_tables(self):
-        # Four independently written tables exist in the code base; the NCBI
-        # table 1 must agree with every one of them (cross-check).
+    def test_table1_matches_independent_reference_and_module_tables(self):
+        # Until Stage 3 four independently written tables existed; table 1 was
+        # verified against all of them. Since Stage 4 the modules derive their
+        # tables from core.seqtools, so the cross-check uses a preserved copy
+        # of one of the hand-written tables (tests/fixtures).
+        import sys
         from core.seqtools import get_genetic_code
         from analyses import orf, mutation, rna
         from data.genetic_code import CODON_TABLE
+        sys.path.insert(0, str(FIXTURES_DIR))
+        from standard_code_reference import STANDARD_CODE
 
         reference = get_genetic_code(1).codons
+        self.assertEqual(reference, {k: ("*" if v == "STOP" else v) for k, v in STANDARD_CODE.items()})
 
         def normalised(table):
             return {k.replace("U", "T"): ("*" if v in ("STOP", "*") else v) for k, v in table.items()}

@@ -36,16 +36,13 @@ from __future__ import annotations
 from dataclasses import dataclass, field, replace
 from math import log, log10, sqrt
 from typing import Optional, Sequence
+from core.seqtools import IUPAC_COMPLEMENT as _CORE_IUPAC_COMPLEMENT
 
 DNA_ALPHABET = set("ACGT")
 IUPAC_ALPHABET = set("ACGTRYSWKMBDHVN")
 
-IUPAC_COMPLEMENT = {
-    "A": "T", "T": "A", "C": "G", "G": "C",
-    "R": "Y", "Y": "R", "S": "S", "W": "W",
-    "K": "M", "M": "K", "B": "V", "V": "B",
-    "D": "H", "H": "D", "N": "N",
-}
+# IUPAC complement table shared via core.seqtools.
+IUPAC_COMPLEMENT = dict(_CORE_IUPAC_COMPLEMENT)
 
 # SantaLucia 1998 DNA/DNA nearest-neighbor parameters.
 # Values: (delta_H kcal/mol, delta_S cal/(mol*K)).
@@ -369,68 +366,8 @@ def _nearest_neighbor_thermodynamics(sequence: str) -> tuple[float, float]:
     return delta_h, delta_s
 
 
-def calculate_tm_nearest_neighbor(
-    sequence: str,
-    salt_mM: float = 50.0,
-    mg_mM: float = 1.5,
-    dntp_mM: float = 0.2,
-    primer_concentration_nM: float = 250.0,
-    include_symmetry_correction: bool = True,
-    return_details: bool = False,
-) -> float | ThermodynamicResult:
-    """
-    Calculate DNA/DNA Tm using SantaLucia-style nearest-neighbor parameters.
-
-    The reaction concentration is treated as total strand concentration in the
-    standard homodimer/symmetry formulation. Salt is applied as an empirical
-    entropy correction using an effective monovalent concentration that also
-    accounts approximately for free Mg2+ after dNTP binding.
-    """
-    sequence = normalize_dna_sequence(sequence)
-    _validate_thermodynamic_conditions(
-        salt_mM, mg_mM, dntp_mM, primer_concentration_nM
-    )
-
-    delta_h, delta_s = _nearest_neighbor_thermodynamics(sequence)
-
-    effective_salt_mM = _effective_monovalent_salt_mM(
-        salt_mM, mg_mM, dntp_mM
-    )
-
-    # Empirical salt entropy correction, compatible with the SantaLucia-style
-    # nearest-neighbor treatment. log([salt]) uses mol/L.
-    effective_salt_molar = effective_salt_mM / 1000.0
-    delta_s += 0.368 * (len(sequence) - 1) * log(effective_salt_molar)
-
-    symmetry_applied = False
-    if include_symmetry_correction and sequence == reverse_complement(sequence):
-        delta_s += NN_SYMMETRY_DS
-        symmetry_applied = True
-
-    concentration_molar = primer_concentration_nM * 1e-9
-    denominator = delta_s + GAS_CONSTANT * log(concentration_molar / 4.0)
-
-    tm = (delta_h * 1000.0) / denominator - 273.15
-
-    result = ThermodynamicResult(
-        tm=round(tm, 3),
-        delta_h_kcal=round(delta_h, 3),
-        delta_s_cal=round(delta_s, 3),
-        concentration_nM=primer_concentration_nM,
-        salt_mM=salt_mM,
-        mg_mM=mg_mM,
-        dntp_mM=dntp_mM,
-        effective_monovalent_mM=round(effective_salt_mM, 3),
-        model="nearest_neighbor",
-        symmetry_correction_applied=symmetry_applied,
-        explanation=(
-            "SantaLucia-style DNA/DNA nearest-neighbor thermodynamics with "
-            "empirical ionic-strength adjustment. Mg2+ is approximately "
-            "adjusted for dNTP binding."
-        ),
-    )
-
-    return result if return_details else result.tm
+# Superseded definition of calculate_tm_nearest_neighbor() removed in Stage 4 (never reachable;
+# a later definition in this module replaces it). See docs/CHANGES.md.
 
 
 def calculate_tm_wallace(sequence: str) -> float:
@@ -539,77 +476,16 @@ def _three_prime_complementarity(
     return best
 
 
-def analyze_hairpin(sequence: str, max_stem: int = 4) -> StructureResult:
-    """Detect simple intramolecular hairpin stems with a minimum 3-nt loop."""
-    sequence = normalize_dna_sequence(sequence)
-    best = 0
-    best_position = None
-    max_test_stem = min(8, len(sequence) // 2)
-    for stem in range(max_test_stem, 2, -1):
-        for left_start in range(0, len(sequence) - stem - 3):
-            left = sequence[left_start:left_start + stem]
-            for right_start in range(left_start + stem + 3, len(sequence) - stem + 1):
-                right = sequence[right_start:right_start + stem]
-                if left == reverse_complement(right) and stem > best:
-                    best = stem
-                    best_position = left_start
-    if best >= max_stem:
-        severity = "HIGH"
-    elif best == max_stem - 1:
-        severity = "MODERATE"
-    else:
-        severity = "LOW"
-    return StructureResult(
-        max_stem=best,
-        three_prime_stem=0,
-        best_position=best_position,
-        severity=severity,
-        explanation=f"Longest detected intramolecular stem: {best} bp; 3-nt minimum-loop heuristic.",
-    )
+# Superseded definition of analyze_hairpin() removed in Stage 4 (never reachable;
+# a later definition in this module replaces it). See docs/CHANGES.md.
 
 
-def analyze_self_dimer(sequence: str, max_stem: int = 4) -> StructureResult:
-    """Analyze self-dimer formation heuristically."""
-    sequence = normalize_dna_sequence(sequence)
-    stem, position = _alignment_stem(sequence, sequence)
-    terminal = _three_prime_complementarity(sequence)
-    if stem >= max_stem or terminal >= 3:
-        severity = "HIGH"
-    elif stem == max_stem - 1 or terminal == 2:
-        severity = "MODERATE"
-    else:
-        severity = "LOW"
-    return StructureResult(
-        max_stem=stem,
-        three_prime_stem=terminal,
-        best_position=position,
-        severity=severity,
-        explanation=f"Longest self-complementary stem: {stem} bp; estimated 3'-complementarity: {terminal} bp.",
-    )
+# Superseded definition of analyze_self_dimer() removed in Stage 4 (never reachable;
+# a later definition in this module replaces it). See docs/CHANGES.md.
 
 
-def analyze_heterodimer(forward: str, reverse: str, max_stem: int = 4) -> StructureResult:
-    """Analyze forward/reverse heterodimer formation heuristically."""
-    forward = normalize_dna_sequence(forward)
-    reverse = normalize_dna_sequence(reverse)
-    stem, position = _alignment_stem(forward, reverse)
-    terminal = max(
-        _three_prime_complementarity(forward, reverse),
-        _three_prime_complementarity(reverse, forward),
-    )
-    if stem >= max_stem or terminal >= 3:
-        severity = "HIGH"
-    elif stem == max_stem - 1 or terminal == 2:
-        severity = "MODERATE"
-    else:
-        severity = "LOW"
-    return StructureResult(
-        max_stem=stem,
-        three_prime_stem=terminal,
-        best_position=position,
-        severity=severity,
-        explanation=f"Longest heterodimer stem: {stem} bp; estimated 3'-complementarity: {terminal} bp.",
-    )
+# Superseded definition of analyze_heterodimer() removed in Stage 4 (never reachable;
+# a later definition in this module replaces it). See docs/CHANGES.md.
 
 
 # ============================================================================
@@ -2626,236 +2502,16 @@ class ProfessionalPrimerConfig:
 # PROFESSIONAL CANDIDATE GENERATION
 # ============================================================================
 
-def generate_professional_primer_candidates(
-    sequence: str,
-    target_start: int,
-    target_end: int,
-    orientation: str,
-    *,
-    config: ProfessionalPrimerConfig = (
-        ProfessionalPrimerConfig()
-    ),
-) -> tuple[
-    list[AdvancedPrimerCandidate],
-    int,
-]:
-    """
-    Generate candidates using the complete existing sequence-level filters
-    followed by nearest-neighbor thermodynamic validation.
-    """
-
-    config.validate()
-
-    base_candidates, evaluated = (
-        generate_primer_candidates(
-            sequence,
-            target_start,
-            target_end,
-            orientation,
-            config.primer,
-            config.tm_method
-            if config.tm_method.lower()
-            in {
-                "wallace",
-                "salt",
-                "salt_adjusted",
-            }
-            else "wallace",
-        )
-    )
-
-    professional = []
-
-    for candidate in base_candidates:
-        advanced = (
-            analyze_primer_candidate_thermodynamics(
-                candidate,
-                conditions=(
-                    config.thermodynamics
-                ),
-            )
-        )
-
-        if config.require_thermodynamic_tm:
-            tm = advanced.thermodynamics.tm_C
-
-            if not (
-                config.primer.min_tm
-                <= tm
-                <= config.primer.max_tm
-            ):
-                continue
-
-        professional.append(
-            advanced
-        )
-
-    professional.sort(
-        key=lambda item: (
-            -item.thermodynamic_score,
-            -item.candidate.score,
-            abs(
-                item.thermodynamics.tm_C
-                - config.primer.optimal_tm
-            ),
-            abs(
-                item.candidate.gc_percent
-                - config.primer.optimal_gc
-            ),
-        )
-    )
-
-    return (
-        professional,
-        evaluated,
-    )
+# Superseded definition of generate_professional_primer_candidates() removed in Stage 4 (never reachable;
+# a later definition in this module replaces it). See docs/CHANGES.md.
 
 
 # ============================================================================
 # PROFESSIONAL PAIR RANKING
 # ============================================================================
 
-def rank_professional_primer_pairs(
-    sequence: str,
-    forward_candidates: Sequence[
-        AdvancedPrimerCandidate
-    ],
-    reverse_candidates: Sequence[
-        AdvancedPrimerCandidate
-    ],
-    *,
-    config: ProfessionalPrimerConfig = (
-        ProfessionalPrimerConfig()
-    ),
-    reference_sequences: Optional[
-        dict[str, str]
-        | Sequence[tuple[str, str]]
-    ] = None,
-) -> tuple[
-    list[AdvancedPrimerPair],
-    int,
-]:
-    """
-    Rank primer pairs using both existing compatibility analysis and
-    nearest-neighbor thermodynamics.
-    """
-
-    config.validate()
-
-    pairs = []
-    evaluated = 0
-
-    for forward_item in forward_candidates:
-        for reverse_item in reverse_candidates:
-            forward = forward_item.candidate
-            reverse = reverse_item.candidate
-
-            if forward.end > reverse.start:
-                continue
-
-            evaluated += 1
-
-            pair = build_primer_pair(
-                sequence,
-                forward,
-                reverse,
-                config.primer,
-                reference_sequences,
-            )
-
-            if pair is None:
-                continue
-
-            advanced = (
-                analyze_primer_pair_thermodynamics(
-                    pair,
-                    conditions=(
-                        config.thermodynamics
-                    ),
-                    max_tm_delta=(
-                        config.primer.max_tm_delta
-                    ),
-                )
-            )
-
-            # The thermodynamic pair score is combined with the existing
-            # pair score instead of replacing it.
-            combined_score = (
-                pair.score * 0.70
-                + advanced.thermodynamic_pair_score
-                * (100.0 / 15.0)
-                * 0.30
-            )
-
-            combined_score = round(
-                min(
-                    100.0,
-                    max(
-                        0.0,
-                        combined_score,
-                    ),
-                ),
-                2,
-            )
-
-            upgraded_pair = PrimerPair(
-                forward=pair.forward,
-                reverse=pair.reverse,
-                amplicon_start=pair.amplicon_start,
-                amplicon_end=pair.amplicon_end,
-                amplicon_length=pair.amplicon_length,
-                amplicon_sequence=pair.amplicon_sequence,
-                amplicon_gc_percent=(
-                    gc_percent(pair.amplicon_sequence)
-                ),
-                tm_delta=advanced.thermodynamic_tm_delta,
-                heterodimer=pair.heterodimer,
-                score=combined_score,
-                category=_category(
-                    combined_score
-                ),
-                specificity_hits=pair.specificity_hits,
-                warnings=pair.warnings,
-            )
-
-            advanced = AdvancedPrimerPair(
-                pair=upgraded_pair,
-                forward_thermodynamics=(
-                    advanced.forward_thermodynamics
-                ),
-                reverse_thermodynamics=(
-                    advanced.reverse_thermodynamics
-                ),
-                thermodynamic_tm_delta=(
-                    advanced.thermodynamic_tm_delta
-                ),
-                thermodynamic_pair_score=(
-                    advanced.thermodynamic_pair_score
-                ),
-            )
-
-            pairs.append(
-                advanced
-            )
-
-    pairs.sort(
-        key=lambda item: (
-            -item.pair.score,
-            item.thermodynamic_tm_delta,
-            item.pair.heterodimer.max_stem,
-            abs(
-                item.pair.amplicon_length
-                - config.primer.optimal_amplicon_length
-            ),
-        )
-    )
-
-    return (
-        pairs[
-            :config.top_pairs
-        ],
-        evaluated,
-    )
+# Superseded definition of rank_professional_primer_pairs() removed in Stage 4 (never reachable;
+# a later definition in this module replaces it). See docs/CHANGES.md.
 
 
 # ============================================================================
@@ -2897,146 +2553,8 @@ class ProfessionalPrimerDesignReport:
 # PROFESSIONAL WORKFLOW
 # ============================================================================
 
-def design_primers_professional(
-    sequence: str,
-    target_start: int = 0,
-    target_end: Optional[int] = None,
-    *,
-    config: ProfessionalPrimerConfig = (
-        ProfessionalPrimerConfig()
-    ),
-    reference_sequences: Optional[
-        dict[str, str]
-        | Sequence[tuple[str, str]]
-    ] = None,
-) -> ProfessionalPrimerDesignReport:
-    """
-    Run the complete V3 thermodynamic primer-design workflow.
-    """
-
-    config.validate()
-
-    sequence = normalize_dna_sequence(
-        sequence
-    )
-
-    if target_end is None:
-        target_end = len(sequence)
-
-    validate_target_region(
-        sequence,
-        target_start,
-        target_end,
-    )
-
-    forward_candidates, forward_evaluated = (
-        generate_professional_primer_candidates(
-            sequence,
-            target_start,
-            target_end,
-            "FORWARD",
-            config=config,
-        )
-    )
-
-    reverse_candidates, reverse_evaluated = (
-        generate_professional_primer_candidates(
-            sequence,
-            target_start,
-            target_end,
-            "REVERSE",
-            config=config,
-        )
-    )
-
-    ranked_pairs, pairs_evaluated = (
-        rank_professional_primer_pairs(
-            sequence,
-            forward_candidates,
-            reverse_candidates,
-            config=config,
-            reference_sequences=(
-                reference_sequences
-            ),
-        )
-    )
-
-    failure_reasons = []
-
-    if not forward_candidates:
-        failure_reasons.append(
-            "No thermodynamically acceptable forward "
-            "primer candidates found."
-        )
-
-    if not reverse_candidates:
-        failure_reasons.append(
-            "No thermodynamically acceptable reverse "
-            "primer candidates found."
-        )
-
-    if (
-        forward_candidates
-        and reverse_candidates
-        and not ranked_pairs
-    ):
-        failure_reasons.append(
-            "No acceptable primer pair satisfies "
-            "amplicon, compatibility and "
-            "thermodynamic constraints."
-        )
-
-    warnings = []
-
-    if not reference_sequences:
-        warnings.append(
-            "Specificity was not genome-wide screened; "
-            "no reference database was supplied."
-        )
-
-    warnings.append(
-        "Nearest-neighbor Tm is a thermodynamic screening "
-        "model; experimental PCR conditions should be "
-        "validated independently."
-    )
-
-    warnings.append(
-        "Mg2+ and dNTP effects are represented by an "
-        "effective ionic-strength approximation, not a "
-        "complete buffer-speciation model."
-    )
-
-    return ProfessionalPrimerDesignReport(
-        sequence_length=len(sequence),
-        target_start=target_start,
-        target_end=target_end,
-        target_length=(
-            target_end - target_start
-        ),
-        tm_method=config.tm_method,
-        thermodynamic_conditions=(
-            config.thermodynamics
-        ),
-        forward_candidates_evaluated=(
-            forward_evaluated
-        ),
-        reverse_candidates_evaluated=(
-            reverse_evaluated
-        ),
-        forward_candidates_accepted=len(
-            forward_candidates
-        ),
-        reverse_candidates_accepted=len(
-            reverse_candidates
-        ),
-        pairs_evaluated=pairs_evaluated,
-        pairs_accepted=len(
-            ranked_pairs
-        ),
-        ranked_pairs=ranked_pairs,
-        failure_reasons=failure_reasons,
-        warnings=warnings,
-    )
+# Superseded definition of design_primers_professional() removed in Stage 4 (never reachable;
+# a later definition in this module replaces it). See docs/CHANGES.md.
 
 
 # ============================================================================
@@ -3108,212 +2626,12 @@ def _print_thermodynamic_conditions(
     )
 
 
-def summarize_professional_primer_pair(
-    advanced_pair: AdvancedPrimerPair,
-    rank: int = 1,
-) -> str:
-    """Return the extended pair report."""
-
-    pair = advanced_pair.pair
-
-    forward = pair.forward
-    reverse = pair.reverse
-
-    f_thermo = (
-        advanced_pair.forward_thermodynamics
-    )
-
-    r_thermo = (
-        advanced_pair.reverse_thermodynamics
-    )
-
-    specificity = (
-        "NOT SCREENED"
-        if not pair.specificity_hits
-        else f"{len(pair.specificity_hits)} HIT(S)"
-    )
-
-    lines = [
-        f"PRIMER PAIR #{rank}",
-        f"Score:                 {pair.score:.2f}/100",
-        f"Category:              {pair.category}",
-        "",
-        "FORWARD",
-        f"Sequence:              {forward.sequence}",
-        f"Position:              {forward.start}-{forward.end}",
-        f"Length:                {forward.length} bp",
-        f"GC:                    {forward.gc_percent:.2f}%",
-        f"Tm:                    {f_thermo.tm_C:.2f} °C",
-        f"ΔH:                    "
-        f"{f_thermo.delta_h_kcal_mol:.2f} kcal/mol",
-        f"ΔS:                    "
-        f"{f_thermo.delta_s_cal_mol_k:.2f} cal/(mol*K)",
-        f"ΔG @25°C:              "
-        f"{f_thermo.delta_g_kcal_mol:.2f} kcal/mol",
-        f"Effective salt:        "
-        f"{f_thermo.effective_salt_mM:.2f} mM",
-        f"3' GC clamp:           {forward.gc_clamp} bp",
-        f"Hairpin stem:          "
-        f"{forward.hairpin.max_stem} bp "
-        f"({forward.hairpin.severity})",
-        f"Self-dimer stem:       "
-        f"{forward.self_dimer.max_stem} bp "
-        f"({forward.self_dimer.severity})",
-        "",
-        "REVERSE",
-        f"Sequence:              {reverse.sequence}",
-        f"Position:              {reverse.start}-{reverse.end}",
-        f"Length:                {reverse.length} bp",
-        f"GC:                    {reverse.gc_percent:.2f}%",
-        f"Tm:                    {r_thermo.tm_C:.2f} °C",
-        f"ΔH:                    "
-        f"{r_thermo.delta_h_kcal_mol:.2f} kcal/mol",
-        f"ΔS:                    "
-        f"{r_thermo.delta_s_cal_mol_k:.2f} cal/(mol*K)",
-        f"ΔG @25°C:              "
-        f"{r_thermo.delta_g_kcal_mol:.2f} kcal/mol",
-        f"Effective salt:        "
-        f"{r_thermo.effective_salt_mM:.2f} mM",
-        f"3' GC clamp:           {reverse.gc_clamp} bp",
-        f"Hairpin stem:          "
-        f"{reverse.hairpin.max_stem} bp "
-        f"({reverse.hairpin.severity})",
-        f"Self-dimer stem:       "
-        f"{reverse.self_dimer.max_stem} bp "
-        f"({reverse.self_dimer.severity})",
-        "",
-        "PAIR",
-        f"Amplicon:              "
-        f"{pair.amplicon_start}-{pair.amplicon_end}",
-        f"Amplicon length:       "
-        f"{pair.amplicon_length} bp",
-        f"ΔTm:                   "
-        f"{advanced_pair.thermodynamic_tm_delta:.2f} °C",
-        f"Thermodynamic score:   "
-        f"{advanced_pair.thermodynamic_pair_score:.2f}/15",
-        f"Heterodimer stem:      "
-        f"{pair.heterodimer.max_stem} bp "
-        f"({pair.heterodimer.severity})",
-        f"Specificity screening: "
-        f"{specificity}",
-    ]
-
-    return "\n".join(
-        lines
-    )
+# Superseded definition of summarize_professional_primer_pair() removed in Stage 4 (never reachable;
+# a later definition in this module replaces it). See docs/CHANGES.md.
 
 
-def print_professional_primer_report(
-    report: ProfessionalPrimerDesignReport,
-) -> None:
-    """Print the complete V3 report."""
-
-    print("=" * 72)
-    print("SYNAPSE — PROFESSIONAL PRIMER DESIGN")
-    print("=" * 72)
-
-    print(
-        f"Sequence length:            "
-        f"{report.sequence_length} bp"
-    )
-
-    print(
-        f"Target region:              "
-        f"{report.target_start}-{report.target_end} "
-        f"({report.target_length} bp)"
-    )
-
-    print(
-        f"Tm method:                  "
-        f"{report.tm_method}"
-    )
-
-    _print_thermodynamic_conditions(
-        report.thermodynamic_conditions
-    )
-
-    print()
-    print("CANDIDATE GENERATION")
-    print("-" * 72)
-
-    print(
-        f"Forward evaluated:          "
-        f"{report.forward_candidates_evaluated}"
-    )
-
-    print(
-        f"Forward accepted:           "
-        f"{report.forward_candidates_accepted}"
-    )
-
-    print(
-        f"Reverse evaluated:          "
-        f"{report.reverse_candidates_evaluated}"
-    )
-
-    print(
-        f"Reverse accepted:           "
-        f"{report.reverse_candidates_accepted}"
-    )
-
-    print()
-    print("PAIR EVALUATION")
-    print("-" * 72)
-
-    print(
-        f"Pairs evaluated:             "
-        f"{report.pairs_evaluated}"
-    )
-
-    print(
-        f"Pairs accepted/ranked:       "
-        f"{report.pairs_accepted}"
-    )
-
-    print()
-
-    if report.ranked_pairs:
-        for index, advanced_pair in enumerate(
-            report.ranked_pairs,
-            start=1,
-        ):
-            print(
-                summarize_professional_primer_pair(
-                    advanced_pair,
-                    index,
-                )
-            )
-            print()
-
-    else:
-        print(
-            "NO ACCEPTABLE PRIMER PAIR FOUND"
-        )
-        print()
-
-        if report.failure_reasons:
-            print(
-                "MAIN LIMITING FACTORS"
-            )
-
-            for reason in report.failure_reasons:
-                print(
-                    f"- {reason}"
-                )
-
-            print()
-
-    if report.warnings:
-        print(
-            "WARNINGS"
-        )
-
-        for warning in report.warnings:
-            print(
-                f"- {warning}"
-            )
-
-    print("=" * 72)
+# Superseded definition of print_professional_primer_report() removed in Stage 4 (never reachable;
+# a later definition in this module replaces it). See docs/CHANGES.md.
 
 
 # ============================================================================
@@ -4629,62 +3947,8 @@ def _primer_ui_select_tm_model():
     return methods[choice]
 
 
-def _primer_ui_design(sequence, target_start, target_end, pipeline):
-    """Run the complete primer-design workflow."""
-    tm_method = _primer_ui_select_tm_model()
-
-    if tm_method is None:
-        return None
-
-    conditions = _primer_ui_read_conditions()
-
-    if conditions is None:
-        return None
-
-    print()
-    print("RUNNING PRIMER DESIGN...")
-    print()
-
-    try:
-        if tm_method == "nearest_neighbor":
-            config = ProfessionalPrimerConfig(
-                thermodynamics=conditions,
-                tm_method="nearest_neighbor",
-            )
-
-            report = design_primers_professional(
-                sequence,
-                target_start=target_start,
-                target_end=target_end,
-                config=config,
-            )
-
-            print_professional_primer_report(report)
-
-        else:
-            config = PrimerDesignConfig(
-                salt_mM=conditions.sodium_mM,
-                mg_mM=conditions.magnesium_mM,
-                dntp_mM=conditions.dntp_mM,
-                primer_concentration_nM=conditions.primer_nM,
-            )
-
-            report = design_primers(
-                sequence,
-                target_start=target_start,
-                target_end=target_end,
-                config=config,
-                tm_method=tm_method,
-            )
-
-            print_primer_report(report)
-
-        _primer_ui_store_result(pipeline, report)
-        return report
-
-    except (TypeError, ValueError, ZeroDivisionError) as exc:
-        print(f"ERROR: {exc}")
-        return None
+# Superseded definition of _primer_ui_design() removed in Stage 4 (never reachable;
+# a later definition in this module replaces it). See docs/CHANGES.md.
 
 
 def _primer_ui_single_analysis(pipeline=None):
@@ -4862,67 +4126,8 @@ def _primer_ui_design_menu(dna, header, pipeline):
             print("ERROR: Invalid selection.")
 
 
-def run_primer_analysis_ui(
-    dna,
-    pipeline=None,
-    header="Sequence",
-):
-    """
-    Run the module-owned Primer Design UI.
-
-    The main menu only needs to call this function. The primer engine itself
-    remains independent from the CLI navigation layer.
-    """
-    try:
-        sequence = normalize_dna_sequence(dna)
-    except (TypeError, ValueError) as exc:
-        _primer_ui_header("PRIMER DESIGN")
-        print(f"ERROR: {exc}")
-        return None
-
-    while True:
-        _primer_ui_header("PRIMER DESIGN")
-
-        print(f"Input:  {header}")
-        print(f"Length: {len(sequence)} bp")
-        print()
-        print("[1] Primer Design")
-        print("[2] Single Primer Analysis")
-        print()
-        print("[0] Back")
-        print("-" * 72)
-
-        choice = input("Selection: ").strip()
-
-        if choice == "0":
-            return None
-
-        if choice == "1":
-            target = _primer_ui_read_target(sequence)
-
-            if target is None:
-                continue
-
-            target_start, target_end = target
-
-            result = _primer_ui_design(
-                sequence,
-                target_start,
-                target_end,
-                pipeline,
-            )
-
-            if result is not None:
-                return result
-
-        elif choice == "2":
-            result = _primer_ui_single_analysis(pipeline)
-
-            if result is not None:
-                return result
-
-        else:
-            print("ERROR: Invalid selection.")
+# Superseded definition of run_primer_analysis_ui() removed in Stage 4 (never reachable;
+# a later definition in this module replaces it). See docs/CHANGES.md.
 
 
 # ============================================================================
@@ -5162,100 +4367,8 @@ def _professional_build_candidate(
     return advanced
 
 
-def generate_professional_primer_candidates(
-    sequence: str,
-    target_start: int,
-    target_end: int,
-    orientation: str,
-    *,
-    config: ProfessionalPrimerConfig = ProfessionalPrimerConfig(),
-) -> tuple[list[AdvancedPrimerCandidate], int]:
-    """
-    Generate professional candidates using the actual configured NN model.
-
-    Candidate generation is deliberately separated from candidate acceptance:
-    a primer is first measured, then ranked.  This prevents a preferred GC
-    clamp or a heuristic structure flag from deleting an otherwise useful
-    candidate before the thermodynamic model has been considered.
-    """
-    config.validate()
-    sequence = normalize_dna_sequence(sequence)
-    validate_target_region(sequence, target_start, target_end)
-
-    orientation = orientation.upper()
-    if orientation not in {"FORWARD", "REVERSE"}:
-        raise ValueError("orientation must be FORWARD or REVERSE.")
-
-    candidates = []
-    evaluated = 0
-
-    if orientation == "FORWARD":
-        positions = (
-            (start, start + length)
-            for start in range(target_start, target_end)
-            for length in range(
-                config.primer.min_length,
-                config.primer.max_length + 1,
-            )
-            if start + length <= target_end
-        )
-    else:
-        positions = (
-            (end - length, end)
-            for end in range(target_end, target_start, -1)
-            for length in range(
-                config.primer.min_length,
-                config.primer.max_length + 1,
-            )
-            if end - length >= target_start
-        )
-
-    for start, end in positions:
-        evaluated += 1
-        advanced = _professional_build_candidate(
-            sequence,
-            orientation,
-            start,
-            end,
-            config,
-        )
-
-        # Keep the original candidate metadata intact.  Rejection reasons are
-        # used only for transparent diagnostics in the professional layer.
-        tier, reasons = _professional_tier(advanced, config)
-        advanced.candidate.rejection_reasons = reasons
-        advanced.screening_tier = tier
-        advanced.screening_score = _professional_candidate_quality(
-            advanced,
-            config,
-        )
-        candidates.append(advanced)
-
-    # Rank strict candidates first, but retain the best relaxed/fallback
-    # candidates as well. This prevents a small strict pool from producing
-    # zero primer pairs when a compatible relaxed candidate exists.
-    selected = list(candidates)
-
-    selected.sort(
-        key=lambda item: (
-            item.screening_tier,
-            -item.screening_score,
-            abs(
-                item.thermodynamics.tm_C
-                - config.primer.optimal_tm
-            ),
-            abs(
-                item.candidate.gc_percent
-                - config.primer.optimal_gc
-            ),
-            abs(
-                item.candidate.length
-                - config.primer.optimal_length
-            ),
-        )
-    )
-
-    return selected[:config.max_pair_candidates], evaluated
+# Superseded definition of generate_professional_primer_candidates() removed in Stage 4 (never reachable;
+# a later definition in this module replaces it). See docs/CHANGES.md.
 
 
 def _professional_failure_diagnostics(
@@ -5286,112 +4399,8 @@ def _professional_failure_diagnostics(
     return messages
 
 
-def design_primers_professional(
-    sequence: str,
-    target_start: int = 0,
-    target_end: Optional[int] = None,
-    *,
-    config: ProfessionalPrimerConfig = ProfessionalPrimerConfig(),
-    reference_sequences: Optional[
-        dict[str, str] | Sequence[tuple[str, str]]
-    ] = None,
-) -> ProfessionalPrimerDesignReport:
-    """Run the improved professional primer-design workflow."""
-    config.validate()
-    sequence = normalize_dna_sequence(sequence)
-    if target_end is None:
-        target_end = len(sequence)
-    validate_target_region(sequence, target_start, target_end)
-
-    forward_candidates, forward_evaluated = generate_professional_primer_candidates(
-        sequence,
-        target_start,
-        target_end,
-        "FORWARD",
-        config=config,
-    )
-    reverse_candidates, reverse_evaluated = generate_professional_primer_candidates(
-        sequence,
-        target_start,
-        target_end,
-        "REVERSE",
-        config=config,
-    )
-
-    ranked_pairs, pairs_evaluated = rank_professional_primer_pairs(
-        sequence,
-        forward_candidates,
-        reverse_candidates,
-        config=config,
-        reference_sequences=reference_sequences,
-    )
-
-    failure_reasons = []
-    warnings = []
-
-    if not forward_candidates:
-        failure_reasons.append("No forward primer candidates could be generated.")
-    if not reverse_candidates:
-        failure_reasons.append("No reverse primer candidates could be generated.")
-    if forward_candidates and reverse_candidates and not ranked_pairs:
-        failure_reasons.append(
-            "No primer pair satisfies the configured amplicon and compatibility constraints."
-        )
-
-    # Explicit diagnostics when the strict tier was unavailable.
-    if forward_candidates and any(item.screening_tier > 1 for item in forward_candidates):
-        strict_forward = sum(item.screening_tier == 1 for item in forward_candidates)
-        if strict_forward == 0:
-            warnings.append(
-                "Forward candidates required relaxed screening; the strict preferred window produced no candidates."
-            )
-
-    if reverse_candidates and any(item.screening_tier > 1 for item in reverse_candidates):
-        strict_reverse = sum(item.screening_tier == 1 for item in reverse_candidates)
-        if strict_reverse == 0:
-            warnings.append(
-                "Reverse candidates required relaxed screening; the strict preferred window produced no candidates."
-            )
-
-    if not reference_sequences:
-        warnings.append(
-            "Specificity was not genome-wide screened; no reference database was supplied."
-        )
-
-    warnings.append(
-        "Nearest-neighbor Tm is a sequence-level thermodynamic screening model; validate final primers under the actual PCR conditions."
-    )
-    warnings.append(
-        "Mg2+ and dNTP effects use an effective ionic-strength approximation rather than a complete buffer-speciation model."
-    )
-
-    # Add useful diagnostics only when the strict pool failed.
-    if forward_candidates and all(item.screening_tier > 1 for item in forward_candidates):
-        warnings.append("Forward limiting factors: " + "; ".join(
-            _professional_failure_diagnostics(forward_candidates, config)
-        ))
-    if reverse_candidates and all(item.screening_tier > 1 for item in reverse_candidates):
-        warnings.append("Reverse limiting factors: " + "; ".join(
-            _professional_failure_diagnostics(reverse_candidates, config)
-        ))
-
-    return ProfessionalPrimerDesignReport(
-        sequence_length=len(sequence),
-        target_start=target_start,
-        target_end=target_end,
-        target_length=target_end - target_start,
-        tm_method=config.tm_method,
-        thermodynamic_conditions=config.thermodynamics,
-        forward_candidates_evaluated=forward_evaluated,
-        reverse_candidates_evaluated=reverse_evaluated,
-        forward_candidates_accepted=len(forward_candidates),
-        reverse_candidates_accepted=len(reverse_candidates),
-        pairs_evaluated=pairs_evaluated,
-        pairs_accepted=len(ranked_pairs),
-        ranked_pairs=ranked_pairs,
-        failure_reasons=failure_reasons,
-        warnings=warnings,
-    )
+# Superseded definition of design_primers_professional() removed in Stage 4 (never reachable;
+# a later definition in this module replaces it). See docs/CHANGES.md.
 
 
 def _print_professional_candidate_diagnostics(

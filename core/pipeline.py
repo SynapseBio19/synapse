@@ -980,6 +980,11 @@ class SynapsePipeline:
             protein="",
             rna=rna,
             initiator_start=initiator_start,
+            genetic_code=(
+                self.context.selected_orf.get("genetic_code", 1)
+                if initiator_start and isinstance(self.context.selected_orf, dict)
+                else 1
+            ),
         )
 
         protein = result.get(

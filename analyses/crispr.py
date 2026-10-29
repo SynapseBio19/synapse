@@ -46,6 +46,7 @@ import re
 import tempfile
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
+from core.seqtools import IUPAC_COMPLEMENT as _CORE_IUPAC_COMPLEMENT
 
 
 # ============================================================================
@@ -64,12 +65,8 @@ IUPAC_CODES: Dict[str, set[str]] = {
     "N": {"A", "C", "G", "T"},
 }
 
-IUPAC_COMPLEMENT = {
-    "A": "T", "C": "G", "G": "C", "T": "A",
-    "R": "Y", "Y": "R", "S": "S", "W": "W",
-    "K": "M", "M": "K", "B": "V", "V": "B",
-    "D": "H", "H": "D", "N": "N",
-}
+# IUPAC complement table shared via core.seqtools.
+IUPAC_COMPLEMENT = dict(_CORE_IUPAC_COMPLEMENT)
 
 # Data-driven CRISPR system registry.  PAM orientation is defined relative to
 # the guide/protospacer sequence in its targeting orientation.

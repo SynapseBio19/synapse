@@ -495,7 +495,16 @@ def expand_iupac_codon(codon):
     ]
 
 
-def resolve_codon(codon):
+def rna_codon_table(genetic_code=1):
+    """Codon table (RNA alphabet, "STOP" for stops) for an NCBI genetic code."""
+    if genetic_code in (None, 1):
+        return CODON_TABLE
+    from core.seqtools import codon_dict
+    return codon_dict(int(genetic_code), rna=True, stop_symbol="STOP")
+
+
+def resolve_codon(codon, codon_table=None):
+    codon_table = CODON_TABLE if codon_table is None else codon_table
 
     codon = (
         codon
@@ -522,7 +531,7 @@ def resolve_codon(codon):
 
     for concrete_codon in expanded:
 
-        amino_acid = CODON_TABLE.get(
+        amino_acid = codon_table.get(
             concrete_codon
         )
 
@@ -651,7 +660,7 @@ def translate_protein(rna):
 
 
 
-def analyze_translation(rna, initiator_start=False):
+def analyze_translation(rna, initiator_start=False, genetic_code=1):
     """Translate RNA in frame +1 with the standard genetic code.
 
     initiator_start=True states that the first codon is the selected start
@@ -659,6 +668,7 @@ def analyze_translation(rna, initiator_start=False):
     decoded as methionine, because initiator tRNA inserts (formyl-)Met at
     the start codon (audit P0-8). For arbitrary sequence windows leave it
     False: the first codon is translated with the elongation code.
+    genetic_code selects the NCBI translation table (default 1, standard).
     """
 
     if not isinstance(rna, str):
@@ -695,6 +705,7 @@ def analyze_translation(rna, initiator_start=False):
         len(rna) % 3
     )
 
+    codon_table = rna_codon_table(genetic_code)
     records = []
 
     protein = ""
@@ -719,9 +730,7 @@ def analyze_translation(rna, initiator_start=False):
             start:end
         ]
 
-        result = resolve_codon(
-            codon
-        )
+        result = resolve_codon(codon, codon_table)
 
         initiator = False
         if (
@@ -808,6 +817,10 @@ def analyze_translation(rna, initiator_start=False):
 
         "reading_frame":
             "+1",
+
+        "genetic_code":
+
+            int(genetic_code or 1),
 
         "protein":
             protein,
@@ -2139,6 +2152,7 @@ def analyze_complete_protein(
     protein,
     rna=None,
     initiator_start=False,
+    genetic_code=1,
 ):
 
     if not isinstance(protein, str):
@@ -2155,6 +2169,7 @@ def analyze_complete_protein(
         translation = analyze_translation(
             rna,
             initiator_start=initiator_start,
+            genetic_code=genetic_code,
         )
 
         protein = translation[
@@ -4539,6 +4554,7 @@ def protein_analysis_menu(
     reading_frame=None,
     orf_status=None,
     initiator_start=False,
+    genetic_code=1,
 ):
     """
     Main Protein Analysis UI.
@@ -4552,6 +4568,7 @@ def protein_analysis_menu(
         translation = analyze_translation(
             rna,
             initiator_start=initiator_start,
+            genetic_code=genetic_code,
         )
 
         # Preserve the biological frame from the selected ORF.
@@ -4697,6 +4714,7 @@ def run_protein_analysis_from_orf(
     reading_frame=None,
     orf_status=None,
     pipeline=None,
+    genetic_code=1,
 ):
     """
     Start Protein Analysis from exactly one selected ORF.
@@ -4755,6 +4773,7 @@ def run_protein_analysis_from_orf(
     translation = analyze_translation(
         rna,
         initiator_start=True,
+        genetic_code=genetic_code,
     )
 
     if reading_frame is not None:
@@ -4780,7 +4799,7 @@ def run_protein_analysis_from_orf(
     if pipeline is not None:
         context = getattr(pipeline, "context", None)
         try:
-            analysis = analyze_complete_protein("", rna=rna, initiator_start=True)
+            analysis = analyze_complete_protein("", rna=rna, initiator_start=True, genetic_code=genetic_code)
             if context is not None:
                 context.protein_source = "Selected ORF"
                 context.store_protein_analysis(analysis, protein_sequence=analysis.get("protein", ""))
@@ -4804,4 +4823,5 @@ def run_protein_analysis_from_orf(
         ),
         orf_status=orf_status,
         initiator_start=True,
+        genetic_code=genetic_code,
     )

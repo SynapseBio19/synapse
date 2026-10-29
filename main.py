@@ -480,8 +480,8 @@ while True:
                     if selected_orf.get("genetic_code", 1) != 1:
                         print(
                             "! ORF found with NCBI table "
-                            f"{selected_orf['genetic_code']}; the RNA and Protein "
-                            "modules still translate with the standard code (table 1)."
+                            f"{selected_orf['genetic_code']}; Protein analysis uses this "
+                            "table, the RNA module's codon view uses the standard code."
                         )
 
                     input(
@@ -592,6 +592,7 @@ while True:
                     reading_frame=reading_frame,
                     orf_status=orf_status,
                     pipeline=pipeline,
+                    genetic_code=selected_orf.get("genetic_code", 1),
                 )
 
             except Exception as error:

@@ -292,3 +292,34 @@ unchanged.
 
 - `tests/test_primer_thermodynamics.py` (7), `tests/test_stage3_additions.py`
   (21) and a menu test for `[R]` in `tests/test_main_smoke.py`.
+
+## Stage 4 – consolidation and preparation for a future UI (2026-10-30)
+
+No scientific result changes in this stage; all golden snapshots unchanged.
+
+- **Primer patch chain**: 13 superseded function definitions in
+  `analyses/primer.py` (1,014 lines; earlier versions of e.g.
+  `design_primers_professional`, `generate_professional_primer_candidates`,
+  `run_primer_analysis_ui`) were removed. They were never reachable: a later
+  definition replaced the name before any call. Evidence of equivalence:
+  the compiled bytecode of every remaining module-level function and class
+  is identical before and after (automated comparison), and all tests pass.
+  The live v5–v11 wrapper chain for candidate ranking was kept; flattening
+  it would change code that is actually executed and is left for later.
+- **Shared tables**: the standard genetic code in `orf`, `mutation`, `rna`
+  and `data/genetic_code.py` and the IUPAC complement tables in `crispr`,
+  `primer` and `mutation` are now derived from `core/seqtools.py`
+  (`codon_dict`). Each replaced table was asserted equal to the derived one
+  before replacement. One former hand-written table is kept as an
+  independent test fixture (`tests/fixtures/standard_code_reference.py`).
+  The modules' own normalization and error handling were not changed.
+- **Genetic code in protein analysis**: `analyze_translation`,
+  `analyze_complete_protein`, the protein menu and the pipeline use the
+  genetic code of the selected ORF (default table 1).
+- **`core/api.py`**: non-interactive entry points (load, sequence overview,
+  ORF, RNA, protein, restriction digest, primer design, sequence comparison,
+  VCF, CRISPR) returning `AnalysisResult`. The ORF entry point is tested to
+  give results identical to the module call.
+- **Documentation**: `docs/METHODS.md` (methods, defaults, references,
+  validation status per module); README extended.
+- Tests: `tests/test_stage4_consolidation.py` (10).
