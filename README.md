@@ -6,7 +6,9 @@ Status: research and teaching software under active correction. Results are
 computational predictions; none is experimentally validated, and Synapse is
 not a substitute for established, validated tools. See `docs/METHODS.md` for
 methods, defaults, references and validation status, and `docs/CHANGES.md`
-for every change to scientific behavior.
+for every change to scientific behavior. `docs/AUDIT_STATUS.md` records what
+the 2026-10 audit asked for and what has been implemented, tested, deferred
+or rejected.
 
 Requirements: Python 3.10 or newer; no third-party packages.
 

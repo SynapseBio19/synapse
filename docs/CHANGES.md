@@ -341,3 +341,10 @@ No scientific result changes in this stage; all golden snapshots unchanged.
   give identical values; all golden snapshots are unchanged.
 - Tests: `tests/test_stage5_protein_positions.py` (5), including the
   position-identity check against the fully resolved sequence.
+
+## Assessment against the audit (2026-10-30)
+
+`docs/AUDIT_STATUS.md` lists every P0, P1, P2 and P3 recommendation with one
+of: implemented and tested / implemented but not independently validated /
+partial / deferred / rejected, including the validation steps that could not
+be performed in this environment.
