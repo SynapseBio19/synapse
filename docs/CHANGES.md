@@ -323,3 +323,21 @@ No scientific result changes in this stage; all golden snapshots unchanged.
 - **Documentation**: `docs/METHODS.md` (methods, defaults, references,
   validation status per module); README extended.
 - Tests: `tests/test_stage4_consolidation.py` (10).
+
+## Stage 5 – unresolved residues keep their position (2026-10-30)
+
+- `analyses/protein.py`: new `get_positional_protein()` keeps unresolved
+  residues ("?") instead of deleting them. The position-dependent analyses
+  (hydropathy profile, hydrophobic regions, transmembrane screen,
+  flexibility profile, signal-peptide screen, instability index) use it and
+  skip only the windows or dipeptides that contain a "?". Previously such
+  residues were removed, which silently shifted every later position: for a
+  75-residue protein with one ambiguous codon, every reported window
+  position after that residue was off by one.
+- Visible consequence only for sequences that contain ambiguous codons:
+  windows covering an unresolved residue are no longer reported (instead of
+  being reported with a wrong position), and the instability index is
+  normalized by the number of scored dipeptides. Fully resolved sequences
+  give identical values; all golden snapshots are unchanged.
+- Tests: `tests/test_stage5_protein_positions.py` (5), including the
+  position-identity check against the fully resolved sequence.

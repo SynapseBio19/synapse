@@ -390,6 +390,23 @@ def get_resolved_protein(protein):
 
 
 
+def get_positional_protein(protein):
+    """Keep standard residues and unresolved positions ("?"), drop other symbols.
+
+    Position-dependent analyses (sliding windows, dipeptide scales, signal
+    peptide) must not simply delete unresolved residues: doing so shifts every
+    later position. They use this function and then skip the windows or
+    dipeptides that contain a "?" (audit P2-5).
+    """
+    if not isinstance(protein, str):
+        return ""
+    return "".join(
+        residue
+        for residue in protein.upper()
+        if residue in STANDARD_AMINO_ACIDS or residue == "?"
+    )
+
+
 def analyze_protein_quality(protein):
 
     if not isinstance(protein, str):
@@ -1382,7 +1399,7 @@ def calculate_hydropathy_profile(
     window=9
 ):
 
-    protein = get_resolved_protein(
+    protein = get_positional_protein(
         protein
     )
 
@@ -1407,6 +1424,12 @@ def calculate_hydropathy_profile(
             start:
             start + window
         ]
+
+        if "?" in segment:
+
+            # Unresolved position: no score instead of a shifted window.
+
+            continue
 
         score = (
             sum(
@@ -1466,7 +1489,7 @@ def find_transmembrane_domains(
     max_charged=2
 ):
 
-    protein = get_resolved_protein(
+    protein = get_positional_protein(
         protein
     )
 
@@ -1496,6 +1519,12 @@ def find_transmembrane_domains(
             start:
             start + window
         ]
+
+        if "?" in segment:
+
+            # Unresolved position: no score instead of a shifted window.
+
+            continue
 
         hydropathy = (
             sum(
@@ -1694,7 +1723,7 @@ def calculate_instability_index(
     protein
 ):
 
-    protein = get_resolved_protein(
+    protein = get_positional_protein(
         protein
     )
 
@@ -1702,6 +1731,7 @@ def calculate_instability_index(
         return None
 
     score = 0.0
+    scored = 0
 
     for i in range(
         len(protein) - 1
@@ -1709,6 +1739,13 @@ def calculate_instability_index(
 
         first = protein[i]
         second = protein[i + 1]
+
+        if first == "?" or second == "?":
+            # Unresolved residue: this dipeptide has no weight. Skipping it
+            # keeps every other dipeptide at its true position.
+            continue
+
+        scored += 1
 
         score += (
             INSTABILITY_WEIGHTS[
@@ -1718,9 +1755,14 @@ def calculate_instability_index(
             ]
         )
 
+    if scored == 0:
+        return None
+
+    # 10/L * sum over dipeptides (Guruprasad et al. 1990); L is the number of
+    # scored residues, which equals len(protein) for a fully resolved sequence.
     return (
         10.0
-        / len(protein)
+        / (scored + 1)
         * score
     )
 
@@ -1826,7 +1868,7 @@ def calculate_flexibility_profile(
     window=9
 ):
 
-    protein = get_resolved_protein(
+    protein = get_positional_protein(
         protein
     )
 
@@ -1852,6 +1894,12 @@ def calculate_flexibility_profile(
             start + window
         ]
 
+        if "?" in segment:
+
+            # Unresolved position: no score instead of a shifted window.
+
+            continue
+
         score = (
             sum(
                 FLEXIBILITY_SCALE[residue]
@@ -1875,7 +1923,7 @@ def predict_signal_peptide(
     protein
 ):
 
-    protein = get_resolved_protein(
+    protein = get_positional_protein(
         protein
     )
 
@@ -1917,6 +1965,10 @@ def predict_signal_peptide(
                 start:
                 start + window
             ]
+
+            if "?" in segment:
+                # Unresolved position: no score instead of a shifted window.
+                continue
 
             score = (
                 sum(

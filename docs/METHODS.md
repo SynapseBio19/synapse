@@ -61,7 +61,17 @@ use 0-based inclusive `start <= stop` on the forward strand.
 - Protein analysis uses the genetic code of the selected ORF. The RNA
   module's three-frame codon view always uses table 1.
 - Physicochemical values (mass, pI, GRAVY and similar) are sequence-based
-  estimates; not independently validated.
+  estimates. Checked against ExPASy ProtParam for ubiquitin (MW 8564.84 Da,
+  pI 6.56, GRAVY −0.489, ε 1490 M⁻¹cm⁻¹); otherwise not independently
+  validated.
+- Unresolved residues ("?", from ambiguous codons) keep their position.
+  Sliding windows (hydropathy, flexibility, transmembrane screen, signal
+  peptide) and the instability index skip the windows or dipeptides that
+  contain one instead of deleting the residue, so reported positions always
+  refer to the real protein. Composition-based values (pI, GRAVY, extinction
+  coefficient and similar) are computed over the resolved residues only.
+- The transmembrane and signal-peptide outputs are screens based on the
+  Kyte–Doolittle scale, not predictions from TMHMM/Phobius or SignalP.
 
 ## Restriction and cloning (`analyses/restriction.py`, `analyses/cloning.py`)
 
