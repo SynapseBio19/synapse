@@ -1,0 +1,7 @@
+##fileformat=VCFv4.3
+##fileformat=VCFv4.3
+#CHROM	POS	ID	REF	ALT	QUAL	FILTER	INFO
+chr1	100	.	G	A	100.0	PASS	AF=0.1
+chr1	200	.	A	AT	80.0	PASS	AF=0.2
+chr1	300	.	AT	A	60.0	PASS	AF=0.3
+chr2	150	.	A	G	95.0	.	.

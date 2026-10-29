@@ -1,0 +1,229 @@
+{
+  "metadata": {
+    "rid": "CD3MMW95016",
+    "submitted_at_utc": "2026-10-07T18:25:24+00:00",
+    "completed_at_utc": "2026-10-07T18:26:38+00:00",
+    "program": "blastn",
+    "database": "refseq_rna",
+    "database_type": "nucleotide",
+    "query_name": "TEST_8_REFERENCE",
+    "query_length": 99,
+    "query_source": "Selected Synapse Sequence",
+    "parameters": {
+      "program": "blastn",
+      "database": "refseq_rna",
+      "evalue": 10.0,
+      "max_target_seqs": 50,
+      "word_size": null,
+      "gap_open": null,
+      "gap_extend": null,
+      "matrix": null,
+      "filter_query": null,
+      "num_threads": null,
+      "task": null,
+      "tool": "Synapse",
+      "email": ""
+    },
+    "ncbi_status": "READY",
+    "ncbi_version": "BLASTN 2.17.0+",
+    "ncbi_database_reported": "refseq_rna",
+    "warnings": [
+      "No contact email was configured for the NCBI request. Set an email address in Synapse configuration when appropriate."
+    ],
+    "engine": "NCBI Remote",
+    "local_database_path": null
+  },
+  "query": {
+    "name": "TEST_8_REFERENCE",
+    "sequence": "ATGAAACGTGCTGACTTTGGTGACGCTTACCGTAAAGGTCCTGAACTGCTGACCGTTGACGAACTGAAAGCTGGTGCTTACGGTGACCTGATCGCTGAA",
+    "sequence_type": "DNA",
+    "source": "Selected Synapse Sequence",
+    "region_start": 1,
+    "region_end": 99,
+    "feature_type": "sequence",
+    "feature_name": null
+  },
+  "hits": [
+    {
+      "hit_id": "gi|1059423130|ref|XM_017928726.1|",
+      "accession": "XM_017928726",
+      "definition": "PREDICTED: Nicrophorus vespilloides protein UBASH3A homolog (LOC108567923), transcript variant X1, mRNA",
+      "length": 2334,
+      "hsps": [
+        {
+          "number": 1,
+          "bit_score": 40.9604,
+          "raw_score": 44.0,
+          "evalue": 7.45249,
+          "query_start": 50,
+          "query_end": 81,
+          "subject_start": 1775,
+          "subject_end": 1806,
+          "query_frame": 1,
+          "subject_frame": 1,
+          "identity": 28,
+          "positive": 28,
+          "gaps": 0,
+          "alignment_length": 32,
+          "query_sequence": "TGACCGTTGACGAACTGAAAGCTGGTGCTTAC",
+          "subject_sequence": "TGACTGTTGACGAACTGAAAGTTGCTGGTTAC",
+          "midline": "|||| |||||||||||||||| || || ||||",
+          "identity_percent": 87.5,
+          "positive_percent": 87.5,
+          "gap_percent": 0.0,
+          "query_coverage": 100.0
+        }
+      ],
+      "scientific_names": [
+        "Nicrophorus vespilloides"
+      ],
+      "taxonomy_ids": [],
+      "best_bit_score": 40.9604,
+      "best_evalue": 7.45249,
+      "best_identity_percent": 87.5,
+      "best_coverage_percent": 100.0,
+      "total_alignment_length": 32
+    },
+    {
+      "hit_id": "gi|1059423132|ref|XM_017928727.1|",
+      "accession": "XM_017928727",
+      "definition": "PREDICTED: Nicrophorus vespilloides protein UBASH3A homolog (LOC108567923), transcript variant X2, mRNA",
+      "length": 2241,
+      "hsps": [
+        {
+          "number": 1,
+          "bit_score": 40.9604,
+          "raw_score": 44.0,
+          "evalue": 7.45249,
+          "query_start": 50,
+          "query_end": 81,
+          "subject_start": 1681,
+          "subject_end": 1712,
+          "query_frame": 1,
+          "subject_frame": 1,
+          "identity": 28,
+          "positive": 28,
+          "gaps": 0,
+          "alignment_length": 32,
+          "query_sequence": "TGACCGTTGACGAACTGAAAGCTGGTGCTTAC",
+          "subject_sequence": "TGACTGTTGACGAACTGAAAGTTGCTGGTTAC",
+          "midline": "|||| |||||||||||||||| || || ||||",
+          "identity_percent": 87.5,
+          "positive_percent": 87.5,
+          "gap_percent": 0.0,
+          "query_coverage": 100.0
+        }
+      ],
+      "scientific_names": [
+        "Nicrophorus vespilloides"
+      ],
+      "taxonomy_ids": [],
+      "best_bit_score": 40.9604,
+      "best_evalue": 7.45249,
+      "best_identity_percent": 87.5,
+      "best_coverage_percent": 100.0,
+      "total_alignment_length": 32
+    },
+    {
+      "hit_id": "gi|2705325425|ref|XM_064041268.1|",
+      "accession": "XM_064041268",
+      "definition": "PREDICTED: Helicoverpa armigera odorant receptor Or2 (LOC110371134), mRNA",
+      "length": 1745,
+      "hsps": [
+        {
+          "number": 1,
+          "bit_score": 40.9604,
+          "raw_score": 44.0,
+          "evalue": 7.45249,
+          "query_start": 3,
+          "query_end": 34,
+          "subject_start": 456,
+          "subject_end": 425,
+          "query_frame": 1,
+          "subject_frame": -1,
+          "identity": 28,
+          "positive": 28,
+          "gaps": 0,
+          "alignment_length": 32,
+          "query_sequence": "GAAACGTGCTGACTTTGGTGACGCTTACCGTA",
+          "subject_sequence": "GAAATGTGCTCACTTTTGTCACGCTTACCGTA",
+          "midline": "|||| ||||| ||||| || ||||||||||||",
+          "identity_percent": 87.5,
+          "positive_percent": 87.5,
+          "gap_percent": 0.0,
+          "query_coverage": 100.0
+        }
+      ],
+      "scientific_names": [
+        "Helicoverpa armigera"
+      ],
+      "taxonomy_ids": [],
+      "best_bit_score": 40.9604,
+      "best_evalue": 7.45249,
+      "best_identity_percent": 87.5,
+      "best_coverage_percent": 100.0,
+      "total_alignment_length": 32
+    }
+  ],
+  "database_statistics": {
+    "db-num": 84877076,
+    "db-len": 252106195982,
+    "hsp-len": 0,
+    "eff-space": 0,
+    "kappa": 0.41,
+    "lambda": 0.625,
+    "entropy": 0.78
+  },
+  "interpretation_notes": [
+    "BLAST reports local sequence similarity and statistical significance.",
+    "A high-scoring hit does not by itself prove biological identity or function.",
+    "Interpretation depends on database composition, search parameters and query context."
+  ],
+  "evidence_profile": [
+    {
+      "hit_id": "gi|1059423130|ref|XM_017928726.1|",
+      "accession": "XM_017928726",
+      "identity_percent": 87.5,
+      "query_coverage_percent": 100.0,
+      "evalue": 7.45249,
+      "bit_score": 40.9604,
+      "alignment_length": 32,
+      "evidence_score": 74.38,
+      "evidence_band": "MODERATE_SEQUENCE_EVIDENCE",
+      "notes": [
+        "Evidence profile summarizes sequence-level BLAST output.",
+        "It is not a probability, experimental efficacy score or functional annotation."
+      ]
+    },
+    {
+      "hit_id": "gi|1059423132|ref|XM_017928727.1|",
+      "accession": "XM_017928727",
+      "identity_percent": 87.5,
+      "query_coverage_percent": 100.0,
+      "evalue": 7.45249,
+      "bit_score": 40.9604,
+      "alignment_length": 32,
+      "evidence_score": 74.38,
+      "evidence_band": "MODERATE_SEQUENCE_EVIDENCE",
+      "notes": [
+        "Evidence profile summarizes sequence-level BLAST output.",
+        "It is not a probability, experimental efficacy score or functional annotation."
+      ]
+    },
+    {
+      "hit_id": "gi|2705325425|ref|XM_064041268.1|",
+      "accession": "XM_064041268",
+      "identity_percent": 87.5,
+      "query_coverage_percent": 100.0,
+      "evalue": 7.45249,
+      "bit_score": 40.9604,
+      "alignment_length": 32,
+      "evidence_score": 74.38,
+      "evidence_band": "MODERATE_SEQUENCE_EVIDENCE",
+      "notes": [
+        "Evidence profile summarizes sequence-level BLAST output.",
+        "It is not a probability, experimental efficacy score or functional annotation."
+      ]
+    }
+  ]
+}

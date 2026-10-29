@@ -1,0 +1,3082 @@
+from itertools import product
+from collections import Counter
+
+from analyses.sequence import get_reverse_complement
+
+
+# ============================================================
+# ORF ANALYSIS
+# ============================================================
+
+
+# ============================================================
+# CONSTANTS
+# ============================================================
+
+STANDARD_START_CODONS = {"ATG"}
+
+ALTERNATIVE_START_CODONS = {
+    "GTG",
+    "TTG"
+}
+
+ALL_START_CODONS = (
+    STANDARD_START_CODONS
+    | ALTERNATIVE_START_CODONS
+)
+
+STANDARD_STOP_CODONS = {
+    "TAA",
+    "TAG",
+    "TGA"
+}
+
+DEFAULT_MIN_ORF_LENGTH = 10
+
+
+DNA_IUPAC = {
+    "A": ("A",),
+    "T": ("T",),
+    "C": ("C",),
+    "G": ("G",),
+
+    "R": ("A", "G"),
+    "Y": ("C", "T"),
+    "S": ("G", "C"),
+    "W": ("A", "T"),
+    "K": ("G", "T"),
+    "M": ("A", "C"),
+
+    "B": ("C", "G", "T"),
+    "D": ("A", "G", "T"),
+    "H": ("A", "C", "T"),
+    "V": ("A", "C", "G"),
+    "N": ("A", "T", "C", "G")
+}
+
+
+# ============================================================
+# GENETIC CODE
+# ============================================================
+
+GENETIC_CODE = {
+    "TTT": "F", "TTC": "F",
+    "TTA": "L", "TTG": "L",
+
+    "TCT": "S", "TCC": "S",
+    "TCA": "S", "TCG": "S",
+
+    "TAT": "Y", "TAC": "Y",
+    "TAA": "STOP", "TAG": "STOP",
+
+    "TGT": "C", "TGC": "C",
+    "TGA": "STOP", "TGG": "W",
+
+    "CTT": "L", "CTC": "L",
+    "CTA": "L", "CTG": "L",
+
+    "CCT": "P", "CCC": "P",
+    "CCA": "P", "CCG": "P",
+
+    "CAT": "H", "CAC": "H",
+    "CAA": "Q", "CAG": "Q",
+
+    "CGT": "R", "CGC": "R",
+    "CGA": "R", "CGG": "R",
+
+    "ATT": "I", "ATC": "I",
+    "ATA": "I", "ATG": "M",
+
+    "ACT": "T", "ACC": "T",
+    "ACA": "T", "ACG": "T",
+
+    "AAT": "N", "AAC": "N",
+    "AAA": "K", "AAG": "K",
+
+    "AGT": "S", "AGC": "S",
+    "AGA": "R", "AGG": "R",
+
+    "GTT": "V", "GTC": "V",
+    "GTA": "V", "GTG": "V",
+
+    "GCT": "A", "GCC": "A",
+    "GCA": "A", "GCG": "A",
+
+    "GAT": "D", "GAC": "D",
+    "GAA": "E", "GAG": "E",
+
+    "GGT": "G", "GGC": "G",
+    "GGA": "G", "GGG": "G"
+}
+
+
+# ============================================================
+# IUPAC CODON HANDLING
+# ============================================================
+
+def expand_iupac_codon(codon):
+
+    codon = codon.upper()
+
+    if len(codon) != 3:
+        return []
+
+    possibilities = []
+
+    for base in codon:
+
+        if base not in DNA_IUPAC:
+            return []
+
+        possibilities.append(
+            DNA_IUPAC[base]
+        )
+
+    return [
+        "".join(combination)
+        for combination in product(
+            *possibilities
+        )
+    ]
+
+
+def analyze_codon_identity(
+    codon,
+    target_codons
+):
+
+    expanded = expand_iupac_codon(
+        codon
+    )
+
+    if not expanded:
+        return "invalid"
+
+    matches = [
+        expanded_codon in target_codons
+        for expanded_codon in expanded
+    ]
+
+    if all(matches):
+        return "definite"
+
+    if any(matches):
+        return "possible"
+
+    return "no"
+
+
+# ============================================================
+# START CODON CLASSIFICATION
+# ============================================================
+
+def classify_start_codon(codon):
+
+    status = analyze_codon_identity(
+        codon,
+        ALL_START_CODONS
+    )
+
+    if status == "definite":
+
+        if codon == "ATG":
+            return "Canonical"
+
+        if codon in ALTERNATIVE_START_CODONS:
+            return "Alternative"
+
+        return "Ambiguous-Definite"
+
+    if status == "possible":
+        return "Possible"
+
+    return "None"
+
+
+# ============================================================
+# ORF AMBIGUITY ANALYSIS
+# ============================================================
+
+def analyze_orf_ambiguity(
+    orf_sequence
+):
+
+    ambiguous_codons = []
+    deterministic_ambiguous_codons = []
+    uncertain_codons = []
+    possible_stop_codons = []
+
+    for position in range(
+        0,
+        len(orf_sequence),
+        3
+    ):
+
+        codon = orf_sequence[
+            position:
+            position + 3
+        ]
+
+        if len(codon) < 3:
+            continue
+
+        is_ambiguous = any(
+            base not in "ATCG"
+            for base in codon
+        )
+
+        if not is_ambiguous:
+            continue
+
+        expanded_codons = (
+            expand_iupac_codon(
+                codon
+            )
+        )
+
+        translations = set()
+
+        for expanded_codon in (
+            expanded_codons
+        ):
+
+            amino_acid = GENETIC_CODE.get(
+                expanded_codon
+            )
+
+            if amino_acid is not None:
+                translations.add(
+                    amino_acid
+                )
+
+        amino_acids = sorted(
+            amino_acid
+            for amino_acid in translations
+            if amino_acid != "STOP"
+        )
+
+        contains_stop = (
+            "STOP" in translations
+        )
+
+        if len(translations) == 1:
+
+            translation_status = (
+                "Deterministic"
+            )
+
+            resolved_translation = (
+                next(iter(translations))
+            )
+
+            deterministic_ambiguous_codons.append({
+                "codon": codon,
+                "position": position + 1,
+                "translation":
+                    resolved_translation
+            })
+
+        else:
+
+            translation_status = (
+                "Uncertain"
+            )
+
+            resolved_translation = None
+
+            uncertain_codons.append({
+                "codon": codon,
+                "position": position + 1,
+                "possibilities":
+                    amino_acids,
+                "contains_stop":
+                    contains_stop
+            })
+
+        if contains_stop:
+
+            possible_stop_codons.append({
+                "codon": codon,
+                "position": position + 1
+            })
+
+        ambiguous_codons.append({
+            "codon": codon,
+            "position": position + 1,
+            "translation_status":
+                translation_status,
+            "translation":
+                resolved_translation,
+            "possibilities":
+                amino_acids,
+            "contains_stop":
+                contains_stop
+        })
+
+    return {
+        "ambiguous_codon_count":
+            len(ambiguous_codons),
+
+        "ambiguous_codons":
+            ambiguous_codons,
+
+        "deterministic_ambiguous_count":
+            len(
+                deterministic_ambiguous_codons
+            ),
+
+        "deterministic_ambiguous_codons":
+            deterministic_ambiguous_codons,
+
+        "uncertain_codon_count":
+            len(uncertain_codons),
+
+        "uncertain_codons":
+            uncertain_codons,
+
+        "possible_stop_codon_count":
+            len(possible_stop_codons),
+
+        "possible_stop_codons":
+            possible_stop_codons,
+
+        "translation_safe":
+            len(uncertain_codons) == 0
+    }
+
+
+# ============================================================
+# CODON STATISTICS
+# ============================================================
+
+def analyze_codon_usage(
+    coding_sequence
+):
+
+    codons = []
+
+    for position in range(
+        0,
+        len(coding_sequence) - 2,
+        3
+    ):
+
+        codon = coding_sequence[
+            position:
+            position + 3
+        ]
+
+        if len(codon) < 3:
+            continue
+
+        if codon in STANDARD_STOP_CODONS:
+            break
+
+        codons.append(codon)
+
+    counts = Counter(codons)
+
+    standard_codons = [
+        codon
+        for codon in counts
+        if all(
+            base in "ATCG"
+            for base in codon
+        )
+    ]
+
+    gc3_values = []
+
+    for codon in codons:
+
+        if all(
+            base in "ATCG"
+            for base in codon
+        ):
+
+            gc3_values.append(
+                1
+                if codon[2] in "GC"
+                else 0
+            )
+
+    if gc3_values:
+
+        gc3_content = (
+            sum(gc3_values)
+            / len(gc3_values)
+            * 100
+        )
+
+    else:
+
+        gc3_content = None
+
+    return {
+        "total_codons":
+            len(codons),
+
+        "unique_codons":
+            len(counts),
+
+        "codon_counts":
+            dict(counts),
+
+        "standard_codon_count":
+            len(standard_codons),
+
+        "gc3_content":
+            gc3_content
+    }
+
+
+# ============================================================
+# CODON DIVERSITY
+# ============================================================
+
+def calculate_codon_diversity(
+    coding_sequence
+):
+
+    usage = analyze_codon_usage(
+        coding_sequence
+    )
+
+    total = usage["total_codons"]
+    unique = usage["unique_codons"]
+
+    if total == 0:
+        return 0.0
+
+    return unique / total
+
+
+# ============================================================
+# START CONTEXT — KOZAK
+# ============================================================
+
+def analyze_kozak_context(
+    sequence,
+    start_position
+):
+
+    """
+    Simplified Kozak-context analysis.
+
+    Consensus:
+
+        GCCRCCATGG
+
+    Evaluated positions:
+        -6 = G
+        -3 = A/G
+        +4 = G
+
+    This is a sequence-context heuristic and does not prove
+    translation initiation.
+    """
+
+    if (
+        start_position < 6
+        or start_position + 3 >= len(sequence)
+    ):
+
+        return {
+            "available": False,
+            "context": None,
+            "score": None,
+            "classification":
+                "Unavailable"
+        }
+
+    context_start = (
+        start_position - 6
+    )
+
+    context_end = (
+        start_position + 4
+    )
+
+    context = sequence[
+        context_start:
+        context_end
+    ]
+
+    score = 0
+
+    if sequence[
+        start_position - 6
+    ] == "G":
+
+        score += 1
+
+    if sequence[
+        start_position - 3
+    ] in "AG":
+
+        score += 1
+
+    if sequence[
+        start_position + 3
+    ] == "G":
+
+        score += 1
+
+    if score == 3:
+        classification = "Strong"
+
+    elif score == 2:
+        classification = "Moderate"
+
+    elif score == 1:
+        classification = "Weak"
+
+    else:
+        classification = "Poor"
+
+    return {
+        "available": True,
+        "context": context,
+        "score": score,
+        "classification":
+            classification
+    }
+
+
+# ============================================================
+# START CONTEXT — SHINE-DALGARNO
+# ============================================================
+
+def analyze_shine_dalgarno(
+    sequence,
+    start_position
+):
+
+    upstream_start = max(
+        0,
+        start_position - 20
+    )
+
+    upstream_end = max(
+        0,
+        start_position - 4
+    )
+
+    upstream = sequence[
+        upstream_start:
+        upstream_end
+    ]
+
+    motifs = [
+        "AGGAGG",
+        "GGAGG",
+        "AAGGAG",
+        "AGGAG",
+        "GAGG"
+    ]
+
+    best_motif = None
+    best_position = None
+
+    for motif in motifs:
+
+        position = upstream.find(
+            motif
+        )
+
+        if position != -1:
+
+            if (
+                best_motif is None
+                or len(motif)
+                > len(best_motif)
+            ):
+
+                best_motif = motif
+
+                best_position = (
+                    upstream_start
+                    + position
+                )
+
+    if best_motif is None:
+
+        return {
+            "available": True,
+            "detected": False,
+            "motif": None,
+            "position": None,
+            "distance_to_start": None
+        }
+
+    distance = (
+        start_position
+        - (
+            best_position
+            + len(best_motif)
+        )
+    )
+
+    return {
+        "available": True,
+        "detected": True,
+        "motif": best_motif,
+        "position": best_position,
+        "distance_to_start": distance
+    }
+
+
+# ============================================================
+# START CONTEXT
+# ============================================================
+
+def analyze_start_context(
+    sequence,
+    start_position
+):
+
+    return {
+        "kozak":
+            analyze_kozak_context(
+                sequence,
+                start_position
+            ),
+
+        "shine_dalgarno":
+            analyze_shine_dalgarno(
+                sequence,
+                start_position
+            )
+    }
+
+
+# ============================================================
+# CDS QUALITY
+# ============================================================
+
+def calculate_cds_quality(
+    orf
+):
+
+    score = 0
+    reasons = []
+
+    if orf["status"] == "Complete":
+
+        score += 30
+
+        reasons.append(
+            "Complete start-to-stop ORF"
+        )
+
+    else:
+
+        score += 10
+
+        reasons.append(
+            "Partial ORF"
+        )
+
+    if orf["length"] >= 300:
+
+        score += 20
+
+        reasons.append(
+            "Substantial ORF length"
+        )
+
+    elif orf["length"] >= 150:
+
+        score += 15
+
+    else:
+
+        score += 5
+
+    if orf["start_codon"] == "ATG":
+
+        score += 20
+
+        reasons.append(
+            "Canonical ATG start"
+        )
+
+    elif (
+        orf["start_codon"]
+        in ALTERNATIVE_START_CODONS
+    ):
+
+        score += 10
+
+        reasons.append(
+            "Alternative start codon"
+        )
+
+    if orf["translation_safe"]:
+
+        score += 15
+
+        reasons.append(
+            "Translation is unambiguous"
+        )
+
+    else:
+
+        score -= 10
+
+        reasons.append(
+            "Translation contains uncertainty"
+        )
+
+    if orf["ambiguous_codon_count"] == 0:
+
+        score += 10
+
+    elif (
+        orf["ambiguous_codon_count"] <= 2
+    ):
+
+        score += 5
+
+    else:
+
+        score -= 5
+
+    if (
+        orf["possible_stop_codon_count"]
+        > 0
+    ):
+
+        score -= 5
+
+        reasons.append(
+            "Possible ambiguous stop codons"
+        )
+
+    score = max(
+        0,
+        min(100, score)
+    )
+
+    if score >= 80:
+        classification = "High"
+
+    elif score >= 60:
+        classification = "Moderate"
+
+    elif score >= 40:
+        classification = "Low"
+
+    else:
+        classification = "Very Low"
+
+    return {
+        "score": score,
+        "classification":
+            classification,
+        "reasons": reasons
+    }
+
+
+# ============================================================
+# ORF CONFIDENCE
+# ============================================================
+
+def calculate_orf_confidence(
+    orf
+):
+
+    score = 0
+
+    if orf["status"] == "Complete":
+        score += 25
+    else:
+        score += 10
+
+    if orf["start_codon"] == "ATG":
+        score += 20
+
+    elif (
+        orf["start_codon"]
+        in ALTERNATIVE_START_CODONS
+    ):
+        score += 10
+
+    if orf["length"] >= 600:
+        score += 20
+
+    elif orf["length"] >= 300:
+        score += 15
+
+    elif orf["length"] >= 150:
+        score += 10
+
+    else:
+        score += 5
+
+    if orf["translation_safe"]:
+        score += 15
+    else:
+        score -= 5
+
+    if orf["ambiguous_codon_count"] == 0:
+        score += 10
+
+    elif (
+        orf["ambiguous_codon_count"] <= 2
+    ):
+        score += 5
+
+    else:
+        score -= 5
+
+    kozak = (
+        orf["start_context"]
+        ["kozak"]
+    )
+
+    if kozak["available"]:
+
+        if kozak["classification"] == "Strong":
+            score += 10
+
+        elif kozak["classification"] == "Moderate":
+            score += 6
+
+        elif kozak["classification"] == "Weak":
+            score += 3
+
+    shine = (
+        orf["start_context"]
+        ["shine_dalgarno"]
+    )
+
+    if shine["detected"]:
+        score += 5
+
+    score = max(
+        0,
+        min(100, score)
+    )
+
+    if score >= 80:
+        classification = "High"
+
+    elif score >= 60:
+        classification = "Moderate"
+
+    elif score >= 40:
+        classification = "Low"
+
+    else:
+        classification = "Very Low"
+
+    return {
+        "score": score,
+        "classification":
+            classification
+    }
+
+
+# ============================================================
+# ORF FINDER
+# ============================================================
+
+def find_orfs(
+    dna,
+    include_partial=True,
+    min_length=DEFAULT_MIN_ORF_LENGTH,
+    start_codons=None,
+    stop_codons=None
+):
+
+    if start_codons is None:
+        start_codons = ALL_START_CODONS
+
+    if stop_codons is None:
+        stop_codons = STANDARD_STOP_CODONS
+
+    start_codons = set(
+        start_codons
+    )
+
+    stop_codons = set(
+        stop_codons
+    )
+
+    if min_length < 0:
+
+        raise ValueError(
+            "min_length must be "
+            "greater than or equal to 0."
+        )
+
+    reverse_dna = (
+        get_reverse_complement(dna)
+    )
+
+    strands = [
+        ("+", dna),
+        ("-", reverse_dna)
+    ]
+
+    sequence_length = len(dna)
+
+    orfs = []
+
+    for strand, sequence in strands:
+
+        for frame_offset in range(3):
+
+            frame_number = (
+                frame_offset + 1
+                if strand == "+"
+                else -(frame_offset + 1)
+            )
+
+            position = frame_offset
+
+            while (
+                position
+                <= len(sequence) - 3
+            ):
+
+                codon = sequence[
+                    position:
+                    position + 3
+                ]
+
+                start_status = (
+                    analyze_codon_identity(
+                        codon,
+                        start_codons
+                    )
+                )
+
+                if start_status == "definite":
+
+                    stop_position = (
+                        position + 3
+                    )
+
+                    stop_codon = None
+
+                    possible_stop_sites = []
+
+                    while (
+                        stop_position
+                        <= len(sequence) - 3
+                    ):
+
+                        current_codon = (
+                            sequence[
+                                stop_position:
+                                stop_position + 3
+                            ]
+                        )
+
+                        stop_status = (
+                            analyze_codon_identity(
+                                current_codon,
+                                stop_codons
+                            )
+                        )
+
+                        if (
+                            stop_status
+                            == "definite"
+                        ):
+
+                            stop_codon = (
+                                current_codon
+                            )
+
+                            break
+
+                        if (
+                            stop_status
+                            == "possible"
+                        ):
+
+                            possible_stop_sites.append({
+                                "codon":
+                                    current_codon,
+
+                                "position":
+                                    stop_position + 1
+                            })
+
+                        stop_position += 3
+
+                    # ====================================================
+                    # COMPLETE ORF
+                    # ====================================================
+
+                    if stop_codon is not None:
+
+                        orf_sequence = sequence[
+                            position:
+                            stop_position + 3
+                        ]
+
+                        if strand == "+":
+
+                            genomic_start = (
+                                position
+                            )
+
+                            genomic_stop = (
+                                stop_position + 2
+                            )
+
+                        else:
+
+                            genomic_start = (
+                                sequence_length
+                                - (
+                                    stop_position
+                                    + 3
+                                )
+                            )
+
+                            genomic_stop = (
+                                sequence_length
+                                - position
+                                - 1
+                            )
+
+                        if (
+                            len(orf_sequence)
+                            >= min_length
+                        ):
+
+                            ambiguity = (
+                                analyze_orf_ambiguity(
+                                    orf_sequence
+                                )
+                            )
+
+                            codon_count = (
+                                len(orf_sequence)
+                                // 3
+                            )
+
+                            protein_length = (
+                                codon_count - 1
+                            )
+
+                            start_type = (
+                                "Canonical"
+                                if codon == "ATG"
+                                else "Alternative"
+                            )
+
+                            start_context = (
+                                analyze_start_context(
+                                    sequence,
+                                    position
+                                )
+                            )
+
+                            codon_usage = (
+                                analyze_codon_usage(
+                                    orf_sequence
+                                )
+                            )
+
+                            orf = {
+                                "strand":
+                                    strand,
+
+                                "frame":
+                                    frame_number,
+
+                                "start":
+                                    genomic_start,
+
+                                "stop":
+                                    genomic_stop,
+
+                                "length":
+                                    len(orf_sequence),
+
+                                "codon_count":
+                                    codon_count,
+
+                                "protein_length":
+                                    protein_length,
+
+                                "start_codon":
+                                    codon,
+
+                                "start_type":
+                                    start_type,
+
+                                "start_status":
+                                    start_status,
+
+                                "stop_codon":
+                                    stop_codon,
+
+                                "status":
+                                    "Complete",
+
+                                "sequence":
+                                    orf_sequence,
+
+                                "possible_stop_sites":
+                                    possible_stop_sites,
+
+                                "ambiguous_codon_count":
+                                    ambiguity[
+                                        "ambiguous_codon_count"
+                                    ],
+
+                                "ambiguous_codons":
+                                    ambiguity[
+                                        "ambiguous_codons"
+                                    ],
+
+                                "deterministic_ambiguous_count":
+                                    ambiguity[
+                                        "deterministic_ambiguous_count"
+                                    ],
+
+                                "uncertain_codon_count":
+                                    ambiguity[
+                                        "uncertain_codon_count"
+                                    ],
+
+                                "possible_stop_codon_count":
+                                    ambiguity[
+                                        "possible_stop_codon_count"
+                                    ],
+
+                                "translation_safe":
+                                    ambiguity[
+                                        "translation_safe"
+                                    ],
+
+                                "start_context":
+                                    start_context,
+
+                                "codon_usage":
+                                    codon_usage,
+
+                                "codon_diversity":
+                                    calculate_codon_diversity(
+                                        orf_sequence
+                                    )
+                            }
+
+                            orf["cds_quality"] = (
+                                calculate_cds_quality(
+                                    orf
+                                )
+                            )
+
+                            orf["confidence"] = (
+                                calculate_orf_confidence(
+                                    orf
+                                )
+                            )
+
+                            orfs.append(orf)
+
+                    # ====================================================
+                    # PARTIAL ORF
+                    # ====================================================
+
+                    elif include_partial:
+
+                        remaining_length = (
+                            len(sequence)
+                            - position
+                        )
+
+                        usable_length = (
+                            remaining_length
+                            - (
+                                remaining_length
+                                % 3
+                            )
+                        )
+
+                        if usable_length >= 3:
+
+                            orf_sequence = sequence[
+                                position:
+                                position + usable_length
+                            ]
+
+                            if (
+                                len(orf_sequence)
+                                >= min_length
+                            ):
+
+                                last_position = (
+                                    position
+                                    + usable_length
+                                    - 1
+                                )
+
+                                if strand == "+":
+
+                                    genomic_start = (
+                                        position
+                                    )
+
+                                    genomic_stop = (
+                                        last_position
+                                    )
+
+                                else:
+
+                                    genomic_start = (
+                                        sequence_length
+                                        - (
+                                            position
+                                            + usable_length
+                                        )
+                                    )
+
+                                    genomic_stop = (
+                                        sequence_length
+                                        - position
+                                        - 1
+                                    )
+
+                                ambiguity = (
+                                    analyze_orf_ambiguity(
+                                        orf_sequence
+                                    )
+                                )
+
+                                codon_count = (
+                                    len(orf_sequence)
+                                    // 3
+                                )
+
+                                protein_length = (
+                                    codon_count
+                                )
+
+                                start_type = (
+                                    "Canonical"
+                                    if codon == "ATG"
+                                    else "Alternative"
+                                )
+
+                                start_context = (
+                                    analyze_start_context(
+                                        sequence,
+                                        position
+                                    )
+                                )
+
+                                codon_usage = (
+                                    analyze_codon_usage(
+                                        orf_sequence
+                                    )
+                                )
+
+                                orf = {
+                                    "strand":
+                                        strand,
+
+                                    "frame":
+                                        frame_number,
+
+                                    "start":
+                                        genomic_start,
+
+                                    "stop":
+                                        genomic_stop,
+
+                                    "length":
+                                        len(orf_sequence),
+
+                                    "codon_count":
+                                        codon_count,
+
+                                    "protein_length":
+                                        protein_length,
+
+                                    "start_codon":
+                                        codon,
+
+                                    "start_type":
+                                        start_type,
+
+                                    "start_status":
+                                        start_status,
+
+                                    "stop_codon":
+                                        None,
+
+                                    "status":
+                                        "Partial - Missing Stop",
+
+                                    "sequence":
+                                        orf_sequence,
+
+                                    "possible_stop_sites":
+                                        possible_stop_sites,
+
+                                    "ambiguous_codon_count":
+                                        ambiguity[
+                                            "ambiguous_codon_count"
+                                        ],
+
+                                    "ambiguous_codons":
+                                        ambiguity[
+                                            "ambiguous_codons"
+                                        ],
+
+                                    "deterministic_ambiguous_count":
+                                        ambiguity[
+                                            "deterministic_ambiguous_count"
+                                        ],
+
+                                    "uncertain_codon_count":
+                                        ambiguity[
+                                            "uncertain_codon_count"
+                                        ],
+
+                                    "possible_stop_codon_count":
+                                        ambiguity[
+                                            "possible_stop_codon_count"
+                                        ],
+
+                                    "translation_safe":
+                                        ambiguity[
+                                            "translation_safe"
+                                        ],
+
+                                    "start_context":
+                                        start_context,
+
+                                    "codon_usage":
+                                        codon_usage,
+
+                                    "codon_diversity":
+                                        calculate_codon_diversity(
+                                            orf_sequence
+                                        )
+                                }
+
+                                orf["cds_quality"] = (
+                                    calculate_cds_quality(
+                                        orf
+                                    )
+                                )
+
+                                orf["confidence"] = (
+                                    calculate_orf_confidence(
+                                        orf
+                                    )
+                                )
+
+                                orfs.append(orf)
+
+                position += 3
+
+    # ========================================================
+    # RANK ORFS
+    # ========================================================
+
+    orfs.sort(
+        key=lambda orf: (
+            orf["confidence"]["score"],
+            orf["cds_quality"]["score"],
+            orf["length"],
+            orf["status"] == "Complete"
+        ),
+        reverse=True
+    )
+
+    for rank, orf in enumerate(
+        orfs,
+        start=1
+    ):
+
+        orf["rank"] = rank
+
+    return orfs
+
+
+# ============================================================
+# ORF DENSITY
+# ============================================================
+
+def calculate_orf_density(
+    orfs,
+    sequence_length
+):
+
+    if sequence_length <= 0:
+        return 0.0
+
+    if not orfs:
+        return 0.0
+
+    total_orf_bases = sum(
+        orf["length"]
+        for orf in orfs
+    )
+
+    return (
+        total_orf_bases
+        / sequence_length
+    ) * 100
+
+
+# ============================================================
+# FRAME STATISTICS
+# ============================================================
+
+def calculate_frame_statistics(
+    orfs
+):
+
+    frames = {
+        "+1": [],
+        "+2": [],
+        "+3": [],
+        "-1": [],
+        "-2": [],
+        "-3": []
+    }
+
+    for orf in orfs:
+
+        key = (
+            f"{orf['frame']:+d}"
+        )
+
+        if key in frames:
+            frames[key].append(
+                orf
+            )
+
+    statistics = {}
+
+    for frame, frame_orfs in (
+        frames.items()
+    ):
+
+        if not frame_orfs:
+
+            statistics[frame] = {
+                "count": 0,
+                "complete": 0,
+                "partial": 0,
+                "longest": None,
+                "average_length": 0.0
+            }
+
+            continue
+
+        complete = sum(
+            1
+            for orf in frame_orfs
+            if orf["status"] == "Complete"
+        )
+
+        longest = max(
+            frame_orfs,
+            key=lambda orf: orf["length"]
+        )
+
+        average_length = (
+            sum(
+                orf["length"]
+                for orf in frame_orfs
+            )
+            / len(frame_orfs)
+        )
+
+        statistics[frame] = {
+            "count":
+                len(frame_orfs),
+
+            "complete":
+                complete,
+
+            "partial":
+                len(frame_orfs) - complete,
+
+            "longest":
+                longest,
+
+            "average_length":
+                average_length
+        }
+
+    return statistics
+
+
+# ============================================================
+# ORF SUMMARY
+# ============================================================
+
+def summarize_orfs(
+    orfs,
+    sequence_length=None
+):
+
+    if not orfs:
+
+        return {
+            "total": 0,
+            "forward": 0,
+            "reverse": 0,
+            "complete": 0,
+            "partial": 0,
+            "canonical_start": 0,
+            "alternative_start": 0,
+            "ambiguous": 0,
+            "translation_safe": 0,
+            "kozak_available": 0,
+            "shine_dalgarno_detected": 0,
+            "average_length": 0.0,
+            "longest": None,
+            "orf_density": 0.0,
+            "frame_statistics":
+                calculate_frame_statistics([])
+        }
+
+    forward = sum(
+        1
+        for orf in orfs
+        if orf["strand"] == "+"
+    )
+
+    reverse = sum(
+        1
+        for orf in orfs
+        if orf["strand"] == "-"
+    )
+
+    complete = sum(
+        1
+        for orf in orfs
+        if orf["status"] == "Complete"
+    )
+
+    partial = (
+        len(orfs) - complete
+    )
+
+    canonical_start = sum(
+        1
+        for orf in orfs
+        if orf["start_type"]
+        == "Canonical"
+    )
+
+    alternative_start = sum(
+        1
+        for orf in orfs
+        if orf["start_type"]
+        == "Alternative"
+    )
+
+    ambiguous = sum(
+        1
+        for orf in orfs
+        if orf["ambiguous_codon_count"] > 0
+    )
+
+    translation_safe = sum(
+        1
+        for orf in orfs
+        if orf["translation_safe"]
+    )
+
+    kozak_available = sum(
+        1
+        for orf in orfs
+        if (
+            orf["start_context"]
+            ["kozak"]["available"]
+        )
+    )
+
+    shine_dalgarno_detected = sum(
+        1
+        for orf in orfs
+        if (
+            orf["start_context"]
+            ["shine_dalgarno"]["detected"]
+        )
+    )
+
+    average_length = (
+        sum(
+            orf["length"]
+            for orf in orfs
+        )
+        / len(orfs)
+    )
+
+    longest = max(
+        orfs,
+        key=lambda orf: orf["length"]
+    )
+
+    if sequence_length is None:
+        sequence_length = 0
+
+    return {
+        "total":
+            len(orfs),
+
+        "forward":
+            forward,
+
+        "reverse":
+            reverse,
+
+        "complete":
+            complete,
+
+        "partial":
+            partial,
+
+        "canonical_start":
+            canonical_start,
+
+        "alternative_start":
+            alternative_start,
+
+        "ambiguous":
+            ambiguous,
+
+        "translation_safe":
+            translation_safe,
+
+        "kozak_available":
+            kozak_available,
+
+        "shine_dalgarno_detected":
+            shine_dalgarno_detected,
+
+        "average_length":
+            average_length,
+
+        "longest":
+            longest,
+
+        "orf_density":
+            calculate_orf_density(
+                orfs,
+                sequence_length
+            ),
+
+        "frame_statistics":
+            calculate_frame_statistics(
+                orfs
+            )
+    }
+
+
+# ============================================================
+# UNIFIED ORF ANALYSIS
+# ============================================================
+
+def analyze_orfs(
+    dna,
+    include_partial=True,
+    min_length=DEFAULT_MIN_ORF_LENGTH
+):
+
+    """
+    Unified high-level ORF analysis.
+
+    Returns all ORFs together with summary, frame statistics,
+    density and ranked candidates.
+    """
+
+    orfs = find_orfs(
+        dna,
+        include_partial=include_partial,
+        min_length=min_length
+    )
+
+    summary = summarize_orfs(
+        orfs,
+        len(dna)
+    )
+
+    return {
+        "sequence_length":
+            len(dna),
+
+        "minimum_length":
+            min_length,
+
+        "include_partial":
+            include_partial,
+
+        "orfs":
+            orfs,
+
+        "summary":
+            summary,
+
+        "frame_statistics":
+            summary["frame_statistics"],
+
+        "orf_density":
+            summary["orf_density"],
+
+        "longest_orf":
+            summary["longest"],
+
+        "top_candidate":
+            orfs[0]
+            if orfs
+            else None
+    }
+
+
+# ============================================================
+# SEQUENCE PREVIEW
+# ============================================================
+
+def create_orf_preview(
+    sequence,
+    max_length=60
+):
+
+    if len(sequence) <= max_length:
+        return sequence
+
+    half = max_length // 2
+
+    return (
+        sequence[:half]
+        + "..."
+        + sequence[-half:]
+    )
+
+
+# ============================================================
+# ORF REPORT
+# ============================================================
+
+def print_orf_report(
+    orfs,
+    min_length=DEFAULT_MIN_ORF_LENGTH
+):
+
+    print()
+    print("=" * 70)
+    print("ORF ANALYSIS")
+    print("=" * 70)
+
+    print(
+        f"\nMinimum ORF Length: "
+        f"{min_length} bp"
+    )
+
+    if not orfs:
+
+        print("\nNo ORFs found.")
+
+        print("\nORF Definition")
+        print("-" * 45)
+
+        print(
+            "Search Space:        "
+            "Both strands / six reading frames"
+        )
+
+        print(
+            "Start Codons:        "
+            "ATG, GTG, TTG"
+        )
+
+        print(
+            "Stop Codons:         "
+            "TAA, TAG, TGA"
+        )
+
+        print(
+            "Minimum Length:      "
+            f"{min_length} bp"
+        )
+
+        print()
+        print("=" * 70)
+
+        return
+
+    # Infer sequence length from genomic coordinates.
+    sequence_length = max(
+        orf["stop"]
+        for orf in orfs
+    ) + 1
+
+    summary = summarize_orfs(
+        orfs,
+        sequence_length
+    )
+
+    # ========================================================
+    # SUMMARY
+    # ========================================================
+
+    print("\nORF Summary")
+    print("-" * 45)
+
+    print(
+        f"ORFs Found:              "
+        f"{summary['total']}"
+    )
+
+    print(
+        f"Forward Strand:          "
+        f"{summary['forward']}"
+    )
+
+    print(
+        f"Reverse Strand:          "
+        f"{summary['reverse']}"
+    )
+
+    print(
+        f"Complete ORFs:           "
+        f"{summary['complete']}"
+    )
+
+    print(
+        f"Partial ORFs:            "
+        f"{summary['partial']}"
+    )
+
+    print(
+        f"Canonical Start (ATG):   "
+        f"{summary['canonical_start']}"
+    )
+
+    print(
+        f"Alternative Start:       "
+        f"{summary['alternative_start']}"
+    )
+
+    print(
+        f"ORFs with Ambiguity:     "
+        f"{summary['ambiguous']}"
+    )
+
+    print(
+        f"Translation-Safe:        "
+        f"{summary['translation_safe']}"
+    )
+
+    print(
+        f"Kozak Context Available: "
+        f"{summary['kozak_available']}"
+    )
+
+    print(
+        f"Shine-Dalgarno Detected: "
+        f"{summary['shine_dalgarno_detected']}"
+    )
+
+    print(
+        f"Average ORF Length:      "
+        f"{summary['average_length']:.1f} bp"
+    )
+
+    print(
+        f"Longest ORF:             "
+        f"{summary['longest']['length']} bp"
+    )
+
+    print(
+        f"ORF Density:             "
+        f"{summary['orf_density']:.2f}%"
+    )
+
+    # ========================================================
+    # FRAME STATISTICS
+    # ========================================================
+
+    print("\nReading Frame Statistics")
+    print("-" * 45)
+
+    for frame in (
+        "+1",
+        "+2",
+        "+3",
+        "-1",
+        "-2",
+        "-3"
+    ):
+
+        statistics = (
+            summary["frame_statistics"]
+            [frame]
+        )
+
+        print(
+            f"Frame {frame}: "
+            f"{statistics['count']} ORFs | "
+            f"{statistics['complete']} complete | "
+            f"{statistics['partial']} partial"
+        )
+
+        if statistics["longest"]:
+
+            print(
+                f"           Longest: "
+                f"{statistics['longest']['length']} bp"
+            )
+
+    # ========================================================
+    # SEARCH PARAMETERS
+    # ========================================================
+
+    print("\nSearch Parameters")
+    print("-" * 45)
+
+    print(
+        "Search Space:        "
+        "Both strands / six reading frames"
+    )
+
+    print(
+        "Start Codons:        "
+        "ATG, GTG, TTG"
+    )
+
+    print(
+        "Canonical Start:     "
+        "ATG"
+    )
+
+    print(
+        "Alternative Starts:  "
+        "GTG, TTG"
+    )
+
+    print(
+        "Stop Codons:         "
+        "TAA, TAG, TGA"
+    )
+
+    print(
+        "Minimum Length:      "
+        f"{min_length} bp"
+    )
+
+    print(
+        "Stop Rule:           "
+        "First definite downstream "
+        "in-frame stop"
+    )
+
+    print(
+        "Ambiguous Starts:    "
+        "Only definite starts initiate ORFs"
+    )
+
+    print(
+        "Ambiguous Stops:     "
+        "Possible-only stops do not terminate ORFs"
+    )
+
+    # ========================================================
+    # RANKED ORFS
+    # ========================================================
+
+    print("\nRanked ORF Candidates")
+    print("-" * 45)
+
+    for orf in orfs:
+
+        print()
+
+        print(
+            f"ORF #{orf['rank']}"
+        )
+
+        print("-" * 45)
+
+        print(
+            f"Confidence:          "
+            f"{orf['confidence']['score']}/100 "
+            f"({orf['confidence']['classification']})"
+        )
+
+        print(
+            f"CDS Quality:         "
+            f"{orf['cds_quality']['score']}/100 "
+            f"({orf['cds_quality']['classification']})"
+        )
+
+        print(
+            f"Strand:              "
+            f"{orf['strand']}"
+        )
+
+        print(
+            f"Reading Frame:       "
+            f"{orf['frame']:+d}"
+        )
+
+        print(
+            f"Start Position:      "
+            f"{orf['start'] + 1}"
+        )
+
+        print(
+            f"Stop Position:       "
+            f"{orf['stop'] + 1}"
+        )
+
+        print(
+            f"Length:              "
+            f"{orf['length']} bp"
+        )
+
+        print(
+            f"Codons:              "
+            f"{orf['codon_count']}"
+        )
+
+        print(
+            f"Potential Protein:   "
+            f"{orf['protein_length']} aa"
+        )
+
+        print(
+            f"Start Codon:         "
+            f"{orf['start_codon']}"
+        )
+
+        print(
+            f"Start Type:          "
+            f"{orf['start_type']}"
+        )
+
+        print(
+            f"Status:              "
+            f"{orf['status']}"
+        )
+
+        if orf["stop_codon"] is None:
+
+            print(
+                "Stop Codon:          "
+                "Not detected"
+            )
+
+        else:
+
+            print(
+                f"Stop Codon:          "
+                f"{orf['stop_codon']}"
+            )
+
+        # ====================================================
+        # START CONTEXT
+        # ====================================================
+
+        print("\nStart Context")
+        print("-" * 45)
+
+        kozak = (
+            orf["start_context"]
+            ["kozak"]
+        )
+
+        if kozak["available"]:
+
+            print(
+                f"Kozak Context:       "
+                f"{kozak['context']}"
+            )
+
+            print(
+                f"Kozak Score:         "
+                f"{kozak['score']}/3"
+            )
+
+            print(
+                f"Kozak Classification:"
+                f" {kozak['classification']}"
+            )
+
+        else:
+
+            print(
+                "Kozak Context:       "
+                "Unavailable"
+            )
+
+        shine = (
+            orf["start_context"]
+            ["shine_dalgarno"]
+        )
+
+        if shine["detected"]:
+
+            print(
+                f"Shine-Dalgarno:      "
+                f"{shine['motif']}"
+            )
+
+            print(
+                f"SD Distance:         "
+                f"{shine['distance_to_start']} nt"
+            )
+
+        else:
+
+            print(
+                "Shine-Dalgarno:      "
+                "Not detected"
+            )
+
+        # ====================================================
+        # CODON STATISTICS
+        # ====================================================
+
+        codon_usage = (
+            orf["codon_usage"]
+        )
+
+        print("\nCodon Statistics")
+        print("-" * 45)
+
+        print(
+            f"Total Codons:        "
+            f"{codon_usage['total_codons']}"
+        )
+
+        print(
+            f"Unique Codons:       "
+            f"{codon_usage['unique_codons']}"
+        )
+
+        print(
+            f"Codon Diversity:     "
+            f"{orf['codon_diversity']:.3f}"
+        )
+
+        if (
+            codon_usage["gc3_content"]
+            is not None
+        ):
+
+            print(
+                f"GC3 Content:         "
+                f"{codon_usage['gc3_content']:.2f}%"
+            )
+
+        else:
+
+            print(
+                "GC3 Content:         "
+                "Not available"
+            )
+
+        # ====================================================
+        # AMBIGUITY
+        # ====================================================
+
+        print("\nSequence Ambiguity")
+        print("-" * 45)
+
+        print(
+            f"Ambiguous Codons:    "
+            f"{orf['ambiguous_codon_count']}"
+        )
+
+        print(
+            f"Deterministic:       "
+            f"{orf['deterministic_ambiguous_count']}"
+        )
+
+        print(
+            f"Translation-Uncertain:"
+            f" {orf['uncertain_codon_count']}"
+        )
+
+        print(
+            f"Possible Stop Codons:"
+            f" {orf['possible_stop_codon_count']}"
+        )
+
+        if orf["translation_safe"]:
+
+            if (
+                orf["ambiguous_codon_count"]
+                == 0
+            ):
+
+                print(
+                    "Translation Status: "
+                    " Unambiguous"
+                )
+
+            else:
+
+                print(
+                    "Translation Status: "
+                    " Deterministically resolvable"
+                )
+
+        else:
+
+            print(
+                "Translation Status: "
+                " Contains uncertainty"
+            )
+
+        # ====================================================
+        # AMBIGUOUS CODON DETAILS
+        # ====================================================
+
+        if orf["ambiguous_codons"]:
+
+            print(
+                "\nAmbiguous Codon Details"
+            )
+
+            print("-" * 45)
+
+            for item in (
+                orf["ambiguous_codons"]
+            ):
+
+                codon_number = (
+                    (
+                        item["position"] - 1
+                    )
+                    // 3
+                ) + 1
+
+                if (
+                    item[
+                        "translation_status"
+                    ]
+                    == "Deterministic"
+                ):
+
+                    print(
+                        f"Codon {codon_number}: "
+                        f"{item['codon']} -> "
+                        f"{item['translation']}"
+                    )
+
+                else:
+
+                    possibilities = (
+                        "/".join(
+                            item[
+                                "possibilities"
+                            ]
+                        )
+                    )
+
+                    if item[
+                        "contains_stop"
+                    ]:
+
+                        possibilities += (
+                            "/STOP"
+                        )
+
+                    print(
+                        f"Codon {codon_number}: "
+                        f"{item['codon']} -> "
+                        f"{possibilities}"
+                    )
+
+        # ====================================================
+        # SEQUENCE
+        # ====================================================
+
+        print("\nSequence")
+        print("-" * 45)
+
+        print(
+            create_orf_preview(
+                orf["sequence"]
+            )
+        )
+
+    # ========================================================
+    # INTERPRETATION
+    # ========================================================
+
+    print("\nInterpretation")
+    print("-" * 45)
+
+    print(
+        "ORFs are sequence-defined candidate "
+        "coding regions."
+    )
+
+    print(
+        "ORF detection alone does not prove "
+        "biological expression or protein function."
+    )
+
+    print(
+        "ATG is treated as the canonical start codon, "
+        "while GTG and TTG are treated as alternative "
+        "start codons."
+    )
+
+    print(
+        "The analysis evaluates all six reading frames "
+        "on both DNA strands."
+    )
+
+    print(
+        "IUPAC ambiguity is explicitly evaluated rather "
+        "than silently ignored."
+    )
+
+    print(
+        "Kozak and Shine-Dalgarno results are sequence-based "
+        "context indicators and do not prove translation."
+    )
+
+    print(
+        "Confidence and CDS quality scores are heuristic "
+        "ranking systems, not experimental evidence."
+    )
+
+    print()
+
+    print("=" * 70)
+
+
+
+# ============================================================
+# ORF OVERLAP / NESTED ANALYSIS
+# ============================================================
+
+def _orf_genomic_interval(orf):
+    """Return a normalized 0-based inclusive genomic interval."""
+    return min(orf["start"], orf["stop"]), max(orf["start"], orf["stop"])
+
+
+def analyze_orf_relationships(orfs):
+    """
+    Detect overlapping and nested ORFs.
+
+    Relationships are sequence-coordinate relationships only. They do not
+    imply that the ORFs are biologically functional or simultaneously used.
+    """
+    relationships = []
+    overlap_pairs = []
+    nested_pairs = []
+
+    for i in range(len(orfs)):
+        a = orfs[i]
+        a_start, a_end = _orf_genomic_interval(a)
+
+        for j in range(i + 1, len(orfs)):
+            b = orfs[j]
+            b_start, b_end = _orf_genomic_interval(b)
+
+            overlap_start = max(a_start, b_start)
+            overlap_end = min(a_end, b_end)
+
+            if overlap_start > overlap_end:
+                continue
+
+            overlap_length = overlap_end - overlap_start + 1
+
+            a_contains_b = (
+                a_start <= b_start and b_end <= a_end
+            )
+            b_contains_a = (
+                b_start <= a_start and a_end <= b_end
+            )
+
+            if a_contains_b and not b_contains_a:
+                relation = "Nested"
+                outer = a
+                inner = b
+                nested_pairs.append((a, b))
+            elif b_contains_a and not a_contains_b:
+                relation = "Nested"
+                outer = b
+                inner = a
+                nested_pairs.append((b, a))
+            else:
+                relation = "Overlapping"
+
+            overlap_fraction_a = overlap_length / a["length"]
+            overlap_fraction_b = overlap_length / b["length"]
+
+            record = {
+                "orf_a_rank": a["rank"],
+                "orf_b_rank": b["rank"],
+                "relation": relation,
+                "overlap_start": overlap_start + 1,
+                "overlap_end": overlap_end + 1,
+                "overlap_length": overlap_length,
+                "overlap_fraction_a": overlap_fraction_a,
+                "overlap_fraction_b": overlap_fraction_b,
+                "same_strand": a["strand"] == b["strand"],
+                "same_frame": a["frame"] == b["frame"],
+            }
+
+            if relation == "Nested":
+                record["outer_orf_rank"] = outer["rank"]
+                record["inner_orf_rank"] = inner["rank"]
+
+            relationships.append(record)
+
+            if relation == "Overlapping":
+                overlap_pairs.append(record)
+
+    return {
+        "relationship_count": len(relationships),
+        "overlap_count": len(overlap_pairs),
+        "nested_count": len(nested_pairs),
+        "relationships": relationships,
+        "overlaps": overlap_pairs,
+        "nested": [
+            relationship
+            for relationship in relationships
+            if relationship["relation"] == "Nested"
+        ],
+    }
+
+
+# ============================================================
+# ORF RANKING / COMPARISON
+# ============================================================
+
+def rank_orf_candidates(orfs):
+    """Return ORFs ranked by the existing heuristic confidence model."""
+    ranked = sorted(
+        orfs,
+        key=lambda orf: (
+            orf["confidence"]["score"],
+            orf["cds_quality"]["score"],
+            orf["length"],
+            orf["status"] == "Complete",
+            orf["start_type"] == "Canonical",
+        ),
+        reverse=True,
+    )
+
+    for rank, orf in enumerate(ranked, start=1):
+        orf["rank"] = rank
+
+    return ranked
+
+
+def compare_orf_candidates(orfs, top_n=5):
+    """Create a compact comparison table for the best ORF candidates."""
+    ranked = rank_orf_candidates(orfs)
+    return [
+        {
+            "rank": orf["rank"],
+            "strand": orf["strand"],
+            "frame": orf["frame"],
+            "length": orf["length"],
+            "protein_length": orf["protein_length"],
+            "start_codon": orf["start_codon"],
+            "status": orf["status"],
+            "confidence_score": orf["confidence"]["score"],
+            "confidence_classification": orf["confidence"]["classification"],
+            "cds_quality_score": orf["cds_quality"]["score"],
+            "cds_quality_classification": orf["cds_quality"]["classification"],
+            "translation_safe": orf["translation_safe"],
+            "ambiguous_codons": orf["ambiguous_codon_count"],
+        }
+        for orf in ranked[:max(0, top_n)]
+    ]
+
+
+# ============================================================
+# ORF TRANSLATION PREVIEW
+# ============================================================
+
+def translate_orf_sequence(orf_sequence):
+    """
+    Translate an ORF using the local genetic code.
+
+    Ambiguous codons are translated as '?' when they do not resolve to a
+    single amino acid. STOP terminates the returned protein and is not added
+    as an amino-acid character.
+    """
+    protein = []
+
+    for position in range(0, len(orf_sequence) - 2, 3):
+        codon = orf_sequence[position:position + 3].upper()
+
+        if any(base not in DNA_IUPAC for base in codon):
+            protein.append("?")
+            continue
+
+        expanded = expand_iupac_codon(codon)
+        translations = {
+            GENETIC_CODE.get(expanded_codon)
+            for expanded_codon in expanded
+            if GENETIC_CODE.get(expanded_codon) is not None
+        }
+
+        if translations == {"STOP"}:
+            break
+
+        if len(translations) == 1 and "STOP" not in translations:
+            protein.append(next(iter(translations)))
+        else:
+            protein.append("?")
+
+    return "".join(protein)
+
+
+def analyze_selected_orf(orf):
+    """Return a focused downstream-ready analysis for one selected ORF."""
+    protein = translate_orf_sequence(orf["sequence"])
+
+    return {
+        "rank": orf["rank"],
+        "strand": orf["strand"],
+        "frame": orf["frame"],
+        "start": orf["start"],
+        "stop": orf["stop"],
+        "length": orf["length"],
+        "status": orf["status"],
+        "sequence": orf["sequence"],
+        "protein_sequence": protein,
+        "protein_length": len(protein),
+        "confidence": orf["confidence"],
+        "cds_quality": orf["cds_quality"],
+        "start_context": orf["start_context"],
+        "codon_usage": orf["codon_usage"],
+        "translation_safe": orf["translation_safe"],
+    }
+
+
+# ============================================================
+# ORF FEATURE SUMMARY
+# ============================================================
+
+def calculate_orf_feature_summary(orfs):
+    """Summarize high-value candidate features without claiming function."""
+    if not orfs:
+        return {
+            "high_confidence": 0,
+            "moderate_confidence": 0,
+            "low_confidence": 0,
+            "canonical_complete": 0,
+            "alternative_complete": 0,
+            "translation_safe_fraction": 0.0,
+        }
+
+    high = sum(
+        orf["confidence"]["classification"] == "High"
+        for orf in orfs
+    )
+    moderate = sum(
+        orf["confidence"]["classification"] == "Moderate"
+        for orf in orfs
+    )
+    low = len(orfs) - high - moderate
+
+    canonical_complete = sum(
+        orf["status"] == "Complete"
+        and orf["start_type"] == "Canonical"
+        for orf in orfs
+    )
+    alternative_complete = sum(
+        orf["status"] == "Complete"
+        and orf["start_type"] == "Alternative"
+        for orf in orfs
+    )
+
+    translation_safe_fraction = (
+        sum(orf["translation_safe"] for orf in orfs) / len(orfs)
+    )
+
+    return {
+        "high_confidence": high,
+        "moderate_confidence": moderate,
+        "low_confidence": low,
+        "canonical_complete": canonical_complete,
+        "alternative_complete": alternative_complete,
+        "translation_safe_fraction": translation_safe_fraction,
+    }
+
+
+# ============================================================
+# ENHANCED UNIFIED ORF ANALYSIS
+# ============================================================
+
+def analyze_orfs_enhanced(
+    dna,
+    include_partial=True,
+    min_length=DEFAULT_MIN_ORF_LENGTH,
+    top_n=5,
+):
+    """
+    Full ORF analysis with ranking, candidate comparison, overlap/nesting
+    detection and downstream translation of a selected candidate.
+    """
+    result = analyze_orfs(
+        dna,
+        include_partial=include_partial,
+        min_length=min_length,
+    )
+
+    ranked = rank_orf_candidates(result["orfs"])
+    relationships = analyze_orf_relationships(ranked)
+
+    result["orfs"] = ranked
+    result["top_candidates"] = compare_orf_candidates(
+        ranked,
+        top_n=top_n,
+    )
+    result["relationships"] = relationships
+    result["feature_summary"] = calculate_orf_feature_summary(ranked)
+    result["candidate_count"] = len(ranked)
+
+    if ranked:
+        result["top_candidate"] = ranked[0]
+
+    return result
+
+
+# ============================================================
+# ORF COMPARISON REPORT
+# ============================================================
+
+def print_orf_candidate_comparison(orfs, top_n=5):
+    """Print a compact comparison of the highest-ranked candidates."""
+    candidates = compare_orf_candidates(orfs, top_n=top_n)
+
+    print("\nTop ORF Candidate Comparison")
+    print("-" * 70)
+
+    if not candidates:
+        print("No ORF candidates available.")
+        return
+
+    for candidate in candidates:
+        print(
+            f"#{candidate['rank']} | "
+            f"Frame {candidate['frame']:+d} | "
+            f"{candidate['length']} bp | "
+            f"{candidate['protein_length']} aa | "
+            f"{candidate['start_codon']} | "
+            f"{candidate['status']} | "
+            f"Confidence {candidate['confidence_score']}/100 | "
+            f"CDS {candidate['cds_quality_score']}/100"
+        )
+
+
+def print_orf_relationship_report(orfs):
+    """Print detected overlap/nesting relationships."""
+    relationships = analyze_orf_relationships(orfs)
+
+    print("\nORF Relationships")
+    print("-" * 70)
+
+    print(f"Overlapping pairs: {relationships['overlap_count']}")
+    print(f"Nested pairs:      {relationships['nested_count']}")
+
+    if not relationships["relationships"]:
+        print("No overlapping or nested ORF relationships detected.")
+        return
+
+    for item in relationships["relationships"]:
+        print(
+            f"ORF #{item['orf_a_rank']} ↔ ORF #{item['orf_b_rank']} | "
+            f"{item['relation']} | "
+            f"overlap {item['overlap_length']} bp | "
+            f"same strand: {'YES' if item['same_strand'] else 'NO'} | "
+            f"same frame: {'YES' if item['same_frame'] else 'NO'}"
+        )
+
+# ============================================================
+# ORF UI / SELECTION
+# ============================================================
+
+def _print_orf_header(title):
+    print()
+    print("=" * 68)
+    print(title)
+    print("=" * 68)
+
+
+def _orf_status_label(orf):
+    return "COMPLETE" if orf["status"] == "Complete" else "PARTIAL"
+
+
+def print_orf_summary_card(analysis):
+    """Compact executive summary for the ORF UI."""
+    _print_orf_header("ORF ANALYSIS SUMMARY")
+
+    summary = analysis.get("summary", {})
+    top = analysis.get("top_candidate")
+
+    print(f"Sequence length:       {analysis.get('sequence_length', 0)} bp")
+    print(f"ORF candidates:        {summary.get('total', 0)}")
+
+    if top:
+        print(f"Best candidate:        ORF #{top['rank']}")
+        print(
+            f"Confidence:            {top['confidence']['score']}/100 "
+            f"({top['confidence']['classification']})"
+        )
+        print(
+            f"CDS quality:           {top['cds_quality']['score']}/100 "
+            f"({top['cds_quality']['classification']})"
+        )
+        print(f"Status:                {top['status']}")
+    else:
+        print("Best candidate:        None")
+
+    print()
+    print(
+        f"Complete: {summary.get('complete', 0)} | "
+        f"Partial: {summary.get('partial', 0)} | "
+        f"Forward: {summary.get('forward', 0)} | "
+        f"Reverse: {summary.get('reverse', 0)}"
+    )
+
+
+def print_orf_candidates(orfs, top_n=None):
+    """Display a clean candidate list without asking for input."""
+    _print_orf_header("ORF CANDIDATES")
+
+    if not orfs:
+        print("No ORF candidates available.")
+        return
+
+    candidates = orfs if top_n is None else orfs[:max(0, top_n)]
+
+    print(
+        f"{'ID':<10}"
+        f"{'Frame':<9}"
+        f"{'Length':<11}"
+        f"{'Protein':<11}"
+        f"{'Start':<8}"
+        f"{'Status':<24}"
+        f"{'Conf.':<8}"
+    )
+    print("-" * 68)
+
+    for orf in candidates:
+        print(
+            f"ORF-{orf['rank']:03d}  "
+            f"{orf['frame']:+d}{'':<6}"
+            f"{orf['length']} bp{'':<5}"
+            f"{orf['protein_length']} aa{'':<5}"
+            f"{orf['start_codon']:<8}"
+            f"{_orf_status_label(orf):<24}"
+            f"{orf['confidence']['score']}/100"
+        )
+
+
+def print_orf_candidate_details(orf):
+    """Detailed view for one candidate."""
+    _print_orf_header(f"ORF-{orf['rank']:03d} — CANDIDATE DETAILS")
+
+    print(f"Identifier:            ORF-{orf['rank']:03d}")
+    print(f"Rank:                  #{orf['rank']}")
+    print(f"Strand:                {orf['strand']}")
+    print(f"Reading frame:         {orf['frame']:+d}")
+    print(f"Genomic start:         {orf['start'] + 1}")
+    print(f"Genomic stop:          {orf['stop'] + 1}")
+    print(f"Length:                {orf['length']} bp")
+    print(f"Potential protein:     {orf['protein_length']} aa")
+    print(f"Start codon:           {orf['start_codon']}")
+    print(f"Start type:            {orf['start_type']}")
+    print(f"Status:                {orf['status']}")
+
+    print("\nQuality")
+    print("-" * 42)
+    print(
+        f"Confidence:            {orf['confidence']['score']}/100 "
+        f"({orf['confidence']['classification']})"
+    )
+    print(
+        f"CDS quality:           {orf['cds_quality']['score']}/100 "
+        f"({orf['cds_quality']['classification']})"
+    )
+    print(
+        f"Translation safe:      "
+        f"{'YES' if orf['translation_safe'] else 'NO'}"
+    )
+
+    print("\nStart Context")
+    print("-" * 42)
+
+    kozak = orf["start_context"]["kozak"]
+    if kozak["available"]:
+        print(f"Kozak context:         {kozak['context']}")
+        print(f"Kozak score:           {kozak['score']}/3")
+        print(f"Kozak classification:  {kozak['classification']}")
+    else:
+        print("Kozak context:         Unavailable")
+
+    shine = orf["start_context"]["shine_dalgarno"]
+    if shine["detected"]:
+        print(f"Shine-Dalgarno:        {shine['motif']}")
+        print(f"SD distance:           {shine['distance_to_start']} nt")
+    else:
+        print("Shine-Dalgarno:        Not detected")
+
+    print("\nSequence")
+    print("-" * 42)
+    print(create_orf_preview(orf["sequence"]))
+
+
+def print_orf_comparison_table(orfs, top_n=5):
+    """Display the highest-ranked candidates side by side."""
+    candidates = compare_orf_candidates(orfs, top_n=top_n)
+
+    _print_orf_header("COMPARE ORFs")
+
+    if not candidates:
+        print("No ORF candidates available.")
+        return
+
+    print(
+        f"{'Feature':<24}"
+        + "".join(f"ORF #{c['rank']:<14}" for c in candidates)
+    )
+    print("-" * max(68, 24 + 14 * len(candidates)))
+
+    rows = [
+        ("Strand", lambda c: c["strand"]),
+        ("Reading frame", lambda c: f"{c['frame']:+d}"),
+        ("Length", lambda c: f"{c['length']} bp"),
+        ("Protein", lambda c: f"{c['protein_length']} aa"),
+        ("Start codon", lambda c: c["start_codon"]),
+        ("Status", lambda c: c["status"]),
+        ("Confidence", lambda c: f"{c['confidence_score']}/100"),
+        ("CDS quality", lambda c: f"{c['cds_quality_score']}/100"),
+        (
+            "Translation safe",
+            lambda c: "YES" if c["translation_safe"] else "NO",
+        ),
+        ("Ambiguous codons", lambda c: str(c["ambiguous_codons"])),
+    ]
+
+    for label, getter in rows:
+        values = "".join(f"{getter(c):<14}" for c in candidates)
+        print(f"{label:<24}{values}")
+
+
+def print_orf_relationships(orfs):
+    """Display sequence-coordinate relationships between ORFs."""
+    data = analyze_orf_relationships(orfs)
+
+    _print_orf_header("ORF RELATIONSHIPS")
+
+    print(f"Relationships found:   {data['relationship_count']}")
+    print(f"Overlapping pairs:     {data['overlap_count']}")
+    print(f"Nested pairs:          {data['nested_count']}")
+
+    if not data["relationships"]:
+        print("\nNo overlapping or nested ORF relationships detected.")
+        return
+
+    print()
+
+    for item in data["relationships"]:
+        print(
+            f"ORF #{item['orf_a_rank']} <-> ORF #{item['orf_b_rank']}"
+        )
+        print(f"Relationship:          {item['relation']}")
+        print(f"Overlap:               {item['overlap_length']} bp")
+        print(
+            f"ORF A coverage:        "
+            f"{item['overlap_fraction_a'] * 100:.1f}%"
+        )
+        print(
+            f"ORF B coverage:        "
+            f"{item['overlap_fraction_b'] * 100:.1f}%"
+        )
+        print(
+            f"Same strand:           "
+            f"{'YES' if item['same_strand'] else 'NO'}"
+        )
+        print(
+            f"Same frame:            "
+            f"{'YES' if item['same_frame'] else 'NO'}"
+        )
+        print("-" * 42)
+
+
+def select_orf(orfs):
+    """
+    Single source of truth for ORF selection.
+
+    Important:
+    The caller must not call another selection prompt after this function
+    returns. The selected ORF is already the object used by downstream RNA
+    and protein analysis.
+    """
+    if not orfs:
+        print("\nNo ORF candidates available for selection.")
+        return None
+
+    _print_orf_header("SELECT ORF")
+
+    print("Available candidates")
+    print("-" * 68)
+
+    for index, orf in enumerate(orfs, start=1):
+        print(
+            f"[{index}] "
+            f"ORF-{orf['rank']:03d} | "
+            f"Frame {orf['frame']:+d} | "
+            f"{orf['length']} bp | "
+            f"{orf['protein_length']} aa | "
+            f"{orf['start_codon']} | "
+            f"{orf['status']} | "
+            f"Confidence {orf['confidence']['score']}/100"
+        )
+
+    print("\n[0] Back")
+
+    while True:
+        choice = input("\nSelect ORF: ").strip()
+
+        if choice == "0":
+            return None
+
+        if choice.isdigit():
+            index = int(choice)
+
+            if 1 <= index <= len(orfs):
+                selected = orfs[index - 1]
+
+                _print_orf_header("ORF SELECTED")
+
+                print(f"Identifier:            ORF-{selected['rank']:03d}")
+                print(f"Rank:                  #{selected['rank']}")
+                print(f"Strand:                {selected['strand']}")
+                print(f"Reading frame:         {selected['frame']:+d}")
+                print(f"Length:                {selected['length']} bp")
+                print(
+                    f"Protein length:        "
+                    f"{selected['protein_length']} aa"
+                )
+                print(f"Start codon:           {selected['start_codon']}")
+                print(f"Status:                {selected['status']}")
+                print(
+                    f"Confidence:            "
+                    f"{selected['confidence']['score']}/100"
+                )
+                print(
+                    f"CDS quality:           "
+                    f"{selected['cds_quality']['score']}/100"
+                )
+
+                print("\nPipeline Status")
+                print("-" * 42)
+                print("✓ ORF Selected")
+                print("✓ Ready for RNA Analysis")
+                print("✓ Ready for Protein Analysis")
+                print("✓ Ready for CRISPR Guide Design")
+
+                return selected
+
+        print(
+            "Invalid selection. "
+            "Enter a candidate number or 0 to go back."
+        )
+
+
+def run_orf_analysis_ui(
+    dna,
+    include_partial=True,
+    min_length=DEFAULT_MIN_ORF_LENGTH,
+):
+    """
+    Professional ORF module.
+
+    Workflow:
+        Discovery -> Candidates -> Compare -> Relationships -> Select
+
+    Returns the selected ORF or None.
+    """
+    analysis = analyze_orfs_enhanced(
+        dna,
+        include_partial=include_partial,
+        min_length=min_length,
+    )
+
+    while True:
+        _print_orf_header("ORF ANALYSIS")
+
+        print(f"Sequence length: {analysis['sequence_length']} bp")
+        print(f"ORF candidates:  {analysis['candidate_count']}")
+
+        top = analysis.get("top_candidate")
+
+        if top:
+            print(
+                f"Best candidate:  "
+                f"ORF-{top['rank']:03d} "
+                f"({top['confidence']['score']}/100)"
+            )
+        else:
+            print("Best candidate:  None")
+
+        print()
+        print("[1] ORF Discovery")
+        print("[2] ORF Candidates")
+        print("[3] Compare ORFs")
+        print("[4] ORF Relationships")
+        print("[5] Select ORF")
+        print("[0] Back")
+
+        choice = input("\nSelect option: ").strip()
+
+        if choice == "1":
+            print_orf_report(
+                analysis["orfs"],
+                min_length=min_length,
+            )
+            input("\nPress Enter to continue...")
+
+        elif choice == "2":
+            print_orf_summary_card(analysis)
+            print_orf_candidates(analysis["orfs"])
+            input("\nPress Enter to continue...")
+
+        elif choice == "3":
+            print_orf_comparison_table(analysis["orfs"])
+            input("\nPress Enter to continue...")
+
+        elif choice == "4":
+            print_orf_relationships(analysis["orfs"])
+            input("\nPress Enter to continue...")
+
+        elif choice == "5":
+            selected = select_orf(analysis["orfs"])
+            if selected is not None:
+                return selected
+
+        elif choice == "0":
+            return None
+
+        else:
+            print("\nInvalid option. Please choose 0-5.")
+
+
+# Backward-compatible UI aliases
+show_orf_candidates = print_orf_candidates
+show_orf_comparison = print_orf_comparison_table
+show_orf_relationships = print_orf_relationships
