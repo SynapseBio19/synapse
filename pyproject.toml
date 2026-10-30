@@ -16,10 +16,19 @@ dependencies = []
 [project.optional-dependencies]
 # Independent reference implementations used for cross-validation only.
 reference = ["biopython>=1.81", "primer3-py>=2.0"]
-dev = ["pytest>=7"]
+dev = ["pytest>=7", "pyright[nodejs]==1.1.414"]
 
 [tool.setuptools]
 packages = ["analyses", "core", "data", "fileio", "ui"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+
+[tool.pyright]
+# Check against the oldest supported version (requires-python >= 3.10).
+pythonVersion = "3.10"
+venvPath = "."
+venv = ".venv"
+include = ["main.py", "analyses", "core", "data", "fileio", "ui", "tests"]
+exclude = ["LEGACY", "Synapse_Website", "**/__pycache__", ".venv"]
+typeCheckingMode = "standard"
