@@ -348,3 +348,64 @@ No scientific result changes in this stage; all golden snapshots unchanged.
 of: implemented and tested / implemented but not independently validated /
 partial / deferred / rejected, including the validation steps that could not
 be performed in this environment.
+
+## Phase 6 – Tier 1 corrections (2026-10-31)
+
+Defect IDs refer to `docs/PHASE6_INITIAL_AUDIT.md`. Each defect is corrected
+in its own commit with its own regression tests in
+`tests/test_phase6_tier1.py`.
+
+### D12 Contig names in REF checking and normalization (`analyses/variant_analysis.py`, `core/api.py`)
+
+- Problem: reference sequences were looked up by exact CHROM name, and a
+  name that did not match was skipped silently. With a VCF using `1` and a
+  reference keyed `chr1` (or the reverse), `check_reference_alleles`
+  reported `mismatched: 0` (the skip was visible only in `not_checked`),
+  `normalize_variants` returned the variant trimmed but not left-aligned
+  and without any flag, and `core.api.analyze_vcf` recorded
+  `parameters["normalized"] = True`. Example: `1 7 AA>A` against
+  `chr1 = GGGAAAAAGGG` stayed `7 AA>A`; the correct left-aligned form is
+  `3 GA>G`.
+- Now:
+  - `resolve_contig_names()` maps CHROM names onto reference names. Mode
+    `contig_matching="exact"` (default) keeps exact matching. Mode
+    `"chr_prefix"` (opt-in) also pairs a nuclear contig with the name that
+    differs only by a leading `chr`; an exact name always wins.
+  - Mitochondrial names (`M`, `MT`, `chrM`, `chrMT`) are never paired:
+    hg19 chrM (16,571 bp) and the rCRS MT of GRCh37/GRCh38 (16,569 bp) are
+    different sequences. Case variants (`Chr1`) are never folded. CHROM is
+    never renamed.
+  - A variant without a reference is flagged `REFERENCE_CONTIG_NOT_FOUND`
+    with a note that it was not REF-checked or left-aligned; in exact mode
+    the note names the `chr`-prefix partner when one exists. A variant
+    matched through the prefix rule is flagged `CONTIG_NAME_ALIASED` and
+    records `annotation["reference_contig"]`.
+  - `check_reference_alleles()` additionally reports `contigs_not_found`,
+    `aliased_contigs`, `suggested_aliases`, `contig_matching`, and splits
+    `not_checked` into `not_checked_no_reference` and
+    `not_checked_symbolic_or_non_acgtn`. Existing keys are unchanged.
+  - `core.api.analyze_vcf(contig_matching=)`: `parameters["normalized"]` is
+    True only when every variant had a reference; `data["normalization"]`
+    lists the contigs without one and the counts; each missing contig and
+    each alias produces a warning.
+  - Variant menu `[8] Normalize Variants` reports how many variants had a
+    reference sequence and how many were only trimmed, instead of
+    "Normalized N variant(s)".
+  - `normalize_variants()` no longer writes its new flags into the input
+    variants (copy-on-write of `validation_flags`).
+- Design source: guidance of the project-local `genomic-coordinates` skill
+  (`references/reference-builds.md`, "Contig naming"): renaming between
+  naming schemes is valid only when the sequences are identical, and
+  `chrM`/`MT` must not be mapped silently. The prefix rule is therefore
+  opt-in, recorded per variant, and still subject to the per-variant REF
+  check against the supplied sequence.
+- Unchanged: exact-name behavior, left-alignment, trimming, every golden
+  snapshot (no snapshot regenerated), the variant self-test (27/27).
+- Tests: 9 new tests (13 cases with sub-tests). Suite 109 → 118, all
+  passing. pyright at `pythonVersion = 3.10` reports the same 5
+  pre-existing diagnostics in the changed files before and after; none is
+  on a changed line.
+- Not done: `bcftools norm` comparison (no native Windows build); contig
+  length checks against `##contig` header lines; RefSeq/GenBank accession
+  naming (`NC_000001.11`), which needs an assembly report rather than a
+  string rule.

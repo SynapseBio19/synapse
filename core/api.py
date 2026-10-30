@@ -163,27 +163,68 @@ def compare_sequences(reference: str, variant: str, *, reference_name: str = "Re
 
 
 def analyze_vcf(path: str, *, contig_references: Optional[Dict[str, str]] = None,
-                split_multiallelic: bool = True) -> AnalysisResult:
-    """Parse, normalize (when references are given) and summarize a VCF file."""
+                split_multiallelic: bool = True, contig_matching: str = "exact") -> AnalysisResult:
+    """Parse, normalize (when references are given) and summarize a VCF file.
+
+    ``contig_references`` maps reference contig names to sequences.
+    ``contig_matching`` is "exact" (default) or "chr_prefix", which also pairs
+    "1" with "chr1"; use it only for references of the same assembly
+    (mitochondrial names are never paired). ``parameters["normalized"]`` is
+    True only when every variant had a reference; ``data["normalization"]``
+    lists the contigs that had none.
+    """
     from analyses import variant_analysis as V
 
+    V.validate_contig_matching(contig_matching)
     variants, metadata, samples = V.parse_vcf_file(path, split_multiallelic=split_multiallelic)
     warnings: List[str] = []
     reference_check = None
+    normalization: Dict[str, Any] = {
+        "reference_supplied": bool(contig_references),
+        "contigs_not_found": [],
+        "aliased_contigs": {},
+        "variants_with_reference": 0,
+        "variants_without_reference": len(variants),
+    }
     if contig_references:
-        reference_check = V.check_reference_alleles(variants, contig_references)
+        reference_check = V.check_reference_alleles(variants, contig_references,
+                                                    contig_matching=contig_matching)
         if reference_check["mismatched"]:
             warnings.append(f"{reference_check['mismatched']} REF allele(s) do not match the reference.")
-        variants = V.normalize_variants(variants, contig_references=contig_references)
+        not_found = reference_check["contigs_not_found"]
+        for contig in not_found:
+            count = sum(v.chromosome == contig for v in variants)
+            message = (f"No reference sequence for contig '{contig}': {count} variant(s) "
+                       "were not REF-checked or left-aligned.")
+            suggestion = reference_check["suggested_aliases"].get(contig)
+            if suggestion:
+                message += (f" Reference contig '{suggestion}' differs only by the 'chr' prefix; "
+                            "pass contig_matching='chr_prefix' if both describe the same assembly.")
+            warnings.append(message)
+        for contig, reference_name in reference_check["aliased_contigs"].items():
+            warnings.append(f"Contig '{contig}' was matched to reference contig '{reference_name}' "
+                            "by the 'chr' prefix rule; CHROM names are unchanged.")
+        variants = V.normalize_variants(variants, contig_references=contig_references,
+                                        contig_matching=contig_matching)
+        without_reference = sum(v.chromosome in not_found for v in variants)
+        normalization.update(
+            contigs_not_found=list(not_found),
+            aliased_contigs=dict(reference_check["aliased_contigs"]),
+            variants_with_reference=len(variants) - without_reference,
+            variants_without_reference=without_reference,
+        )
     else:
         warnings.append("No reference sequence given: variants were not left-normalized.")
     statistics = V.calculate_variant_statistics(variants)
     data = {"variants": variants, "samples": samples, "statistics": statistics,
-            "reference_check": reference_check, "header_line_count": len(metadata)}
+            "reference_check": reference_check, "normalization": normalization,
+            "header_line_count": len(metadata)}
     from core.models import sha256_file
     result = _result("variant", data, "", path,
                      parameters={"split_multiallelic": split_multiallelic,
-                                 "normalized": bool(contig_references)},
+                                 "contig_matching": contig_matching,
+                                 "normalized": bool(contig_references)
+                                 and normalization["variants_without_reference"] == 0},
                      warnings=warnings)
     result.parameters["vcf_sha256"] = sha256_file(path)
     return result

@@ -580,6 +580,14 @@ fixed list of twelve labels. Not a crash; an inconsistent contract.
 | S13 | `main.py` | SUSPECTED | `main.py` is a top-level script with module-level control flow (`sequences = choose_sequence_file()` at import, `while True:` loops at module scope) and no `if __name__ == "__main__":` guard. `tests/test_main_smoke.py` therefore has to drive it by patching `builtins.input`. Any import of `main` starts the application. |
 | S14 | `analyses/*` | UNVERIFIED CONCERN | Eleven of twelve analysis modules own their terminal menus (`run_*_ui`, `*_menu`), so `print()`/`input()` and scientific computation live in the same file: 1,966 `print(` and 126 `input(` calls across `analyses/`. `core/api.py` provides a clean non-interactive layer for ten analyses, which is the P2-2 compromise, but the modules themselves are not UI-free and `core/api.py` does not yet cover cloning, variant filtering, mutation reporting, BLAST or literature. |
 
+Found while verifying the D12 correction (2026-10-31); neither is in D12's
+scope and neither was changed:
+
+| ID | Location | Level | Finding |
+|---|---|---|---|
+| S15 | `analyses/variant_analysis.py`, `annotate_from_mutation_analysis` (call at lines 2026–2027 after D12) | SUSPECTED | pyright reports `No parameter named "reference_cds"` and `"variant_cds"` on a call into the mutation module. If that call path is reached it would raise `TypeError`. Present identically at `824ca5f`; not reproduced by execution. |
+| S16 | `analyses/variant_analysis.py`, `left_normalize_variant` | CONFIRMED | The normalized copy is built with `annotation=dict(variant.annotation)`, a shallow copy, and `REF_MISMATCH` is then added with `setdefault(...).append`, so the flag is also written into the *input* variant's `validation_flags` list when that list already exists. Reproduced: input flags `["PRE_EXISTING"]` become `["PRE_EXISTING", "REF_MISMATCH"]` after `left_normalize_variant(Variant("chr1", 1, "TTT", "T"), "GGGAAAAAGGG")`; an input without a pre-existing list stays clean. D12's new flags use copy-on-write and do not have this problem; the pre-existing `REF_MISMATCH` path was left unchanged. (Listed here with the S-items because it was found after the audit; it is a confirmed defect.) |
+
 ### Examined and found correct (not defects)
 
 - `crispr.list_crispr_systems()` returns `CRISPRSystem` objects, not names; all three call sites use them correctly.

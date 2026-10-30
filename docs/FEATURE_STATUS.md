@@ -33,10 +33,10 @@ simulated keystrokes (see audit §11.5).
 | Functions and classes inventoried | ~1,100 |
 | Main-menu entries | 15 |
 | Sub-menu entries inventoried | 78 |
-| Automated tests | 109, all passing |
+| Automated tests | 118, all passing (109 at the audit + 9 for D12) |
 | Module self-tests | 12 suites, all passing (CRISPR 28, BLAST 33, mutation 44, variant 27, others aggregated) |
 | Golden-master scenarios | 12 |
-| Confirmed defects | 19 (D1–D19) |
+| Confirmed defects | 19 (D1–D19); corrected so far: 1 (D12, 2026-10-31) |
 | Suspected / unverified concerns | 14 (S1–S14) |
 | External validations performed in this audit | 8 (audit §3, §6) |
 | Features advertised but not implemented | 1 (`[11] AI Experiment Planner`) |
@@ -56,7 +56,7 @@ simulated keystrokes (see audit §11.5).
 | 4 | Protein Analysis | `analyses.protein.run_protein_analysis_from_orf` | Implemented | Execution-tested | Integration-tested | Independently validated (ProtParam) | Requires a selected ORF by design; no silent whole-sequence fallback. |
 | 5 | Restriction & Cloning | `analyses.restriction.run_restriction_cloning_ui` | Partially implemented | Execution-tested | Integration-tested | Independently validated (digests) | **D3/D4/D5**. |
 | 6 | Primer Design | `analyses.primer.run_primer_analysis_ui` | Implemented | Execution-tested | Integration-tested | Independently validated (primer3-py) | **D16** duplicate/shadowed definitions. |
-| 7 | Mutation & Variant Analysis | `analyses.mutation.run_mutation_variant_ui` | Implemented | Execution-tested | Integration-tested | Partially (algorithm checked, no bcftools) | **D12** in the variant branch. |
+| 7 | Mutation & Variant Analysis | `analyses.mutation.run_mutation_variant_ui` | Implemented | Execution-tested | Integration-tested | Partially (algorithm checked, no bcftools) | **D12** in the variant branch — corrected 2026-10-31 (Phase 6 Tier 1). |
 | 8 | CRISPR Guide Design | `analyses.crispr.crispr_menu` | Partially implemented | Execution-tested | Integration-tested | Not applicable | **D8/D9/D10**. |
 | 9 | BLAST Search | `analyses.blast.blast_menu` | Implemented | Execution-tested | Integration-tested | Independently validated (real BLAST+ run) | **D6/D7**. |
 | 10 | Literature Search | `analyses.literature.main` | Implemented | Execution-tested (offline) | Integration-tested | Blocked by external dependency (no live call made) | **S11**. |
@@ -293,8 +293,8 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 | 6 | Variant Statistics | `calculate_variant_statistics`, `is_transition_variant` | Implemented | Execution-tested | Not applicable | Ti/Tv, allele frequencies, quality. |
 | 7 | Cohort / Sample Analysis | `sample_variant_summary`, `calculate_cohort_summary` | Implemented | Execution-tested | Not applicable | |
 | 8 | Normalize Variants | `left_normalize_variant`, `normalize_variants`, `trim_common_bases` | Implemented | Execution-tested | **Partially validated** | Algorithm hand-verified against Tan et al. 2015 on 5 constructed cases (audit §3.7). **No bcftools comparison** — blocked on Windows. |
-| — | REF validation | `check_reference_alleles`, `_reference_allele_matches` | **Partially implemented** | Execution-tested | Not applicable | **D12**: exact contig-name lookup; `chr1`/`1` silently `not_checked`, and `normalize_variants` then returns the variant unnormalised **with no flag** while the API reports `normalized: True`. |
-| — | Contig-name unification | — | **Not implemented** | Not applicable | Not applicable | P1-5's named gap, confirmed. |
+| — | REF validation | `check_reference_alleles`, `_reference_allele_matches` | Implemented | Execution-tested | Not applicable | **D12 corrected 2026-10-31**: a contig without a reference is flagged `REFERENCE_CONTIG_NOT_FOUND` and listed in `contigs_not_found`; `not_checked` is split by reason. Previously it was skipped silently. Tests: `tests/test_phase6_tier1.py::VariantContigMatchingTests`. |
+| — | Contig-name matching | `resolve_contig_names`, `ContigResolution`, `contig_matching=` | Implemented | Execution-tested | Not applicable | Exact by default; opt-in `chr_prefix` pairs `1`/`chr1` (flag `CONTIG_NAME_ALIASED`, CHROM unchanged). Mitochondrial names never paired; case variants not folded. **Not covered**: contig-length checks against `##contig`, RefSeq/GenBank accession names. |
 | 9 | Export VCF | `variants_to_vcf`, `write_vcf` | Implemented | Execution-tested | Not applicable | Round-trip self-tested. |
 | 10 | Export TSV | `variants_to_tsv` | Implemented | Execution-tested | Not applicable | |
 | 11 | Full Variant Report | `build_variant_report`, `print_variant_report` | Implemented | Reachable | Not applicable | |
@@ -398,7 +398,7 @@ relative to size; the 28 self-tests are the module's own fixtures.
 |---|---|---|---|---|
 | Shared data model | `models.Interval`, `Feature`, `SequenceRecord`, `AnalysisResult` | Implemented | Execution-tested | One internal convention (0-based half-open + strand) with explicit 1-based conversion. `SequenceRecord.alphabet` is set to `"DNA"` and never checked (**D14**). |
 | Hashing / provenance | `models.sha256_text`, `sha256_file`, `provenance()` | Implemented | Execution-tested | Present in every stored result. |
-| Non-interactive API | `api.load_records`, `sequence_overview`, `find_orfs`, `analyze_rna`, `analyze_protein_from_cds`, `restriction_digest`, `design_primers`, `compare_sequences`, `analyze_vcf`, `design_crispr_guides` | **Partially implemented** | Execution-tested | 10 entry points, no `input()`. **Missing**: cloning, variant filtering, mutation reporting, BLAST, literature (**S14**). `analyze_vcf` reports `normalized: True` even when contigs did not match (**D12**). |
+| Non-interactive API | `api.load_records`, `sequence_overview`, `find_orfs`, `analyze_rna`, `analyze_protein_from_cds`, `restriction_digest`, `design_primers`, `compare_sequences`, `analyze_vcf`, `design_crispr_guides` | **Partially implemented** | Execution-tested | 10 entry points, no `input()`. **Missing**: cloning, variant filtering, mutation reporting, BLAST, literature (**S14**). `analyze_vcf` now reports `normalized: True` only when every variant had a reference, with `data["normalization"]` and per-contig warnings (**D12** corrected 2026-10-31). |
 | Pipeline context and store | `pipeline.PipelineContext.store`, `store_result`, `latest`, `results` | Implemented | **Integration-tested** | ORF change clears `rna`, `protein`, `crispr`, `blast` — verified. **D19** `completed` shape. |
 | ORF-dependent invalidation | `pipeline.ORF_DEPENDENT_MODULES` | Implemented | Integration-tested | Confirmed working. |
 | RNA / protein source resolution | `pipeline.get_rna_source_dna`, `get_protein_source_rna` | Implemented | **Integration-tested** | Selected-ORF-vs-whole-sequence rule confirmed intact. |
@@ -435,7 +435,7 @@ relative to size; the 28 self-tests are the module's own fixtures.
 | CRISPR menu `[4]`/`[5]` | Cut position for the chosen system | **Not implemented** (**D8**). |
 | CRISPR menu `[9]`/`[10]` | On-target exclusion from off-target counts | **Not implemented** (**D9**). |
 | `restriction` docs / P2-7 | Type IIS enzymes, reverse-strand site search | **Not implemented** — no Type IIS enzyme in the database, so no wrong output today. |
-| `variant` P1-5 | Contig-name unification (`chr1` vs `1`) | **Not implemented** (**D12**). |
+| `variant` P1-5 | Contig-name unification (`chr1` vs `1`) | **Implemented 2026-10-31** (**D12**): opt-in `contig_matching="chr_prefix"`; unmatched contigs are flagged, not skipped. |
 | BLAST P1-7 | RID resume | **Not implemented** (**S6**). |
 | ORF METHODS | 5′-partial ORFs; ORFs across a circular origin | **Not implemented** (documented). |
 | Brief §10.2 | Restriction-site-driven primer design | **Not implemented** — no wiring exists. |

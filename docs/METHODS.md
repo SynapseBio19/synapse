@@ -138,9 +138,21 @@ Validation:
 - Normalization: trimming and left-shifting through repeats (Tan et al.
   2015) when the contig sequence is supplied; REF alleles are checked
   against it (`REF_MISMATCH`).
+- Contig names: CHROM is matched to the reference names exactly by default
+  (`contig_matching="exact"`). `contig_matching="chr_prefix"` also pairs
+  `1` with `chr1`; use it only when both describe the same assembly.
+  Mitochondrial names are never paired (hg19 chrM, 16,571 bp, is not the
+  rCRS MT of GRCh37/GRCh38, 16,569 bp), case variants are not folded, and
+  CHROM is never renamed. A variant whose contig has no reference is only
+  trimmed and is flagged `REFERENCE_CONTIG_NOT_FOUND`; an aliased one is
+  flagged `CONTIG_NAME_ALIASED`. Contig lengths are not compared, and
+  RefSeq/GenBank accession names are not translated.
 - FILTER `.` counts as "not filtered", not as failed.
-- Validation: known-answer tests; not compared against `bcftools norm`
-  (recommended next validation step).
+- Validation: known-answer tests; the left-alignment algorithm was checked
+  by hand against Tan et al. (2015) on constructed repeat cases
+  (`docs/PHASE6_INITIAL_AUDIT.md` §3.7); not compared against
+  `bcftools norm` (no native Windows build; recommended next validation
+  step).
 
 ## CRISPR guide design (`analyses/crispr.py`)
 
