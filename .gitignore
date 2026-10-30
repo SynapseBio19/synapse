@@ -9,3 +9,4 @@ __pycache__/
 Thumbs.db
 .sync/
 /logs/
+/.claude/skills/
