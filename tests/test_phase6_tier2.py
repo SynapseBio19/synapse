@@ -52,5 +52,57 @@ class LocalBlastDatabasePathTests(unittest.TestCase):
                                  local_database_path=str(LOCAL_TEST_DB))
 
 
+# ----------------------------------------------------------------------
+# D9: the guide's own site is not an off-target
+# ----------------------------------------------------------------------
+def _random_dna(length, seed):
+    import random
+    rng = random.Random(seed)
+    return "".join(rng.choice("ACGT") for _ in range(length))
+
+
+class CrisprOnTargetTests(unittest.TestCase):
+    SEQUENCE = _random_dna(300, 7)
+
+    def test_own_site_is_listed_but_not_penalized(self):
+        from analyses import crispr as C
+        result = C.design_guides(self.SEQUENCE, local_reference_sequences={"self": self.SEQUENCE})
+        self.assertTrue(result.candidates)
+        self.assertEqual({c.strand for c in result.candidates}, {"+", "-"})
+        for candidate in result.candidates:
+            with self.subTest(candidate=candidate.candidate_id):
+                profile = candidate.specificity_profile
+                self.assertEqual((profile["on_target_matches"], profile["exact_matches"]), (1, 0))
+                self.assertEqual(candidate.off_target_hits, profile["total_hits"])
+                own = [h for h in candidate.local_off_target_hits if h["on_target"]]
+                self.assertEqual(len(own), 1)
+                self.assertEqual(own[0]["classification"], "on-target")
+                self.assertEqual((own[0]["guide_start"], own[0]["strand"]),
+                                 (candidate.guide_start, candidate.strand))
+        best = result.candidates[0]
+        self.assertEqual(best.rank_components["Specificity"], 100.0)  # was 60.0 (100 - 40)
+        self.assertNotIn("INFO: local-sequence matches found", best.flags)
+
+    def test_an_identical_copy_elsewhere_is_still_an_off_target(self):
+        from analyses import crispr as C
+        result = C.design_guides(self.SEQUENCE, local_reference_sequences={
+            "self": self.SEQUENCE, "copy": self.SEQUENCE})
+        best = result.candidates[0]
+        self.assertEqual((best.specificity_profile["on_target_matches"],
+                          best.specificity_profile["exact_matches"]), (1, 1))
+        self.assertEqual(best.rank_components["Specificity"], 60.0)
+
+    def test_near_match_in_another_sequence_is_counted(self):
+        from analyses import crispr as C
+        result = C.design_guides(self.SEQUENCE)
+        candidate = result.candidates[0]
+        mutated = candidate.guide[:2] + ("A" if candidate.guide[2] != "A" else "C") + candidate.guide[3:]
+        other = _random_dna(40, 1) + mutated + candidate.pam + _random_dna(40, 2)
+        C.annotate_local_off_targets([candidate], {"self": self.SEQUENCE, "other": other})
+        profile = candidate.specificity_profile
+        self.assertEqual(profile["on_target_matches"], 1)
+        self.assertGreaterEqual(profile["one_mismatch_hits"], 1)
+
+
 if __name__ == "__main__":
     unittest.main()

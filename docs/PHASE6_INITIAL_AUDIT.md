@@ -632,6 +632,12 @@ Found during the D14 investigation (2026-10-31); not reproduced:
 | S21 | `fileio/genbank.py`, `ORIGIN` reader | SUSPECTED | Only letters are kept from `ORIGIN` lines, so a non-letter symbol there (e.g. `*`, `-`) would be dropped silently. Practical impact unverified. |
 | S22 | `analyses/variant_analysis.py`, REF check | SUSPECTED | The supplied reference sequence is not checked for its own alphabet. |
 
+Found during the D9 work (2026-10-31); not changed there:
+
+| ID | Location | Level | Finding |
+|---|---|---|---|
+| S23 | `analyses/crispr.py`, `_candidate_from_oriented_window` | CONFIRMED (by reading) | `seed_sequence = guide[-seed_length:]` is the PAM-proximal seed only for 3′-PAM systems. For Cas12a (5′ PAM) the seed is the 5′ end of the guide; the off-target screen already uses the correct end, but the stored and exported `seed_sequence` is the PAM-distal end. |
+
 ### Examined and found correct (not defects)
 
 - `crispr.list_crispr_systems()` returns `CRISPRSystem` objects, not names; all three call sites use them correctly.

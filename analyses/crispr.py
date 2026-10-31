@@ -1093,7 +1093,16 @@ def search_local_off_targets_detailed(
     seed_length: int = DEFAULT_SEED_LENGTH,
     require_pam: bool = True,
 ) -> List[Dict[str, Any]]:
-    """PAM-aware local specificity screen over explicitly supplied sequences."""
+    """PAM-aware local specificity screen over explicitly supplied sequences.
+
+    A hit that is the candidate's own intended site - an exact match on the
+    same strand at the same guide coordinates - is marked ``on_target`` and
+    classified "on-target"; it is listed but not counted as an off-target
+    (audit D9). At most one hit per candidate is the on-target site, so an
+    identical copy in a second reference still counts as an off-target.
+    Coordinates are compared as given, so this applies when the supplied
+    reference uses the coordinates of the designed sequence.
+    """
     system = get_crispr_system(candidate.system)
     items = list(reference_sequences.items()) if isinstance(reference_sequences, Mapping) else list(reference_sequences)
     query = candidate.guide
@@ -1117,6 +1126,13 @@ def search_local_off_targets_detailed(
             pam_ok = pam_matches(window["pam"], system.pam)
             if require_pam and not pam_ok:
                 continue
+            on_target = (
+                not any(h["on_target"] for h in hits)
+                and mm == 0
+                and window["strand"] == candidate.strand
+                and window["guide_start"] == candidate.guide_start
+                and window["guide_end"] == candidate.guide_end
+            )
             hits.append({
                 "sequence": str(name),
                 "strand": window["strand"],
@@ -1130,8 +1146,11 @@ def search_local_off_targets_detailed(
                 "mismatches": mm,
                 "mismatch_positions": mm_positions,
                 "seed_mismatches": seed_mm,
+                "on_target": on_target,
                 "classification": (
-                    "exact"
+                    "on-target"
+                    if on_target
+                    else "exact"
                     if mm == 0
                     else "seed-mismatch" if seed_mm else "distal-mismatch"
                 ),
@@ -1144,6 +1163,9 @@ def search_local_off_targets_detailed(
 
 
 def specificity_profile(hits: Sequence[Mapping[str, Any]], query_sequence_name: str = "target") -> Dict[str, Any]:
+    """Summarize local hits; the candidate's own site (``on_target``) is not an off-target."""
+    on_target = sum(bool(h.get("on_target", False)) for h in hits)
+    hits = [h for h in hits if not h.get("on_target", False)]
     exact = sum(int(h.get("mismatches", 999)) == 0 for h in hits)
     one_mm = sum(int(h.get("mismatches", 999)) == 1 for h in hits)
     two_mm = sum(int(h.get("mismatches", 999)) == 2 for h in hits)
@@ -1155,6 +1177,7 @@ def specificity_profile(hits: Sequence[Mapping[str, Any]], query_sequence_name: 
         "scope": "local supplied sequences",
         "query": query_sequence_name,
         "total_hits": len(hits),
+        "on_target_matches": on_target,
         "exact_matches": exact,
         "one_mismatch_hits": one_mm,
         "two_mismatch_hits": two_mm,
@@ -1184,10 +1207,10 @@ def annotate_local_off_targets(
             require_pam=require_pam,
         )
         candidate.local_off_target_hits = hits
-        candidate.off_target_hits = len(hits)
         candidate.specificity_profile = specificity_profile(hits, candidate.candidate_id)
+        candidate.off_target_hits = candidate.specificity_profile["total_hits"]
         candidate.flags = [f for f in candidate.flags if f != "INFO: local-sequence matches found"]
-        if hits:
+        if candidate.off_target_hits:
             candidate.flags.append("INFO: local-sequence matches found")
     return list(candidates)
 

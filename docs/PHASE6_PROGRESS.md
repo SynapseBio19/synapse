@@ -57,12 +57,13 @@ IUPAC, gapped and invalid input (D14):
 | 6 | D14-F6 protein codes B/Z/J/X/U/O keep position; masses and ranges | `343ffb7` | internal tests; external reference comparison (Biopython `protein_weights`, `molecular_weight`); one Stage 5 assertion updated (encoded the deletion) | Corrected; suite 194/194; pyright unchanged |
 | 7 | D14-F8/F9/F10 ORF search, transcription and GC counting check/normalize input | `d40d328` | internal tests; probe re-run (no silent results for foreign types) | Corrected; D14 and D13 complete; suite 197/197; pyright unchanged |
 | 8 | D6 + S7 programmatic local BLAST by database prefix, with provenance | `5b120ec` | internal tests; external tool execution (bundled database, blastn + blastdbcmd) | Corrected; suite 200/200; pyright unchanged |
-| 9 | D7 stale BLAST artifact labelled as legacy; AUDIT_STATUS cites the test | this package | documentation; the README's numbers match `tests/test_p0_regressions.py` | Corrected (file kept; deletion is the owner's decision) |
+| 9 | D7 stale BLAST artifact labelled as legacy; AUDIT_STATUS cites the test | `e1a48c6` | documentation; the README's numbers match `tests/test_p0_regressions.py` | Corrected (file kept; deletion is the owner's decision) |
+| 10 | D9 CRISPR on-target site excluded from the local specificity screen | this package | internal tests (both strands, identical copy, near match) | Corrected; suite 203/203; pyright unchanged; S23 recorded |
 
 ## Open after the current package
 
-D8–D11, D15–D19 and S1–S6, S8–S19, S21, S22 (see `docs/PHASE6_INITIAL_AUDIT.md`)
-until a package above closes an item. D12, D1–D7, D13, D14, S7 and S20
+D8, D10, D11, D15–D19 and S1–S6, S8–S19, S21–S23 (see `docs/PHASE6_INITIAL_AUDIT.md`)
+until a package above closes an item. D12, D1–D7, D9, D13, D14, S7 and S20
 are corrected.
 
 ## Handover notes (working practice)

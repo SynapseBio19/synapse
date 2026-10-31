@@ -816,3 +816,22 @@ Tests are in `tests/test_phase6_tier2.py`.
   values are tested. `docs/AUDIT_STATUS.md` P0-1 cites the test, not the
   file. Deleting the file was not done: it removes the only record of
   that remote run and needs the owner's decision.
+
+### D9 The guide's own site is not an off-target (`analyses/crispr.py`)
+
+- Problem: the local specificity screen counted the guide's intended site
+  as an exact off-target. Supplying the designed sequence as the local
+  reference - what the menu's "Off-Target Analysis" invites - gave every
+  guide `exact_matches = 1` and a specificity component of 60 instead of
+  100, which entered the ranking.
+- Now: an exact hit on the same strand at the candidate's own guide
+  coordinates is marked `on_target` (classification "on-target"). It
+  stays in the hit list, is reported as `on_target_matches`, and is not
+  counted in `exact_matches`, the mismatch classes, `total_hits`,
+  `off_target_hits`, the specificity score or the "local matches" flag.
+  At most one hit per candidate is the on-target site, so an identical
+  copy in a second reference still counts as an off-target.
+- Limitation: the rule compares coordinates as given; it identifies the
+  own site when the reference uses the coordinates of the designed
+  sequence (the designed sequence itself, or its parent).
+- Tests: 3 new (`CrisprOnTargetTests`, both strands). Suite 200 → 203.
