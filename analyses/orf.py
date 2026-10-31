@@ -2661,9 +2661,14 @@ def compare_orf_candidates(orfs, top_n=5, ranking=None):
 # ORF TRANSLATION PREVIEW
 # ============================================================
 
-def translate_orf_sequence(orf_sequence, initiator_start=True, genetic_code=1):
+def translate_orf_sequence(orf_sequence, initiator_start=True, genetic_code=None):
     """
     Translate an ORF using the local genetic code.
+
+    orf_sequence is an ORF dict from find_orfs() or a DNA string. An ORF is
+    translated with its own "genetic_code" (audit D2); an explicit,
+    different genetic_code raises ValueError instead of being used
+    silently. A string carries no table, so genetic_code defaults to 1.
 
     Ambiguous codons are translated as '?' when they do not resolve to a
     single amino acid. STOP terminates the returned protein and is not added
@@ -2675,6 +2680,19 @@ def translate_orf_sequence(orf_sequence, initiator_start=True, genetic_code=1):
     methionine, as initiator tRNA does (audits P0-8, D1). Any other first
     codon, and every later codon, is read with the elongation code.
     """
+    if isinstance(orf_sequence, dict):
+        orf_code = orf_sequence.get("genetic_code") or 1
+        if genetic_code is not None and int(genetic_code) != int(orf_code):
+            raise ValueError(
+                f"The ORF was found with NCBI table {orf_code}; "
+                f"translating it with table {genetic_code} would be inconsistent."
+            )
+        genetic_code = orf_code
+        orf_sequence = orf_sequence["sequence"]
+
+    if genetic_code is None:
+        genetic_code = 1
+
     codon_table = codon_table_for(genetic_code)
     protein = []
 
@@ -2713,7 +2731,7 @@ def translate_orf_sequence(orf_sequence, initiator_start=True, genetic_code=1):
 
 def analyze_selected_orf(orf):
     """Return a focused downstream-ready analysis for one selected ORF."""
-    protein = translate_orf_sequence(orf["sequence"], genetic_code=orf.get("genetic_code", 1))
+    protein = translate_orf_sequence(orf)
 
     return {
         "rank": orf["rank"],

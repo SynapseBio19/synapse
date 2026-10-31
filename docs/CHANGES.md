@@ -561,3 +561,29 @@ in its own commit with its own regression tests in
 - Found and recorded, not changed: S19 (start-codon *classification* and
   the CDS-quality / heuristic scores still use the fixed ATG/GTG/TTG set,
   so a CTG ORF is classified "None" and scores lower).
+
+### D2 An ORF's genetic code travels with the ORF into translation (`analyses/orf.py`, `core/api.py`)
+
+- Problem: ORF dicts carry `genetic_code`, but both translators took only
+  a DNA string with a silent table-1 default. A table-2 ORF
+  (`ATG` + `TGA`×25 + `TAG`) translated with the default gave `"M"`
+  instead of `"M" + "W"×25`, with no warning; the same applied to
+  `core.api.analyze_protein_from_cds(orf["sequence"])` for ORFs returned
+  by `core.api.find_orfs`.
+- Now: `orf.translate_orf_sequence` and `core.api.analyze_protein_from_cds`
+  accept the ORF dict itself and translate it with the ORF's own
+  `genetic_code`; an explicit, different `genetic_code` raises
+  `ValueError` instead of being used. `analyze_selected_orf` passes the
+  ORF. A DNA string still defaults to table 1 (a string carries no table),
+  so every existing call behaves as before; `genetic_code` now defaults to
+  `None` meaning "the ORF's table, or 1 for a string".
+- Editorial: the rewritten `analyze_protein_from_cds` docstring uses the
+  project spelling "analyze".
+- Tests: 5 new (`OrfGeneticCodeHandoffTests`), including agreement of the
+  ORF translator and the API for every ORF found in a 3 kb sequence with
+  tables 1, 2, 4 and 11 (several hundred ORFs). Suite 146 → 151.
+- Not changed: the RNA module's three-frame codon view still uses table 1
+  for a selected non-standard-table ORF. This is the documented P1-9
+  limitation (`main.py` warns when such an ORF is selected), not part of
+  D2; it is the remaining gap against "translation uses the selected ORF's
+  genetic code" and is listed as open in `docs/FEATURE_STATUS.md`.

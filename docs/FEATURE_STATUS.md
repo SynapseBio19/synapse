@@ -33,10 +33,10 @@ simulated keystrokes (see audit §11.5).
 | Functions and classes inventoried | ~1,100 |
 | Main-menu entries | 15 |
 | Sub-menu entries inventoried | 78 |
-| Automated tests | 146, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1) |
+| Automated tests | 151, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1 + 5 D2) |
 | Module self-tests | 12 suites, all passing (CRISPR 28, BLAST 33, mutation 44, variant 27, others aggregated) |
 | Golden-master scenarios | 12 |
-| Confirmed defects | 19 (D1–D19); corrected so far: 5 (D12, D4, D3, D5, D1; 2026-10-31) |
+| Confirmed defects | 19 (D1–D19); corrected so far: 6 (D12, D4, D3, D5, D1, D2; 2026-10-31) |
 | Suspected / unverified concerns | 14 (S1–S14) |
 | External validations performed in this audit | 8 (audit §3, §6) |
 | Features advertised but not implemented | 1 (`[11] AI Experiment Planner`) |
@@ -115,7 +115,7 @@ relative to its use (every session runs it).
 | — | Shine–Dalgarno screen | `analyze_shine_dalgarno` | Implemented | Execution-tested | Not applicable | Fixed motif list, no energy model. |
 | — | CDS quality, heuristic score | `calculate_cds_quality`, `calculate_orf_confidence` | Implemented | Execution-tested | Not applicable | **D18**. |
 | — | ORF density, frame statistics | `calculate_orf_density`, `calculate_frame_statistics` | Implemented | Execution-tested | Not applicable | |
-| — | ORF translation | `translate_orf_sequence`, `initiation_codons`, `is_initiation_codon` | **Partially implemented** | Execution-tested | **Independently validated** (Biopython, tables 1/2/4/11) | **D1 corrected 2026-10-31**: initiator Met only for initiation codons of the genetic code (table 1: ATG/CTG/GTG/TTG); internal codons use the elongation code. **D2** ignores the ORF's own `genetic_code` by default. |
+| — | ORF translation | `translate_orf_sequence`, `initiation_codons`, `is_initiation_codon` | Implemented | Execution-tested | **Independently validated** (Biopython, tables 1/2/4/11) | **D1 corrected 2026-10-31**: initiator Met only for initiation codons of the genetic code (table 1: ATG/CTG/GTG/TTG); internal codons use the elongation code. **D2 corrected 2026-10-31**: accepts the ORF dict and uses its `genetic_code`; a conflicting table raises; a bare string defaults to table 1. Agrees with `core.api` for every ORF found in tables 1/2/4/11. |
 | — | Start-codon classification and scores | `classify_start_codon`, `calculate_cds_quality`, `calculate_orf_confidence` | Partially implemented | Execution-tested | Not applicable | **S19**: still use the fixed ATG/GTG/TTG set — a CTG ORF is classified "None" and scores 10 points lower than an equivalent GTG ORF. |
 | — | Circular / origin-spanning ORFs | — | **Not implemented** | Not applicable | Not applicable | `core.api.find_orfs` adds a limitation note for circular records. |
 
@@ -130,7 +130,7 @@ Test coverage: 19 test references — the best-covered module.
 | — | Source resolution (ORF vs whole sequence) | `resolve_rna_source` | Implemented | Integration-tested | Not applicable | **Confirmed intact**: `mode="orf"`/label "Selected ORF" with a selection, whole sequence and "Selected DNA" without. |
 | — | Transcription | `transcribe_rna` | Implemented | Execution-tested | Not applicable | T→U on the given strand. |
 | 1 | RNA Overview | `print_rna_overview`, `analyze_rna` | Implemented | Execution-tested | Not applicable | |
-| 2 | Translation & Codon Analysis | `translate_rna_frame`, `analyze_rna_three_frames`, `analyze_rna_codon_usage` | Partially implemented | Execution-tested | Not applicable | **Always NCBI table 1**, even for a table-2/4/11 ORF (documented; `main.py` warns). |
+| 2 | Translation & Codon Analysis | `translate_rna_frame`, `analyze_rna_three_frames`, `analyze_rna_codon_usage` | Partially implemented | Execution-tested | Not applicable | **Always NCBI table 1**, even for a table-2/4/11 ORF (documented P1-9 limitation; `main.py` warns). Not part of D1/D2; the remaining place where a selected ORF is not translated with its own genetic code. |
 | 3 | RNA Features | `find_rna_hairpins`, `summarize_rna_structure`, `find_rna_start_stop_landscape`, `find_rna_homopolymers` | Implemented | Execution-tested | Not applicable | Hairpins are a complementarity proxy, **not** a folding model. P2-5 G·U pairing and optional RNAfold deferred. |
 | 4 | Complete RNA Report | `print_rna_report` | Implemented | Reachable | Not applicable | |
 | 5 | RNA Sequence view | `print_rna_sequence_view` | Implemented | Reachable | Not applicable | |

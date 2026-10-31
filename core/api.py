@@ -102,11 +102,27 @@ def analyze_rna(record_or_sequence: Any, *, profile_window: int = 100,
                    parameters={"profile_window": profile_window, "profile_step": profile_step})
 
 
-def analyze_protein_from_cds(cds: str, *, initiator_start: bool = True,
-                             genetic_code: int = 1, description: str = "CDS") -> AnalysisResult:
-    """Translate a coding sequence (frame +1) and analyse the protein."""
+def analyze_protein_from_cds(cds: Any, *, initiator_start: bool = True,
+                             genetic_code: Optional[int] = None,
+                             description: str = "CDS") -> AnalysisResult:
+    """Translate a coding sequence (frame +1) and analyze the protein.
+
+    ``cds`` is a DNA string or an ORF dict from ``find_orfs``. An ORF is
+    translated with its own genetic code; an explicit, different
+    ``genetic_code`` raises ``ValueError``. A string uses ``genetic_code``
+    (default 1).
+    """
     from analyses.orf import is_initiation_codon
     from analyses.protein import analyze_complete_protein
+
+    if isinstance(cds, dict):
+        orf_code = int(cds.get("genetic_code") or 1)
+        if genetic_code is not None and int(genetic_code) != orf_code:
+            raise ValueError(f"The ORF was found with NCBI table {orf_code}; "
+                             f"translating it with table {genetic_code} would be inconsistent.")
+        genetic_code = orf_code
+        cds = cds["sequence"]
+    genetic_code = 1 if genetic_code is None else int(genetic_code)
 
     sequence = normalize_dna(cds)
     data = analyze_complete_protein("", rna=sequence.replace("T", "U"),

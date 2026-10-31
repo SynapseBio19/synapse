@@ -487,5 +487,63 @@ class OrfInitiationCodonTests(unittest.TestCase):
                 self.assertEqual(decoded_as_met, ncbi_starts | synapse_policy | elongation_met)
 
 
+# ----------------------------------------------------------------------
+# D2: an ORF's genetic code travels with the ORF into translation
+# ----------------------------------------------------------------------
+class OrfGeneticCodeHandoffTests(unittest.TestCase):
+    MITO = "ATG" + "TGA" * 25 + "TAG"   # TGA = Trp in table 2 (stop in table 1)
+    MITO_PROTEIN = "M" + "W" * 25
+
+    def _table2_orf(self):
+        from analyses import orf as O
+        [orf] = [o for o in O.find_orfs(self.MITO, genetic_code=2, min_length=30, include_partial=False)
+                 if o["strand"] == "+" and o["start"] == 0]
+        self.assertEqual(orf["genetic_code"], 2)
+        return orf
+
+    def test_translation_reads_the_orfs_own_table(self):
+        from analyses import orf as O
+        orf = self._table2_orf()
+        self.assertEqual(O.translate_orf_sequence(orf), self.MITO_PROTEIN)
+        self.assertEqual(O.translate_orf_sequence(orf, genetic_code=2), self.MITO_PROTEIN)
+        # A bare sequence carries no table: the documented default, table 1, applies.
+        self.assertEqual(O.translate_orf_sequence(orf["sequence"]), "M")
+
+    def test_conflicting_table_is_rejected_not_silently_used(self):
+        from analyses import orf as O
+        from core import api
+        orf = self._table2_orf()
+        with self.assertRaises(ValueError):
+            O.translate_orf_sequence(orf, genetic_code=1)
+        with self.assertRaises(ValueError):
+            api.analyze_protein_from_cds(orf, genetic_code=1)
+
+    def test_selected_orf_analysis_uses_its_table(self):
+        from analyses import orf as O
+        self.assertEqual(O.analyze_selected_orf(self._table2_orf())["protein_sequence"], self.MITO_PROTEIN)
+
+    def test_api_protein_from_an_orf_uses_its_table(self):
+        from core import api
+        result = api.analyze_protein_from_cds(self._table2_orf())
+        self.assertEqual(result.data["protein"], self.MITO_PROTEIN)
+        self.assertEqual(result.parameters["genetic_code"], 2)
+        self.assertEqual(api.analyze_protein_from_cds(self.MITO).data["protein"], "M")  # string: table 1
+
+    def test_api_and_orf_translator_agree_for_every_found_orf(self):
+        from analyses import orf as O
+        from core import api
+        from tests._support import deterministic_dna
+        sequence = deterministic_dna(3000, seed=5)
+        for table, policy in ((1, "table_starts"), (2, "table_starts"), (4, "atg_and_alternative"), (11, "table_starts")):
+            found = api.find_orfs(sequence, genetic_code=table, start_codon_policy=policy, min_length=60,
+                                  top_n=200).data["orfs"]
+            self.assertTrue(found, table)
+            for orf in found:
+                with self.subTest(table=table, start=orf["start"], strand=orf["strand"]):
+                    protein = O.translate_orf_sequence(orf)
+                    self.assertEqual(protein[0], "M")  # every found ORF starts at an initiation codon
+                    self.assertEqual(api.analyze_protein_from_cds(orf).data["protein"], protein)
+
+
 if __name__ == "__main__":
     unittest.main()
