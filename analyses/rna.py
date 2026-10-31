@@ -88,6 +88,29 @@ RNA_NUCLEOTIDE_RESIDUE_MASSES = {
 RNA_CODON_TABLE = codon_dict(1, rna=True, stop_symbol="STOP")
 
 
+def rna_codon_table(genetic_code=1):
+    """Codon table (RNA alphabet, "STOP" for stops) for an NCBI genetic code.
+
+    Audit P1-9: the three-frame codon view used to read table 1 even when a
+    selected ORF had been found with another table, so the preview could
+    disagree with the ORF's own translation.
+    """
+    if genetic_code in (None, 1):
+        return RNA_CODON_TABLE
+    return codon_dict(int(genetic_code), rna=True, stop_symbol="STOP")
+
+
+def orf_genetic_code(selected_orf, default=1):
+    """The genetic code of a selected ORF, or *default* when it carries none."""
+    if selected_orf is None:
+        return default
+    value = _orf_value(selected_orf, "genetic_code", None)
+    try:
+        return int(value) if value else default
+    except (TypeError, ValueError):
+        return default
+
+
 # ============================================================
 # TRANSCRIPTION
 # ============================================================
@@ -1365,7 +1388,7 @@ def find_rna_start_stop_landscape(rna):
 # THREE-FRAME TRANSLATION
 # ============================================================
 
-def translate_rna_frame(rna, frame=0):
+def translate_rna_frame(rna, frame=0, genetic_code=1):
     """
     Translate one RNA reading frame.
 
@@ -1376,7 +1399,11 @@ def translate_rna_frame(rna, frame=0):
 
     Ambiguous codons are represented as '?'.
     Translation stops at the first definite stop codon.
+
+    genetic_code selects the NCBI table (audit P1-9).
     """
+
+    table = rna_codon_table(genetic_code)
 
     if frame not in (0, 1, 2):
         raise ValueError(
@@ -1399,7 +1426,7 @@ def translate_rna_frame(rna, frame=0):
 
         codons.append(codon)
 
-        amino_acid = RNA_CODON_TABLE.get(
+        amino_acid = table.get(
             codon
         )
 
@@ -1416,6 +1443,7 @@ def translate_rna_frame(rna, frame=0):
     return {
         "frame": frame + 1,
         "frame_offset": frame,
+        "genetic_code": 1 if genetic_code in (None, 1) else int(genetic_code),
         "codons": codons,
         "codon_count": len(codons),
         "protein": "".join(protein),
@@ -1425,15 +1453,19 @@ def translate_rna_frame(rna, frame=0):
     }
 
 
-def analyze_rna_three_frames(rna):
-    """Return translation previews for all three forward RNA frames."""
+def analyze_rna_three_frames(rna, genetic_code=1):
+    """Return translation previews for all three forward RNA frames.
+
+    All three frames use *genetic_code* (audit P1-9).
+    """
 
     frames = [
-        translate_rna_frame(rna, frame)
+        translate_rna_frame(rna, frame, genetic_code=genetic_code)
         for frame in range(3)
     ]
 
     return {
+        "genetic_code": 1 if genetic_code in (None, 1) else int(genetic_code),
         "frames": frames,
         "best_frame": max(
             frames,
@@ -1588,10 +1620,10 @@ def summarize_rna_analysis(analysis):
 # THREE-FRAME TRANSLATION REPORT
 # ============================================================
 
-def print_rna_translation_report(rna):
+def print_rna_translation_report(rna, genetic_code=1):
     """Print the three forward RNA reading-frame previews."""
 
-    translation = analyze_rna_three_frames(rna)
+    translation = analyze_rna_three_frames(rna, genetic_code=genetic_code)
 
     print()
     print("=" * 70)
@@ -1752,7 +1784,8 @@ def print_rna_feature_report(analysis):
 def analyze_rna(
     dna,
     profile_window=100,
-    profile_step=1
+    profile_step=1,
+    genetic_code=1
 ):
 
     rna = transcribe_rna(
@@ -1943,9 +1976,14 @@ def analyze_rna(
         )
     )
 
+    analysis["genetic_code"] = (
+        1 if genetic_code in (None, 1) else int(genetic_code)
+    )
+
     analysis["translation_frames"] = (
         analyze_rna_three_frames(
-            rna
+            rna,
+            genetic_code=genetic_code,
         )
     )
 
@@ -3006,6 +3044,13 @@ def analyze_rna_from_pipeline(
             "No DNA sequence is available for RNA analysis."
         )
 
+    # Audit P1-9: a selected ORF carries the table it was found with, so the
+    # codon view must use it unless the caller states another one.
+    analysis_kwargs.setdefault(
+        "genetic_code",
+        orf_genetic_code(source["orf"]),
+    )
+
     analysis = analyze_rna(
         source["dna"],
         **analysis_kwargs
@@ -3450,7 +3495,8 @@ def run_rna_analysis_ui(
         elif choice == "2":
 
             print_rna_translation_report(
-                analysis["rna"]
+                analysis["rna"],
+                genetic_code=analysis.get("genetic_code", 1),
             )
 
             _pause_rna_ui()

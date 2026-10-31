@@ -126,15 +126,23 @@ def find_orfs(record_or_sequence: Any, *, min_length: Optional[int] = None,
 
 
 def analyze_rna(record_or_sequence: Any, *, profile_window: int = 100,
-                profile_step: int = 1, sequence_type: Optional[str] = None) -> AnalysisResult:
-    """RNA analysis of a DNA template or an RNA sequence."""
+                profile_step: int = 1, sequence_type: Optional[str] = None,
+                genetic_code: int = 1) -> AnalysisResult:
+    """RNA analysis of a DNA template or an RNA sequence.
+
+    ``genetic_code`` selects the NCBI table for the three-frame codon view
+    (audit P1-9); pass the selected ORF's table to keep the preview
+    consistent with that ORF's own translation.
+    """
     from analyses.rna import analyze_rna as _analyze_rna
 
     sequence, description, _, warnings = _sequence_of(
         record_or_sequence, sequence_type=sequence_type, context="RNA analysis")
-    data = _analyze_rna(sequence, profile_window=profile_window, profile_step=profile_step)
+    data = _analyze_rna(sequence, profile_window=profile_window, profile_step=profile_step,
+                        genetic_code=genetic_code)
     return _result("rna", data, sequence, description,
-                   parameters={"profile_window": profile_window, "profile_step": profile_step},
+                   parameters={"profile_window": profile_window, "profile_step": profile_step,
+                               "genetic_code": genetic_code},
                    warnings=warnings)
 
 

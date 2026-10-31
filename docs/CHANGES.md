@@ -1121,3 +1121,23 @@ interrupted the Opus 5.5 session at the start of this investigation.
 - Not done: merging the surviving generations into single functions. That
   would change executed code and has no reachability argument behind it, so
   it is out of scope.
+
+### P1-9 The RNA codon view uses the selected ORF's genetic code (`analyses/rna.py`)
+
+- Problem, the last remaining gap of P1-9: the three-frame codon preview
+  always read NCBI table 1. With a table-2 ORF selected, the preview stopped
+  at the first UGA and showed `M`, while the ORF's own translation correctly
+  read UGA as Trp and gave `MWWWWWK`. The same screen therefore showed two
+  different answers for one sequence.
+- Now: `rna_codon_table()` returns the table for a code,
+  `translate_rna_frame()` and `analyze_rna_three_frames()` take
+  `genetic_code`, and `analyze_rna()` records it in the result. The chosen
+  table reaches them from the selected ORF: `orf_genetic_code()` reads it
+  from the ORF, `analyze_rna_from_pipeline()` and `SynapsePipeline.run_rna()`
+  apply it unless the caller passes another one, and `core.api.analyze_rna`
+  exposes it as a parameter.
+- Verified agreement: for a table-2 ORF the +1 frame preview now equals
+  `orf.translate_orf_sequence(orf)` exactly, which is what the finding asked
+  for. Without a selected ORF the default stays table 1, so existing results
+  and the golden master are unchanged.
+- Tests: 5 new (`RnaGeneticCodeTests`). Suite 240 -> 245.

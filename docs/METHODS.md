@@ -130,6 +130,10 @@ use 0-based inclusive `start <= stop` on the forward strand.
   coefficient and similar) are computed over the resolved residues only.
 - The transmembrane and signal-peptide outputs are screens based on the
   Kyte–Doolittle scale, not predictions from TMHMM/Phobius or SignalP.
+- RNA codon view (P1-9): the three-frame preview uses the genetic code of
+  the selected ORF, taken from the ORF itself; without a selected ORF it
+  uses table 1. The +1 frame therefore agrees with the ORF's own
+  translation.
 - Protein letters (D14-F6): every position is kept. B, Z, J, X and `?`
   are ambiguous; U (selenocysteine) and O (pyrrolysine) are defined
   residues with masses (Biopython `IUPACData.protein_weights` minus

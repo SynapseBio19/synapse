@@ -863,6 +863,16 @@ class SynapsePipeline:
             dna_source
         )
 
+        # Audit P1-9: a selected ORF carries the genetic code it was found
+        # with, so the RNA codon view uses it unless the caller says otherwise.
+        if use_selected_orf and self.context.selected_orf is not None:
+            from analyses.rna import orf_genetic_code
+
+            kwargs.setdefault(
+                "genetic_code",
+                orf_genetic_code(self.context.selected_orf),
+            )
+
         result = analyze_rna(
             dna_source,
             **kwargs

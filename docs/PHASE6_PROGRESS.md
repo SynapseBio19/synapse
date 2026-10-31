@@ -72,6 +72,8 @@ IUPAC, gapped and invalid input (D14):
 | 21 | S1, S2 assessed as not defects (locked by tests); S9 quantified by measurement; S11, S12 resolved in documentation | this package | execution on constructed minus-strand cases; `tracemalloc` measurement at three sizes | Assessed; suite 240/240 |
 | 22 | D16 part 2: superseded primer generations removed after a reachability review | this package | AST binding order + project-wide reference scan + `sys.settrace` on a real design run; bytecode identical for all 105 surviving callables; pyright 134 -> 112 | Corrected; 1,326 lines removed; suite 240/240 |
 
+| 23 | P1-9 RNA codon view uses the selected ORF's genetic code | this package | internal tests; +1 frame preview equals `translate_orf_sequence` for a table-2 ORF | Corrected; suite 245/245 |
+
 ## Paused (2026-10-31)
 
 Planned pause at the owner's request; see `docs/PHASE6_HANDOVER.md` for the

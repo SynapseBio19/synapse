@@ -622,5 +622,53 @@ class AlignmentCostNoteTests(unittest.TestCase):
         self.assertFalse(any("aligned globally" in n for n in result.notes))
 
 
+# ----------------------------------------------------------------------
+# P1-9: the RNA codon view uses the selected ORF's genetic code
+# ----------------------------------------------------------------------
+class RnaGeneticCodeTests(unittest.TestCase):
+    # Table 2 reads UGA as Trp, table 1 as a stop.
+    RNA = "AUG" + "UGA" * 5 + "AAA" + "UAA"
+    DNA = RNA.replace("U", "T")
+
+    def test_frame_translation_follows_the_table(self):
+        from analyses import rna as R
+        standard = R.translate_rna_frame(self.RNA, 0)
+        mitochondrial = R.translate_rna_frame(self.RNA, 0, genetic_code=2)
+        self.assertEqual(standard["protein"], "M")              # stops at the first UGA
+        self.assertEqual(mitochondrial["protein"], "MWWWWWK")   # UGA is Trp
+        self.assertEqual((standard["genetic_code"], mitochondrial["genetic_code"]), (1, 2))
+
+    def test_three_frame_view_records_the_table(self):
+        from analyses import rna as R
+        view = R.analyze_rna_three_frames(self.RNA, genetic_code=2)
+        self.assertEqual(view["genetic_code"], 2)
+        self.assertTrue(all(f["genetic_code"] == 2 for f in view["frames"]))
+        self.assertEqual(view["frames"][0]["protein"], "MWWWWWK")
+
+    def test_a_selected_orf_supplies_its_table(self):
+        from analyses import rna as R
+        orf = {"sequence": self.DNA, "genetic_code": 2}
+        self.assertEqual(R.orf_genetic_code(orf), 2)
+        self.assertEqual(R.orf_genetic_code({"sequence": self.DNA}), 1)
+        self.assertEqual(R.orf_genetic_code(None), 1)
+        analysis = R.analyze_rna_from_pipeline(self.DNA, selected_orf=orf)
+        self.assertEqual(analysis["genetic_code"], 2)
+        self.assertEqual(analysis["translation_frames"]["frames"][0]["protein"], "MWWWWWK")
+
+    def test_without_an_orf_the_default_table_is_used(self):
+        from analyses import rna as R
+        analysis = R.analyze_rna_from_pipeline(self.DNA)
+        self.assertEqual(analysis["genetic_code"], 1)
+        self.assertEqual(analysis["translation_frames"]["frames"][0]["protein"], "M")
+
+    def test_api_and_orf_translation_agree(self):
+        from core import api
+        from analyses.orf import translate_orf_sequence
+        orf = {"sequence": self.DNA, "genetic_code": 2}
+        view = api.analyze_rna(self.DNA, genetic_code=2).data["translation_frames"]
+        # The +1 frame preview must match what the ORF itself translates to.
+        self.assertEqual(view["frames"][0]["protein"], translate_orf_sequence(orf))
+
+
 if __name__ == "__main__":
     unittest.main()
