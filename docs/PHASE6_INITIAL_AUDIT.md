@@ -514,7 +514,7 @@ It is the only main-menu entry with no implementation.
 it as a feature.
 
 ### D16 – Duplicate and shadowed primer functions
-**`analyses/primer.py:1782, 3699`** · CONFIRMED · architectural
+**`analyses/primer.py:1782, 3699`** · CONFIRMED · architectural · **partially corrected 2026-10-31** (duplicate definition removed; the `_v5`–`_v11` ranking chain remains, pending the independent review in `AUDIT_STATUS.md` open item 7)
 
 `calculate_tm_nearest_neighbor` is defined twice at module level. The
 second definition is a backward-compatibility adapter that captures the

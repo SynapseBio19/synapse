@@ -31,10 +31,26 @@ class SharedTableTests(unittest.TestCase):
         tree = ast.parse((PROJECT_ROOT / "analyses" / "primer.py").read_text(encoding="utf-8"))
         names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
         duplicates = {n for n in names if names.count(n) > 1}
-        # calculate_tm_nearest_neighbor is defined twice on purpose: the v3
-        # model is captured under _calculate_tm_nearest_neighbor_v3_raw before
-        # the adapter replaces the public name.
-        self.assertEqual(duplicates, {"calculate_tm_nearest_neighbor"})
+        # Phase 6 (audit D16): the v3 model used to carry the public name and
+        # was then shadowed by the backward-compatible adapter, so this test
+        # accepted one duplicate. The model is now defined under its private
+        # name, so no module-level name may be defined twice at all.
+        self.assertEqual(duplicates, set())
+
+    def test_primer_tm_adapter_delegates_to_the_private_model(self):
+        from typing import cast
+        from analyses import primer as P
+        # The public name is the adapter; the model is reachable privately.
+        self.assertIn("salt_mM", P.calculate_tm_nearest_neighbor.__doc__ or "")
+        self.assertIsNot(P.calculate_tm_nearest_neighbor, P._calculate_tm_nearest_neighbor_v3_raw)
+        sequence = "ACGTACGTACGTACGTACGT"
+        # The adapter's legacy aliases reach the same model as the v3 names.
+        # cast(): the adapter is declared float | NearestNeighborTmResult and
+        # returns the float unless return_details=True.
+        legacy = cast(float, P.calculate_tm_nearest_neighbor(sequence, salt_mM=50.0, mg_mM=1.5))
+        direct = P._calculate_tm_nearest_neighbor_v3_raw(sequence, sodium_mM=50.0, magnesium_mM=1.5)
+        self.assertIsInstance(legacy, float)
+        self.assertAlmostEqual(legacy, direct)
 
 
 class ProteinGeneticCodeTests(unittest.TestCase):

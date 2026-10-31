@@ -1779,7 +1779,15 @@ def calculate_duplex_concentration_term(
 # NEAREST-NEIGHBOR Tm
 # ============================================================================
 
-def calculate_tm_nearest_neighbor(
+# This is the V3 model itself. The public entry point is the
+# backward-compatible adapter calculate_tm_nearest_neighbor() further down,
+# which accepts the older parameter names and delegates here.
+#
+# Audit D16: this implementation used to carry the public name and was then
+# rebound to the private name and shadowed by the adapter, so the definition a
+# reader found first was not the one that ran. Naming it privately here leaves
+# exactly one definition per name without changing which code executes.
+def _calculate_tm_nearest_neighbor_v3_raw(
     sequence: str,
     *,
     sodium_mM: float = 50.0,
@@ -3688,12 +3696,6 @@ class NearestNeighborTmResult:
     @property
     def mg_mM(self) -> float:
         return self.magnesium_mM
-
-
-
-_calculate_tm_nearest_neighbor_v3_raw = (
-    calculate_tm_nearest_neighbor
-)
 
 
 def calculate_tm_nearest_neighbor(

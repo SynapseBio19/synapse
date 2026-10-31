@@ -993,3 +993,34 @@ interrupted the Opus 5.5 session at the start of this investigation.
 - Tests: 9 new (`CrisprSeedOrientationTests`, `PrimeEditingRttTests`,
   `CrisprThresholdDocumentationTests`). Suite 219 -> 228; pyright unchanged;
   golden master unchanged.
+
+## Phase 6 - Architecture (2026-10-31)
+
+### D16 (part 1) One definition per name in the primer module (`analyses/primer.py`)
+
+- Problem: `calculate_tm_nearest_neighbor` was defined twice at module
+  level. The first definition was the V3 model; it was then rebound to
+  `_calculate_tm_nearest_neighbor_v3_raw` and the public name was replaced
+  by a backward-compatible adapter. The behaviour was correct, but the
+  definition a reader finds first was not the one that runs, and pyright
+  reported the shadowing as `reportRedeclaration`.
+- Now: the model is defined directly under its private name and the alias
+  assignment is gone, so the public name has exactly one definition - the
+  adapter - and the module has no duplicated module-level name at all.
+- Equivalence: all 129 module-level callables of `analyses.primer` were
+  fingerprinted by the SHA-256 of their compiled bytecode before and after.
+  No name was added or removed and no entry changed; both Tm names keep
+  exactly the code object they had. Module-level lookups resolve at call
+  time, so every existing call site reaches the adapter as before.
+- pyright: the `reportRedeclaration` diagnostic is gone (134 -> 131 against
+  the `ab4bd2a` baseline, together with the two S15 diagnostics).
+- Test changed deliberately:
+  `test_primer_has_single_live_definition_per_name` asserted
+  `duplicates == {"calculate_tm_nearest_neighbor"}`, i.e. it recorded the
+  duplication as intended. It now asserts `set()`, which is stricter, and a
+  new test checks that the adapter's legacy parameter aliases reach the same
+  model as the v3 names.
+- **Not done, deliberately:** the live `_v5`-`_v11` ranking wrapper chain is
+  unchanged. Flattening it alters executed code and requires the independent
+  review recorded as open validation item 7 in `docs/AUDIT_STATUS.md`. D16 is
+  therefore partially corrected.

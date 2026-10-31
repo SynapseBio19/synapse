@@ -69,6 +69,8 @@ IUPAC, gapped and invalid input (D14):
 
 | 18 | S23 PAM-proximal guide seed; S3 real RTT coverage check; S4/S5 thresholds documented and sourced | this package | internal tests; literature verified in PubMed (PMIDs 24476820, 27096365, 29160308, 31634902, 33811918) | Corrected; suite 228/228; pyright unchanged. Done by Opus 5 on a restricted assignment after a safeguard interrupted the Opus 5.5 session. |
 
+| 19 | D16 part 1: one definition per name in `analyses/primer.py` | this package | bytecode fingerprint of all 129 module-level callables unchanged; pyright `reportRedeclaration` gone | Partially corrected; v5–v11 chain deferred; suite 229/229 |
+
 ## Paused (2026-10-31)
 
 Planned pause at the owner's request; see `docs/PHASE6_HANDOVER.md` for the
@@ -95,6 +97,11 @@ are corrected.
   except `pipeline.py`/`validation.py`, `fileio/genbank.py`,
   `fileio/loader.py`, the tests and the docs use LF. `analyses/orf.py` has
   exactly two intentional bare-LF lines; edit it byte-exactly.
+- `pyright.exe` is blocked by a Windows application control policy
+  (WinError 4551) since 2026-10-31; run it as
+  `python -m pyright --pythonversion 3.10` instead. The baseline for
+  comparison remains the 134 diagnostics of `ab4bd2a`; the current count is
+  131 (three corrected, none added).
 - Check: `python -m unittest discover -s tests -t .`;
   `git -c core.whitespace=cr-at-eol diff --check`; pyright 1.1.414 with
   `--pythonversion 3.10` compared against the 134-diagnostic baseline of
