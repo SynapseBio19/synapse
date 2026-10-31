@@ -62,12 +62,14 @@ IUPAC, gapped and invalid input (D14):
 | 11 | D8 CRISPR cut site per system, with citations | `ca2ec39` | internal tests (both strands, all four systems); literature (PMIDs 22745249, 25830891, 30166441, 26422227) | Corrected; suite 206/206; pyright unchanged |
 | 12 | D10 dead CRISPR config fields act; D11 exports in `exports/crispr` | `8145556` | internal tests (defaults unchanged) | Corrected; suite 210/210; pyright unchanged |
 | 13 | D19 pipeline `run_orf` search settings; fixed `completed` shape | `e47cb85` | internal tests (equality with `core.api.find_orfs`) | Corrected; suite 212/212; pyright unchanged |
-| 14 | D15 planner entry labelled "not implemented" | this package | end-to-end `main.py` test | Corrected (planner itself remains P3-1, deferred); suite 213/213 |
+| 14 | D15 planner entry labelled "not implemented" | `f3a09c1` | end-to-end `main.py` test | Corrected (planner itself remains P3-1, deferred); suite 213/213 |
+| 15 | S15 variant-to-mutation bridge works; S16 REF_MISMATCH no longer leaks into the input | this package | internal tests; pyright 134 → 132 (the two S15 diagnostics) | Corrected; suite 215/215 |
 
 ## Open after the current package
 
-D16–D18 and S1–S6, S8–S19, S21–S23 (see `docs/PHASE6_INITIAL_AUDIT.md`)
-until a package above closes an item. D12, D1–D11, D13–D15, D19, S7 and S20
+D16–D18 and S1–S6, S8–S14, S17–S19, S21–S23 (see `docs/PHASE6_INITIAL_AUDIT.md`)
+until a package above closes an item. D12, D1–D11, D13–D15, D19, S7, S15, S16 and
+S20
 are corrected.
 
 ## Handover notes (working practice)
@@ -86,7 +88,7 @@ are corrected.
 - Check: `python -m unittest discover -s tests -t .`;
   `git -c core.whitespace=cr-at-eol diff --check`; pyright 1.1.414 with
   `--pythonversion 3.10` compared against the 134-diagnostic baseline of
-  `ab4bd2a` (no new diagnostics allowed).
+  `ab4bd2a` (no new diagnostics allowed; 132 since the S15 fix).
 - Commit messages end with
   `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
 - Biopython and primer3-py are test-only; comparison tests skip without

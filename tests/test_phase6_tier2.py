@@ -263,5 +263,25 @@ class PlannerPlaceholderTests(unittest.TestCase):
         self.assertNotIn("coming soon", output)
 
 
+# ----------------------------------------------------------------------
+# S15, S16: variant module
+# ----------------------------------------------------------------------
+class VariantModuleFindingTests(unittest.TestCase):
+    def test_ref_mismatch_flag_does_not_leak_into_the_input(self):
+        from analyses import variant_analysis as V
+        original = V.Variant("chr1", 1, "TTT", "T")
+        original.annotation["validation_flags"] = ["PRE_EXISTING"]
+        normalized = V.left_normalize_variant(original, "GGGAAAAAGGG")
+        self.assertEqual(original.annotation["validation_flags"], ["PRE_EXISTING"])  # was + REF_MISMATCH
+        self.assertEqual(normalized.annotation["validation_flags"], ["PRE_EXISTING", "REF_MISMATCH"])
+
+    def test_mutation_bridge_runs(self):
+        from analyses import variant_analysis as V
+        variant = V.annotate_from_mutation_analysis(
+            V.Variant("c", 4, "A", "G"), reference_sequence="ATGAAATAA", alternative_sequence="ATGGAATAA")
+        self.assertEqual((variant.variant_type, variant.consequence, variant.coding_change),
+                         ("SNV", "Missense", "AAA>GAA"))
+
+
 if __name__ == "__main__":
     unittest.main()

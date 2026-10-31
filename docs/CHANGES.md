@@ -902,3 +902,18 @@ Tests are in `tests/test_phase6_tier2.py`.
   is deferred (P3-1). The key is kept so the menu numbering is unchanged.
   Implementing the planner is not part of this correction.
 - Tests: 1 new (`PlannerPlaceholderTests`, drives `main.py`). Suite 212 → 213.
+
+### S15, S16 Two variant-module defects (`analyses/variant_analysis.py`)
+
+- S15 (confirmed by execution): `annotate_from_mutation_analysis` always
+  failed - it imported a top-level `mutation` module that does not exist
+  (`analyses.mutation` is the module) and would then have passed
+  `reference_cds`/`variant_cds`, which `compare_sequences` does not
+  accept. It now imports `analyses.mutation` and calls `compare_sequences`
+  with its real parameters. pyright's two diagnostics on that call are
+  gone (baseline 134 → 132).
+- S16: `left_normalize_variant` added `REF_MISMATCH` through a shallow copy
+  of the annotation, so the flag also appeared in the *input* variant's
+  existing flag list. It now uses the copy-on-write helper introduced for
+  D12.
+- Tests: 2 new (`VariantModuleFindingTests`). Suite 213 → 215.

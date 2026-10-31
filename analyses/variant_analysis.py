@@ -899,9 +899,8 @@ def left_normalize_variant(
         reference_sequence = str(reference_sequence).upper()
         observed = reference_sequence[pos - 1:pos - 1 + len(ref)]
         if len(observed) != len(ref) or not _reference_allele_matches(ref, observed):
-            flags = new.annotation.setdefault("validation_flags", [])
-            if "REF_MISMATCH" not in flags:
-                flags.append("REF_MISMATCH")
+            # Copy-on-write: the input variant's flag list is not modified (audit S16).
+            _add_validation_flag(new, "REF_MISMATCH")
             new.normalization_notes.append(
                 f"REF allele '{ref}' does not match the reference sequence "
                 f"('{observed or 'out of range'}') at position {pos}; "
@@ -2011,8 +2010,11 @@ def annotate_from_mutation_analysis(
     usable. The adapter uses the sequence-level engine when available and
     attaches the most direct consequence information to this variant.
     """
+    # Audit S15: the import named a top-level "mutation" module and the call
+    # passed keyword arguments compare_sequences does not have, so this
+    # function always failed.
     try:
-        from mutation import compare_sequences
+        from analyses.mutation import compare_sequences
     except ImportError as exc:
         raise VariantAnalysisError(
             "mutation.py could not be imported for sequence-derived annotation."
@@ -2023,8 +2025,6 @@ def annotate_from_mutation_analysis(
         alternative_sequence,
         reference_name="Reference",
         variant_name="Variant",
-        reference_cds=reference_sequence,
-        variant_cds=alternative_sequence,
     )
 
     if not result.mutations:
