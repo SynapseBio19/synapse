@@ -243,5 +243,25 @@ class PipelineOrfRunnerTests(unittest.TestCase):
         self.assertEqual(tuple(pipeline.context.status()), STATUS_MODULES)
 
 
+# ----------------------------------------------------------------------
+# D15: the unimplemented planner is labelled as such
+# ----------------------------------------------------------------------
+class PlannerPlaceholderTests(unittest.TestCase):
+    def test_menu_says_not_implemented(self):
+        import os
+        import subprocess
+        import sys
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            env = dict(os.environ, SYNAPSE_LOG_DIR=tmp, PYTHONIOENCODING="utf-8")
+            completed = subprocess.run([sys.executable, "main.py"], cwd=PROJECT_ROOT, input="\n1\n11\n\n0\n",
+                                       capture_output=True, text=True, encoding="utf-8", timeout=120, env=env)
+        output = completed.stdout + completed.stderr
+        self.assertEqual(completed.returncode, 0, output[-2000:])
+        self.assertIn("[11] AI Experiment Planner (not implemented)", output)
+        self.assertIn("AI Experiment Planner: not implemented. Nothing is run or stored.", output)
+        self.assertNotIn("coming soon", output)
+
+
 if __name__ == "__main__":
     unittest.main()

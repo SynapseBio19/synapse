@@ -891,3 +891,14 @@ Tests are in `tests/test_phase6_tier2.py`.
   for the same settings. `completed` always has the twelve modules of
   `STATUS_LABELS` (one table, also used by `print_status`).
 - Tests: 2 new (`PipelineOrfRunnerTests`). Suite 210 → 212.
+
+### D15 The unimplemented planner is labelled as such (`main.py`, `ui/menu.py`)
+
+- Problem: the main menu advertised `[11] AI Experiment Planner` and only
+  printed "coming soon"; `docs/AUDIT_STATUS.md` lists it as P3-1
+  DEFERRED.
+- Now: the entry reads `[11] AI Experiment Planner (not implemented)` and
+  selecting it states that nothing is run or stored and that the planner
+  is deferred (P3-1). The key is kept so the menu numbering is unchanged.
+  Implementing the planner is not part of this correction.
+- Tests: 1 new (`PlannerPlaceholderTests`, drives `main.py`). Suite 212 → 213.

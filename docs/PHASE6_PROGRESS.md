@@ -61,12 +61,13 @@ IUPAC, gapped and invalid input (D14):
 | 10 | D9 CRISPR on-target site excluded from the local specificity screen | `3514617` | internal tests (both strands, identical copy, near match) | Corrected; suite 203/203; pyright unchanged; S23 recorded |
 | 11 | D8 CRISPR cut site per system, with citations | `ca2ec39` | internal tests (both strands, all four systems); literature (PMIDs 22745249, 25830891, 30166441, 26422227) | Corrected; suite 206/206; pyright unchanged |
 | 12 | D10 dead CRISPR config fields act; D11 exports in `exports/crispr` | `8145556` | internal tests (defaults unchanged) | Corrected; suite 210/210; pyright unchanged |
-| 13 | D19 pipeline `run_orf` search settings; fixed `completed` shape | this package | internal tests (equality with `core.api.find_orfs`) | Corrected; suite 212/212; pyright unchanged |
+| 13 | D19 pipeline `run_orf` search settings; fixed `completed` shape | `e47cb85` | internal tests (equality with `core.api.find_orfs`) | Corrected; suite 212/212; pyright unchanged |
+| 14 | D15 planner entry labelled "not implemented" | this package | end-to-end `main.py` test | Corrected (planner itself remains P3-1, deferred); suite 213/213 |
 
 ## Open after the current package
 
-D15–D18 and S1–S6, S8–S19, S21–S23 (see `docs/PHASE6_INITIAL_AUDIT.md`)
-until a package above closes an item. D12, D1–D11, D13, D14, D19, S7 and S20
+D16–D18 and S1–S6, S8–S19, S21–S23 (see `docs/PHASE6_INITIAL_AUDIT.md`)
+until a package above closes an item. D12, D1–D11, D13–D15, D19, S7 and S20
 are corrected.
 
 ## Handover notes (working practice)

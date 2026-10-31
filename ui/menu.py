@@ -21,7 +21,7 @@ def show_menu():
 
     print("[9] BLAST Search")
     print("[10] Literature Search")
-    print("[11] AI Experiment Planner")
+    print("[11] AI Experiment Planner (not implemented)")
 
     print("-" * 60)
 
