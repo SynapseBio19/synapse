@@ -587,3 +587,33 @@ in its own commit with its own regression tests in
   limitation (`main.py` warns when such an ORF is selected), not part of
   D2; it is the remaining gap against "translation uses the selected ORF's
   genetic code" and is listed as open in `docs/FEATURE_STATUS.md`.
+
+## Phase 6 – Sequence types (D14 with D13, 2026-10-31)
+
+D14 was investigated in twelve sub-findings (F1–F12, listed under D14 in
+`docs/PHASE6_INITIAL_AUDIT.md`); F12 is D13, and both are corrected
+together. Binding decisions for this work: no percentage threshold is
+presented as an established cut-off; a sequence whose type cannot be told
+from its content needs an explicit type before type-dependent analysis;
+protein FASTA records get a route to protein analysis. Tests are in
+`tests/test_phase6_sequence_types.py`.
+
+### D14-F2 One query-type vocabulary in BLAST (`analyses/blast.py`)
+
+- Problem: the program table declared `query_type: "protein"` while every
+  `BlastQuery` carries `sequence_type: "PROTEIN"`. Local blastp and
+  tblastn therefore always failed with "blastp expects a protein query, but
+  the query is PROTEIN.", and the BLAST menu offered no program at all for
+  a protein query. Reproduced on the previous commit with a real
+  `makeblastdb`/`blastp` run.
+- Now: the table uses `"PROTEIN"` (`QUERY_TYPES = ("DNA", "PROTEIN")`),
+  the menu lists programs with `programs_for_query_type`, and both the
+  local engine and the NCBI client check the query against the program
+  with `check_program_query_type`. The NCBI client now refuses a
+  mismatched query *before* submitting it instead of sending it to NCBI.
+- Validation: external tool execution — a 40-residue query against a
+  two-record protein database built with `makeblastdb`, searched with
+  BLAST+ 2.17.0 `blastp`, returns the correct target (skipped when BLAST+
+  is not installed).
+- Tests: 5 new (`BlastQueryTypeVocabularyTests`). Suite 151 → 156.
+- Not changed here: how a query's type is inferred (F1, next package).

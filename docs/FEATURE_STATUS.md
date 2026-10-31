@@ -33,11 +33,11 @@ simulated keystrokes (see audit §11.5).
 | Functions and classes inventoried | ~1,100 |
 | Main-menu entries | 15 |
 | Sub-menu entries inventoried | 78 |
-| Automated tests | 151, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1 + 5 D2) |
+| Automated tests | 156, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1 + 5 D2 + 5 D14-F2) |
 | Module self-tests | 12 suites, all passing (CRISPR 28, BLAST 33, mutation 44, variant 27, others aggregated) |
 | Golden-master scenarios | 12 |
 | Confirmed defects | 19 (D1–D19); corrected so far: 6 (D12, D4, D3, D5, D1, D2; 2026-10-31) |
-| Suspected / unverified concerns | 14 (S1–S14) |
+| Suspected / unverified concerns | 14 at the audit (S1–S14); S15–S22 recorded since |
 | External validations performed in this audit | 8 (audit §3, §6) |
 | Features advertised but not implemented | 1 (`[11] AI Experiment Planner`) |
 
@@ -343,11 +343,11 @@ relative to size; the 28 self-tests are the module's own fixtures.
 
 | Menu | Feature | Function | Implementation | Execution | Validation | Notes |
 |---|---|---|---|---|---|---|
-| 1 | Run BLAST Search (local) | `run_blast_analysis(engine="local")`, `LocalBlastEngine.run` | **Partially implemented** | **Execution-tested** | **Independently validated** | **Real BLAST+ 2.17.0+ run executed** (audit §6): 2 hits, coverage 100 % / 98.04 %, correct E-values and bands. **D6**: the programmatic `local_database_path` gate tests a prefix with `.exists()` and always fails. |
+| 1 | Run BLAST Search (local) | `run_blast_analysis(engine="local")`, `LocalBlastEngine.run` | **Partially implemented** | **Execution-tested** | **Independently validated** | **Real BLAST+ 2.17.0+ run executed** (audit §6): 2 hits, coverage 100 % / 98.04 %, correct E-values and bands. **D6**: the programmatic `local_database_path` gate tests a prefix with `.exists()` and always fails. Protein queries (blastp/tblastn) were rejected by a type-vocabulary mismatch and the menu offered them no program (**D14-F2**, corrected 2026-10-31; a real local blastp run is now a test). |
 | 1 | Run BLAST Search (remote) | `NCBIBlastClient.submit/status/fetch_xml/run` | Implemented | **Not tested** | Blocked by external dependency | No live call made in this audit. Privacy confirmation before sending is implemented. |
 | — | Query building | `build_query`, `build_orf_query`, `infer_sequence_type`, `normalize_sequence` | Implemented | Execution-tested | Not applicable | ORF query retains global coordinates and strand. |
 | — | FASTA query loading | `load_fasta_queries`, `_resolve_synapse_user_path` | Implemented | Execution-tested | Not applicable | |
-| 2 | Search Configuration | `BlastParameters`, `.normalized()` | Implemented | Reachable | Not applicable | Program/database compatibility self-tested. |
+| 2 | Search Configuration | `BlastParameters`, `.normalized()` | Implemented | Reachable | Not applicable | Program/database compatibility self-tested; program/query-type compatibility via `check_program_query_type` (D14-F2). |
 | 3 | BLAST Database Manager | `blast_database_manager_menu`, `LocalBlastDatabaseManager` | Implemented | Execution-tested | Not applicable | 8 sub-entries: status, download/update, verify, create custom from FASTA, remove, information, BLAST+ tool status, change root. |
 | 3.1 | Database status / scan / verify | `scan_database`, `verify_database`, `database_info`, `_parse_blastdbcmd_info` | Implemented | Execution-tested | Not applicable | 6 catalog entries correctly report `NOT_INSTALLED`. Multi-volume and alias discovery self-tested. |
 | 3.2 | Download / update NCBI database | `update_ncbi_database` | Implemented | **Not tested** | Blocked by external dependency | Would be a very large download; deliberately not run. |

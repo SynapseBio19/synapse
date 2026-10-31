@@ -205,7 +205,7 @@ PROGRAMS = {
         "description": "Nucleotide query against a nucleotide database.",
     },
     "blastp": {
-        "query_type": "protein",
+        "query_type": "PROTEIN",
         "database_type": "protein",
         "description": "Protein query against a protein database.",
     },
@@ -215,7 +215,7 @@ PROGRAMS = {
         "description": "Six-frame translated nucleotide query against protein.",
     },
     "tblastn": {
-        "query_type": "protein",
+        "query_type": "PROTEIN",
         "database_type": "nucleotide",
         "description": "Protein query against six-frame translated nucleotide sequences.",
     },
@@ -225,6 +225,29 @@ PROGRAMS = {
         "description": "Translated nucleotide query against translated nucleotide sequences.",
     },
 }
+
+# Query types use the vocabulary of BlastQuery.sequence_type.
+QUERY_TYPES = ("DNA", "PROTEIN")
+
+
+def programs_for_query_type(query_type: str) -> List[str]:
+    """BLAST programs that accept a query of this type ("DNA" or "PROTEIN")."""
+    wanted = str(query_type or "").strip().upper()
+    return [name for name, info in PROGRAMS.items() if info["query_type"] == wanted]
+
+
+def check_program_query_type(program: str, query: "BlastQuery") -> None:
+    """Raise BlastAnalysisError unless *program* accepts *query*'s type."""
+    name = str(program or "").lower().strip()
+    if name not in PROGRAMS:
+        raise BlastAnalysisError(f"Unsupported BLAST program: {name}")
+    expected = PROGRAMS[name]["query_type"]
+    if expected != str(query.sequence_type).upper():
+        raise BlastAnalysisError(
+            f"{name} expects a {expected} query, "
+            f"but the query is {query.sequence_type}."
+        )
+
 
 DATABASES = {
     "nt": {
@@ -985,6 +1008,7 @@ class NCBIBlastClient:
         max_wait: float = DEFAULT_MAX_WAIT_SECONDS,
     ) -> BlastRun:
         params = parameters.normalized()
+        check_program_query_type(params.program, query)
 
         if params.email == "":
             # NCBI can accept requests without email, but Synapse exposes this
@@ -2588,12 +2612,7 @@ class LocalBlastEngine:
         blast_executable = self.executable_manager.require(program)
 
         # Validate query type against the selected BLAST program.
-        expected_query = PROGRAMS[program]["query_type"]
-        if expected_query != query.sequence_type:
-            raise BlastAnalysisError(
-                f"{program} expects a {expected_query} query, "
-                f"but the query is {query.sequence_type}."
-            )
+        check_program_query_type(program, query)
 
         local_parameters = BlastParameters(
             program=program,
@@ -4214,11 +4233,7 @@ def blast_menu(
 
             available_query_type = search_query.sequence_type
 
-            compatible_programs = [
-                name
-                for name, info in PROGRAMS.items()
-                if info["query_type"] == available_query_type
-            ]
+            compatible_programs = programs_for_query_type(available_query_type)
 
             print("\r\nSEARCH ENGINE")
             print("[1] Local BLAST+")
