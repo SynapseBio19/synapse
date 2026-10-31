@@ -3442,22 +3442,19 @@ def run_blast_analysis(
 
     manager = LocalBlastDatabaseManager(root=local_database_root)
     if local_database_path:
-        db_path = Path(local_database_path).expanduser().resolve()
-        if not db_path.exists():
-            raise BlastAnalysisError(f"Local BLAST database path not found: {db_path}")
-        database_type = (
-            LOCAL_DATABASE_CATALOG.get(database, {}).get("type")
-            or "nucleotide"
-        )
-        database_record = LocalBlastDatabase(
-            name=database,
-            database_type=database_type,
-            path=str(db_path),
-            installed=True,
-            structurally_valid=True,
-            verification_status="USER_SUPPLIED",
-            verification_message="Database path supplied programmatically.",
-        )
+        # A BLAST database is addressed by a path prefix (".../name" for
+        # name.nin, name.nsq, ...), not by a file (audit D6). The prefix is
+        # scanned and verified like a managed database, which also records
+        # its type, title, date and size (S7).
+        prefix = Path(local_database_path).expanduser().resolve()
+        manager = LocalBlastDatabaseManager(root=prefix.parent)
+        database_record = manager.verify_database(prefix.name)
+        if not database_record.exists:
+            raise BlastAnalysisError(
+                f"No BLAST database found at prefix {prefix} "
+                f"({database_record.verification_message or database_record.verification_status})."
+            )
+        database_record.source = "User-supplied path"
     else:
         database_record = manager.scan_database(database)
 

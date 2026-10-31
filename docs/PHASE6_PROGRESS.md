@@ -55,10 +55,11 @@ IUPAC, gapped and invalid input (D14):
 | 4 | D14-F1 BLAST query type from the classifier; S20 J/U/O accepted | `7c716a2` | internal tests; external tool execution (blastp on the IUPAC-letter peptide; BLAST+ acceptance of U, O, J checked directly) | Corrected; suite 180/180; pyright unchanged |
 | 5 | D13 + D14-F4/F5/F7: one input contract; menu type gate with user declaration; API type checks; protein record route | `162ca16` | internal tests; end-to-end `main.py` run with protein, undetermined, RNA and invalid records | Corrected; suite 189/189; pyright unchanged |
 | 6 | D14-F6 protein codes B/Z/J/X/U/O keep position; masses and ranges | `343ffb7` | internal tests; external reference comparison (Biopython `protein_weights`, `molecular_weight`); one Stage 5 assertion updated (encoded the deletion) | Corrected; suite 194/194; pyright unchanged |
-| 7 | D14-F8/F9/F10 ORF search, transcription and GC counting check/normalize input | this package | internal tests; probe re-run (no silent results for foreign types) | Corrected; D14 and D13 complete; suite 197/197; pyright unchanged |
+| 7 | D14-F8/F9/F10 ORF search, transcription and GC counting check/normalize input | `d40d328` | internal tests; probe re-run (no silent results for foreign types) | Corrected; D14 and D13 complete; suite 197/197; pyright unchanged |
+| 8 | D6 + S7 programmatic local BLAST by database prefix, with provenance | this package | internal tests; external tool execution (bundled database, blastn + blastdbcmd) | Corrected; suite 200/200; pyright unchanged |
 
 ## Open after the current package
 
-D6–D11, D15–D19 and S1–S19, S21, S22 (see `docs/PHASE6_INITIAL_AUDIT.md`)
-until a package above closes an item. D12, D1–D5, D13, D14 and S20 are
-corrected.
+D7–D11, D15–D19 and S1–S6, S8–S19, S21, S22 (see `docs/PHASE6_INITIAL_AUDIT.md`)
+until a package above closes an item. D12, D1–D6, D13, D14, S7 and S20
+are corrected.

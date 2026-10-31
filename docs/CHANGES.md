@@ -781,3 +781,25 @@ With this package every D14 sub-finding (F1–F12) and D13 is corrected.
 A re-run of the read-only probe from the investigation shows each module
 either accepting a type or refusing it with a message; no module returns
 a silent result for a foreign type any more.
+
+## Phase 6 – Tier 2 functional corrections (2026-10-31)
+
+Tests are in `tests/test_phase6_tier2.py`.
+
+### D6, S7 Programmatic local BLAST with a database path (`analyses/blast.py`)
+
+- Problem: `run_blast_analysis(engine="local", local_database_path=...)`
+  tested the path with `Path.exists()`. A BLAST database is a path
+  *prefix* (`.../synapse_test` for `synapse_test.nin`, ...), so the check
+  always failed for a valid database. On that branch the database type
+  was also guessed from the catalog name, and title, date, version and
+  size stayed `None` (S7).
+- Now: the prefix is scanned and verified by `LocalBlastDatabaseManager`
+  (rooted at the prefix's folder), exactly like a managed database:
+  type and volumes from the files, title/date/sequence count from
+  `blastdbcmd -info`. A missing prefix raises a clear error, and a
+  program/database type mismatch is refused as on the managed path.
+- Validation: external tool execution — the bundled `data/local_test`
+  database addressed by its prefix gives the two hits of the audit's
+  first real run (coverage 100 % and 98.04 %) with full provenance.
+- Tests: 3 new (`LocalBlastDatabasePathTests`). Suite 197 → 200.

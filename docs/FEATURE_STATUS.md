@@ -33,10 +33,10 @@ simulated keystrokes (see audit §11.5).
 | Functions and classes inventoried | ~1,100 |
 | Main-menu entries | 15 |
 | Sub-menu entries inventoried | 78 |
-| Automated tests | 197, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1 + 5 D2 + 5 D14-F2 + 11 sequence-type classifier + 6 D14-F3/F11 + 7 D14-F1 + 9 D13/D14-F4/F5/F7 + 5 D14-F6 + 3 D14-F8–F10) |
+| Automated tests | 200, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1 + 5 D2 + 5 D14-F2 + 11 sequence-type classifier + 6 D14-F3/F11 + 7 D14-F1 + 9 D13/D14-F4/F5/F7 + 5 D14-F6 + 3 D14-F8–F10 + 3 D6) |
 | Module self-tests | 12 suites, all passing (CRISPR 28, BLAST 33, mutation 44, variant 27, others aggregated) |
 | Golden-master scenarios | 12 |
-| Confirmed defects | 19 (D1–D19); corrected so far: 8 (D12, D4, D3, D5, D1, D2, D13, D14 with all sub-findings F1–F12; 2026-10-31) |
+| Confirmed defects | 19 (D1–D19); corrected so far: 9 (D12, D4, D3, D5, D1, D2, D13, D14 with all sub-findings F1–F12, D6; 2026-10-31) |
 | Suspected / unverified concerns | 14 at the audit (S1–S14); S15–S22 recorded since |
 | External validations performed in this audit | 8 (audit §3, §6) |
 | Features advertised but not implemented | 1 (`[11] AI Experiment Planner`) |
@@ -344,7 +344,7 @@ relative to size; the 28 self-tests are the module's own fixtures.
 
 | Menu | Feature | Function | Implementation | Execution | Validation | Notes |
 |---|---|---|---|---|---|---|
-| 1 | Run BLAST Search (local) | `run_blast_analysis(engine="local")`, `LocalBlastEngine.run` | **Partially implemented** | **Execution-tested** | **Independently validated** | **Real BLAST+ 2.17.0+ run executed** (audit §6): 2 hits, coverage 100 % / 98.04 %, correct E-values and bands. **D6**: the programmatic `local_database_path` gate tests a prefix with `.exists()` and always fails. Protein queries (blastp/tblastn) were rejected by a type-vocabulary mismatch and the menu offered them no program (**D14-F2**, corrected 2026-10-31; a real local blastp run is now a test). |
+| 1 | Run BLAST Search (local) | `run_blast_analysis(engine="local")`, `LocalBlastEngine.run` | **Partially implemented** | **Execution-tested** | **Independently validated** | **Real BLAST+ 2.17.0+ run executed** (audit §6): 2 hits, coverage 100 % / 98.04 %, correct E-values and bands. The programmatic `local_database_path` branch now verifies the database prefix like a managed database (**D6**, **S7** corrected 2026-10-31; tested with real BLAST+). Protein queries (blastp/tblastn) were rejected by a type-vocabulary mismatch and the menu offered them no program (**D14-F2**, corrected 2026-10-31; a real local blastp run is now a test). |
 | 1 | Run BLAST Search (remote) | `NCBIBlastClient.submit/status/fetch_xml/run` | Implemented | **Not tested** | Blocked by external dependency | No live call made in this audit. Privacy confirmation before sending is implemented. |
 | — | Query building | `build_query`, `build_orf_query`, `infer_sequence_type`, `normalize_sequence` | Implemented | Execution-tested | Not applicable | ORF query retains global coordinates and strand. The query type comes from `core.alphabets`; an undetermined type is asked for (menu) or refused (API), RNA is searched as DNA with a note (**D14-F1**, corrected 2026-10-31). |
 | — | FASTA query loading | `load_fasta_queries`, `_resolve_synapse_user_path` | Implemented | Execution-tested | Not applicable | |
@@ -362,7 +362,7 @@ relative to size; the 28 self-tests are the module's own fixtures.
 | 8 | Compare BLAST Runs | `compare_blast_runs`, `BlastComparison` | Implemented | Execution-tested | Not applicable | |
 | 9 | Export Results | `export_json`, `export_csv`, `export_text`, `run_to_dict`, `run_to_json` | Implemented | Execution-tested | Not applicable | |
 | 10 | Full BLAST Report | `build_text_report` | Implemented | **Execution-tested** | Not applicable | Rendered from the real run. |
-| — | Provenance | `BlastRunMetadata`, `database_details`, `reported_parameters` | Partially implemented | Execution-tested | Not applicable | Effective parameters, BLAST version, engine, local path and timestamps all recorded. **S7**: title/date/version `None` on the user-supplied-path branch. |
+| — | Provenance | `BlastRunMetadata`, `database_details`, `reported_parameters` | Partially implemented | Execution-tested | Not applicable | Effective parameters, BLAST version, engine, local path and timestamps all recorded. Title/date/size are also recorded on the user-supplied-path branch (**S7** corrected 2026-10-31). |
 | — | RID resume | — | **Not implemented** | Not applicable | Not applicable | **S6**: `submit`/`status`/`fetch_xml` exist; "resume" appears nowhere and no menu entry offers it. P1-7. |
 | — | BLAST+ executable management | `BlastExecutableManager` (`available`, `resolve`, `require`, …) | Implemented | **Execution-tested** | Not applicable | Correctly located BLAST+ 2.17.0+ in `C:\Program Files\NCBI\`. |
 | — | Short-query rescue | `_should_run_short_query_rescue`, task configuration | Implemented | Execution-tested | Not applicable | Self-tested policy for short queries. |
