@@ -105,13 +105,19 @@ def analyze_rna(record_or_sequence: Any, *, profile_window: int = 100,
 def analyze_protein_from_cds(cds: str, *, initiator_start: bool = True,
                              genetic_code: int = 1, description: str = "CDS") -> AnalysisResult:
     """Translate a coding sequence (frame +1) and analyse the protein."""
+    from analyses.orf import is_initiation_codon
     from analyses.protein import analyze_complete_protein
 
     sequence = normalize_dna(cds)
     data = analyze_complete_protein("", rna=sequence.replace("T", "U"),
                                     initiator_start=initiator_start, genetic_code=genetic_code)
+    warnings: List[str] = []
+    if initiator_start and len(sequence) >= 3 and not is_initiation_codon(sequence[:3], genetic_code):
+        warnings.append(f"First codon {sequence[:3]} is not an initiation codon of NCBI table "
+                        f"{genetic_code}; it was translated as an internal codon, not as Met.")
     return _result("protein", data, sequence, description,
                    parameters={"initiator_start": initiator_start, "genetic_code": genetic_code},
+                   warnings=warnings,
                    limitations=["Physicochemical values are sequence-based estimates."])
 
 

@@ -33,10 +33,10 @@ simulated keystrokes (see audit §11.5).
 | Functions and classes inventoried | ~1,100 |
 | Main-menu entries | 15 |
 | Sub-menu entries inventoried | 78 |
-| Automated tests | 139, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5) |
+| Automated tests | 146, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1) |
 | Module self-tests | 12 suites, all passing (CRISPR 28, BLAST 33, mutation 44, variant 27, others aggregated) |
 | Golden-master scenarios | 12 |
-| Confirmed defects | 19 (D1–D19); corrected so far: 4 (D12, D4, D3, D5; 2026-10-31) |
+| Confirmed defects | 19 (D1–D19); corrected so far: 5 (D12, D4, D3, D5, D1; 2026-10-31) |
 | Suspected / unverified concerns | 14 (S1–S14) |
 | External validations performed in this audit | 8 (audit §3, §6) |
 | Features advertised but not implemented | 1 (`[11] AI Experiment Planner`) |
@@ -115,7 +115,8 @@ relative to its use (every session runs it).
 | — | Shine–Dalgarno screen | `analyze_shine_dalgarno` | Implemented | Execution-tested | Not applicable | Fixed motif list, no energy model. |
 | — | CDS quality, heuristic score | `calculate_cds_quality`, `calculate_orf_confidence` | Implemented | Execution-tested | Not applicable | **D18**. |
 | — | ORF density, frame statistics | `calculate_orf_density`, `calculate_frame_statistics` | Implemented | Execution-tested | Not applicable | |
-| — | ORF translation | `translate_orf_sequence` | **Partially implemented** | Execution-tested | Not applicable | **D1** wrong initiator set for table 1; **D2** ignores the ORF's own `genetic_code` by default. |
+| — | ORF translation | `translate_orf_sequence`, `initiation_codons`, `is_initiation_codon` | **Partially implemented** | Execution-tested | **Independently validated** (Biopython, tables 1/2/4/11) | **D1 corrected 2026-10-31**: initiator Met only for initiation codons of the genetic code (table 1: ATG/CTG/GTG/TTG); internal codons use the elongation code. **D2** ignores the ORF's own `genetic_code` by default. |
+| — | Start-codon classification and scores | `classify_start_codon`, `calculate_cds_quality`, `calculate_orf_confidence` | Partially implemented | Execution-tested | Not applicable | **S19**: still use the fixed ATG/GTG/TTG set — a CTG ORF is classified "None" and scores 10 points lower than an equivalent GTG ORF. |
 | — | Circular / origin-spanning ORFs | — | **Not implemented** | Not applicable | Not applicable | `core.api.find_orfs` adds a limitation note for circular records. |
 
 Test coverage: 19 test references — the best-covered module.
@@ -148,7 +149,7 @@ Test coverage: 2 test references.
 
 | Menu | Feature | Function | Implementation | Execution | Validation | Notes |
 |---|---|---|---|---|---|---|
-| — | Translation | `translate_protein`, `analyze_translation`, `resolve_codon` | Implemented | Execution-tested | Independently validated | GTG-ORF initiator → M matches `Bio.Seq.translate(table=11, cds=True)`. |
+| — | Translation | `translate_protein`, `analyze_translation`, `resolve_codon` | Implemented | Execution-tested | Independently validated | GTG-ORF initiator → M matches `Bio.Seq.translate(table=11, cds=True)`. **D1 corrected 2026-10-31**: with `initiator_start=True` only an initiation codon of the genetic code becomes Met (previously any resolved first codon); same rule as the ORF translator. |
 | — | Unresolved-residue handling | `get_positional_protein`, `get_resolved_protein` | Implemented | Execution-tested | Not applicable | Stage 5: `?` keeps its position; windows containing it are skipped, not shifted. |
 | 1 | Protein Overview | `_print_protein_overview` | Implemented | Reachable | Not applicable | |
 | 2 | Translation & Sequence | `_print_translation_and_sequence` | Implemented | Reachable | Not applicable | |

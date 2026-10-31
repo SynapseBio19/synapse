@@ -392,5 +392,100 @@ class CloningCircularTopologyTests(unittest.TestCase):
         self.assertEqual((kwargs["vector_topology"], kwargs["insert_topology"]), ("circular", "linear"))
 
 
+# ----------------------------------------------------------------------
+# D1: one initiation-codon rule, taken from the genetic code
+# ----------------------------------------------------------------------
+class OrfInitiationCodonTests(unittest.TestCase):
+    TABLES = (1, 2, 4, 11)
+
+    def test_table1_ctg_initiation_is_methionine_on_every_path(self):
+        from analyses import orf as O, protein as P
+        from core import api
+        sequence = "CTG" + "GCA" * 30 + "TAA"
+        [orf] = [o for o in O.find_orfs(sequence, start_codon_policy="table_starts", min_length=30)
+                 if o["start_codon"] == "CTG"]
+        expected = "M" + "A" * 30
+        self.assertEqual(O.translate_orf_sequence(orf["sequence"]), expected)
+        self.assertEqual(P.analyze_translation(orf["sequence"].replace("T", "U"),
+                                               initiator_start=True)["protein"], expected)
+        self.assertEqual(api.analyze_protein_from_cds(orf["sequence"]).data["protein"], expected)
+
+    def test_initiation_codons_come_from_the_genetic_code(self):
+        from analyses import orf as O
+        from core.seqtools import get_genetic_code
+        self.assertEqual(O.initiation_codons(1), frozenset({"ATG", "CTG", "GTG", "TTG"}))
+        for table in self.TABLES:
+            with self.subTest(table=table):
+                ncbi = get_genetic_code(table).start_codons
+                self.assertLessEqual(ncbi, O.initiation_codons(table))
+                if table != 1:  # only table 1 adds Synapse's documented GTG policy
+                    self.assertEqual(O.initiation_codons(table), ncbi)
+
+    def test_every_initiation_codon_is_decoded_as_methionine(self):
+        from analyses import orf as O, protein as P
+        for table in self.TABLES:
+            for codon in sorted(O.initiation_codons(table)):
+                with self.subTest(table=table, codon=codon):
+                    cds = codon + "AAATTTTAA"
+                    self.assertEqual(O.translate_orf_sequence(cds, genetic_code=table), "MKF")
+                    self.assertEqual(P.analyze_translation(cds.replace("T", "U"), initiator_start=True,
+                                                           genetic_code=table)["protein"], "MKF")
+
+    def test_internal_codons_keep_their_amino_acid(self):
+        from analyses import orf as O, protein as P
+        for table, cds, expected in ((1, "ATGCTGGTGTTGTAA", "MLVL"),
+                                     (11, "ATGGTGATATTGTAA", "MVIL"),
+                                     (2, "ATGATAGTGTAA", "MMV")):
+            with self.subTest(table=table):
+                self.assertEqual(O.translate_orf_sequence(cds, genetic_code=table), expected)
+                self.assertEqual(P.analyze_translation(cds.replace("T", "U"), initiator_start=True,
+                                                       genetic_code=table)["protein"], expected)
+
+    def test_a_non_initiation_first_codon_is_not_forced_to_methionine(self):
+        from analyses import orf as O, protein as P
+        from core import api
+        self.assertEqual(O.translate_orf_sequence("GCTAAATTTTAA"), "AKF")
+        translation = P.analyze_translation("GCUAAAUUUUAA", initiator_start=True)
+        self.assertEqual(translation["protein"], "AKF")
+        self.assertFalse(translation["codon_records"][0]["initiator"])
+        result = api.analyze_protein_from_cds("GCTAAATTTTAA")
+        self.assertEqual(result.data["protein"], "AKF")
+        self.assertTrue(any("GCT" in w and "initiation codon" in w for w in result.warnings))
+
+    def test_ambiguous_first_codon_is_an_initiator_only_if_every_reading_is(self):
+        from analyses import orf as O, protein as P
+        for codon, table, expected in (("WTG", 1, "M"),   # ATG / TTG: both initiation codons
+                                       ("YTG", 1, "M"),   # CTG / TTG: both initiation codons
+                                       ("NTG", 1, "M"),   # ATG / CTG / GTG / TTG: all initiation codons
+                                       ("NNG", 1, "?"),   # includes non-initiation codons, several amino acids
+                                       ("RTA", 2, "?")):  # ATA is a table-2 start, GTA (Val) is not
+            with self.subTest(codon=codon, table=table):
+                self.assertEqual(O.translate_orf_sequence(codon + "AAATAA", genetic_code=table)[0], expected)
+                self.assertEqual(P.analyze_translation(codon.replace("T", "U") + "AAAUAA", initiator_start=True,
+                                                       genetic_code=table)["protein"][0], expected)
+
+    @unittest.skipUnless(__import__("importlib").util.find_spec("Bio"), "Biopython (reference extra) not installed")
+    def test_translation_agrees_with_biopython(self):
+        import itertools
+        from Bio.Seq import Seq
+        from Bio.Data.CodonTable import unambiguous_dna_by_id
+        from analyses import orf as O
+        codons = ["".join(c) for c in itertools.product("TCAG", repeat=3)]
+        for table in self.TABLES:
+            ncbi_starts = set(unambiguous_dna_by_id[table].start_codons)
+            with self.subTest(table=table, part="internal codons"):
+                for codon in codons:
+                    reference = str(Seq("ATG" + codon).translate(table=table))[1:]
+                    ours = O.translate_orf_sequence("ATG" + codon, genetic_code=table)[1:]
+                    self.assertEqual(ours, "" if reference == "*" else reference, codon)
+            with self.subTest(table=table, part="first codon"):
+                decoded_as_met = {c for c in codons if O.translate_orf_sequence(c + "AAA", genetic_code=table)[:1] == "M"}
+                elongation_met = {c for c in codons if str(Seq(c).translate(table=table)) == "M"}
+                for codon in ncbi_starts:  # Biopython's cds=True initiator rule
+                    self.assertEqual(str(Seq(codon + "AAATAA").translate(table=table, cds=True)), "MK")
+                synapse_policy = {"GTG"} if table == 1 else set()
+                self.assertEqual(decoded_as_met, ncbi_starts | synapse_policy | elongation_met)
+
+
 if __name__ == "__main__":
     unittest.main()

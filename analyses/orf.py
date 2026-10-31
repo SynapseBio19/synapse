@@ -163,6 +163,33 @@ def start_codons_for(genetic_code=1, start_codon_policy=None):
     return set(START_CODON_POLICIES[policy])
 
 
+def initiation_codons(genetic_code=1):
+    """Codons that can initiate an ORF in a genetic code (audit D1).
+
+    The union of the start codons of every start-codon policy for the
+    table: the NCBI start codons of that table (core.seqtools, checked
+    against Biopython) plus, for table 1, Synapse's documented
+    "atg_and_alternative" policy (ATG, GTG, TTG). As the first codon of an
+    ORF such a codon is the initiation codon and is decoded as methionine;
+    anywhere else it is read with the elongation code.
+    """
+    policies = list(START_CODON_POLICIES) + ["table_starts"]
+    return frozenset().union(
+        *(start_codons_for(genetic_code, policy) for policy in policies)
+    )
+
+
+def is_initiation_codon(codon, genetic_code=1):
+    """True when every IUPAC reading of the codon is an initiation codon.
+
+    This is the rule the ORF finder applies to a "definite" start codon,
+    so the codon that starts a Synapse ORF is always decoded as initiator.
+    Accepts DNA or RNA letters.
+    """
+    codon = str(codon).upper().replace("U", "T")
+    return analyze_codon_identity(codon, initiation_codons(genetic_code)) == "definite"
+
+
 def _genetic_code_name(genetic_code=1):
     if genetic_code in (None, 1):
         return "NCBI translation table 1 (standard)"
@@ -2643,12 +2670,12 @@ def translate_orf_sequence(orf_sequence, initiator_start=True, genetic_code=1):
     as an amino-acid character.
 
     initiator_start=True (default, because every Synapse ORF begins at its
-    start codon): a definite start codon in position 1 -- ATG, GTG or TTG --
-    is decoded as methionine, as initiator tRNA does (audit P0-8). For
-    genetic_code != 1, the NCBI start codons of that table are used.
+    start codon): a first codon that is an initiation codon of the genetic
+    code (is_initiation_codon; table 1: ATG, CTG, GTG, TTG) is decoded as
+    methionine, as initiator tRNA does (audits P0-8, D1). Any other first
+    codon, and every later codon, is read with the elongation code.
     """
     codon_table = codon_table_for(genetic_code)
-    initiators = ALL_START_CODONS if genetic_code in (None, 1) else start_codons_for(genetic_code, "table_starts")
     protein = []
 
     for position in range(0, len(orf_sequence) - 2, 3):
@@ -2657,7 +2684,7 @@ def translate_orf_sequence(orf_sequence, initiator_start=True, genetic_code=1):
         if (
             position == 0
             and initiator_start
-            and codon in initiators
+            and is_initiation_codon(codon, genetic_code)
         ):
             protein.append("M")
             continue

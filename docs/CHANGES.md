@@ -518,3 +518,46 @@ in its own commit with its own regression tests in
   insert donor, the pipeline path, and a scripted run of the menu from
   Restriction & Cloning to the planner. Suite 132 → 139.
 - Not changed (recorded as S17): the cloning digest's cut coordinates.
+
+### D1 One initiation-codon rule, taken from the genetic code (`analyses/orf.py`, `analyses/protein.py`, `core/api.py`)
+
+- Problem: the two translators decided differently whether the first
+  codon is decoded as initiator Met, and neither followed the genetic
+  code. `orf.translate_orf_sequence` used a hard-coded set ATG/GTG/TTG for
+  table 1, so a CTG-initiated ORF (found with `table_starts`) translated as
+  `LAAA…`. `protein.analyze_translation(initiator_start=True)` — the path
+  of the ORF → Protein menu and of `core.api.analyze_protein_from_cds` —
+  turned any resolved first codon into Met, so a CDS beginning with GCT
+  (Ala) translated as `MKF…`. The same CTG ORF therefore gave `L…` in one
+  path and `M…` in the other.
+- Now: `orf.initiation_codons(table)` is the union of the start codons of
+  every Synapse start-codon policy for the table — the NCBI start codons
+  (`core.seqtools`, verified against Biopython) plus, for table 1 only,
+  the documented `atg_and_alternative` policy's GTG. Table 1:
+  ATG/CTG/GTG/TTG; tables 2, 4, 11: exactly NCBI's start set.
+  `orf.is_initiation_codon(codon, table)` is true when every IUPAC
+  reading is an initiation codon — the rule the ORF finder already
+  applies to a "definite" start. Both translators use it for the first
+  codon; every other codon is read with the elongation code of the table.
+  `core.api.analyze_protein_from_cds` warns when `initiator_start=True`
+  but the first codon is not an initiation codon.
+- Behavior changes: CTG (table 1) and definite IUPAC initiators such as
+  WTG/YTG/NTG now give Met in the ORF translator; a non-initiation first
+  codon is no longer forced to Met by the protein module. Unchanged: every
+  ORF found by the ORF finder (its first codon is always an initiation
+  codon), GTG/TTG → Met in table 1 (P0-8), all internal codons, the golden
+  snapshots.
+- GTG in table 1 is not an NCBI table-1 start codon; it stays an
+  initiation codon because Synapse's user-selectable `atg_and_alternative`
+  policy (approved with P0-8) searches for GTG-initiated ORFs. This is
+  the one intentional difference from Biopython's `cds=True` rule and is
+  asserted as such in the test.
+- Validation: against Biopython 1.88 for tables 1, 2, 4, 11 — every
+  internal codon translates as in `Bio.Seq.translate`, and the set of
+  first codons decoded as Met equals Biopython's start codons (plus GTG
+  for table 1) together with the codons that encode Met anyway.
+- Tests: 7 new (`OrfInitiationCodonTests`; the Biopython comparison is
+  skipped when the `reference` extra is not installed). Suite 139 → 146.
+- Found and recorded, not changed: S19 (start-codon *classification* and
+  the CDS-quality / heuristic scores still use the fixed ATG/GTG/TTG set,
+  so a CTG ORF is classified "None" and scores lower).

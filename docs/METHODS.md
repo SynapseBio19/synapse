@@ -47,7 +47,12 @@ use 0-based inclusive `start <= stop` on the forward strand.
   short ORFs, non-ATG starts and nested ORFs exist and can be enabled.
 - `LEGACY_ORF_SETTINGS` reproduces the pre-2026-10-29 behavior (10 nt,
   ATG/GTG/TTG, all starts, heuristic ranking); a test proves equivalence.
-- The first codon of an ORF is translated as initiator Met (also GTG/TTG).
+- The first codon of an ORF is translated as initiator Met when it is an
+  initiation codon of the ORF's genetic code (`orf.initiation_codons`:
+  the NCBI start codons of the table plus, for table 1, Synapse's GTG
+  policy; table 1 = ATG, CTG, GTG, TTG). An IUPAC codon counts only if
+  every reading is an initiation codon. Internal codons always use the
+  elongation code (e.g. internal CTG = Leu, internal GTG = Val).
 - The "heuristic score" is a ranking aid, not a probability of coding.
 - Not implemented: 5′-partial ORFs without a start codon, ORFs across the
   origin of circular sequences.
@@ -57,7 +62,10 @@ use 0-based inclusive `start <= stop` on the forward strand.
 ## RNA and protein (`analyses/rna.py`, `analyses/protein.py`)
 
 - Translation in frame +1; ambiguous codons give `?` unless all expansions
-  encode one amino acid.
+  encode one amino acid. With `initiator_start=True` (protein analysis of
+  a selected ORF, `core.api.analyze_protein_from_cds`) the first codon is
+  decoded as Met only if it is an initiation codon of the genetic code —
+  the same rule as the ORF translator.
 - Protein analysis uses the genetic code of the selected ORF. The RNA
   module's three-frame codon view always uses table 1.
 - Physicochemical values (mass, pI, GRAVY and similar) are sequence-based

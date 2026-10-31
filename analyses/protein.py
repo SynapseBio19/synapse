@@ -681,12 +681,14 @@ def analyze_translation(rna, initiator_start=False, genetic_code=1):
     """Translate RNA in frame +1 with the standard genetic code.
 
     initiator_start=True states that the first codon is the selected start
-    codon of an ORF. Alternative initiation codons (GUG, UUG, ...) are then
+    codon of an ORF. If it is an initiation codon of the genetic code
+    (analyses.orf.is_initiation_codon; table 1: AUG, CUG, GUG, UUG) it is
     decoded as methionine, because initiator tRNA inserts (formyl-)Met at
-    the start codon (audit P0-8). For arbitrary sequence windows leave it
-    False: the first codon is translated with the elongation code.
+    the start codon (audits P0-8, D1); any other first codon is read with
+    the elongation code. For arbitrary sequence windows leave it False.
     genetic_code selects the NCBI translation table (default 1, standard).
     """
+    from analyses.orf import is_initiation_codon
 
     if not isinstance(rna, str):
         return {
@@ -753,9 +755,10 @@ def analyze_translation(rna, initiator_start=False, genetic_code=1):
         if (
             initiator_start
             and codon_index == 0
-            and result["status"] == "resolved"
+            and is_initiation_codon(codon, genetic_code)
         ):
             result = dict(result)
+            result["status"] = "resolved"
             result["amino_acid"] = "M"
             result["possibilities"] = ["M"]
             initiator = True
