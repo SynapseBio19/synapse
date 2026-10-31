@@ -10,14 +10,25 @@ The functions are thin wrappers: the scientific work is done by the
 existing modules in ``analyses/``. Parameter defaults are those of the
 underlying modules, so results are identical to the menus' results for the
 same settings.
+
+Sequence types (audit D14): every entry point states which types it
+accepts and checks its input with ``core.alphabets``. A sequence whose type
+cannot be told from its letters needs ``sequence_type=``; a wrong type
+raises ``core.alphabets.SequenceTypeError`` (a ``ValueError``). Nucleotide
+analyses accept RNA and analyze it in the DNA alphabet (U read as T),
+recording that as a warning. Restriction digests and CRISPR guide design
+accept DNA only; ``analyze_protein`` takes protein sequences.
 """
 
 from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Sequence
 
+from core.alphabets import DNA, PROTEIN, RNA, normalize_sequence, require_sequence_type
 from core.models import AnalysisResult, SequenceRecord, sha256_text
-from core.seqtools import normalize_dna
+
+_NUCLEOTIDE = (DNA, RNA)
+_RNA_AS_DNA = "RNA input was analyzed in the DNA alphabet (U read as T)."
 
 
 def _result(module: str, data: Any, sequence: str, description: str, *,
@@ -35,12 +46,29 @@ def _result(module: str, data: Any, sequence: str, description: str, *,
     )
 
 
-def _sequence_of(record_or_sequence: Any) -> tuple[str, str, str]:
-    """Return (sequence, description, topology) for a record or a plain string."""
+def _sequence_of(record_or_sequence: Any, *, accepted: Sequence[str] = _NUCLEOTIDE,
+                 sequence_type: Optional[str] = None,
+                 context: str = "This analysis") -> tuple[str, str, str, List[str]]:
+    """Return (sequence, description, topology, warnings) after the type check.
+
+    A record's own declared type is used unless *sequence_type* is given.
+    RNA accepted by a nucleotide analysis is converted to the DNA alphabet,
+    with a warning.
+    """
     if isinstance(record_or_sequence, SequenceRecord):
-        return (record_or_sequence.sequence, record_or_sequence.identifier,
-                record_or_sequence.topology)
-    return normalize_dna(str(record_or_sequence)), "sequence", "linear"
+        raw, description, topology = (record_or_sequence.sequence, record_or_sequence.identifier,
+                                      record_or_sequence.topology)
+        declared = sequence_type or record_or_sequence.declared_type
+    else:
+        raw, description, topology = str(record_or_sequence), "sequence", "linear"
+        declared = sequence_type
+    result = require_sequence_type(raw, accepted, declared=declared, context=context)
+    sequence = normalize_sequence(raw)
+    warnings: List[str] = []
+    if result.sequence_type == RNA and DNA in accepted:
+        sequence = sequence.replace("U", "T")
+        warnings.append(_RNA_AS_DNA)
+    return sequence, description, topology, warnings
 
 
 # ----------------------------------------------------------------------
@@ -58,23 +86,27 @@ def load_records(path: str) -> List[SequenceRecord]:
 # Analyses
 # ----------------------------------------------------------------------
 def sequence_overview(record_or_sequence: Any, *, profile_window: int = 100,
-                      profile_step: int = 1) -> AnalysisResult:
+                      profile_step: int = 1, sequence_type: Optional[str] = None) -> AnalysisResult:
     from analyses.sequence import analyze_sequence
 
-    sequence, description, _ = _sequence_of(record_or_sequence)
+    sequence, description, _, warnings = _sequence_of(
+        record_or_sequence, sequence_type=sequence_type, context="The sequence overview")
     data = analyze_sequence(sequence, profile_window=profile_window, profile_step=profile_step)
     return _result("sequence", data, sequence, description,
-                   parameters={"profile_window": profile_window, "profile_step": profile_step})
+                   parameters={"profile_window": profile_window, "profile_step": profile_step},
+                   warnings=warnings)
 
 
 def find_orfs(record_or_sequence: Any, *, min_length: Optional[int] = None,
               start_codon_policy: Optional[str] = None, nested: Optional[bool] = None,
               ranking: Optional[str] = None, include_partial: bool = True,
-              genetic_code: int = 1, top_n: int = 5) -> AnalysisResult:
+              genetic_code: int = 1, top_n: int = 5,
+              sequence_type: Optional[str] = None) -> AnalysisResult:
     """ORF search; ``None`` means the module default (see docs/METHODS.md)."""
     from analyses import orf as O
 
-    sequence, description, topology = _sequence_of(record_or_sequence)
+    sequence, description, topology, warnings = _sequence_of(
+        record_or_sequence, sequence_type=sequence_type, context="ORF search")
     data = O.analyze_orfs_enhanced(
         sequence,
         include_partial=include_partial,
@@ -89,28 +121,33 @@ def find_orfs(record_or_sequence: Any, *, min_length: Optional[int] = None,
     if topology == "circular":
         limitations.append("ORFs spanning the origin of a circular sequence are not reported.")
     return _result("orf", data, sequence, description,
-                   parameters=data.get("parameters", {}), limitations=limitations)
+                   parameters=data.get("parameters", {}), warnings=warnings,
+                   limitations=limitations)
 
 
 def analyze_rna(record_or_sequence: Any, *, profile_window: int = 100,
-                profile_step: int = 1) -> AnalysisResult:
+                profile_step: int = 1, sequence_type: Optional[str] = None) -> AnalysisResult:
+    """RNA analysis of a DNA template or an RNA sequence."""
     from analyses.rna import analyze_rna as _analyze_rna
 
-    sequence, description, _ = _sequence_of(record_or_sequence)
+    sequence, description, _, warnings = _sequence_of(
+        record_or_sequence, sequence_type=sequence_type, context="RNA analysis")
     data = _analyze_rna(sequence, profile_window=profile_window, profile_step=profile_step)
     return _result("rna", data, sequence, description,
-                   parameters={"profile_window": profile_window, "profile_step": profile_step})
+                   parameters={"profile_window": profile_window, "profile_step": profile_step},
+                   warnings=warnings)
 
 
 def analyze_protein_from_cds(cds: Any, *, initiator_start: bool = True,
                              genetic_code: Optional[int] = None,
-                             description: str = "CDS") -> AnalysisResult:
+                             description: str = "CDS",
+                             sequence_type: Optional[str] = None) -> AnalysisResult:
     """Translate a coding sequence (frame +1) and analyze the protein.
 
-    ``cds`` is a DNA string or an ORF dict from ``find_orfs``. An ORF is
-    translated with its own genetic code; an explicit, different
+    ``cds`` is a DNA or RNA string or an ORF dict from ``find_orfs``. An
+    ORF is translated with its own genetic code; an explicit, different
     ``genetic_code`` raises ``ValueError``. A string uses ``genetic_code``
-    (default 1).
+    (default 1). A protein sequence is refused; use ``analyze_protein``.
     """
     from analyses.orf import is_initiation_codon
     from analyses.protein import analyze_complete_protein
@@ -124,10 +161,10 @@ def analyze_protein_from_cds(cds: Any, *, initiator_start: bool = True,
         cds = cds["sequence"]
     genetic_code = 1 if genetic_code is None else int(genetic_code)
 
-    sequence = normalize_dna(cds)
+    sequence, _, _, warnings = _sequence_of(cds, sequence_type=sequence_type,
+                                            context="Translation")
     data = analyze_complete_protein("", rna=sequence.replace("T", "U"),
                                     initiator_start=initiator_start, genetic_code=genetic_code)
-    warnings: List[str] = []
     if initiator_start and len(sequence) >= 3 and not is_initiation_codon(sequence[:3], genetic_code):
         warnings.append(f"First codon {sequence[:3]} is not an initiation codon of NCBI table "
                         f"{genetic_code}; it was translated as an internal codon, not as Met.")
@@ -137,33 +174,60 @@ def analyze_protein_from_cds(cds: Any, *, initiator_start: bool = True,
                    limitations=["Physicochemical values are sequence-based estimates."])
 
 
+def analyze_protein(record_or_sequence: Any, *, sequence_type: Optional[str] = None) -> AnalysisResult:
+    """Analyze a protein sequence (composition, physicochemical estimates).
+
+    A sequence of letters that are also nucleotide codes (e.g. ``MKVHDANWYSK``)
+    needs ``sequence_type="PROTEIN"`` (or a record declared as protein).
+    """
+    from analyses.protein import analyze_complete_protein
+
+    protein, description, _, warnings = _sequence_of(
+        record_or_sequence, accepted=(PROTEIN,), sequence_type=sequence_type,
+        context="Protein analysis")
+    data = analyze_complete_protein(protein)
+    return _result("protein", data, protein, description, warnings=warnings,
+                   limitations=["Physicochemical values are sequence-based estimates."])
+
+
 def restriction_digest(record_or_sequence: Any, enzymes: Sequence[str], *,
                        topology: Optional[str] = None,
-                       include_possible: bool = False) -> AnalysisResult:
+                       include_possible: bool = False,
+                       sequence_type: Optional[str] = None) -> AnalysisResult:
+    """Restriction digest of a DNA sequence (restriction enzymes cut DNA; RNA is refused)."""
     from analyses.restriction import perform_digest
 
-    sequence, description, record_topology = _sequence_of(record_or_sequence)
+    sequence, description, record_topology, warnings = _sequence_of(
+        record_or_sequence, accepted=(DNA,), sequence_type=sequence_type,
+        context="A restriction digest")
     topology = topology or record_topology
     data = perform_digest(sequence, list(enzymes), topology=topology,
                           include_possible=include_possible)
     return _result("restriction", data, sequence, description,
                    parameters={"enzymes": list(enzymes), "topology": topology,
                                "include_possible": include_possible},
+                   warnings=warnings,
                    limitations=["Methylation notes are informational; blocking by methylation and star activity are not modelled."])
 
 
 def design_primers(record_or_sequence: Any, target_start: int = 0,
-                   target_end: Optional[int] = None, *, config: Any = None) -> AnalysisResult:
-    """Primer-pair design; ``config`` is a ``ProfessionalPrimerConfig``."""
+                   target_end: Optional[int] = None, *, config: Any = None,
+                   sequence_type: Optional[str] = None) -> AnalysisResult:
+    """Primer-pair design; ``config`` is a ``ProfessionalPrimerConfig``.
+
+    An RNA template is designed on in the DNA alphabet (its cDNA sequence).
+    """
     from analyses import primer as P
 
-    sequence, description, _ = _sequence_of(record_or_sequence)
+    sequence, description, _, warnings = _sequence_of(
+        record_or_sequence, sequence_type=sequence_type, context="Primer design")
     config = config if config is not None else P.ProfessionalPrimerConfig()
     data = P.design_primers_professional(sequence, target_start, target_end, config=config)
     thermo = config.thermodynamics
     return _result("primer", data, sequence, description,
                    parameters={"target_start": target_start, "target_end": target_end,
                                "config": config},
+                   warnings=warnings,
                    limitations=[
                        "Tm values are nearest-neighbor model predictions "
                        f"({getattr(thermo, 'nn_parameter_set', 'santalucia_1998')}, "
@@ -173,15 +237,20 @@ def design_primers(record_or_sequence: Any, target_start: int = 0,
 
 
 def compare_sequences(reference: str, variant: str, *, reference_name: str = "Reference",
-                      variant_name: str = "Variant") -> AnalysisResult:
+                      variant_name: str = "Variant",
+                      sequence_type: Optional[str] = None) -> AnalysisResult:
+    """Nucleotide comparison; *sequence_type* applies to both sequences."""
     from analyses.mutation import CODING_FRAME_ASSUMPTION, compare_sequences as _compare
 
-    ref = normalize_dna(reference)
-    data = _compare(ref, normalize_dna(variant), reference_name=reference_name,
-                    variant_name=variant_name)
+    ref, _, _, ref_warnings = _sequence_of(reference, sequence_type=sequence_type,
+                                           context="Sequence comparison (reference)")
+    alt, _, _, alt_warnings = _sequence_of(variant, sequence_type=sequence_type,
+                                           context="Sequence comparison (variant)")
+    data = _compare(ref, alt, reference_name=reference_name, variant_name=variant_name)
+    warnings = list(dict.fromkeys(ref_warnings + alt_warnings)) + list(data.notes)
     return _result("mutation", data, ref, reference_name,
                    parameters={"alignment": "global (Needleman-Wunsch), match 2, mismatch -1, gap -2"},
-                   warnings=list(data.notes), limitations=[CODING_FRAME_ASSUMPTION])
+                   warnings=warnings, limitations=[CODING_FRAME_ASSUMPTION])
 
 
 def analyze_vcf(path: str, *, contig_references: Optional[Dict[str, str]] = None,
@@ -253,19 +322,24 @@ def analyze_vcf(path: str, *, contig_references: Optional[Dict[str, str]] = None
 
 
 def design_crispr_guides(record_or_sequence: Any, *, system: str = "SpCas9",
-                         selected_orf: Optional[Any] = None, config: Any = None) -> AnalysisResult:
+                         selected_orf: Optional[Any] = None, config: Any = None,
+                         sequence_type: Optional[str] = None) -> AnalysisResult:
+    """CRISPR guide design on a DNA target (RNA is refused)."""
     from analyses.crispr import run_crispr_analysis
 
-    sequence, description, _ = _sequence_of(record_or_sequence)
+    sequence, description, _, warnings = _sequence_of(
+        record_or_sequence, accepted=(DNA,), sequence_type=sequence_type,
+        context="CRISPR guide design")
     data = run_crispr_analysis(sequence, sequence_name=description, selected_orf=selected_orf,
                                system=system, config=config)
     return _result("crispr", data, sequence, description,
                    parameters={"system": system, "orf_restricted": selected_orf is not None},
+                   warnings=warnings,
                    limitations=["Off-target search covers only the supplied sequence, not a genome."])
 
 
 __all__ = [
     "load_records", "sequence_overview", "find_orfs", "analyze_rna", "analyze_protein_from_cds",
-    "restriction_digest", "design_primers", "compare_sequences", "analyze_vcf",
+    "analyze_protein", "restriction_digest", "design_primers", "compare_sequences", "analyze_vcf",
     "design_crispr_guides",
 ]

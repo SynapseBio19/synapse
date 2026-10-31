@@ -549,8 +549,14 @@ class SynapsePipeline:
     # ========================================================
 
     def attach_record(self, record: SequenceRecord) -> None:
-        """Attach provenance (file, hash, topology) for the loaded sequence."""
-        if record.sequence != self.context.sequence:
+        """Attach provenance (file, hash, topology, sequence type) for the loaded sequence.
+
+        An RNA record matches a loaded sequence in the DNA alphabet (U read as T).
+        """
+        expected = record.sequence
+        if record.alphabet == "RNA":
+            expected = expected.replace("U", "T")
+        if self.context.sequence not in (record.sequence, expected):
             raise ValueError("SequenceRecord does not match the loaded sequence.")
         self.context.record = record
         self.context.topology = record.topology

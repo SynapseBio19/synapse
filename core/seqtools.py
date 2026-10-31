@@ -16,6 +16,8 @@ from dataclasses import dataclass
 from itertools import product
 from typing import Dict, FrozenSet, Iterable, List, Optional
 
+from core.alphabets import normalize_sequence
+
 DNA_BASES = frozenset("ACGT")
 
 IUPAC_DNA: Dict[str, FrozenSet[str]] = {
@@ -34,8 +36,14 @@ IUPAC_COMPLEMENT = {
 
 
 def normalize_dna(sequence: str) -> str:
-    """Remove whitespace, uppercase, convert U to T. Does not drop other symbols."""
-    return "".join(str(sequence or "").split()).upper().replace("U", "T")
+    """Remove whitespace and uppercase; nothing is converted or dropped.
+
+    Same contract as ``core.validation.normalize_dna`` (audit D13). U is
+    kept: converting RNA to the DNA alphabet is a decision for the caller
+    (``core.api`` makes it explicitly and records it). ``translate`` reads
+    U as T codon by codon.
+    """
+    return normalize_sequence(sequence)
 
 
 def invalid_symbols(sequence: str) -> List[int]:

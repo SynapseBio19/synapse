@@ -4762,6 +4762,47 @@ def protein_analysis_menu(
 # ============================================================
 
 
+def run_protein_analysis_from_record(
+    protein,
+    name="Protein record",
+    pipeline=None,
+):
+    """
+    Start Protein Analysis from a protein sequence (a protein FASTA or
+    GenPept record; audit D14).
+
+    The sequence must be in the IUPAC protein alphabet. When a pipeline is
+    given, the complete protein analysis is stored before the interactive
+    menu opens.
+    """
+
+    from core.alphabets import PROTEIN as _PROTEIN, require_sequence_type
+
+    require_sequence_type(
+        protein,
+        (_PROTEIN,),
+        declared=_PROTEIN,
+        context="Protein analysis",
+    )
+
+    clean_protein = "".join(
+        protein.upper().split()
+    )
+
+    if pipeline is not None:
+        context = getattr(pipeline, "context", None)
+        analysis = analyze_complete_protein(clean_protein)
+        if context is not None:
+            context.protein_source = "Protein record"
+            context.store_protein_analysis(analysis, protein_sequence=clean_protein)
+
+    protein_analysis_menu(
+        protein=clean_protein,
+        source="Protein record",
+        orf_id=name,
+    )
+
+
 def run_protein_analysis_from_orf(
     orf_sequence,
     orf_id="Selected ORF",

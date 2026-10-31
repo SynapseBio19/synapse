@@ -230,7 +230,7 @@ def classify_sequence(sequence: str, declared: Optional[str] = None) -> Sequence
     symbols = frozenset(seq)
     foreign = tuple(symbols_outside(seq, ALL_SYMBOLS))
     if foreign:
-        reason = f"contains {_listed(s for _, s in foreign)}, which belong to no sequence alphabet"
+        reason = f"contains {_listed(s for _, s in foreign)}: symbols of no sequence alphabet"
         if symbols & _GAP_SYMBOLS:
             reason += " (alignment gaps are not sequence symbols)"
         return _invalid(reason, declared=declared_type, bad=foreign)
@@ -243,7 +243,7 @@ def classify_sequence(sequence: str, declared: Optional[str] = None) -> Sequence
     if protein_only:
         return SequenceClassification(
             PROTEIN, CONFIRMED, candidates,
-            (f"contains {_listed(protein_only)}, which are not nucleotide codes",),
+            (f"contains {_listed(protein_only)}: symbols that are not nucleotide codes",),
         )
 
     has_t, has_u = "T" in symbols, "U" in symbols
@@ -265,7 +265,7 @@ def classify_sequence(sequence: str, declared: Optional[str] = None) -> Sequence
     codes = symbols & (NUCLEOTIDE_AMBIGUITY - {"N"})
     return SequenceClassification(
         None, AMBIGUOUS, candidates,
-        (f"contains {_listed(codes)}, which are nucleotide ambiguity codes and also "
+        (f"contains {_listed(codes)}: nucleotide ambiguity codes that are also "
          "amino-acid letters; declare the sequence type",),
     )
 

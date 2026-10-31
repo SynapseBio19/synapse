@@ -681,3 +681,48 @@ protein FASTA records get a route to protein analysis. Tests are in
 - Validation: external tool execution — the IUPAC-letter peptide,
   declared a protein, finds itself with local blastp.
 - Tests: 7 new (`BlastQueryTypeInferenceTests`). Suite 173 → 180.
+
+### D13, D14-F4/F5/F7 One input contract for the menu gate and the API; protein records get their own route (`main.py`, `core/api.py`, `core/validation.py`, `core/seqtools.py`, `analyses/protein.py`, `core/pipeline.py`, `ui/menu.py`)
+
+- Problem: two `normalize_dna` functions with different U handling (D13);
+  the menu gate accepted a peptide made of IUPAC-nucleotide letters and
+  the empty string (F4); `core.api` and primer design silently converted
+  RNA to DNA while the menu rejected it (F5); the API checked no types,
+  so `sequence_overview(protein)` reported a GC content and
+  `analyze_protein_from_cds(protein)` returned `"????????"` (F7); a
+  protein record could only reach the DNA overview.
+- One contract: `core.validation.normalize_dna`, `core.seqtools.normalize_dna`
+  and `core.alphabets.normalize_sequence` all strip whitespace and
+  uppercase, and convert nothing. `validate_dna("")` is now False.
+  `GeneticCode.translate` still reads U as T codon by codon.
+- Menu gate (`main.py`): each record's type comes from its
+  `SequenceRecord` classification. An undetermined record (e.g. IUPAC
+  ambiguity codes other than N) is not guessed: the user declares DNA, RNA
+  or protein, and a declaration the letters contradict is refused. An RNA
+  record is analyzed in the DNA alphabet with a printed note, and the
+  report records `analyzed_alphabet`. Invalid records list the offending
+  symbols. A protein record opens a protein menu (protein analysis,
+  BLAST with a protein query, report export) instead of the DNA overview.
+  The record list shows `aa` for protein records.
+- API (`core.api`): every entry point checks its input type and takes an
+  optional `sequence_type`. Nucleotide analyses accept DNA and RNA; RNA is
+  converted to the DNA alphabet with a warning in the result. Restriction
+  digests and CRISPR guide design accept DNA only. New
+  `analyze_protein(record_or_sequence)` for protein sequences. A record's
+  declared type is used. Wrong or undetermined types raise
+  `SequenceTypeError` (a `ValueError`).
+- `SynapsePipeline.attach_record` accepts an RNA record for a sequence
+  loaded in the DNA alphabet; BLAST and report export in the main menu use
+  shared helpers (`store_blast_run`, `export_report_interactive`) so the
+  DNA and protein menus behave the same.
+- Behaviour change, intended: DNA records with IUPAC ambiguity codes
+  other than N now ask for the type once (e.g. `TEST_8_AMBIGUOUS` in
+  `examples/dna.fasta`); a header modifier `[moltype=genomic DNA]`
+  declares it in the file. Plain DNA records behave as before; the golden
+  master is unchanged.
+- Tests: 9 new (`InputContractTests`, `MainMenuSequenceTypeTests`, the
+  latter driving `main.py` through a protein, an undetermined, an RNA and
+  an invalid record). Suite 180 → 189.
+- Not changed here: protein residues X/B/Z/J/U/O in the protein module
+  (F6), lower-case ORF search (F8), `transcribe_rna` (F9), RNA GC content
+  in the sequence module (F10).

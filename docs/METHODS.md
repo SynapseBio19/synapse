@@ -34,6 +34,14 @@ use 0-based inclusive `start <= stop` on the forward strand.
   type. Each record is classified with `core.alphabets` and carries its
   type and confidence into provenance and the report. Without a declared
   type the letters decide (see "Sequence types").
+- Main menu: a record whose type cannot be determined is not guessed; the
+  user declares DNA, RNA or protein. RNA records are analyzed in the DNA
+  alphabet (U read as T), which the report records. Protein records open
+  the protein menu (protein analysis, BLAST, report).
+- `core.api`: nucleotide analyses accept DNA and RNA (RNA converted, with a
+  warning); restriction digests and CRISPR guide design accept DNA only,
+  because both act on DNA; `analyze_protein` takes proteins. Every entry
+  point accepts `sequence_type=` for an undetermined sequence.
 - Provenance: file SHA-256, sequence SHA-256, path, format, record index.
 - GenBank locations: simple spans, `complement()` and `join()` are parsed;
   other forms keep only the raw string.

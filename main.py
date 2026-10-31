@@ -9,10 +9,12 @@ from core.logging_setup import configure_logging
 
 from fileio.loader import load_sequences
 
-from core.validation import (
-    validate_dna,
-    normalize_dna,
-    get_dna_errors,
+from core.alphabets import (
+    AMBIGUOUS,
+    INVALID,
+    PROTEIN,
+    RNA,
+    classify_sequence,
 )
 
 from analyses.sequence import (
@@ -40,6 +42,7 @@ from analyses.rna import (
 
 from analyses.protein import (
     run_protein_analysis_from_orf,
+    run_protein_analysis_from_record,
 )
 
 from analyses.orf import (
@@ -153,6 +156,173 @@ def choose_sequence_file():
             print(f"\n{error}")
 
 
+# ============================================================
+# SHARED MENU ACTIONS
+# ============================================================
+
+
+def store_blast_run(pipeline, blast_run):
+    """Store a finished BLAST run in the pipeline."""
+    if blast_run is None:
+        return
+    from dataclasses import asdict as _asdict
+
+    pipeline.store(
+        "blast",
+        blast_run,
+        parameters=_asdict(blast_run.metadata),
+        limitations=[
+            "BLAST hits show sequence similarity; they do "
+            "not prove function, orthology or identity.",
+        ],
+    )
+
+
+def export_report_interactive(pipeline):
+    """Ask for a path and export every stored result."""
+    default_report = os.path.join(
+        current_folder,
+        "exports",
+        "synapse_report_"
+        + datetime.now().strftime("%Y%m%d_%H%M%S")
+        + ".json",
+    )
+    print("\nReport of all results stored in this session.")
+    print("Use .json (complete) or .md (summary).")
+    raw_path = input(
+        f"Path [Enter = {default_report}]: "
+    ).strip().strip('"')
+    try:
+        saved = export_analysis_report(
+            pipeline, raw_path or default_report
+        )
+        print(f"Report written: {saved.resolve()}")
+    except (OSError, ValueError) as error:
+        report_error("REPORT EXPORT ERROR", error)
+    input(
+        "\nPress Enter to continue..."
+    )
+
+
+# ============================================================
+# SEQUENCE TYPE (audit D14)
+# ============================================================
+
+
+def print_sequence_type_error(record):
+    """Explain why a record cannot be analyzed."""
+    result = classify_sequence(record.sequence, record.declared_type)
+    reason = result.reasons[0]
+    print()
+    print("=" * 60)
+    print("SEQUENCE VALIDATION ERROR")
+    print("=" * 60)
+    print(f"\n{reason[0].upper()}{reason[1:]}.\n")
+    for position, symbol in result.invalid_symbols[:20]:
+        print(f"Invalid character '{symbol}' at position {position}")
+    if len(result.invalid_symbols) > 20:
+        print(f"... and {len(result.invalid_symbols) - 20} more")
+    print("=" * 60)
+    input("\nPress Enter to select another sequence...")
+
+
+def resolve_sequence_type(record):
+    """Return the record with a determined type, or None to choose another.
+
+    A sequence whose type cannot be told from its letters is not guessed:
+    the user declares DNA, RNA or protein.
+    """
+    while record.type_confidence == AMBIGUOUS:
+        print()
+        print("=" * 60)
+        print("SEQUENCE TYPE")
+        print("=" * 60)
+        print("\nThe type of this sequence cannot be determined from its letters:")
+        print(f"{record.type_reasons[0]}.")
+        print("\n[1] DNA")
+        print("[2] RNA")
+        print("[3] Protein")
+        print("[0] Choose another sequence")
+        choice = input("\nSequence type: ").strip()
+        if choice == "0":
+            return None
+        declared = {"1": "DNA", "2": "RNA", "3": "PROTEIN"}.get(choice)
+        if declared is None:
+            print("\nInvalid selection.")
+            continue
+        candidate = record.with_declared_type(declared)
+        if candidate.type_confidence == INVALID:
+            print(f"\nNot possible: {candidate.type_reasons[0]}.")
+            continue
+        logger.info("Sequence type declared by the user: %s", declared)
+        record = candidate
+    if record.type_confidence == INVALID:
+        print_sequence_type_error(record)
+        return None
+    return record
+
+
+def run_protein_record(record, selected_index):
+    """Menu for a protein record: protein analysis, BLAST, report."""
+    pipeline = SynapsePipeline(
+        sequence=record.sequence,
+        header=record.description,
+        sequence_id=selected_index,
+        topology=record.topology,
+    )
+    pipeline.attach_record(record)
+
+    while True:
+        print()
+        print("=" * 60)
+        print("SYNAPSE - PROTEIN RECORD")
+        print("=" * 60)
+        print(f"\n{record.description}")
+        print(
+            f"Length: {record.length} aa | "
+            f"Type: protein ({record.type_confidence.lower()})"
+        )
+        print("\n[1] Protein Analysis")
+        print("[2] BLAST Search")
+        print("[R] Export Analysis Report (JSON / Markdown)")
+        print("[S] Select Another Sequence")
+        print("[0] Exit")
+        choice = input("\nSelect an option: ").strip().upper()
+
+        if choice == "1":
+            try:
+                run_protein_analysis_from_record(
+                    record.sequence,
+                    name=record.identifier,
+                    pipeline=pipeline,
+                )
+            except Exception as error:
+                report_error("PROTEIN ANALYSIS ERROR", error)
+        elif choice == "2":
+            try:
+                store_blast_run(
+                    pipeline,
+                    blast_menu(
+                        sequence=record.sequence,
+                        sequence_name=record.description,
+                        sequence_type="PROTEIN",
+                    ),
+                )
+            except Exception as error:
+                report_error("BLAST SEARCH ERROR", error)
+        elif choice == "R":
+            export_report_interactive(pipeline)
+        elif choice == "S":
+            print("\nReturning to sequence selection...")
+            return
+        elif choice == "0":
+            print("\nThank you for using Synapse!")
+            raise SystemExit
+        else:
+            print("\nInvalid selection.")
+            input("\nPress Enter to continue...")
+
+
 sequences = choose_sequence_file()
 
 
@@ -172,14 +342,32 @@ while True:
         continue
 
     header = record["header"]
-    dna = record["sequence"]
 
-    topology = record.get(
-        "topology",
-        "linear",
+    for note in record.get("notes", []):
+        print(f"\nNote: {note}")
+
+    # ========================================================
+    # SEQUENCE TYPE (DNA, RNA or protein; audit D14)
+    # ========================================================
+
+    sequence_record = resolve_sequence_type(
+        SequenceRecord.from_legacy_dict(record, selected_index)
     )
 
-    dna = normalize_dna(dna)
+    if sequence_record is None:
+        continue
+
+    if sequence_record.alphabet == PROTEIN:
+        run_protein_record(sequence_record, selected_index)
+        continue
+
+    topology = sequence_record.topology
+    dna = sequence_record.sequence
+
+    if sequence_record.alphabet == RNA:
+        # The nucleotide analyses work in the DNA alphabet.
+        dna = dna.replace("U", "T")
+        print("\nNote: RNA sequence, analyzed in the DNA alphabet (U read as T).")
 
     # ========================================================
     # SYNAPSE PIPELINE
@@ -193,54 +381,12 @@ while True:
     )
 
     try:
-        pipeline.attach_record(
-            SequenceRecord.from_legacy_dict(record, selected_index)
-        )
+        pipeline.attach_record(sequence_record)
     except ValueError as error:
         logger.warning("Provenance not attached: %s", error)
 
-    for note in record.get("notes", []):
-        print(f"\nNote: {note}")
-
     # Selected ORF is shared by ORF -> RNA -> Protein.
     selected_orf = None
-
-
-    # ========================================================
-    # DNA VALIDATION
-    # ========================================================
-
-
-    if not validate_dna(dna):
-
-        errors = get_dna_errors(dna)
-
-        print()
-        print("=" * 60)
-        print("SEQUENCE VALIDATION ERROR")
-        print("=" * 60)
-
-        print(
-            "\nInvalid DNA sequence.\n"
-        )
-
-        for error in errors:
-
-            print(
-                f"Invalid character "
-                f"'{error['character']}' "
-                f"at position "
-                f"{error['position']}"
-            )
-
-        print("=" * 60)
-
-        input(
-            "\nPress Enter to select "
-            "another sequence..."
-        )
-
-        continue
 
 
     # ========================================================
@@ -712,24 +858,15 @@ while True:
 
             try:
 
-                blast_run = blast_menu(
-                    sequence=dna,
-                    sequence_name=header,
-                    selected_orf=selected_orf,
+                store_blast_run(
+                    pipeline,
+                    blast_menu(
+                        sequence=dna,
+                        sequence_name=header,
+                        selected_orf=selected_orf,
+                        sequence_type="DNA",
+                    ),
                 )
-
-                if blast_run is not None:
-                    from dataclasses import asdict as _asdict
-
-                    pipeline.store(
-                        "blast",
-                        blast_run,
-                        parameters=_asdict(blast_run.metadata),
-                        limitations=[
-                            "BLAST hits show sequence similarity; they do "
-                            "not prove function, orthology or identity.",
-                        ],
-                    )
 
             except Exception as error:
 
@@ -777,28 +914,7 @@ while True:
 
 
         elif choice == "R":
-            default_report = os.path.join(
-                current_folder,
-                "exports",
-                "synapse_report_"
-                + datetime.now().strftime("%Y%m%d_%H%M%S")
-                + ".json",
-            )
-            print("\nReport of all results stored in this session.")
-            print("Use .json (complete) or .md (summary).")
-            raw_path = input(
-                f"Path [Enter = {default_report}]: "
-            ).strip().strip('"')
-            try:
-                saved = export_analysis_report(
-                    pipeline, raw_path or default_report
-                )
-                print(f"Report written: {saved.resolve()}")
-            except (OSError, ValueError) as error:
-                report_error("REPORT EXPORT ERROR", error)
-            input(
-                "\nPress Enter to continue..."
-            )
+            export_report_interactive(pipeline)
 
         elif choice == "P":
 

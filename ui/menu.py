@@ -47,7 +47,8 @@ def select_gene(sequences):
     for index, record in enumerate(sequences, start=1):
         topology = record.get("topology", "linear")
         length = len(record.get("sequence", ""))
-        print(f"[{index}] {record['header']}  ({length} bp, {topology})")
+        unit = "aa" if record.get("alphabet") == "PROTEIN" else "bp"
+        print(f"[{index}] {record['header']}  ({length} {unit}, {topology})")
 
     print("\n[F] Load another file")
 

@@ -33,10 +33,10 @@ simulated keystrokes (see audit §11.5).
 | Functions and classes inventoried | ~1,100 |
 | Main-menu entries | 15 |
 | Sub-menu entries inventoried | 78 |
-| Automated tests | 180, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1 + 5 D2 + 5 D14-F2 + 11 sequence-type classifier + 6 D14-F3/F11 + 7 D14-F1) |
+| Automated tests | 189, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1 + 5 D2 + 5 D14-F2 + 11 sequence-type classifier + 6 D14-F3/F11 + 7 D14-F1 + 9 D13/D14-F4/F5/F7) |
 | Module self-tests | 12 suites, all passing (CRISPR 28, BLAST 33, mutation 44, variant 27, others aggregated) |
 | Golden-master scenarios | 12 |
-| Confirmed defects | 19 (D1–D19); corrected so far: 6 (D12, D4, D3, D5, D1, D2; 2026-10-31) |
+| Confirmed defects | 19 (D1–D19); corrected so far: 7 (D12, D4, D3, D5, D1, D2, D13; 2026-10-31); D14 partly (F1–F5, F7, F11, F12 corrected; F6, F8–F10 open) |
 | Suspected / unverified concerns | 14 at the audit (S1–S14); S15–S22 recorded since |
 | External validations performed in this audit | 8 (audit §3, §6) |
 | Features advertised but not implemented | 1 (`[11] AI Experiment Planner`) |
@@ -49,11 +49,12 @@ simulated keystrokes (see audit §11.5).
 |---|---|---|---|---|---|---|---|
 | — | Load FASTA/GenBank file | `main.choose_sequence_file`, `fileio.loader.load_sequences` | Implemented | Execution-tested | Integration-tested | Not applicable | Rejects empty and header-less files; content-sniffs, ignores extension. **D14**: accepts a peptide as DNA when all letters are IUPAC nucleotide codes. |
 | — | Sequence selection, `[F]` load another file | `ui.menu.select_gene` | Implemented | Execution-tested | Integration-tested | Not applicable | Shows length and topology. `examples/dna.fasta` = 14 records. |
-| — | DNA validation | `core.validation.validate_dna`, `get_dna_errors` | Implemented | Execution-tested | Not applicable | Not applicable | **D13** diverges from `core.seqtools.normalize_dna` on U. |
+| — | Sequence-type gate | `main.resolve_sequence_type`, `core.validation.validate_dna`, `get_dna_errors` | Implemented | Execution-tested | Integration-tested | Not applicable | Type from `core.alphabets`; undetermined records are declared by the user; RNA analyzed in the DNA alphabet with a note (**D13**, **D14-F4/F5** corrected 2026-10-31). |
 | 1 | Sequence Overview | `analyses.sequence.*` (15 functions called from `main.py`) | Implemented | Execution-tested | Integration-tested | Not applicable | Self-test passes. Stored in the pipeline. |
 | 2 | ORF Analysis | `analyses.orf.run_orf_analysis_ui` | Implemented | Execution-tested | Integration-tested | Independently validated (genetic codes, coordinates) | See §3. |
 | 3 | RNA Analysis | `analyses.rna.run_rna_analysis_ui` | Implemented | Execution-tested | Integration-tested | Not applicable | Selected-ORF vs whole-sequence rule confirmed intact. |
 | 4 | Protein Analysis | `analyses.protein.run_protein_analysis_from_orf` | Implemented | Execution-tested | Integration-tested | Independently validated (ProtParam) | Requires a selected ORF by design; no silent whole-sequence fallback. |
+| — | Protein record menu | `main.run_protein_record`, `analyses.protein.run_protein_analysis_from_record` | Implemented | Execution-tested | Integration-tested | Not applicable | Protein FASTA/GenPept records: protein analysis, BLAST (protein query), report (D14, 2026-10-31). X/B/Z/J/U/O handling is **D14-F6** (open). |
 | 5 | Restriction & Cloning | `analyses.restriction.run_restriction_cloning_ui` | Implemented | Execution-tested | Integration-tested | Independently validated (digests, circular map) | D3/D4/D5 corrected 2026-10-31. Open: **S17**, **S18**. |
 | 6 | Primer Design | `analyses.primer.run_primer_analysis_ui` | Implemented | Execution-tested | Integration-tested | Independently validated (primer3-py) | **D16** duplicate/shadowed definitions. |
 | 7 | Mutation & Variant Analysis | `analyses.mutation.run_mutation_variant_ui` | Implemented | Execution-tested | Integration-tested | Partially (algorithm checked, no bcftools) | **D12** in the variant branch — corrected 2026-10-31 (Phase 6 Tier 1). |
@@ -400,15 +401,15 @@ relative to size; the 28 self-tests are the module's own fixtures.
 |---|---|---|---|---|
 | Shared data model | `models.Interval`, `Feature`, `SequenceRecord`, `AnalysisResult` | Implemented | Execution-tested | One internal convention (0-based half-open + strand) with explicit 1-based conversion. `SequenceRecord.alphabet` is set to `"DNA"` and never checked (**D14**). |
 | Hashing / provenance | `models.sha256_text`, `sha256_file`, `provenance()` | Implemented | Execution-tested | Present in every stored result. |
-| Non-interactive API | `api.load_records`, `sequence_overview`, `find_orfs`, `analyze_rna`, `analyze_protein_from_cds`, `restriction_digest`, `design_primers`, `compare_sequences`, `analyze_vcf`, `design_crispr_guides` | **Partially implemented** | Execution-tested | 10 entry points, no `input()`. **Missing**: cloning, variant filtering, mutation reporting, BLAST, literature (**S14**). `analyze_vcf` now reports `normalized: True` only when every variant had a reference, with `data["normalization"]` and per-contig warnings (**D12** corrected 2026-10-31). |
+| Non-interactive API | `api.load_records`, `sequence_overview`, `find_orfs`, `analyze_rna`, `analyze_protein_from_cds`, `analyze_protein`, `restriction_digest`, `design_primers`, `compare_sequences`, `analyze_vcf`, `design_crispr_guides` | **Partially implemented** | Execution-tested | 11 entry points, no `input()`. Input types checked with `core.alphabets`, optional `sequence_type=` (**D14-F7** corrected 2026-10-31). **Missing**: cloning, variant filtering, mutation reporting, BLAST, literature (**S14**). `analyze_vcf` now reports `normalized: True` only when every variant had a reference, with `data["normalization"]` and per-contig warnings (**D12** corrected 2026-10-31). |
 | Pipeline context and store | `pipeline.PipelineContext.store`, `store_result`, `latest`, `results` | Implemented | **Integration-tested** | ORF change clears `rna`, `protein`, `crispr`, `blast` — verified. **D19** `completed` shape. |
 | ORF-dependent invalidation | `pipeline.ORF_DEPENDENT_MODULES` | Implemented | Integration-tested | Confirmed working. |
 | RNA / protein source resolution | `pipeline.get_rna_source_dna`, `get_protein_source_rna` | Implemented | **Integration-tested** | Selected-ORF-vs-whole-sequence rule confirmed intact. |
 | Pipeline module runners | `pipeline.run_sequence`, `run_orf`, `run_rna`, `run_protein`, `run_restriction`, `run_cloning`, `run_cloning_planner`, `run_core_pipeline` | **Partially implemented** | Execution-tested | **D19**: `run_orf` exposes none of `start_codon_policy`, `nested`, `ranking`, `genetic_code`. |
 | ORF hand-over adapter | `orf_context.resolve_orf_region`, `OrfRegion`, `is_synapse_orf` | Implemented | **Integration-tested** | Validates the ORF against the parent and refuses parent coordinates on mismatch. P0-2's central fix. |
 | Sequence alphabets and type classifier | `alphabets.classify_sequence`, `require_sequence_type`, `normalize_sequence`, `declared_type_from_molecule` | Implemented | Execution-tested | Letter sets **independently validated** against `Bio.Data.IUPACData`. Added in Phase 6 (D14/D13). Used by `fileio`, `SequenceRecord` (D14-F3, F11) and BLAST (D14-F1). |
-| Shared sequence tools | `seqtools.normalize_dna`, `complement`, `reverse_complement`, `gc_fraction`, `GeneticCode`, `codon_dict`, `get_genetic_code` | Implemented | Execution-tested | **Independently validated** against `Bio.Data.CodonTable`. **D13** name clash with `core.validation`. |
-| Legacy validation | `validation.normalize_dna`, `validate_dna`, `get_dna_errors` | Implemented | Execution-tested | **D13** divergent U handling; **D14** no alphabet check. |
+| Shared sequence tools | `seqtools.normalize_dna`, `complement`, `reverse_complement`, `gc_fraction`, `GeneticCode`, `codon_dict`, `get_genetic_code` | Implemented | Execution-tested | **Independently validated** against `Bio.Data.CodonTable`. `normalize_dna` has the same contract as `core.validation` (**D13** corrected 2026-10-31). |
+| Legacy validation | `validation.normalize_dna`, `validate_dna`, `get_dna_errors` | Implemented | Execution-tested | Thin layer over `core.alphabets`; empty input invalid (**D13**, **D14-F4** corrected 2026-10-31). |
 | Reproducible report | `report.build_analysis_report`, `report_to_markdown`, `export_analysis_report`, `to_jsonable`, `canonical_json` | Implemented | **Execution-tested** | JSON and Markdown both written; per-analysis payload SHA-256; rejects other suffixes. **S8** silent `repr()` fallback. |
 | Logging | `logging_setup.configure_logging` | Implemented | Execution-tested | Rotating `logs/synapse.log`; `main.report_error` writes tracebacks there. |
 

@@ -94,6 +94,8 @@ def _input_section(context: Any) -> Dict[str, Any]:
     if record is not None and hasattr(record, "provenance"):
         section["sequence_type"] = getattr(record, "alphabet", None)
         section["sequence_type_confidence"] = getattr(record, "type_confidence", None)
+        if section["sequence_type"] == "RNA" and "U" not in sequence:
+            section["analyzed_alphabet"] = "DNA (U read as T)"
         section["record"] = record.provenance()
     return section
 
