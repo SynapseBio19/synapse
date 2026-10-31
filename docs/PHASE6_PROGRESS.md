@@ -76,6 +76,8 @@ IUPAC, gapped and invalid input (D14):
 
 | 24 | S18 recognition-site scans cached; planner no longer rescans | this package | cProfile before (5,002 scans for 16 combinations); measured 11.8 s -> 0.24 s at 8 enzymes, 100-110 s -> 0.57 s at 10 | Corrected; suite 248/248 |
 
+| 25 | S14 API covers cloning, variant filtering, mutation reports, BLAST and literature | this package | internal tests incl. both privacy gates; local BLAST+ run | Resolved for the API; menus stay with Stage F (P2-2); suite 256/256 |
+
 ## Paused (2026-10-31)
 
 Planned pause at the owner's request; see `docs/PHASE6_HANDOVER.md` for the

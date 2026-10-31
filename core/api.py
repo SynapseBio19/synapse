@@ -346,8 +346,149 @@ def design_crispr_guides(record_or_sequence: Any, *, system: str = "SpCas9",
                    limitations=["Off-target search covers only the supplied sequence, not a genome."])
 
 
+def plan_cloning(vector: Any, insert: Any, enzymes: Optional[Sequence[str]] = None, *,
+                 top_n: int = 5, vector_topology: Optional[str] = None,
+                 insert_topology: Optional[str] = None,
+                 sequence_type: Optional[str] = None) -> AnalysisResult:
+    """Search restriction-cloning strategies for a vector and an insert (audit S14).
+
+    Both sequences must be DNA, because restriction enzymes cut DNA. The
+    full search always runs before ``top_n`` is applied, so the reported
+    counts describe the whole search rather than the displayed rows.
+    """
+    from analyses.cloning import automatic_cloning_planner
+
+    vector_sequence, vector_name, vector_record_topology, vector_warnings = _sequence_of(
+        vector, accepted=(DNA,), sequence_type=sequence_type, context="Cloning (vector)")
+    insert_sequence, insert_name, insert_record_topology, insert_warnings = _sequence_of(
+        insert, accepted=(DNA,), sequence_type=sequence_type, context="Cloning (insert)")
+    vector_topology = vector_topology or vector_record_topology
+    insert_topology = insert_topology or insert_record_topology
+    data = automatic_cloning_planner(
+        vector_sequence, insert_sequence,
+        enzyme_names=list(enzymes) if enzymes else None,
+        top_n=top_n,
+        vector_topology=vector_topology,
+        insert_topology=insert_topology,
+    )
+    return _result("cloning", data, vector_sequence, f"{vector_name} + {insert_name}",
+                   parameters={"enzymes": list(enzymes) if enzymes else None, "top_n": top_n,
+                               "vector_topology": vector_topology,
+                               "insert_topology": insert_topology},
+                   warnings=list(dict.fromkeys(vector_warnings + insert_warnings)),
+                   limitations=[
+                       "Strategies are sequence-level; they do not model ligation "
+                       "efficiency, methylation blocking or star activity.",
+                   ])
+
+
+def filter_variants(variants: Sequence[Any], criteria: Any = None, **filter_fields: Any) -> AnalysisResult:
+    """Apply filtering criteria to parsed variants (audit S14).
+
+    ``criteria`` is a ``VariantFilter``; alternatively its fields may be
+    passed as keywords. Variants that fail carry the reason that rejected
+    them.
+    """
+    from analyses import variant_analysis as V
+
+    if criteria is None:
+        criteria = V.VariantFilter(**filter_fields)
+    elif filter_fields:
+        raise ValueError("Pass either a VariantFilter or its fields, not both.")
+    data = V.filter_variants(list(variants), criteria)
+    passed = len(getattr(data, "passed", []) or [])
+    return _result("variant_filter", data, "", "variant filter",
+                   parameters={"criteria": criteria, "input_variants": len(variants)},
+                   warnings=([] if passed else ["No variant passed the filter."]))
+
+
+def mutation_report(reference: str, variant: str, *, reference_name: str = "Reference",
+                    variant_name: str = "Variant", include_alignment: bool = False,
+                    sequence_type: Optional[str] = None) -> AnalysisResult:
+    """Compare two sequences and render the mutation report text (audit S14)."""
+    from analyses.mutation import build_mutation_report
+
+    comparison = compare_sequences(reference, variant, reference_name=reference_name,
+                                   variant_name=variant_name, sequence_type=sequence_type)
+    report = build_mutation_report(comparison.data, include_alignment=include_alignment)
+    data = {"comparison": comparison.data, "report_text": report}
+    return _result("mutation_report", data, "", reference_name,
+                   parameters={**comparison.parameters, "include_alignment": include_alignment},
+                   warnings=list(comparison.warnings), limitations=list(comparison.limitations))
+
+
+def blast_search(record_or_sequence: Any, *, program: str = "blastn", database: str = "nt",
+                 engine: str = "local", sequence_name: str = "Synapse_Query",
+                 sequence_type: Optional[str] = None,
+                 send_to_ncbi: bool = False, **blast_options: Any) -> AnalysisResult:
+    """Run a BLAST search without the interactive menu (audit S14).
+
+    ``engine="local"`` searches an installed BLAST+ database and sends
+    nothing anywhere. ``engine="remote"`` transmits the query sequence to
+    NCBI (blast.ncbi.nlm.nih.gov), where it is processed on NCBI servers;
+    the menu asks before doing that, so this function requires the caller
+    to pass ``send_to_ncbi=True`` instead. Without it a remote search
+    raises, so a script cannot submit sequences unintentionally.
+    """
+    from analyses.blast import run_blast_analysis
+
+    sequence, description, _, warnings = _sequence_of(
+        record_or_sequence, accepted=(DNA, RNA, PROTEIN), sequence_type=sequence_type,
+        context="A BLAST search")
+    engine = str(engine).lower().strip()
+    if engine == "remote" and not send_to_ncbi:
+        raise ValueError(
+            "A remote BLAST search sends the query sequence to NCBI, where it is "
+            "processed on NCBI servers. Pass send_to_ncbi=True to confirm, or use "
+            "engine='local'."
+        )
+    if engine == "remote":
+        warnings.append("The query sequence was sent to NCBI for processing.")
+    run = run_blast_analysis(sequence, sequence_name=sequence_name, program=program,
+                             database=database, engine=engine, **blast_options)
+    return _result("blast", run, sequence, description,
+                   parameters={"program": program, "database": database, "engine": engine},
+                   warnings=warnings,
+                   limitations=[
+                       "BLAST hits show sequence similarity; they do not prove "
+                       "function, orthology or identity.",
+                   ])
+
+
+def literature_search(query: str, *, sources: Optional[Sequence[str]] = None,
+                      max_results: int = 30, email: Optional[str] = None,
+                      send_to_providers: bool = False, **query_fields: Any) -> AnalysisResult:
+    """Search the configured literature providers (audit S14).
+
+    This always makes external requests: the query text is sent to the
+    selected providers. The caller must pass ``send_to_providers=True`` to
+    confirm, mirroring the privacy gate the BLAST menu applies.
+    """
+    from analyses.literature import LiteratureQuery, run_literature_search
+
+    if not send_to_providers:
+        raise ValueError(
+            "A literature search sends the query to external providers. Pass "
+            "send_to_providers=True to confirm."
+        )
+    fields = dict(query_fields)
+    if sources is not None:
+        fields["sources"] = list(sources)
+    literature_query = LiteratureQuery(query=query, max_results=max_results, **fields)
+    data = run_literature_search(literature_query, email=email)
+    return _result("literature", data, "", query,
+                   parameters={"query": query, "sources": literature_query.sources,
+                               "max_results": max_results},
+                   warnings=["The query was sent to external literature providers."],
+                   limitations=[
+                       "Provider coverage, ranking and availability differ; absence "
+                       "of a record is not evidence that it does not exist.",
+                   ])
+
+
 __all__ = [
     "load_records", "sequence_overview", "find_orfs", "analyze_rna", "analyze_protein_from_cds",
     "analyze_protein", "restriction_digest", "design_primers", "compare_sequences", "analyze_vcf",
-    "design_crispr_guides",
+    "design_crispr_guides", "plan_cloning", "filter_variants", "mutation_report", "blast_search",
+    "literature_search",
 ]

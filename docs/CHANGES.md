@@ -1165,3 +1165,27 @@ interrupted the Opus 5.5 session at the start of this investigation.
 - Tests: 3 new (`CloningPlannerScanReuseTests`), covering the scan count,
   isolation from caller mutation, and identical cold/warm results for both
   topologies. Suite 245 -> 248.
+
+### S14 The API covers the remaining analyses (`core/api.py`)
+
+- Problem: `core/api.py` offered ten entry points but none for cloning,
+  variant filtering, mutation reporting, BLAST or literature, so those
+  workflows were reachable only through the terminal menus.
+- Added: `plan_cloning`, `filter_variants`, `mutation_report`,
+  `blast_search` and `literature_search`. Each returns an `AnalysisResult`
+  with its parameters, warnings and limitations, like the existing ten.
+- Privacy is not weakened by the move off the menu. The BLAST menu asks
+  before a remote search sends the query to NCBI; the API cannot ask, so
+  `blast_search(engine="remote")` raises unless the caller passes
+  `send_to_ncbi=True`, and `literature_search` likewise requires
+  `send_to_providers=True`. A script therefore cannot transmit sequences
+  or queries unintentionally. The local BLAST engine needs no confirmation
+  because it sends nothing.
+- `plan_cloning` accepts DNA only, since restriction enzymes cut DNA, and
+  takes each record's topology unless told otherwise.
+- Tests: 8 new (`ApiCompletenessTests`), including both privacy gates and a
+  local BLAST+ run that sends nothing. Suite 248 -> 256.
+- Still open for P2-2: the analysis modules continue to own their terminal
+  menus. The API now covers every analysis, which is the part S14 named;
+  moving the menus out of the modules belongs with the Stage F interface
+  work.

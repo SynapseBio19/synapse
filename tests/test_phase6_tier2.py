@@ -711,5 +711,82 @@ class CloningPlannerScanReuseTests(unittest.TestCase):
                 self.assertGreater(R._scan_recognition_sites.cache_info().hits, 0)
 
 
+# ----------------------------------------------------------------------
+# S14: the API covers cloning, variant filtering, mutation reports,
+#      BLAST and literature, without weakening the privacy gate
+# ----------------------------------------------------------------------
+class ApiCompletenessTests(unittest.TestCase):
+    # Repeating fillers that cannot spell GAATTC or CTGCAG, so each site below
+    # is the only one of its kind and the planner has a unique cut to work with.
+    VECTOR = "ACAC" * 75 + "GAATTC" + "ATAT" * 10 + "CTGCAG" + "AGAG" * 75
+    INSERT = "GAATTC" + "ACGA" * 62 + "CTGCAG"
+
+    def test_every_analysis_module_has_an_entry_point(self):
+        from core import api
+        for name in ("plan_cloning", "filter_variants", "mutation_report",
+                     "blast_search", "literature_search"):
+            with self.subTest(entry=name):
+                self.assertTrue(callable(getattr(api, name)))
+                self.assertIn(name, api.__all__)
+
+    def test_plan_cloning_finds_a_valid_strategy(self):
+        from core import api
+        result = api.plan_cloning(self.VECTOR, self.INSERT,
+                                  enzymes=["EcoRI", "PstI", "BamHI", "HindIII"])
+        self.assertEqual(result.module, "cloning")
+        self.assertEqual(result.data["valid_count"], 1)
+        self.assertEqual(result.data["best"]["mode"], "two-enzyme")
+        self.assertEqual(result.parameters["vector_topology"], "linear")
+
+    def test_plan_cloning_refuses_a_non_dna_sequence(self):
+        from core import api
+        from core.alphabets import SequenceTypeError
+        with self.assertRaisesRegex(SequenceTypeError, "needs a DNA sequence"):
+            api.plan_cloning(self.VECTOR, self.INSERT.replace("T", "U"))
+
+    def test_filter_variants(self):
+        from core import api
+        from analyses import variant_analysis as V
+        variants = [V.Variant("chr1", 10, "A", "G", quality=50.0),
+                    V.Variant("chr1", 20, "C", "T", quality=5.0)]
+        result = api.filter_variants(variants, minimum_quality=20.0)
+        self.assertEqual(result.module, "variant_filter")
+        self.assertEqual((len(result.data.passed), len(result.data.failed)), (1, 1))
+        self.assertEqual(result.parameters["input_variants"], 2)
+        with self.assertRaisesRegex(ValueError, "not both"):
+            api.filter_variants(variants, V.VariantFilter(), minimum_quality=1.0)
+
+    def test_mutation_report_renders_text(self):
+        from core import api
+        result = api.mutation_report("ATGAAATTTGGGTAA", "ATGAAATTCGGGTAA")
+        self.assertEqual(result.module, "mutation_report")
+        self.assertIn("MUTATION ANALYSIS REPORT", result.data["report_text"])
+        self.assertTrue(result.limitations)
+
+    def test_remote_blast_requires_explicit_confirmation(self):
+        from core import api
+        with self.assertRaisesRegex(ValueError, "send_to_ncbi=True"):
+            api.blast_search("ACGTACGTACGTACGTACGT", engine="remote")
+
+    def test_literature_search_requires_explicit_confirmation(self):
+        from core import api
+        with self.assertRaisesRegex(ValueError, "send_to_providers=True"):
+            api.literature_search("CRISPR off-target")
+
+    @unittest.skipUnless(_blast_plus_available("blastn", "blastdbcmd"),
+                         "BLAST+ (blastn, blastdbcmd) not installed")
+    def test_local_blast_search_sends_nothing(self):
+        """External tool execution: the local engine needs no confirmation."""
+        from core import api
+        lines = (PROJECT_ROOT / "data" / "local_test" / "query.fasta").read_text().splitlines()
+        query = "".join(line.strip() for line in lines if not line.startswith(">"))
+        result = api.blast_search(query, engine="local", program="blastn",
+                                  local_database_path=str(LOCAL_TEST_DB))
+        self.assertEqual(result.module, "blast")
+        self.assertEqual([hit.hit_id for hit in result.data.hits],
+                         ["Test_Gene_001", "Test_Gene_002"])
+        self.assertEqual(result.warnings, [])
+
+
 if __name__ == "__main__":
     unittest.main()

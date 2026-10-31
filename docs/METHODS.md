@@ -38,6 +38,11 @@ use 0-based inclusive `start <= stop` on the forward strand.
   user declares DNA, RNA or protein. RNA records are analyzed in the DNA
   alphabet (U read as T), which the report records. Protein records open
   the protein menu (protein analysis, BLAST, report).
+- `core.api` entry points that make external requests refuse to run
+  unless the caller confirms explicitly: `blast_search(engine="remote")`
+  needs `send_to_ncbi=True` and `literature_search` needs
+  `send_to_providers=True`. This keeps the privacy gate the terminal menu
+  applies, which a non-interactive layer cannot ask for.
 - `core.api`: nucleotide analyses accept DNA and RNA (RNA converted, with a
   warning); restriction digests and CRISPR guide design accept DNA only,
   because both act on DNA; `analyze_protein` takes proteins. Every entry
