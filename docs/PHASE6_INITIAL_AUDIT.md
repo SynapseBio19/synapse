@@ -622,7 +622,7 @@ Found during the D1 work (2026-10-31); outside D1's scope and not changed:
 
 | ID | Location | Level | Finding |
 |---|---|---|---|
-| S19 | `analyses/orf.py`, `classify_start_codon`, `calculate_cds_quality`, `calculate_orf_confidence` | CONFIRMED | Start-codon *classification* and the heuristic scores still use the fixed ATG/GTG/TTG set rather than the genetic code. A CTG ORF found with `table_starts` gets `classify_start_codon("CTG") == "None"`, no "Alternative start codon" reason, and a CDS-quality score of 60 versus 70 for an otherwise identical GTG ORF; table-2 starts such as ATA/ATT are treated the same way. Translation is not affected (D1). |
+| S19 | `analyses/orf.py`, `classify_start_codon`, `calculate_cds_quality`, `calculate_orf_confidence` | CONFIRMED, corrected 2026-10-31 | Start-codon *classification* and the heuristic scores still use the fixed ATG/GTG/TTG set rather than the genetic code. A CTG ORF found with `table_starts` gets `classify_start_codon("CTG") == "None"`, no "Alternative start codon" reason, and a CDS-quality score of 60 versus 70 for an otherwise identical GTG ORF; table-2 starts such as ATA/ATT are treated the same way. Translation is not affected (D1). |
 
 Found during the D14 investigation (2026-10-31); not reproduced:
 

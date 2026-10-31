@@ -935,3 +935,17 @@ Tests are in `tests/test_phase6_tier2.py`.
   `restriction.perform_digest`, whose circular digest agrees with
   Biopython `Bio.Restriction` (D3).
 - Tests: 2 new (`CloningDigestCutTests`). Suite 215 → 217.
+
+### S19 Start-codon classification and heuristic scores follow the genetic code (`analyses/orf.py`)
+
+- Problem: `classify_start_codon`, `calculate_cds_quality` and
+  `calculate_orf_confidence` used the fixed ATG/GTG/TTG set. A CTG ORF
+  found with `table_starts` was classified "None", got no "Alternative
+  start codon" reason and a CDS-quality score of 60 instead of 70 for an
+  otherwise identical GTG ORF; table-2 starts (ATA, ATT) were treated the
+  same way.
+- Now: all three use `initiation_codons(genetic_code)` (the D1 rule);
+  `classify_start_codon` takes an optional `genetic_code` (default 1).
+  Results for ATG, GTG and TTG ORFs are unchanged; the golden master is
+  unchanged.
+- Tests: 2 new (`StartCodonClassificationTests`). Suite 217 → 219.

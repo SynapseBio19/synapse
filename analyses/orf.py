@@ -228,11 +228,23 @@ def analyze_codon_identity(
 # START CODON CLASSIFICATION
 # ============================================================
 
-def classify_start_codon(codon):
+def _is_alternative_start(orf):
+    """A non-ATG start that initiates in the ORF's genetic code (audit S19)."""
+    codon = orf["start_codon"]
+    return codon != "ATG" and is_initiation_codon(codon, orf.get("genetic_code") or 1)
+
+
+def classify_start_codon(codon, genetic_code=1):
+    """Canonical (ATG), Alternative, Possible or None for a genetic code.
+
+    The start set is ``initiation_codons(genetic_code)`` (audit S19; it was
+    the fixed ATG/GTG/TTG set, so CTG in table 1 or ATA/ATT in table 2
+    were "None").
+    """
 
     status = analyze_codon_identity(
         codon,
-        ALL_START_CODONS
+        initiation_codons(genetic_code)
     )
 
     if status == "definite":
@@ -240,7 +252,7 @@ def classify_start_codon(codon):
         if codon == "ATG":
             return "Canonical"
 
-        if codon in ALTERNATIVE_START_CODONS:
+        if codon in initiation_codons(genetic_code):
             return "Alternative"
 
         return "Ambiguous-Definite"
@@ -753,10 +765,7 @@ def calculate_cds_quality(
             "Canonical ATG start"
         )
 
-    elif (
-        orf["start_codon"]
-        in ALTERNATIVE_START_CODONS
-    ):
+    elif _is_alternative_start(orf):
 
         score += 10
 
@@ -848,10 +857,7 @@ def calculate_orf_confidence(
     if orf["start_codon"] == "ATG":
         score += 20
 
-    elif (
-        orf["start_codon"]
-        in ALTERNATIVE_START_CODONS
-    ):
+    elif _is_alternative_start(orf):
         score += 10
 
     if orf["length"] >= 600:

@@ -308,5 +308,29 @@ class CloningDigestCutTests(unittest.TestCase):
                                      sorted(f["length"] for f in restriction["fragments"]))
 
 
+# ----------------------------------------------------------------------
+# S19: start-codon classification and scores follow the genetic code
+# ----------------------------------------------------------------------
+class StartCodonClassificationTests(unittest.TestCase):
+    def test_classification_uses_the_table(self):
+        from analyses import orf as O
+        self.assertEqual(O.classify_start_codon("ATG"), "Canonical")
+        self.assertEqual(O.classify_start_codon("CTG"), "Alternative")      # NCBI table 1 start; was "None"
+        self.assertEqual(O.classify_start_codon("ATA", 2), "Alternative")   # vertebrate mitochondrial
+        self.assertEqual(O.classify_start_codon("ATA"), "None")
+        self.assertEqual(O.classify_start_codon("AAA"), "None")
+
+    def test_ctg_orf_scores_like_gtg_orf(self):
+        from analyses import orf as O
+        body = "GCT" * 40 + "TAA"
+        ctg = next(o for o in O.find_orfs("CC" + "CTG" + body, min_length=60, start_codon_policy="table_starts")
+                   if o["start_codon"] == "CTG")
+        gtg = next(o for o in O.find_orfs("CC" + "GTG" + body, min_length=60,
+                                          start_codon_policy="atg_and_alternative")
+                   if o["start_codon"] == "GTG")
+        self.assertEqual(O.calculate_cds_quality(ctg)["score"], O.calculate_cds_quality(gtg)["score"])
+        self.assertIn("Alternative start codon", O.calculate_cds_quality(ctg)["reasons"])
+
+
 if __name__ == "__main__":
     unittest.main()

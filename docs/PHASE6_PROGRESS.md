@@ -64,13 +64,14 @@ IUPAC, gapped and invalid input (D14):
 | 13 | D19 pipeline `run_orf` search settings; fixed `completed` shape | `e47cb85` | internal tests (equality with `core.api.find_orfs`) | Corrected; suite 212/212; pyright unchanged |
 | 14 | D15 planner entry labelled "not implemented" | `f3a09c1` | end-to-end `main.py` test | Corrected (planner itself remains P3-1, deferred); suite 213/213 |
 | 15 | S15 variant-to-mutation bridge works; S16 REF_MISMATCH no longer leaks into the input | `c71963b` | internal tests; pyright 134 → 132 (the two S15 diagnostics) | Corrected; suite 215/215 |
-| 16 | S17 cloning digest uses the top-strand cut | this package | internal tests; agreement with `restriction.perform_digest` for all 231 enzyme pairs, linear and circular | Corrected; suite 217/217 |
+| 16 | S17 cloning digest uses the top-strand cut | `c743beb` | internal tests; agreement with `restriction.perform_digest` for all 231 enzyme pairs, linear and circular | Corrected; suite 217/217 |
+| 17 | S19 start-codon classification and scores use the genetic code | this package | internal tests; golden master unchanged | Corrected; suite 219/219 |
 
 ## Open after the current package
 
-D16–D18 and S1–S6, S8–S14, S18, S19, S21–S23 (see `docs/PHASE6_INITIAL_AUDIT.md`)
-until a package above closes an item. D12, D1–D11, D13–D15, D19, S7, S15–S17 and
-S20
+D16–D18 and S1–S6, S8–S14, S18, S21–S23 (see `docs/PHASE6_INITIAL_AUDIT.md`)
+until a package above closes an item. D12, D1–D11, D13–D15, D19, S7, S15–S17, S19
+and S20
 are corrected.
 
 ## Handover notes (working practice)
