@@ -33,7 +33,7 @@ simulated keystrokes (see audit §11.5).
 | Functions and classes inventoried | ~1,100 |
 | Main-menu entries | 15 |
 | Sub-menu entries inventoried | 78 |
-| Automated tests | 256, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1 + 5 D2 + 5 D14-F2 + 11 sequence-type classifier + 6 D14-F3/F11 + 7 D14-F1 + 9 D13/D14-F4/F5/F7 + 5 D14-F6 + 3 D14-F8–F10 + 3 D6 + 3 D9 + 3 D8 + 4 D10/D11 + 2 D19 + 1 D15 + 2 S15/S16 + 2 S17 + 2 S19 + 9 S23/S3/S4/S5 + 1 D16 + 7 S8/S10/S21/S22 + 4 S1/S2/S9 + 5 P1-9 + 3 S18 + 8 S14) |
+| Automated tests | 265, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1 + 5 D2 + 5 D14-F2 + 11 sequence-type classifier + 6 D14-F3/F11 + 7 D14-F1 + 9 D13/D14-F4/F5/F7 + 5 D14-F6 + 3 D14-F8–F10 + 3 D6 + 3 D9 + 3 D8 + 4 D10/D11 + 2 D19 + 1 D15 + 2 S15/S16 + 2 S17 + 2 S19 + 9 S23/S3/S4/S5 + 1 D16 + 7 S8/S10/S21/S22 + 4 S1/S2/S9 + 5 P1-9 + 3 S18 + 8 S14 + 9 P1-7) |
 | Module self-tests | 12 suites, all passing (CRISPR 28, BLAST 33, mutation 44, variant 27, others aggregated) |
 | Golden-master scenarios | 12 |
 | Confirmed defects | 19 (D1–D19); corrected so far: 16 (D12, D4, D3, D5, D1, D2, D13, D14 with all sub-findings F1–F12, D6, D7, D8, D9, D10, D11, D15, D19; 2026-10-31) and D16 partially (duplicate definition removed; v5–v11 chain deferred) |
@@ -440,7 +440,7 @@ relative to size; the 28 self-tests are the module's own fixtures.
 | CRISPR menu `[9]`/`[10]` | On-target exclusion from off-target counts | **Not implemented** (**D9**). |
 | `restriction` docs / P2-7 | Type IIS enzymes, reverse-strand site search | **Not implemented** — no Type IIS enzyme in the database, so no wrong output today. |
 | `variant` P1-5 | Contig-name unification (`chr1` vs `1`) | **Implemented 2026-10-31** (**D12**): opt-in `contig_matching="chr_prefix"`; unmatched contigs are flagged, not skipped. |
-| BLAST P1-7 | RID resume | **Not implemented** (**S6**). |
+| BLAST P1-7 | RID resume | Implemented 2026-10-31: `resume()`, menu [14], `core.api.blast_resume()`. Tested against a stub; a live resume was not run. |
 | ORF METHODS | 5′-partial ORFs; ORFs across a circular origin | **Not implemented** (documented). |
 | Brief §10.2 | Restriction-site-driven primer design | **Not implemented** — no wiring exists. |
 | P2-3 | CFD off-target scoring | **Not implemented** — deliberately deferred pending a citable matrix. Correct call. |

@@ -550,10 +550,16 @@ class BlastQuery:
     feature_type: str = "sequence"
     feature_name: Optional[str] = None
     notes: List[str] = field(default_factory=list)
+    # Set only when the sequence itself is unavailable, as for a run resumed
+    # from its request ID: the BLAST XML reports the query length but not the
+    # query sequence (P1-7).
+    reported_length: Optional[int] = None
 
     @property
     def length(self) -> int:
-        return len(self.sequence)
+        if self.sequence:
+            return len(self.sequence)
+        return int(self.reported_length or 0)
 
 
 @dataclass
@@ -1078,17 +1084,40 @@ class NCBIBlastClient:
         if wait_time:
             time.sleep(min(wait_time, max_wait))
 
+        run = self.resume(
+            rid,
+            query=query,
+            parameters=params,
+            poll_interval=poll_interval,
+            max_wait=max_wait,
+            submitted_at=submitted_at,
+        )
+
+        if email_warning:
+            run.metadata.warnings.append(email_warning)
+
+        return run
+
+    def await_ready(
+        self,
+        rid: str,
+        *,
+        poll_interval: float = DEFAULT_POLL_INTERVAL_SECONDS,
+        max_wait: float = DEFAULT_MAX_WAIT_SECONDS,
+    ) -> None:
+        """Poll a request ID until NCBI reports READY, or raise."""
         start = time.monotonic()
-        status = "WAITING"
 
         while True:
             status, _status_response = self.status(rid)
 
             if status == "READY":
-                break
+                return
             if status in {"FAILED", "UNKNOWN"}:
                 raise BlastAnalysisError(
-                    f"NCBI BLAST request {rid} ended with status {status}."
+                    f"NCBI BLAST request {rid} ended with status {status}. "
+                    "NCBI keeps a request ID only for a limited time, so an "
+                    "older RID may simply have expired."
                 )
             if time.monotonic() - start >= max_wait:
                 raise BlastAnalysisError(
@@ -1098,21 +1127,54 @@ class NCBIBlastClient:
 
             time.sleep(max(self.min_poll_interval, poll_interval))
 
+    def resume(
+        self,
+        rid: str,
+        *,
+        query: Optional[BlastQuery] = None,
+        parameters: Optional[BlastParameters] = None,
+        poll_interval: float = DEFAULT_POLL_INTERVAL_SECONDS,
+        max_wait: float = DEFAULT_MAX_WAIT_SECONDS,
+        submitted_at: Optional[str] = None,
+    ) -> BlastRun:
+        """Collect a search that was submitted earlier, by its request ID (P1-7).
+
+        Every Synapse run records its RID, so a search can be picked up again
+        without resubmitting the query - useful when a long search outlives
+        the session that started it. NCBI retains an RID only for a limited
+        period; an expired one reports UNKNOWN.
+
+        ``query`` and ``parameters`` are used when the caller still holds
+        them, for example from a stored run. Otherwise they are rebuilt from
+        the returned XML, which states the query definition, the query
+        length, the program and the database, but not the query sequence.
+        """
+        rid = str(rid).strip()
+        if not rid:
+            raise BlastAnalysisError("A request ID is required to resume a search.")
+
+        self.await_ready(rid, poll_interval=poll_interval, max_wait=max_wait)
         xml_text = self.fetch_xml(rid)
         completed_at = _utc_now()
+
+        if query is None or parameters is None:
+            recovered_query, recovered_parameters = describe_run_from_xml(xml_text)
+            query = query or recovered_query
+            parameters = parameters or recovered_parameters
 
         run = parse_blast_xml(
             xml_text,
             query=query,
             rid=rid,
-            parameters=params,
-            submitted_at=submitted_at,
+            parameters=parameters,
+            submitted_at=submitted_at or completed_at,
             completed_at=completed_at,
         )
-
-        if email_warning:
-            run.metadata.warnings.append(email_warning)
-
+        if submitted_at is None:
+            run.metadata.warnings.append(
+                "This run was resumed from its request ID; the original "
+                "submission time is not known to this session."
+            )
         return run
 
 
@@ -3034,6 +3096,47 @@ def _parse_database_statistics(root: ET.Element) -> Dict[str, Any]:
     return stats
 
 
+def describe_run_from_xml(xml_text: str) -> Tuple[BlastQuery, BlastParameters]:
+    """Rebuild a query and parameters from a BLAST XML document (P1-7).
+
+    Used when a run is resumed from its request ID and the caller no longer
+    holds the original objects. Only what the XML states is recovered: the
+    query sequence is not part of BLAST output, so the query carries its
+    reported length and an empty sequence rather than an invented one.
+    """
+    try:
+        root = ET.fromstring(xml_text)
+    except ET.ParseError as exc:
+        raise BlastAnalysisError(f"Invalid BLAST XML: {exc}") from exc
+
+    definition = _child_text(root, "BlastOutput_query-def") or "Resumed_Query"
+    raw_length = _child_text(root, "BlastOutput_query-len") or "0"
+    try:
+        length = int(raw_length)
+    except (TypeError, ValueError):
+        length = 0
+    program = (_child_text(root, "BlastOutput_program") or "blastn").lower().strip()
+    database = _child_text(root, "BlastOutput_db") or "unknown"
+
+    query = BlastQuery(
+        name=definition.split()[0] if definition.split() else "Resumed_Query",
+        sequence="",
+        sequence_type=PROGRAMS.get(program, {}).get("query_type", "DNA"),
+        source="Resumed NCBI request",
+        region_start=1,
+        region_end=max(1, length),
+        feature_name=definition,
+        notes=["Recovered from BLAST XML; the query sequence is not part of it."],
+        reported_length=length,
+    )
+    if not length:
+        query.notes.append(
+            "The XML states no query length, so coverage cannot be computed "
+            "for this resumed run."
+        )
+    return query, BlastParameters(program=program, database=database)
+
+
 def parse_blast_xml(
     xml_text: str,
     *,
@@ -4191,6 +4294,7 @@ def blast_menu(
         print("[1] Run BLAST Search")
         print("[2] Search Configuration")
         print("[3] BLAST Database Manager")
+        print("[14] Resume Search by Request ID (RID)")
         print()
         print("RESULT ANALYSIS")
         print("[4] Result Summary")
@@ -4670,6 +4774,41 @@ def blast_menu(
 
         elif choice == "13":
             _print_local_database_status(manager)
+
+        elif choice == "14":
+            # P1-7: collect a search submitted earlier instead of repeating it.
+            print("\r\nRESUME A PREVIOUS SEARCH")
+            print(
+                "Enter the request ID (RID) of a search submitted earlier. Only "
+                "the RID is sent to NCBI; the query sequence is not transmitted "
+                "again. NCBI keeps a request ID for a limited time, so an older "
+                "one may have expired."
+            )
+            rid = input("Request ID (RID): ").strip()
+            if not rid:
+                print("No request ID supplied.")
+                continue
+
+            confirm = input(f"Contact NCBI for request {rid}? [y/N]: ").strip().lower()
+            if confirm not in {"y", "yes", "j", "ja"}:
+                print("Resume cancelled.")
+                continue
+
+            try:
+                resumed = NCBIBlastClient().resume(rid)
+            except BlastAnalysisError as exc:
+                print(f"ERROR: {exc}")
+                continue
+
+            last_run = resumed
+            active_query = resumed.query
+            print(
+                f"Resumed request {rid}: {len(resumed.hits)} hit(s) for "
+                f"{resumed.query.name} ({resumed.query.length} "
+                f"{resumed.query.sequence_type.lower()})."
+            )
+            for note in resumed.metadata.warnings:
+                print(f"Note: {note}")
 
         else:
             print("Invalid selection.")

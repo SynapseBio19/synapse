@@ -312,6 +312,10 @@ Validation:
   (`DEFAULT_EVIDENCE_EVALUE_THRESHOLD`, configurable); the threshold is a
   screening convention, not a universal significance level.
 - Stored: parameters reported by BLAST, database title/date/version.
+- A remote search can be collected later from its request ID (P1-7).
+  Only the RID is sent; BLAST output does not contain the query
+  sequence, so a resumed run keeps the reported query length and an
+  empty sequence rather than an invented one, and is marked as resumed.
 - Query type: from `core.alphabets` (declared, or inferred from the
   letters). An undetermined query is not guessed: the menu asks for DNA
   or protein, the programmatic entry points refuse it. RNA is searched as

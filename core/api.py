@@ -455,6 +455,34 @@ def blast_search(record_or_sequence: Any, *, program: str = "blastn", database: 
                    ])
 
 
+def blast_resume(rid: str, *, contact_ncbi: bool = False, email: Optional[str] = None,
+                 **client_options: Any) -> AnalysisResult:
+    """Collect an NCBI BLAST search submitted earlier, by its request ID (P1-7).
+
+    Only the request ID is sent; the query sequence is not transmitted
+    again. The call still contacts NCBI, so it requires
+    ``contact_ncbi=True``. NCBI keeps a request ID for a limited time, so an
+    older one may have expired.
+    """
+    from analyses.blast import NCBIBlastClient
+
+    if not contact_ncbi:
+        raise ValueError(
+            "Resuming a search contacts NCBI to fetch the stored result. Pass "
+            "contact_ncbi=True to confirm. Only the request ID is sent."
+        )
+    client = NCBIBlastClient(email=email) if email else NCBIBlastClient()
+    run = client.resume(str(rid), **client_options)
+    return _result("blast", run, "", f"resumed request {rid}",
+                   parameters={"rid": rid, "engine": "remote", "resumed": True},
+                   warnings=["Only the request ID was sent to NCBI; the query "
+                             "sequence was not transmitted again."],
+                   limitations=[
+                       "BLAST hits show sequence similarity; they do not prove "
+                       "function, orthology or identity.",
+                   ])
+
+
 def literature_search(query: str, *, sources: Optional[Sequence[str]] = None,
                       max_results: int = 30, email: Optional[str] = None,
                       send_to_providers: bool = False, **query_fields: Any) -> AnalysisResult:
@@ -490,5 +518,5 @@ __all__ = [
     "load_records", "sequence_overview", "find_orfs", "analyze_rna", "analyze_protein_from_cds",
     "analyze_protein", "restriction_digest", "design_primers", "compare_sequences", "analyze_vcf",
     "design_crispr_guides", "plan_cloning", "filter_variants", "mutation_report", "blast_search",
-    "literature_search",
+    "blast_resume", "literature_search",
 ]

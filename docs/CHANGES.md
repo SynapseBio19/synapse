@@ -1189,3 +1189,34 @@ interrupted the Opus 5.5 session at the start of this investigation.
   menus. The API now covers every analysis, which is the part S14 named;
   moving the menus out of the modules belongs with the Stage F interface
   work.
+
+### S6, P1-7 An NCBI search can be resumed from its request ID (`analyses/blast.py`, `core/api.py`)
+
+- Problem: every run already recorded its RID and the client had the
+  primitives (`submit`, `status`, `fetch_xml`), but nothing used them to
+  pick a search up again, and no menu entry offered it. A long search that
+  outlived its session had to be resubmitted.
+- Now: `NCBIBlastClient.await_ready()` holds the polling loop that `run()`
+  always had, and `NCBIBlastClient.resume(rid)` waits for an existing
+  request and parses its result. `run()` now submits and then calls
+  `resume()`, so both paths share one implementation. Menu entry
+  `[14] Resume Search by Request ID (RID)` and `core.api.blast_resume()`
+  expose it.
+- Nothing is invented for a resumed run. `describe_run_from_xml()` rebuilds
+  the query and parameters from what the XML states - definition, length,
+  program, database - and leaves the query sequence empty, because BLAST
+  output does not contain it. `BlastQuery.reported_length` carries the
+  stated length so coverage still works; when the XML states no length,
+  the query says so instead of guessing. A resumed run is marked as such
+  in its warnings, since the original submission time is unknown.
+- Privacy: resuming sends only the request ID, never the sequence again.
+  The menu asks before contacting NCBI and `blast_resume` requires
+  `contact_ncbi=True`, consistent with the other external entry points.
+- An expired request ID reports NCBI's `UNKNOWN` status with an
+  explanation, because NCBI retains an RID only for a limited period.
+- Tests: 9 new (`BlastResumeTests`), driven by a stubbed client that
+  asserts `submit()` is never called, so **no request leaves the machine**.
+  Suite 256 -> 265.
+- Not verified: a real resume against NCBI. That needs a live submission,
+  which requires the owner's approval, so it remains an untested path
+  against the real service.

@@ -788,5 +788,114 @@ class ApiCompletenessTests(unittest.TestCase):
         self.assertEqual(result.warnings, [])
 
 
+# ----------------------------------------------------------------------
+# S6 / P1-7: resuming an NCBI search from its request ID
+# ----------------------------------------------------------------------
+class BlastResumeTests(unittest.TestCase):
+    """Driven by a stubbed client: no request leaves this machine."""
+
+    RID = "ABCD1234567"
+
+    def _client(self, status_sequence=("READY",), xml=None):
+        from analyses import blast as B
+        client = B.NCBIBlastClient()
+        statuses = list(status_sequence)
+        calls = {"status": 0, "fetch": 0, "submit": 0}
+
+        def fake_status(rid):
+            calls["status"] += 1
+            return (statuses.pop(0) if statuses else "READY"), "stub"
+
+        def fake_fetch(rid):
+            calls["fetch"] += 1
+            return xml if xml is not None else B.SAMPLE_XML
+
+        def fake_submit(*args, **kwargs):
+            calls["submit"] += 1
+            raise AssertionError("resume() must not submit a new search")
+
+        client.status = fake_status          # type: ignore[method-assign]
+        client.fetch_xml = fake_fetch        # type: ignore[method-assign]
+        client.submit = fake_submit          # type: ignore[method-assign]
+        client.min_poll_interval = 0
+        return client, calls
+
+    def test_resume_fetches_without_resubmitting(self):
+        client, calls = self._client()
+        run = client.resume(self.RID, poll_interval=0)
+        self.assertEqual(run.metadata.rid, self.RID)
+        self.assertEqual(calls["submit"], 0)
+        self.assertEqual(calls["fetch"], 1)
+        self.assertTrue(any("resumed from its request ID" in w
+                            for w in run.metadata.warnings))
+
+    # NCBI output carries the query definition, length, program and database.
+    XML_WITH_QUERY = (
+        '<?xml version="1.0"?>\n<BlastOutput>\n'
+        "  <BlastOutput_program>blastp</BlastOutput_program>\n"
+        "  <BlastOutput_db>swissprot</BlastOutput_db>\n"
+        "  <BlastOutput_query-def>SYN_TEST some description</BlastOutput_query-def>\n"
+        "  <BlastOutput_query-len>137</BlastOutput_query-len>\n"
+        "  <BlastOutput_iterations></BlastOutput_iterations>\n</BlastOutput>\n"
+    )
+
+    def test_query_and_parameters_are_recovered_from_the_xml(self):
+        from analyses import blast as B
+        query, parameters = B.describe_run_from_xml(self.XML_WITH_QUERY)
+        self.assertEqual((parameters.program, parameters.database), ("blastp", "swissprot"))
+        self.assertEqual(query.name, "SYN_TEST")
+        self.assertEqual(query.sequence_type, "PROTEIN")
+        self.assertEqual(query.sequence, "")          # never invented
+        self.assertEqual((query.length, query.reported_length), (137, 137))
+        self.assertTrue(any("not part of it" in note for note in query.notes))
+
+    def test_a_missing_query_length_is_stated_not_guessed(self):
+        from analyses import blast as B
+        query, _ = B.describe_run_from_xml(B.SAMPLE_XML)  # carries no query-len
+        self.assertEqual(query.length, 0)
+        self.assertTrue(any("no query length" in note for note in query.notes))
+
+    def test_a_supplied_query_is_preferred_over_the_xml(self):
+        from analyses import blast as B
+        client, _ = self._client()
+        original = B.build_query("ACGTACGTACGTACGTACGT", name="Original")
+        run = client.resume(self.RID, query=original,
+                            parameters=B.BlastParameters(program="blastn", database="nt"),
+                            submitted_at="2026-10-31T00:00:00+00:00", poll_interval=0)
+        self.assertEqual(run.query.name, "Original")
+        self.assertEqual(run.query.sequence, original.sequence)
+        self.assertFalse(any("resumed from its request ID" in w
+                             for w in run.metadata.warnings))
+
+    def test_waiting_then_ready(self):
+        client, calls = self._client(status_sequence=("WAITING", "WAITING", "READY"))
+        client.resume(self.RID, poll_interval=0)
+        self.assertEqual(calls["status"], 3)
+
+    def test_an_expired_request_is_explained(self):
+        from analyses import blast as B
+        client, _ = self._client(status_sequence=("UNKNOWN",))
+        with self.assertRaisesRegex(B.BlastAnalysisError, "may simply have expired"):
+            client.resume(self.RID, poll_interval=0)
+
+    def test_an_empty_request_id_is_refused(self):
+        from analyses import blast as B
+        client, _ = self._client()
+        with self.assertRaisesRegex(B.BlastAnalysisError, "request ID is required"):
+            client.resume("   ")
+
+    def test_api_requires_confirmation_before_contacting_ncbi(self):
+        from core import api
+        with self.assertRaisesRegex(ValueError, "contact_ncbi=True"):
+            api.blast_resume(self.RID)
+
+    def test_the_menu_offers_the_entry(self):
+        import inspect
+        from analyses import blast as B
+        source = inspect.getsource(B.blast_menu)
+        self.assertIn("Resume Search by Request ID", source)
+        self.assertIn('choice == "14"', source)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -78,6 +78,8 @@ IUPAC, gapped and invalid input (D14):
 
 | 25 | S14 API covers cloning, variant filtering, mutation reports, BLAST and literature | this package | internal tests incl. both privacy gates; local BLAST+ run | Resolved for the API; menus stay with Stage F (P2-2); suite 256/256 |
 
+| 26 | S6/P1-7 resume an NCBI search from its request ID | this package | internal tests against a stubbed client (asserts no submission); no live NCBI call | Implemented; suite 265/265 |
+
 ## Paused (2026-10-31)
 
 Planned pause at the owner's request; see `docs/PHASE6_HANDOVER.md` for the
