@@ -26,6 +26,11 @@ from itertools import combinations
 
 from data.restriction_enzymes import RESTRICTION_ENZYMES
 
+# Restriction sites are recognized by the restriction engine's matcher, so
+# restriction and cloning analyses apply the same CONFIRMED/POSSIBLE rules
+# (audit D4). bases_match is re-exported for existing callers.
+from analyses.restriction import bases_match, find_recognition_site_matches
+
 
 # ============================================================
 # IUPAC / DNA HELPERS
@@ -83,52 +88,6 @@ def reverse_complement(sequence):
     return "".join(
         complement.get(base, "N")
         for base in reversed(sequence)
-    )
-
-
-def bases_match(sequence_base, recognition_base):
-    sequence_set = IUPAC_BASES.get(
-        str(sequence_base).upper()
-    )
-    recognition_set = IUPAC_BASES.get(
-        str(recognition_base).upper()
-    )
-
-    if sequence_set is None or recognition_set is None:
-        return False
-
-    return bool(
-        sequence_set & recognition_set
-    )
-
-
-def _recognition_matches(
-    sequence,
-    start,
-    recognition_sequence,
-):
-    recognition_sequence = normalize_sequence(
-        recognition_sequence
-    )
-
-    fragment = sequence[
-        start:
-        start + len(recognition_sequence)
-    ]
-
-    if len(fragment) != len(recognition_sequence):
-        return False
-
-    return all(
-        bases_match(
-            observed,
-            expected,
-        )
-        for observed, expected
-        in zip(
-            fragment,
-            recognition_sequence,
-        )
     )
 
 
@@ -276,29 +235,21 @@ def is_blunt_enzyme(enzyme_name):
 def find_restriction_sites(
     sequence,
     recognition_sequence,
+    include_possible=False,
 ):
-    sequence = normalize_sequence(
-        sequence
-    )
-    recognition_sequence = normalize_sequence(
-        recognition_sequence
-    )
+    """1-based start positions of recognition sites.
 
-    if not recognition_sequence:
-        return []
-
+    Only CONFIRMED sites (no IUPAC ambiguity inside the site) are returned
+    unless include_possible=True; a run of N is not a site. Raises
+    ValueError for an empty or non-IUPAC sequence.
+    """
     return [
-        position + 1
-        for position in range(
-            len(sequence)
-            - len(recognition_sequence)
-            + 1
-        )
-        if _recognition_matches(
-            sequence,
-            position,
+        match["position_1based"]
+        for match in find_recognition_site_matches(
+            normalize_sequence(sequence),
             recognition_sequence,
         )
+        if include_possible or match["status"] == "CONFIRMED"
     ]
 
 
@@ -316,10 +267,23 @@ def analyze_enzyme(
         )
     )
 
-    sites = find_restriction_sites(
+    matches = find_recognition_site_matches(
         sequence,
         recognition_sequence,
     )
+    # "sites" holds CONFIRMED sites only. Ambiguity-dependent (POSSIBLE)
+    # sites are never used as cut positions, but they prevent an enzyme
+    # from counting as a unique or absent cutter (see _ambiguity_reason).
+    sites = [
+        match["position_1based"]
+        for match in matches
+        if match["status"] == "CONFIRMED"
+    ]
+    possible_sites = [
+        match["position_1based"]
+        for match in matches
+        if match["status"] == "POSSIBLE"
+    ]
 
     overhang = get_overhang(
         enzyme_name
@@ -332,6 +296,9 @@ def analyze_enzyme(
         ),
         "site_count": len(sites),
         "sites": sites,
+        "possible_site_count": len(possible_sites),
+        "possible_sites": possible_sites,
+        "site_matches": matches,
         "cut_type": get_cut_type(
             enzyme_name
         ),
@@ -835,10 +802,33 @@ def analyze_junction(
 # TWO-END DEFINITIONS
 # ============================================================
 
+def _ambiguity_reason(analysis, role):
+    """Explain why POSSIBLE sites leave an enzyme's site count open, else None.
+
+    An ambiguity-dependent site may or may not exist, so an enzyme with one
+    is neither a confirmed unique cutter nor a confirmed non-cutter -- the
+    rule restriction.py applies to unique cutters and enzyme pairs.
+    """
+    count = analysis.get("possible_site_count", 0)
+    if not count:
+        return None
+    positions = ", ".join(
+        str(position)
+        for position in analysis.get("possible_sites", [])
+    )
+    return (
+        f"{analysis['enzyme']} has {count} ambiguity-dependent (POSSIBLE) "
+        f"site(s) in the {role} at position(s) {positions}: IUPAC symbols "
+        "inside the recognition sequence leave the number of real sites "
+        "undetermined."
+    )
+
+
 def _end_definition(
     sequence,
     left_enzyme,
     right_enzyme,
+    role="molecule",
 ):
     left_analysis = analyze_enzyme(
         sequence,
@@ -848,6 +838,33 @@ def _end_definition(
         sequence,
         right_enzyme,
     )
+
+    ambiguity = [
+        reason
+        for reason in (
+            _ambiguity_reason(left_analysis, role),
+            _ambiguity_reason(right_analysis, role)
+            if right_enzyme != left_enzyme
+            else None,
+        )
+        if reason
+    ]
+
+    if ambiguity:
+        return {
+            "valid": False,
+            "mode": (
+                "same-enzyme"
+                if left_enzyme == right_enzyme
+                else "two-enzyme"
+            ),
+            "reason": " ".join(ambiguity),
+            "ambiguity_dependent": True,
+            "left_analysis": left_analysis,
+            "right_analysis": right_analysis,
+            "left_site": None,
+            "right_site": None,
+        }
 
     if (
         left_enzyme
@@ -1577,12 +1594,14 @@ def evaluate_cloning_strategy(
         vector,
         vector_left_enzyme,
         vector_right_enzyme,
+        role="vector",
     )
 
     insert_definition = _end_definition(
         insert,
         insert_left_enzyme,
         insert_right_enzyme,
+        role="insert",
     )
 
     if not vector_definition[
@@ -2034,6 +2053,27 @@ def analyze_cloning(
         )
     )
 
+    vector_ambiguity = _ambiguity_reason(
+        vector_analysis,
+        "vector",
+    )
+    insert_ambiguity = _ambiguity_reason(
+        insert_analysis,
+        "insert",
+    )
+    vector_unique = (
+        vector_analysis[
+            "site_count"
+        ] == 1
+        and vector_ambiguity is None
+    )
+    insert_unique = (
+        insert_analysis[
+            "site_count"
+        ] == 1
+        and insert_ambiguity is None
+    )
+
     validity = {
         "all_required_sites": (
             vector_analysis[
@@ -2043,23 +2083,11 @@ def analyze_cloning(
                 "site_count"
             ] >= 1
         ),
-        "vector_unique": (
-            vector_analysis[
-                "site_count"
-            ] == 1
-        ),
-        "insert_unique": (
-            insert_analysis[
-                "site_count"
-            ] == 1
-        ),
+        "vector_unique": vector_unique,
+        "insert_unique": insert_unique,
         "no_internal_sites": (
-            vector_analysis[
-                "site_count"
-            ] == 1
-            and insert_analysis[
-                "site_count"
-            ] == 1
+            vector_unique
+            and insert_unique
         ),
         "junctions_compatible": (
             compatibility[
@@ -2072,12 +2100,8 @@ def analyze_cloning(
             ] is not None
         ),
         "valid": (
-            vector_analysis[
-                "site_count"
-            ] == 1
-            and insert_analysis[
-                "site_count"
-            ] == 1
+            vector_unique
+            and insert_unique
             and compatibility[
                 "compatible"
             ] is True
@@ -2125,6 +2149,10 @@ def analyze_cloning(
             "Insert does not contain exactly one selected site."
         )
 
+    for reason in (vector_ambiguity, insert_ambiguity):
+        if reason:
+            warnings.append(reason)
+
     if compatibility[
         "compatible"
     ] is not True:
@@ -2166,9 +2194,19 @@ def assess_enzyme_suitability(
         enzyme_name,
     )
 
+    ambiguity = [
+        reason
+        for reason in (
+            _ambiguity_reason(vector, "vector"),
+            _ambiguity_reason(insert, "insert"),
+        )
+        if reason
+    ]
+
     suitable = (
         vector["site_count"] == 1
         and insert["site_count"] == 1
+        and not ambiguity
         and (
             get_overhang(
                 enzyme_name
@@ -2214,6 +2252,8 @@ def assess_enzyme_suitability(
         reasons.append(
             "Insert contains multiple selected sites."
         )
+
+    reasons.extend(ambiguity)
 
     return {
         "enzyme": enzyme_name,
@@ -2724,7 +2764,9 @@ def _site_diagnostics(
             "site_count"
         ]
 
-        if count == 0:
+        if analysis["possible_site_count"]:
+            status = "AMBIGUITY_DEPENDENT"
+        elif count == 0:
             status = "NO_SITE"
         elif count == 1:
             status = "UNIQUE"
@@ -2740,6 +2782,14 @@ def _site_diagnostics(
             "sites": list(
                 analysis[
                     "sites"
+                ]
+            ),
+            "possible_site_count": analysis[
+                "possible_site_count"
+            ],
+            "possible_sites": list(
+                analysis[
+                    "possible_sites"
                 ]
             ),
             "status": status,
@@ -2764,19 +2814,14 @@ def _no_strategy_diagnostics(
         "insert",
     )
 
+    # Rows with ambiguity-dependent sites cannot define a clean end.
     vector_end_possible = any(
-        row["site_count"] == 1
-        for row in vector_rows
-    ) or any(
-        row["site_count"] == 2
+        row["status"] in {"UNIQUE", "TWO_SITES"}
         for row in vector_rows
     )
 
     insert_end_possible = any(
-        row["site_count"] == 1
-        for row in insert_rows
-    ) or any(
-        row["site_count"] == 2
+        row["status"] in {"UNIQUE", "TWO_SITES"}
         for row in insert_rows
     )
 

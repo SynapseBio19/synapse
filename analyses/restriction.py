@@ -140,16 +140,30 @@ def find_restriction_site_matches(sequence, enzyme_name, topology="linear"):
     the forward strand, which is complete for the palindromic enzymes in the
     Synapse database.
     """
-    sequence = _require_valid_restriction_sequence(sequence)
-    circular = str(topology).lower() == "circular"
     enzyme = get_restriction_enzyme(enzyme_name)
 
     if enzyme is None:
         raise ValueError(f"Unknown restriction enzyme: {enzyme_name}")
 
-    recognition = _normalize_restriction_sequence(
-        enzyme.get("recognition_sequence", "")
+    return find_recognition_site_matches(
+        sequence,
+        enzyme.get("recognition_sequence", ""),
+        topology=topology,
     )
+
+
+def find_recognition_site_matches(sequence, recognition_sequence, topology="linear"):
+    """The single Synapse recognition-site matcher (restriction and cloning).
+
+    Same result format as find_restriction_site_matches(). A window counts
+    as a site when every base is IUPAC-compatible with the recognition
+    sequence; it is CONFIRMED only when the window has no ambiguous symbol,
+    otherwise POSSIBLE. Raises ValueError for an empty or non-IUPAC sequence.
+    """
+    sequence = _require_valid_restriction_sequence(sequence)
+    circular = str(topology).lower() == "circular"
+
+    recognition = _normalize_restriction_sequence(recognition_sequence)
 
     if not recognition:
         return []

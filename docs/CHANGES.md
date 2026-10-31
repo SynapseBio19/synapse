@@ -409,3 +409,46 @@ in its own commit with its own regression tests in
   length checks against `##contig` header lines; RefSeq/GenBank accession
   naming (`NC_000001.11`), which needs an assembly report rather than a
   string rule.
+
+### D4 Cloning used its own site finder without the CONFIRMED/POSSIBLE distinction (`analyses/cloning.py`, `analyses/restriction.py`)
+
+- Problem: `cloning.py` had a private recognition matcher
+  (`_recognition_matches`) that returned every IUPAC-compatible window as a
+  site. The P0-5 fix (ambiguity-dependent sites do not cut) existed only in
+  `restriction.py`. `cloning.find_restriction_sites("A"*10 + "N"*6 + "A"*10,
+  "GAATTC")` returned `[11]`; a vector whose only EcoRI-compatible site was
+  `GANTTC` gave `evaluate_cloning_strategy(...) == "VALID"`, and the
+  automatic planner reported a valid strategy built on that site.
+- Now:
+  - One matcher: `restriction.find_recognition_site_matches(sequence,
+    recognition_sequence, topology)` holds the existing loop of
+    `find_restriction_site_matches`, which now delegates to it (no behavior
+    change; the pUC19 cross-check against Biopython still gives 0
+    differences in 132 comparisons). `cloning.find_restriction_sites` and
+    `cloning.analyze_enzyme` use it; cloning's private matcher was removed
+    and `cloning.bases_match` is the restriction function.
+  - `cloning.analyze_enzyme`: `sites` / `site_count` hold CONFIRMED sites
+    only; new `possible_sites`, `possible_site_count`, `site_matches`.
+    `find_restriction_sites(..., include_possible=False)`.
+  - An enzyme with a POSSIBLE site in a molecule is neither a confirmed
+    unique cutter nor a confirmed non-cutter there — the rule
+    `restriction.py` already applies in `find_unique_cutters`,
+    `recommend_enzyme_pairs` and `get_cloning_compatible_sites`. Cloning
+    ends (`_end_definition`), single-enzyme analysis, enzyme suitability and
+    the planner diagnostics (`AMBIGUITY_DEPENDENT`) apply it and state the
+    reason with the positions.
+- Interface: signatures are unchanged except for the new
+  `include_possible` keyword; `cloning.find_restriction_sites` and
+  `analyze_enzyme` now raise `ValueError` for an empty or non-IUPAC
+  sequence instead of silently skipping invalid windows. The planner and
+  both strategy evaluators validate their input first and are unaffected.
+- Unchanged: results for sequences without ambiguity symbols (golden
+  snapshots unchanged; cloning 13/13, cloning UI and restriction 14/14
+  self-tests pass). Planner on a 1.3 kb vector, 10 enzymes, same process:
+  old 100–110 s, new 68–81 s, identical results.
+- Tests: 7 new (`CloningAmbiguousSiteTests`), including identity of the
+  cloning and restriction site lists for all 22 enzymes on a sequence with
+  IUPAC symbols. Suite 118 → 125.
+- Found and recorded, not changed: S17 (the cloning digest uses the
+  recognition start instead of the cut coordinate) and S18 (planner
+  runtime); see `docs/PHASE6_INITIAL_AUDIT.md` §5.

@@ -78,6 +78,12 @@ use 0-based inclusive `start <= stop` on the forward strand.
 - Sites are CONFIRMED (exact bases) or POSSIBLE (match only through IUPAC
   ambiguity). Digests use CONFIRMED sites by default
   (`include_possible=False`).
+- Restriction and cloning use one matcher
+  (`restriction.find_recognition_site_matches`). Only CONFIRMED sites define
+  cut positions and cloning ends. An enzyme with a POSSIBLE site in a
+  molecule is treated as neither a confirmed unique cutter nor a confirmed
+  non-cutter there (the number of real sites is undetermined), so it cannot
+  define a cloning end in that molecule.
 - Circular topology finds sites spanning the origin.
 - End compatibility requires the same overhang sequence *and* polarity
   (5′ vs 3′); blunt ends are compatible with blunt ends.

@@ -588,6 +588,13 @@ scope and neither was changed:
 | S15 | `analyses/variant_analysis.py`, `annotate_from_mutation_analysis` (call at lines 2026–2027 after D12) | SUSPECTED | pyright reports `No parameter named "reference_cds"` and `"variant_cds"` on a call into the mutation module. If that call path is reached it would raise `TypeError`. Present identically at `824ca5f`; not reproduced by execution. |
 | S16 | `analyses/variant_analysis.py`, `left_normalize_variant` | CONFIRMED | The normalized copy is built with `annotation=dict(variant.annotation)`, a shallow copy, and `REF_MISMATCH` is then added with `setdefault(...).append`, so the flag is also written into the *input* variant's `validation_flags` list when that list already exists. Reproduced: input flags `["PRE_EXISTING"]` become `["PRE_EXISTING", "REF_MISMATCH"]` after `left_normalize_variant(Variant("chr1", 1, "TTT", "T"), "GGGAAAAAGGG")`; an input without a pre-existing list stays clean. D12's new flags use copy-on-write and do not have this problem; the pre-existing `REF_MISMATCH` path was left unchanged. (Listed here with the S-items because it was found after the audit; it is a confirmed defect.) |
 
+Found during the D4 work (2026-10-31); outside D4's scope and not changed:
+
+| ID | Location | Level | Finding |
+|---|---|---|---|
+| S17 | `analyses/cloning.py`, `_selected_digest` | CONFIRMED | The cloning digest uses each site's recognition **start** as the cut position instead of the top-strand cut coordinate, so fragment lengths are off by the enzyme's cut offset. Reproduced with EcoRI (`G^AATTC`) + PstI (`CTGCA^G`) on a 162 bp sequence: cloning reports cuts `[51, 107]`, fragments 51/56/55 bp; `restriction.perform_digest` reports cuts `[51, 111]`, fragments 51/60/51 bp. EcoRI agrees only because its cut offset happens to equal 1. |
+| S18 | `analyses/cloning.py`, `automatic_cloning_planner` | CONFIRMED | Runtime: on a 1.3 kb vector and a 0.3 kb insert the planner takes 100–110 s with 10 enzymes and well over 2 minutes with all 22 (environment-dependent; measured 135 s on a lightly loaded run), because every strategy re-scans both molecules (about 12 site searches per evaluated strategy, ~63,500 strategies for 22 enzymes). Results are correct; the cost is repeated work. Related to P2-6. |
+
 ### Examined and found correct (not defects)
 
 - `crispr.list_crispr_systems()` returns `CRISPRSystem` objects, not names; all three call sites use them correctly.

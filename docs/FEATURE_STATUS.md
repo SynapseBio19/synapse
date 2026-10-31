@@ -33,10 +33,10 @@ simulated keystrokes (see audit §11.5).
 | Functions and classes inventoried | ~1,100 |
 | Main-menu entries | 15 |
 | Sub-menu entries inventoried | 78 |
-| Automated tests | 118, all passing (109 at the audit + 9 for D12) |
+| Automated tests | 125, all passing (109 at the audit + 9 for D12 + 7 for D4) |
 | Module self-tests | 12 suites, all passing (CRISPR 28, BLAST 33, mutation 44, variant 27, others aggregated) |
 | Golden-master scenarios | 12 |
-| Confirmed defects | 19 (D1–D19); corrected so far: 1 (D12, 2026-10-31) |
+| Confirmed defects | 19 (D1–D19); corrected so far: 2 (D12, D4; 2026-10-31) |
 | Suspected / unverified concerns | 14 (S1–S14) |
 | External validations performed in this audit | 8 (audit §3, §6) |
 | Features advertised but not implemented | 1 (`[11] AI Experiment Planner`) |
@@ -205,8 +205,8 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 
 | Menu | Feature | Function | Implementation | Execution | Validation | Notes |
 |---|---|---|---|---|---|---|
-| — | Site finding | `find_restriction_sites`, `_recognition_matches` | **Partially implemented** | Execution-tested | Not applicable | **D4** no CONFIRMED/POSSIBLE split — a 6-N run yields a phantom EcoRI site. **D5** no topology. |
-| — | Enzyme analysis, map | `analyze_enzyme`, `build_restriction_map` | Partially implemented | Execution-tested | Not applicable | Inherits **D4/D5**. |
+| — | Site finding | `find_restriction_sites` → `restriction.find_recognition_site_matches` | **Partially implemented** | Execution-tested | Independently validated (shared matcher, pUC19 vs Biopython) | **D4 corrected 2026-10-31**: the restriction matcher is used; only CONFIRMED sites are returned (`include_possible=True` for POSSIBLE); the private `_recognition_matches` was removed. **D5** no topology. |
+| — | Enzyme analysis, map | `analyze_enzyme`, `build_restriction_map` | Partially implemented | Execution-tested | Not applicable | D4 corrected: `possible_sites` / `possible_site_count` reported; an enzyme with POSSIBLE sites never counts as unique (ends, single-enzyme, suitability, planner diagnostics). Inherits **D5**. |
 | — | Overhang / polarity accessors | `get_overhang`, `get_overhang_polarity`, `get_cut_type`, `is_blunt_enzyme` | Implemented | Execution-tested | **Independently validated** | Derived from cut coordinates; 484-pair matrix matches Biopython. |
 | — | End compatibility | `ends_compatible`, `analyze_end_compatibility`, `_end_signature`, `_site_polarity` | Implemented | Execution-tested | **Independently validated** | Returns `None` for undetermined polarity — a deliberate tri-state. |
 | — | Junction analysis | `analyze_junction`, `_end_definition` | Implemented | Execution-tested | Not applicable | |
