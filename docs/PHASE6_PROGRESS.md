@@ -67,6 +67,8 @@ IUPAC, gapped and invalid input (D14):
 | 16 | S17 cloning digest uses the top-strand cut | `c743beb` | internal tests; agreement with `restriction.perform_digest` for all 231 enzyme pairs, linear and circular | Corrected; suite 217/217 |
 | 17 | S19 start-codon classification and scores use the genetic code | `6c20e69` | internal tests; golden master unchanged | Corrected; suite 219/219 |
 
+| 18 | S23 PAM-proximal guide seed; S3 real RTT coverage check; S4/S5 thresholds documented and sourced | this package | internal tests; literature verified in PubMed (PMIDs 24476820, 27096365, 29160308, 31634902, 33811918) | Corrected; suite 228/228; pyright unchanged. Done by Opus 5 on a restricted assignment after a safeguard interrupted the Opus 5.5 session. |
+
 ## Paused (2026-10-31)
 
 Planned pause at the owner's request; see `docs/PHASE6_HANDOVER.md` for the

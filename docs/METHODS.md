@@ -248,6 +248,43 @@ Validation:
   cleavage efficiency.
 - The guide's own site in a supplied local reference is reported as
   "on-target" and not counted as an off-target (D9).
+- Guide seed (S23): the seed is the PAM-proximal end of the guide in
+  targeting orientation, i.e. the 3′ end for 3′-PAM systems (Cas9) and the
+  5′ end for 5′-PAM systems (Cas12a). The PAM-proximal seed concept is
+  established for Cas9 (Sternberg et al. 2014, PMID 24476820); the default
+  length of 8 nt is the conservative end of the commonly used 8–12 nt range
+  and is a Synapse convention, not a value prescribed by that work.
+  `pam_proximal_seed()` is the single source of this rule for both the
+  stored seed and the local specificity screen.
+- Screening thresholds (S4): the GC range (30–70 %), the homopolymer limit
+  (4) and the local-mismatch limit (3) are Synapse screening conventions
+  consistent with common guide-design practice. They are not published
+  cut-offs, they are configurable through `DesignConfig`, and they are
+  quality filters rather than efficiency predictions.
+- Poly-T warning (S5): a run of ≥ 4 T in a guide is reported as a *possible*
+  RNA polymerase III termination signal, which is relevant only when the
+  guide is expressed from a U6 or H1 promoter; synthetic or in-vitro
+  transcribed guides are unaffected. The threshold is deliberately
+  conservative. Verosloff et al. 2021 (PMID 33811918) found four uracils
+  sufficient to terminate at Pol III type 2 promoters, whereas type 3
+  promoters such as U6 required longer tracts, or shorter tracts combined
+  with upstream RNA secondary structure. Synapse therefore screens for the
+  motif and does not predict that termination occurs.
+- Base-editing windows (S4): protospacer positions, 1-based from the
+  PAM-distal end, inclusive. CBE (4, 8) follows the window reported for BE3
+  (Komor et al. 2016, PMID 27096365); ABE (4, 8) is a conservative superset
+  of the narrower window reported for ABE7.10 (Gaudelli et al. 2017,
+  PMID 29160308). The `CBE+`/`ABE+` variants widen the window by one
+  position and are Synapse screening conventions. A position inside the
+  window is a candidate for editing, not an expected edit.
+- Prime editing (S3): PBS and RTT are sequence-level constructions. The RTT
+  is the **reference** template spanning the edit site; it does not encode
+  the alternative allele and is therefore not a ready-to-use pegRNA RTT.
+  The reported `edit_in_rtt` states that the RTT window covers the edit
+  position — previously it only compared the RTT length with the requested
+  length, which said nothing about the edit (prime editing after Anzalone
+  et al. 2019, PMID 31634902). No thermodynamic, structural or efficacy
+  model is applied.
 
 ## BLAST (`analyses/blast.py`)
 
@@ -297,6 +334,18 @@ Validation:
   class 2 CRISPR-Cas system. Cell 163:759–771. PMID 26422227.
 - Nishimasu H et al. (2018) Engineered CRISPR-Cas9 nuclease with expanded
   targeting space. Science 361:1259–1262. PMID 30166441.
+- Sternberg SH et al. (2014) DNA interrogation by the CRISPR RNA-guided
+  endonuclease Cas9. Nature 507:62–67. PMID 24476820.
+- Komor AC et al. (2016) Programmable editing of a target base in genomic
+  DNA without double-stranded DNA cleavage. Nature 533:420–424.
+  PMID 27096365.
+- Gaudelli NM et al. (2017) Programmable base editing of A•T to G•C in
+  genomic DNA without DNA cleavage. Nature 551:464–471. PMID 29160308.
+- Anzalone AV et al. (2019) Search-and-replace genome editing without
+  double-strand breaks or donor DNA. Nature 576:149–157. PMID 31634902.
+- Verosloff MS et al. (2021) RNA sequence and structure determinants of
+  Pol III transcriptional termination in human cells. J Mol Biol
+  433:166978. PMID 33811918.
 - SantaLucia J Jr (1998) A unified view of polymer, dumbbell, and
   oligonucleotide DNA nearest-neighbor thermodynamics. PNAS 95:1460–1465.
 - SantaLucia J Jr, Hicks D (2004) The thermodynamics of DNA structural

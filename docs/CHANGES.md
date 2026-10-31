@@ -949,3 +949,47 @@ Tests are in `tests/test_phase6_tier2.py`.
   Results for ATG, GTG and TTG ORFs are unchanged; the golden master is
   unchanged.
 - Tests: 2 new (`StartCodonClassificationTests`). Suite 217 → 219.
+
+### S23, S3, S4, S5 CRISPR seed orientation, RTT coverage and sourced thresholds (`analyses/crispr.py`)
+
+Performed by Opus 5 on a restricted assignment, after a model safeguard
+interrupted the Opus 5.5 session at the start of this investigation.
+
+- **S23 (confirmed by execution, corrected).** The stored `seed_sequence`
+  took the guide's 3' end for every system. That is the PAM-proximal seed
+  only for 3'-PAM systems; for Cas12a (5' PAM) it reported the PAM-distal
+  end. Reproduced: guide `CGTTACGCCCGTGGACAGAATTA` stored `CAGAATTA`
+  instead of `CGTTACGC`. The local specificity screen already branched on
+  `pam_side`, so the stored seed and the screened seed disagreed. Both now
+  use the new `pam_proximal_seed()`, which is the single source of the
+  rule. Tests check for all four systems that the seed sits directly
+  against the PAM.
+- **S3 (confirmed, corrected).** `edit_in_rtt` only compared the RTT length
+  with the requested length and therefore could not state whether the RTT
+  covers the edit site. It is now a coordinate check against the clipped
+  RTT window. The emission filter already tested the RTT length separately,
+  so this tightens the filter without loosening any existing condition. The
+  report line is now "RTT spans edit site". Remaining limitation, stated in
+  every candidate's notes and in METHODS: the RTT is the reference template
+  and does not encode the alternative allele, so it is not a ready-to-use
+  pegRNA RTT. Renaming the exported field belongs to D18.
+- **S4 (resolved by documentation).** No threshold was changed. The GC
+  range, homopolymer limit and local-mismatch limit are now labelled Synapse
+  screening conventions; the seed length cites the PAM-proximal seed concept
+  (Sternberg et al. 2014) while labelling 8 nt as a Synapse choice; the
+  base-editing windows cite Komor et al. 2016 (CBE) and Gaudelli et al. 2017
+  (ABE), with the `+` variants labelled as Synapse windows.
+- **S5 (partly confirmed, addressed).** The audit's concern that the poly-T
+  flag is position-independent is not a defect: Pol III terminates wherever
+  it meets the T-tract. The real gap was that the motif was neither named
+  nor sourced. The flag now reads "WARN: poly-T run (possible U6/Pol III
+  terminator)" and the threshold is a named constant. METHODS records that
+  four T is a conservative screening threshold, not a prediction, citing
+  Verosloff et al. 2021: four uracils terminate at Pol III type 2
+  promoters, whereas type 3 promoters such as U6 required longer tracts or
+  upstream RNA secondary structure.
+- Validation: literature verified in PubMed (PMIDs 24476820, 27096365,
+  29160308, 31634902, 33811918). No external tool execution was required.
+- Tests: 9 new (`CrisprSeedOrientationTests`, `PrimeEditingRttTests`,
+  `CrisprThresholdDocumentationTests`). Suite 219 -> 228; pyright unchanged;
+  golden master unchanged.

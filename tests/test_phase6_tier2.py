@@ -332,5 +332,141 @@ class StartCodonClassificationTests(unittest.TestCase):
         self.assertIn("Alternative start codon", O.calculate_cds_quality(ctg)["reasons"])
 
 
+# ----------------------------------------------------------------------
+# S23: the stored guide seed is the PAM-proximal end of the guide
+# ----------------------------------------------------------------------
+class CrisprSeedOrientationTests(unittest.TestCase):
+    SEQUENCE = _random_dna(400, 4)
+
+    def test_seed_is_pam_proximal_for_every_system(self):
+        from analyses import crispr as C
+        for name in ("SpCas9", "SpCas9-NG", "SaCas9", "Cas12a"):
+            system = C.get_crispr_system(name)
+            result = C.design_guides(self.SEQUENCE, system=name)
+            self.assertTrue(result.candidates)
+            for candidate in result.candidates:
+                with self.subTest(system=name, candidate=candidate.candidate_id):
+                    seed = candidate.seed_sequence
+                    self.assertEqual(len(seed), min(C.DEFAULT_SEED_LENGTH, len(candidate.guide)))
+                    # The seed must lie directly against the PAM in target_sequence.
+                    target, pam = candidate.target_sequence, candidate.pam
+                    if system.pam_side == "3prime":
+                        self.assertEqual(seed, candidate.guide[-len(seed):])
+                        self.assertTrue(target.endswith(pam))
+                        self.assertTrue(target[:-len(pam)].endswith(seed))
+                    else:
+                        self.assertEqual(seed, candidate.guide[:len(seed)])
+                        self.assertTrue(target.startswith(pam))
+                        self.assertTrue(target[len(pam):].startswith(seed))
+
+    def test_cas12a_seed_is_the_five_prime_end_not_the_three_prime_end(self):
+        """The defect stored the 3' end for a 5'-PAM system."""
+        from analyses import crispr as C
+        candidates = C.design_guides(self.SEQUENCE, system="Cas12a").candidates
+        length = C.DEFAULT_SEED_LENGTH
+        distinguishing = [c for c in candidates if c.guide[:length] != c.guide[-length:]]
+        self.assertTrue(distinguishing, "fixture produced no guide with distinguishable ends")
+        for candidate in distinguishing:
+            with self.subTest(candidate=candidate.candidate_id):
+                self.assertEqual(candidate.seed_sequence, candidate.guide[:length])
+                self.assertNotEqual(candidate.seed_sequence, candidate.guide[-length:])
+
+    def test_stored_seed_matches_the_specificity_screen(self):
+        from analyses import crispr as C
+        for name in ("SpCas9", "Cas12a"):
+            with self.subTest(system=name):
+                system = C.get_crispr_system(name)
+                candidate = C.design_guides(self.SEQUENCE, system=name).candidates[0]
+                self.assertEqual(
+                    C.pam_proximal_seed(candidate.guide, system, C.DEFAULT_SEED_LENGTH),
+                    candidate.seed_sequence)
+                hits = C.search_local_off_targets_detailed(
+                    candidate, {"self": self.SEQUENCE}, max_mismatches=0)
+                self.assertTrue(hits)
+                self.assertEqual([h["seed_mismatches"] for h in hits], [0] * len(hits))
+
+    def test_seed_length_is_bounded(self):
+        from analyses import crispr as C
+        system = C.get_crispr_system("SpCas9")
+        self.assertEqual(C.pam_proximal_seed("ACGTACGT", system, 0), "")
+        self.assertEqual(C.pam_proximal_seed("ACGT", system, 99), "ACGT")
+
+
+# ----------------------------------------------------------------------
+# S3: edit_in_rtt reports actual coverage of the edit site
+# ----------------------------------------------------------------------
+class PrimeEditingRttTests(unittest.TestCase):
+    SEQUENCE = _random_dna(400, 4)
+    EDIT_POSITION = 200
+
+    def _mutation(self):
+        from analyses import crispr as C
+        reference = self.SEQUENCE[self.EDIT_POSITION - 1]
+        return C.MutationTarget("chr1", self.EDIT_POSITION, reference,
+                                "T" if reference != "T" else "G")
+
+    def _candidates(self):
+        from analyses import crispr as C
+        mutation = self._mutation()
+        guides = C.design_guides(self.SEQUENCE, mutations=[mutation])
+        return mutation, C.design_prime_editing_candidates(
+            self.SEQUENCE, mutation, guides.candidates,
+            pbs_lengths=(13,), rtt_lengths=(16,))
+
+    def test_rtt_actually_covers_the_edit_site(self):
+        from analyses import crispr as C
+        mutation, items = self._candidates()
+        self.assertTrue(items)
+        for item in items:
+            with self.subTest(candidate=item.candidate_id):
+                self.assertTrue(item.edit_in_rtt)
+                # The RTT is built from the edit site outwards, so its first
+                # base is the edit-site base in the guide's orientation.
+                expected = (mutation.reference if item.strand == "+"
+                            else C.reverse_complement(mutation.reference))
+                self.assertEqual(item.rtt_sequence[0], expected)
+
+    def test_notes_state_that_the_rtt_does_not_encode_the_edit(self):
+        _, items = self._candidates()
+        self.assertTrue(items)
+        for item in items:
+            with self.subTest(candidate=item.candidate_id):
+                self.assertTrue(any("does not encode the alternative allele" in note
+                                    for note in item.sequence_level_notes))
+
+    def test_an_rtt_that_misses_the_edit_site_is_rejected(self):
+        """A length check alone cannot detect this; the coordinate check can."""
+        from analyses import crispr as C
+        mutation, items = self._candidates()
+        candidate = C.design_guides(self.SEQUENCE, mutations=[mutation]).candidates[0]
+        # Anchor the edit far outside the supplied sequence: a full-length RTT
+        # can still be cut from the sequence, but it cannot cover the edit.
+        distant = C.MutationTarget("chr1", len(self.SEQUENCE) + 500,
+                                   mutation.reference, mutation.alternative)
+        item = C._prime_edit_for_candidate(self.SEQUENCE, candidate, distant, 13, 16)
+        self.assertFalse(item.edit_in_rtt)
+
+
+# ----------------------------------------------------------------------
+# S4, S5: documented thresholds and a precise poly-T warning
+# ----------------------------------------------------------------------
+class CrisprThresholdDocumentationTests(unittest.TestCase):
+    def test_poly_t_warning_names_the_pol_iii_context(self):
+        from analyses import crispr as C
+        self.assertEqual(C.POL3_TERMINATOR_T_RUN, 4)
+        metrics = C.characterize_guide("ACGTTTTACGTACGTACGT")
+        self.assertTrue(metrics.poly_t)
+        self.assertIn("WARN: poly-T run (possible U6/Pol III terminator)",
+                      C.quality_flags(metrics, C.DesignConfig()))
+        # Below the screening threshold.
+        self.assertFalse(C.characterize_guide("ACGTTTACGTACGTACGTA").poly_t)
+
+    def test_methods_documents_the_screening_thresholds(self):
+        methods = (PROJECT_ROOT / "docs" / "METHODS.md").read_text(encoding="utf-8")
+        for fragment in ("PMID 24476820", "PMID 27096365", "PMID 29160308", "PMID 33811918"):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, methods)
+
+
 if __name__ == "__main__":
     unittest.main()

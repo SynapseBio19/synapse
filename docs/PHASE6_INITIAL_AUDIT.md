@@ -590,9 +590,9 @@ fixed list of twelve labels. Not a crash; an inconsistent contract.
 |---|---|---|---|
 | S1 | `analyses/orf.py:483` | SUSPECTED | `analyze_kozak_context` is called with the *strand-local* sequence and index, so for a minus-strand ORF the reported Kozak context belongs to the reverse-complement coordinate frame. Observed output is `classification: "Unavailable"` for the minus ORFs tested (the window ran off the sequence end), so no wrong value was produced here, but the coordinate frame is undocumented and a longer flanking region would produce a context whose position cannot be mapped back to the parent sequence. |
 | S2 | `analyses/orf.py:942` | SUSPECTED | `_keep_longest_per_stop` keys on `(strand, frame, three_prime, status)`. Including `status` means a complete ORF and a partial ORF sharing a 3′ end are both kept, which is defensible, but the key uses `orf["stop"]` for `+` and `orf["start"]` for `−` as the 3′ end — correct — while `frame` for the minus strand is derived from the reverse-complement offset, so two minus ORFs in the same biological frame but found from different rotations would not collide. Needs a targeted test. |
-| S3 | `analyses/crispr.py:1326` | UNVERIFIED CONCERN | Prime-editing PBS/RTT construction is anchored on `mutation.position` and emits a candidate only when the requested lengths fit. The construction is labelled heuristic and carries explicit notes, which is honest, but there is no check that the RTT actually contains the intended edit — `edit_in_rtt` only tests `len(rtt) == rtt_length`. The field name overstates what is verified. |
-| S4 | `analyses/crispr.py:135` | UNVERIFIED CONCERN | `DEFAULT_MIN_GC = 30`, `DEFAULT_MAX_GC = 70`, `DEFAULT_MAX_HOMOPOLYMER = 4`, `DEFAULT_SEED_LENGTH = 8`, base-editing window `(4, 8)`. These are plausible community conventions but carry no citation in the module or in `docs/METHODS.md`. They should either be referenced or explicitly labelled as Synapse conventions. |
-| S5 | `analyses/crispr.py:642` | UNVERIFIED CONCERN | The poly-T flag fires on any run of ≥4 T anywhere in the guide. The U6-promoter consideration that motivated P2-3 item 2 concerns a TTTT terminator motif; the current flag is a generic homopolymer warning, is position-independent, and the string "U6" appears nowhere in the module. The item is addressed only incidentally. |
+| S3 | `analyses/crispr.py:1326` | CONFIRMED, corrected 2026-10-31 (Opus 5) | Prime-editing PBS/RTT construction is anchored on `mutation.position` and emits a candidate only when the requested lengths fit. The construction is labelled heuristic and carries explicit notes, which is honest, but there is no check that the RTT actually contains the intended edit — `edit_in_rtt` only tests `len(rtt) == rtt_length`. The field name overstates what is verified. |
+| S4 | `analyses/crispr.py:135` | RESOLVED by documentation 2026-10-31 (Opus 5) | `DEFAULT_MIN_GC = 30`, `DEFAULT_MAX_GC = 70`, `DEFAULT_MAX_HOMOPOLYMER = 4`, `DEFAULT_SEED_LENGTH = 8`, base-editing window `(4, 8)`. These are plausible community conventions but carry no citation in the module or in `docs/METHODS.md`. They should either be referenced or explicitly labelled as Synapse conventions. |
+| S5 | `analyses/crispr.py:642` | PARTLY CONFIRMED, addressed 2026-10-31 (Opus 5) | The poly-T flag fires on any run of ≥4 T anywhere in the guide. The U6-promoter consideration that motivated P2-3 item 2 concerns a TTTT terminator motif; the current flag is a generic homopolymer warning, is position-independent, and the string "U6" appears nowhere in the module. The item is addressed only incidentally. |
 | S6 | `analyses/blast.py` | SUSPECTED | `NCBIBlastClient` exposes `submit`/`status`/`fetch_xml`/`run`, i.e. the primitives needed to resume a search from a saved RID, and "rid" occurs 40 times, but "resume" occurs 0 times and no menu entry offers it. P1-7's "RID resume deferred" is accurate; the capability is one small function away from existing. |
 | S7 | `analyses/blast.py:3385` | SUSPECTED | On the user-supplied-path branch, `database_details` is populated with `title`, `database_date`, `blastdb_version`, `sequence_count` all `None` because `blastdbcmd -info` is not invoked. Confirmed in the §6 run. Provenance is weaker on that path than on the managed path. |
 | S8 | `core/report.py:72` | SUSPECTED | `to_jsonable` catches bare `Exception` around `value.to_dict()` and falls through to `repr(value)`. A payload whose `to_dict` raises is silently serialised as a Python repr string, which is unparseable downstream and gives no warning in the report. |
@@ -632,11 +632,46 @@ Found during the D14 investigation (2026-10-31); not reproduced:
 | S21 | `fileio/genbank.py`, `ORIGIN` reader | SUSPECTED | Only letters are kept from `ORIGIN` lines, so a non-letter symbol there (e.g. `*`, `-`) would be dropped silently. Practical impact unverified. |
 | S22 | `analyses/variant_analysis.py`, REF check | SUSPECTED | The supplied reference sequence is not checked for its own alphabet. |
 
+Resolution of the CRISPR findings S3, S4, S5 and S23 (2026-10-31, Opus 5;
+the Opus 5.5 session was interrupted by a model safeguard before this
+investigation began):
+
+- **S23 confirmed by execution and corrected.** For Cas12a the stored
+  `seed_sequence` was the PAM-distal end: guide `CGTTACGCCCGTGGACAGAATTA`
+  stored `CAGAATTA` where the PAM-proximal seed is `CGTTACGC`. The local
+  specificity screen was already correct, so the two disagreed. Both now
+  call the new `pam_proximal_seed()`.
+- **S3 confirmed and corrected.** `edit_in_rtt` compared the RTT length
+  with the requested length, which cannot detect whether the RTT covers the
+  edit. It is now a coordinate check. The filter in
+  `design_prime_editing_candidates` also tests the RTT length separately, so
+  the old term was redundant there and the change tightens the filter
+  without loosening any existing condition. **Remaining limitation:** the
+  RTT is still the reference template and does not encode the alternative
+  allele; this is now stated in every candidate's notes and in METHODS.
+  Emitting an edited RTT is a functional extension, not part of S3. The
+  field *name* remains imprecise and belongs to the D18 export-vocabulary
+  work package.
+- **S4 resolved by documentation.** The GC range, homopolymer limit and
+  local-mismatch limit are now explicitly labelled Synapse screening
+  conventions; the seed length cites Sternberg et al. 2014 for the concept
+  while labelling 8 nt as a Synapse choice; the base-editing windows cite
+  Komor et al. 2016 and Gaudelli et al. 2017. No value was changed.
+- **S5 partly confirmed.** The audit's concern that the flag is
+  "position-independent" is **not** a defect: Pol III terminates wherever it
+  meets the T-tract, so a run anywhere in the guide is relevant. The real
+  gap was that the motif was neither named nor sourced. The flag now names
+  the U6/Pol III context and METHODS records that four T is a conservative
+  screening threshold rather than a prediction: Verosloff et al. 2021 found
+  four uracils sufficient at Pol III type 2 promoters, while type 3
+  promoters such as U6 needed longer tracts or upstream RNA secondary
+  structure. The threshold was deliberately left unchanged.
+
 Found during the D9 work (2026-10-31); not changed there:
 
 | ID | Location | Level | Finding |
 |---|---|---|---|
-| S23 | `analyses/crispr.py`, `_candidate_from_oriented_window` | CONFIRMED (by reading) | `seed_sequence = guide[-seed_length:]` is the PAM-proximal seed only for 3′-PAM systems. For Cas12a (5′ PAM) the seed is the 5′ end of the guide; the off-target screen already uses the correct end, but the stored and exported `seed_sequence` is the PAM-distal end. |
+| S23 | `analyses/crispr.py`, `_candidate_from_oriented_window` | CONFIRMED by execution, corrected 2026-10-31 (Opus 5) | `seed_sequence = guide[-seed_length:]` is the PAM-proximal seed only for 3′-PAM systems. For Cas12a (5′ PAM) the seed is the 5′ end of the guide; the off-target screen already uses the correct end, but the stored and exported `seed_sequence` is the PAM-distal end. |
 
 ### Examined and found correct (not defects)
 

@@ -123,6 +123,14 @@ SYSTEM_DEFINITIONS: Dict[str, Dict[str, Any]] = {
     },
 }
 
+# Base-editing windows are protospacer positions, 1-based from the PAM-distal
+# end, inclusive (audit S4). CBE (4, 8) follows the editing window reported for
+# BE3 (Komor et al. 2016, PMID 27096365). ABE (4, 8) is a conservative superset
+# of the narrower window reported for ABE7.10 (Gaudelli et al. 2017,
+# PMID 29160308). The "+" variants widen the window by one position; they are
+# Synapse screening conventions, not published ranges. None of these windows is
+# an efficiency prediction: a position inside the window is a candidate for
+# editing, not an edit that is expected to occur.
 BASE_EDITOR_DEFINITIONS: Dict[str, Dict[str, Any]] = {
     "CBE": {
         "conversion": ("C", "T"),
@@ -146,11 +154,27 @@ BASE_EDITOR_DEFINITIONS: Dict[str, Dict[str, Any]] = {
     },
 }
 
+# Screening thresholds (audit S4). The GC range, the homopolymer limit and the
+# local-mismatch limit are Synapse screening conventions consistent with common
+# guide-design practice; they are not published cut-offs and are configurable
+# through DesignConfig. DEFAULT_SEED_LENGTH follows the PAM-proximal seed
+# concept established for Cas9 (Sternberg et al. 2014, PMID 24476820); 8 nt is
+# the conservative end of the commonly used 8-12 nt range and is a Synapse
+# convention rather than a value prescribed by that work.
 DEFAULT_MIN_GC = 30.0
 DEFAULT_MAX_GC = 70.0
 DEFAULT_MAX_HOMOPOLYMER = 4
 DEFAULT_MAX_LOCAL_MISMATCHES = 3
 DEFAULT_SEED_LENGTH = 8
+
+# A run of this many T in a guide is reported as a possible RNA polymerase III
+# termination signal when the guide is expressed from a U6/H1 promoter
+# (audit S5). Four is a conservative screening threshold, not a prediction of
+# termination: Verosloff et al. 2021 (PMID 33811918) found four uracils
+# sufficient to terminate at Pol III type 2 promoters, while type 3 promoters
+# such as U6 required longer tracts, or shorter tracts combined with upstream
+# RNA secondary structure.
+POL3_TERMINATOR_T_RUN = 4
 
 
 # ============================================================================
@@ -663,7 +687,7 @@ def characterize_guide(guide: str, config: Optional[DesignConfig] = None) -> Gui
         repeated_dinucleotide=has_repeated_dinucleotide(seq),
         ambiguous_bases=count_ambiguous_bases(seq),
         sequence_complexity=sequence_complexity(seq),
-        poly_t=has_poly_run(seq, "T", 4),
+        poly_t=has_poly_run(seq, "T", POL3_TERMINATOR_T_RUN),
         poly_g=has_poly_run(seq, "G", 4),
         repeat_fraction=repeat_fraction(seq),
         self_complementarity_max=stem,
@@ -687,7 +711,7 @@ def quality_flags(metrics: GuideMetrics, config: DesignConfig) -> List[str]:
     if metrics.sequence_complexity < config.min_complexity:
         flags.append("WARN: low sequence complexity")
     if metrics.poly_t:
-        flags.append("WARN: poly-T")
+        flags.append("WARN: poly-T run (possible U6/Pol III terminator)")
     if metrics.poly_g:
         flags.append("WARN: poly-G")
     if metrics.hairpin_risk == "HIGH":
@@ -714,6 +738,23 @@ def cut_site_forward(strand: str, guide_start: int, guide_end: int, cut_after: i
     if strand == "+":
         return guide_start + cut_after - 1
     return guide_end - cut_after
+
+
+def pam_proximal_seed(guide: str, system: CRISPRSystem, seed_length: int) -> str:
+    """Return the PAM-proximal seed of a guide in targeting orientation.
+
+    A guide is always stored 5'->3' in its targeting orientation, so which end
+    is PAM-proximal depends on the system rather than on the strand: the 3' end
+    for Cas9-like 3'-PAM systems, the 5' end for Cas12a-like 5'-PAM systems.
+
+    Audit S23: the stored seed previously took the 3' end for every system, so
+    for Cas12a it reported the PAM-distal end. The local specificity screen
+    already distinguished the two ends; both now use this function.
+    """
+    length = min(max(int(seed_length), 0), len(guide))
+    if not length:
+        return ""
+    return guide[-length:] if system.pam_side == "3prime" else guide[:length]
 
 
 def _candidate_from_oriented_window(
@@ -758,9 +799,7 @@ def _candidate_from_oriented_window(
         target_sequence=guide + pam if system.pam_side == "3prime" else pam + guide,
         metrics=metrics,
         pam_quality=pam_quality(pam, system.pam),
-        # The guide sequence is always stored in targeting orientation, so the
-        # PAM-proximal seed is the same end of the guide string on both strands.
-        seed_sequence=guide[-min(config.seed_length, len(guide)):],
+        seed_sequence=pam_proximal_seed(guide, system, config.seed_length),
         flags=flags,
         context={
             "region_name": region.name,
@@ -1172,12 +1211,8 @@ def search_local_off_targets_detailed(
             if mm > max_mismatches:
                 continue
             # The seed is the PAM-proximal end of the guide in targeting orientation.
-            if system.pam_side == "3prime":
-                seed_query = query[-min(seed_length, len(query)):]
-                seed_target = target[-min(seed_length, len(target)):]
-            else:
-                seed_query = query[:min(seed_length, len(query))]
-                seed_target = target[:min(seed_length, len(target))]
+            seed_query = pam_proximal_seed(query, system, seed_length)
+            seed_target = pam_proximal_seed(target, system, seed_length)
             seed_mm = mismatch_count(seed_query, seed_target)
             pam_ok = pam_matches(window["pam"], system.pam)
             if require_pam and not pam_ok:
@@ -1451,11 +1486,30 @@ def _prime_edit_for_candidate(
         )
         pbs = upstream
         rtt = reverse_complement(downstream) if downstream else ""
+    # Audit S3: establish whether the RTT window actually covers the edit site.
+    # The previous check only compared the RTT length against the requested
+    # length, which says nothing about the position of the edit.
+    if candidate.strand == "+":
+        rtt_first, rtt_last = local_edit_anchor, local_edit_anchor + rtt_length - 1
+    else:
+        rtt_first, rtt_last = local_edit_anchor - rtt_length + 1, local_edit_anchor
+    covered_first = max(1, rtt_first)
+    covered_last = min(len(seq), rtt_last)
+    spans_edit_site = bool(rtt) and covered_first <= local_edit_anchor <= covered_last
+
     ref_alt = f"{mutation.reference}>{mutation.alternative}"
     notes = [
         "PBS/RTT are sequence-level candidate constructions.",
         "No thermodynamic, structural, cellular, or experimental efficacy model is applied.",
+        "The RTT is the reference-sequence template spanning the edit site. It does "
+        "not encode the alternative allele and is therefore not a ready-to-use "
+        "pegRNA RTT.",
     ]
+    if len(rtt) != rtt_length:
+        notes.append(
+            f"Requested RTT length {rtt_length} nt did not fit the supplied sequence; "
+            f"{len(rtt)} nt were available."
+        )
     return PrimeEditingCandidate(
         candidate_id=f"PE_{candidate.candidate_id}_{pbs_length}_{rtt_length}",
         guide_id=candidate.candidate_id,
@@ -1467,7 +1521,7 @@ def _prime_edit_for_candidate(
         pbs_sequence=pbs,
         rtt_length=len(rtt),
         rtt_sequence=rtt,
-        edit_in_rtt=(len(rtt) == rtt_length),
+        edit_in_rtt=spans_edit_site,
         sequence_level_notes=notes,
     )
 
@@ -1977,7 +2031,7 @@ def format_prime_editing_report(results: Sequence[PrimeEditingCandidate], top_n:
             f"Variant: {item.variant}",
             f"PBS ({item.pbs_length} nt): {item.pbs_sequence}",
             f"RTT ({item.rtt_length} nt): {item.rtt_sequence}",
-            f"Edit represented in RTT: {'YES' if item.edit_in_rtt else 'NO'}",
+            f"RTT spans edit site: {'YES' if item.edit_in_rtt else 'NO'}",
             "Notes: " + " | ".join(item.sequence_level_notes),
             _line(),
         ])
