@@ -84,6 +84,11 @@ use 0-based inclusive `start <= stop` on the forward strand.
   molecule is treated as neither a confirmed unique cutter nor a confirmed
   non-cutter there (the number of real sites is undetermined), so it cannot
   define a cloning end in that molecule.
+- Cloning takes the topology of vector and insert (`vector_topology`,
+  `insert_topology`; the pipeline and menus use the loaded record's).
+  On a circular molecule the segment between the two selected sites, in
+  coordinate order, is taken as the region replaced (vector) or excised
+  (insert); the result states this assumption.
 - Circular topology finds sites spanning the origin, in the digest and in
   every site-based result (map, per-enzyme results, unique and non-cutters,
   enzyme pairs). Positions on a circular sequence are reported modulo its

@@ -484,3 +484,37 @@ in its own commit with its own regression tests in
   that map and digest cut sets and the non-cutter list agree for all 22
   enzymes in both topologies with a site rotated across the origin. Suite
   125 → 132.
+
+### D5 Cloning analysed circular vectors as linear (`analyses/cloning.py`, `core/pipeline.py`, `analyses/restriction.py`)
+
+- Problem: no cloning function accepted a topology; vector and insert
+  digests were hard-coded `"linear"`. A recognition site spanning the
+  origin of a circular plasmid was invisible, so a vector whose EcoRI site
+  spans the origin gave `INVALID_VECTOR_ENDS`, also through
+  `SynapsePipeline.run_cloning` on a sequence loaded as circular.
+- Now: `vector_topology` and `insert_topology` (default `"linear"`;
+  `ValueError` for other values) are accepted and passed down to site
+  finding by `evaluate_cloning_strategy`, `analyze_enzyme_pair`,
+  `analyze_cloning`, `assess_enzyme_suitability`, `find_compatible_enzymes`,
+  `find_best_cloning_strategies`, `automatic_cloning_planner`,
+  `run_advanced_cloning_analysis`, `run_cloning_analysis`,
+  `get_best_cloning_strategy`, and internally by the end definitions,
+  internal-site checks, digests and planner diagnostics.
+  `find_restriction_sites`, `analyze_enzyme` and `build_restriction_map`
+  take `topology`. Results record the topology (`vector.topology`,
+  `insert.topology`, planner `topology`); vector and insert digests use it.
+- Scientific convention, stated in the result (`assumptions`): on a
+  circular molecule the segment between the two selected sites in
+  coordinate order is taken as the region replaced (vector) or excised
+  (insert). Which arc is intended cannot be inferred from the sequence.
+- Integration: `SynapsePipeline.run_cloning` / `run_cloning_planner` pass
+  the loaded record's topology for the vector; the Restriction & Cloning
+  menu passes the sequence's topology to the cloning menu, and an insert
+  chosen from the loaded records keeps that record's topology. The cloning
+  menu shows both topologies.
+- Unchanged: all linear results (golden snapshots unchanged; cloning,
+  cloning-UI and restriction self-tests pass).
+- Tests: 7 new (`CloningCircularTopologyTests`), including a circular
+  insert donor, the pipeline path, and a scripted run of the menu from
+  Restriction & Cloning to the planner. Suite 132 → 139.
+- Not changed (recorded as S17): the cloning digest's cut coordinates.

@@ -1086,6 +1086,7 @@ class SynapsePipeline:
             vector_right_enzyme,
             insert_left_enzyme,
             insert_right_enzyme,
+            vector_topology=self.context.topology,
         )
 
         self.context.store_cloning_analysis(
@@ -1124,7 +1125,8 @@ class SynapsePipeline:
             self.context.sequence,
             insert_sequence,
             enzyme_names,
-            top_n
+            top_n,
+            vector_topology=self.context.topology,
         )
 
         self.context.store_cloning_planner(

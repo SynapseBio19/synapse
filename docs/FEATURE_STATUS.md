@@ -33,10 +33,10 @@ simulated keystrokes (see audit §11.5).
 | Functions and classes inventoried | ~1,100 |
 | Main-menu entries | 15 |
 | Sub-menu entries inventoried | 78 |
-| Automated tests | 132, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3) |
+| Automated tests | 139, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5) |
 | Module self-tests | 12 suites, all passing (CRISPR 28, BLAST 33, mutation 44, variant 27, others aggregated) |
 | Golden-master scenarios | 12 |
-| Confirmed defects | 19 (D1–D19); corrected so far: 3 (D12, D4, D3; 2026-10-31) |
+| Confirmed defects | 19 (D1–D19); corrected so far: 4 (D12, D4, D3, D5; 2026-10-31) |
 | Suspected / unverified concerns | 14 (S1–S14) |
 | External validations performed in this audit | 8 (audit §3, §6) |
 | Features advertised but not implemented | 1 (`[11] AI Experiment Planner`) |
@@ -54,7 +54,7 @@ simulated keystrokes (see audit §11.5).
 | 2 | ORF Analysis | `analyses.orf.run_orf_analysis_ui` | Implemented | Execution-tested | Integration-tested | Independently validated (genetic codes, coordinates) | See §3. |
 | 3 | RNA Analysis | `analyses.rna.run_rna_analysis_ui` | Implemented | Execution-tested | Integration-tested | Not applicable | Selected-ORF vs whole-sequence rule confirmed intact. |
 | 4 | Protein Analysis | `analyses.protein.run_protein_analysis_from_orf` | Implemented | Execution-tested | Integration-tested | Independently validated (ProtParam) | Requires a selected ORF by design; no silent whole-sequence fallback. |
-| 5 | Restriction & Cloning | `analyses.restriction.run_restriction_cloning_ui` | Partially implemented | Execution-tested | Integration-tested | Independently validated (digests) | **D3/D4/D5**. |
+| 5 | Restriction & Cloning | `analyses.restriction.run_restriction_cloning_ui` | Implemented | Execution-tested | Integration-tested | Independently validated (digests, circular map) | D3/D4/D5 corrected 2026-10-31. Open: **S17**, **S18**. |
 | 6 | Primer Design | `analyses.primer.run_primer_analysis_ui` | Implemented | Execution-tested | Integration-tested | Independently validated (primer3-py) | **D16** duplicate/shadowed definitions. |
 | 7 | Mutation & Variant Analysis | `analyses.mutation.run_mutation_variant_ui` | Implemented | Execution-tested | Integration-tested | Partially (algorithm checked, no bcftools) | **D12** in the variant branch — corrected 2026-10-31 (Phase 6 Tier 1). |
 | 8 | CRISPR Guide Design | `analyses.crispr.crispr_menu` | Partially implemented | Execution-tested | Integration-tested | Not applicable | **D8/D9/D10**. |
@@ -205,16 +205,17 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 
 | Menu | Feature | Function | Implementation | Execution | Validation | Notes |
 |---|---|---|---|---|---|---|
-| — | Site finding | `find_restriction_sites` → `restriction.find_recognition_site_matches` | **Partially implemented** | Execution-tested | Independently validated (shared matcher, pUC19 vs Biopython) | **D4 corrected 2026-10-31**: the restriction matcher is used; only CONFIRMED sites are returned (`include_possible=True` for POSSIBLE); the private `_recognition_matches` was removed. **D5** no topology. |
-| — | Enzyme analysis, map | `analyze_enzyme`, `build_restriction_map` | Partially implemented | Execution-tested | Not applicable | D4 corrected: `possible_sites` / `possible_site_count` reported; an enzyme with POSSIBLE sites never counts as unique (ends, single-enzyme, suitability, planner diagnostics). Inherits **D5**. |
+| — | Site finding | `find_restriction_sites` → `restriction.find_recognition_site_matches` | Implemented | Execution-tested | Independently validated (shared matcher, pUC19 vs Biopython) | **D4 corrected 2026-10-31**: the restriction matcher is used; only CONFIRMED sites are returned (`include_possible=True` for POSSIBLE); the private `_recognition_matches` was removed. **D5 corrected 2026-10-31**: `topology` parameter. |
+| — | Enzyme analysis, map | `analyze_enzyme`, `build_restriction_map` | Implemented | Execution-tested | Not applicable | D4 corrected: `possible_sites` / `possible_site_count` reported; an enzyme with POSSIBLE sites never counts as unique (ends, single-enzyme, suitability, planner diagnostics). D5 corrected: `topology`, recorded in the result. |
+| — | Vector / insert topology | `vector_topology`, `insert_topology` on every cloning entry point | Implemented | **Integration-tested** | Not applicable | **D5 corrected 2026-10-31**: origin-spanning sites of circular vectors and inserts are found; digests use the molecule's topology; pipeline and menus pass the loaded record's topology. Assumption stated in results: on a circular molecule the segment between the two sites in coordinate order is replaced/excised. Tests: `CloningCircularTopologyTests`. |
 | — | Overhang / polarity accessors | `get_overhang`, `get_overhang_polarity`, `get_cut_type`, `is_blunt_enzyme` | Implemented | Execution-tested | **Independently validated** | Derived from cut coordinates; 484-pair matrix matches Biopython. |
 | — | End compatibility | `ends_compatible`, `analyze_end_compatibility`, `_end_signature`, `_site_polarity` | Implemented | Execution-tested | **Independently validated** | Returns `None` for undetermined polarity — a deliberate tri-state. |
 | — | Junction analysis | `analyze_junction`, `_end_definition` | Implemented | Execution-tested | Not applicable | |
-| 1 | Automatic Cloning Planner | `automatic_cloning_planner`, `find_best_cloning_strategies`, `_find_all_cloning_strategies` | Partially implemented | Execution-tested | Not applicable | Scientifically dependent on **D4/D5**. |
+| 1 | Automatic Cloning Planner | `automatic_cloning_planner`, `find_best_cloning_strategies`, `_find_all_cloning_strategies` | Implemented | Integration-tested | Not applicable | D4 and D5 corrected 2026-10-31. **S18**: slow with all 22 enzymes (minutes on a 1.3 kb vector). |
 | 2 | Single-Enzyme Analysis | `_cloning_ui_single_enzyme` | Implemented | Reachable | Not applicable | |
 | 3 | Two-Enzyme Strategy Analysis | `analyze_enzyme_pair`, `analyze_directional_strategy`, `_cloning_ui_two_enzyme_strategy` | Implemented | Execution-tested | Not applicable | Directional-cloning logic incl. internal-site checks. |
 | — | Strategy scoring / ranking | `_score_strategy`, `score_cloning_strategy`, `rank_cloning_strategy`, `compare_cloning_strategies` | Implemented | Execution-tested | Not applicable | Heuristic; built on possibly phantom sites (**D4**). |
-| — | Digest fragments | `_digest_fragments`, `_selected_digest` | Implemented | Execution-tested | Not applicable | Has a `topology` parameter, but receives linearly-found sites (**D5**). |
+| — | Digest fragments | `_digest_fragments`, `_selected_digest` | **Partially implemented** | Execution-tested | Not applicable | D5 corrected: sites and fragments follow the molecule's topology. **S17**: cut positions are taken as the recognition start, so fragment lengths are off by the cut offset (e.g. PstI by 4 nt). |
 | — | Enzyme suitability / compatible enzymes | `assess_enzyme_suitability`, `find_compatible_enzymes` | Implemented | Execution-tested | Not applicable | |
 | — | Diagnostics when no strategy exists | `_site_diagnostics`, `_no_strategy_diagnostics` | Implemented | Execution-tested | Not applicable | Good failure reporting. |
 | — | Design reasons, ASCII orientation view | `get_design_reasons`, `ascii_orientation_visualization` | Implemented | Reachable | Not applicable | |

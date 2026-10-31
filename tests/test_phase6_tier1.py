@@ -299,5 +299,98 @@ class RestrictionCircularTopologyTests(unittest.TestCase):
         self.assertEqual(spy.call_args.kwargs.get("topology"), "circular")
 
 
+# ----------------------------------------------------------------------
+# D5: cloning analyses honor the topology of vector and insert
+# ----------------------------------------------------------------------
+class CloningCircularTopologyTests(unittest.TestCase):
+    # Circular vector: EcoRI split across the origin, HindIII inside.
+    VECTOR = "TTC" + _filler(100) + "AAGCTT" + _filler(100) + "GAA"
+    # Linear insert ordered like the vector sites: HindIII ... EcoRI.
+    INSERT = _filler(10) + "AAGCTT" + _filler(60) + "GAATTC" + _filler(10)
+    ENDS = ("HindIII", "EcoRI", "HindIII", "EcoRI")
+
+    def test_site_finding_honors_topology(self):
+        from analyses import cloning as C
+        length = len(self.VECTOR)
+        self.assertEqual(C.find_restriction_sites(self.VECTOR, "GAATTC"), [])
+        self.assertEqual(C.find_restriction_sites(self.VECTOR, "GAATTC", topology="circular"), [length - 2])
+        analysis = C.analyze_enzyme(self.VECTOR, "EcoRI", topology="circular")
+        self.assertEqual((analysis["sites"], analysis["topology"]), ([length - 2], "circular"))
+        self.assertEqual(C.analyze_enzyme(self.VECTOR, "EcoRI")["topology"], "linear")
+
+    def test_strategy_uses_the_origin_spanning_vector_site(self):
+        from analyses import cloning as C
+        linear = C.evaluate_cloning_strategy(self.VECTOR, self.INSERT, *self.ENDS)
+        self.assertEqual(linear["status"], "INVALID_VECTOR_ENDS")
+        circular = C.evaluate_cloning_strategy(self.VECTOR, self.INSERT, *self.ENDS, vector_topology="circular")
+        self.assertEqual(circular["status"], "VALID")
+        self.assertEqual((circular["vector"]["topology"], circular["insert"]["topology"]), ("circular", "linear"))
+        self.assertTrue(circular["strategy"]["directional"])
+        digest = circular["digest"]["vector"]
+        self.assertEqual((digest["topology"], digest["fragment_count"]), ("circular", 2))
+        self.assertTrue(any("circular" in note for note in circular["assumptions"]))
+        self.assertEqual(C.analyze_enzyme_pair(self.VECTOR, self.INSERT, *self.ENDS,
+                                               vector_topology="circular")["status"], "VALID")
+
+    def test_circular_insert_donor(self):
+        from analyses import cloning as C
+        donor = "TTC" + _filler(20) + "AAGCTT" + _filler(20) + "GAA"
+        vector = _filler(30) + "AAGCTT" + _filler(30) + "GAATTC" + _filler(30)
+        self.assertEqual(C.evaluate_cloning_strategy(vector, donor, *self.ENDS)["status"], "INVALID_INSERT_ENDS")
+        self.assertEqual(C.evaluate_cloning_strategy(vector, donor, *self.ENDS,
+                                                     insert_topology="circular")["status"], "VALID")
+
+    def test_planner_single_enzyme_and_suitability(self):
+        from analyses import cloning as C
+        names = ["EcoRI", "HindIII"]
+        self.assertEqual(C.automatic_cloning_planner(self.VECTOR, self.INSERT, enzyme_names=names)["valid_count"], 0)
+        planner = C.automatic_cloning_planner(self.VECTOR, self.INSERT, enzyme_names=names,
+                                              vector_topology="circular")
+        self.assertGreater(planner["valid_count"], 0)
+        self.assertEqual(planner["topology"], {"vector": "circular", "insert": "linear"})
+        self.assertEqual(C.run_cloning_analysis(self.VECTOR, self.INSERT, enzyme_names=names,
+                                                vector_topology="circular")["status"], planner["status"])
+
+        vector = "TTC" + _filler(50) + "GAA"
+        insert = _filler(10) + "GAATTC" + _filler(10)
+        self.assertFalse(C.analyze_cloning(vector, insert, "EcoRI", "EcoRI")["validity"]["valid"])
+        self.assertTrue(C.analyze_cloning(vector, insert, "EcoRI", "EcoRI",
+                                          vector_topology="circular")["validity"]["valid"])
+        self.assertTrue(C.assess_enzyme_suitability(vector, insert, "EcoRI", vector_topology="circular")["suitable"])
+
+    def test_unknown_topology_is_rejected(self):
+        from analyses import cloning as C
+        with self.assertRaises(ValueError):
+            C.evaluate_cloning_strategy(self.VECTOR, self.INSERT, *self.ENDS, vector_topology="supercoiled")
+
+    def test_pipeline_passes_the_loaded_topology(self):
+        from core.pipeline import SynapsePipeline
+        pipeline = SynapsePipeline(sequence=self.VECTOR, header="vector", topology="circular")
+        self.assertEqual(pipeline.run_cloning(self.INSERT, *self.ENDS)["status"], "VALID")
+        self.assertGreater(pipeline.run_cloning_planner(self.INSERT, ["EcoRI", "HindIII"])["valid_count"], 0)
+
+    def test_menu_passes_vector_and_insert_topology(self):
+        import contextlib
+        import io
+        from unittest import mock
+        from analyses import cloning as C, restriction as R
+        real_planner = C.automatic_cloning_planner
+
+        def two_enzyme_planner(vector, insert, **kwargs):
+            kwargs["enzyme_names"] = ["EcoRI", "HindIII"]
+            return real_planner(vector, insert, **kwargs)
+
+        records = [{"header": "vector", "sequence": self.VECTOR, "topology": "circular"},
+                   {"header": "insert", "sequence": self.INSERT, "topology": "linear"}]
+        # cloning, insert #2, planner, best strategy, pause, back, back
+        answers = iter(["2", "2", "1", "1", "", "0", "0"])
+        with mock.patch("builtins.input", lambda *_: next(answers)), \
+                mock.patch.object(C, "automatic_cloning_planner", side_effect=two_enzyme_planner) as spy, \
+                contextlib.redirect_stdout(io.StringIO()):
+            R.run_restriction_cloning_ui(self.VECTOR, "vector", records, topology="circular")
+        kwargs = spy.call_args.kwargs
+        self.assertEqual((kwargs["vector_topology"], kwargs["insert_topology"]), ("circular", "linear"))
+
+
 if __name__ == "__main__":
     unittest.main()

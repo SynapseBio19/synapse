@@ -2705,6 +2705,7 @@ def run_restriction_cloning_ui(
                 vector_header=header,
                 sequences=sequences,
                 pipeline=pipeline,
+                vector_topology=topology,
             )
             continue
 

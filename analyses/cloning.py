@@ -64,6 +64,15 @@ def normalize_sequence(sequence):
     )
 
 
+def _normalize_topology(topology):
+    value = str(topology).lower()
+    if value not in {"linear", "circular"}:
+        raise ValueError(
+            "Topology must be 'linear' or 'circular'."
+        )
+    return value
+
+
 def reverse_complement(sequence):
     sequence = normalize_sequence(sequence)
 
@@ -236,18 +245,21 @@ def find_restriction_sites(
     sequence,
     recognition_sequence,
     include_possible=False,
+    topology="linear",
 ):
     """1-based start positions of recognition sites.
 
     Only CONFIRMED sites (no IUPAC ambiguity inside the site) are returned
-    unless include_possible=True; a run of N is not a site. Raises
-    ValueError for an empty or non-IUPAC sequence.
+    unless include_possible=True; a run of N is not a site. On a circular
+    sequence, sites spanning the origin are included (start near the end).
+    Raises ValueError for an empty or non-IUPAC sequence.
     """
     return [
         match["position_1based"]
         for match in find_recognition_site_matches(
             normalize_sequence(sequence),
             recognition_sequence,
+            topology=_normalize_topology(topology),
         )
         if include_possible or match["status"] == "CONFIRMED"
     ]
@@ -256,9 +268,13 @@ def find_restriction_sites(
 def analyze_enzyme(
     sequence,
     enzyme_name,
+    topology="linear",
 ):
     sequence = normalize_sequence(
         sequence
+    )
+    topology = _normalize_topology(
+        topology
     )
 
     recognition_sequence = (
@@ -270,6 +286,7 @@ def analyze_enzyme(
     matches = find_recognition_site_matches(
         sequence,
         recognition_sequence,
+        topology=topology,
     )
     # "sites" holds CONFIRMED sites only. Ambiguity-dependent (POSSIBLE)
     # sites are never used as cut positions, but they prevent an enzyme
@@ -299,6 +316,7 @@ def analyze_enzyme(
         "possible_site_count": len(possible_sites),
         "possible_sites": possible_sites,
         "site_matches": matches,
+        "topology": topology,
         "cut_type": get_cut_type(
             enzyme_name
         ),
@@ -329,6 +347,7 @@ def analyze_enzyme(
 def build_restriction_map(
     sequence,
     enzyme_names=None,
+    topology="linear",
 ):
     sequence = normalize_sequence(
         sequence
@@ -348,6 +367,7 @@ def build_restriction_map(
         analysis = analyze_enzyme(
             sequence,
             enzyme_name,
+            topology=topology,
         )
 
         for position in analysis[
@@ -829,14 +849,17 @@ def _end_definition(
     left_enzyme,
     right_enzyme,
     role="molecule",
+    topology="linear",
 ):
     left_analysis = analyze_enzyme(
         sequence,
         left_enzyme,
+        topology=topology,
     )
     right_analysis = analyze_enzyme(
         sequence,
         right_enzyme,
+        topology=topology,
     )
 
     ambiguity = [
@@ -981,6 +1004,7 @@ def _end_definition(
 def _internal_site_check(
     sequence,
     definition,
+    topology="linear",
 ):
     if not definition["valid"]:
         return {
@@ -1016,6 +1040,7 @@ def _internal_site_check(
         analysis = analyze_enzyme(
             sequence,
             enzyme_name,
+            topology=topology,
         )
 
         for position in analysis[
@@ -1256,6 +1281,7 @@ def _selected_digest(
         analysis = analyze_enzyme(
             sequence,
             enzyme_name,
+            topology=topology,
         )
 
         for position in analysis[
@@ -1557,7 +1583,24 @@ def evaluate_cloning_strategy(
     vector_right_enzyme,
     insert_left_enzyme,
     insert_right_enzyme,
+    vector_topology="linear",
+    insert_topology="linear",
 ):
+    """Evaluate one four-enzyme cloning architecture.
+
+    vector_topology / insert_topology ("linear" or "circular") decide
+    whether recognition sites spanning a molecule's origin are found. On a
+    circular molecule the segment between its two selected sites, in
+    coordinate order, is taken as the region replaced (vector) or excised
+    (insert); this assumption is listed in the result.
+    """
+    vector_topology = _normalize_topology(
+        vector_topology
+    )
+    insert_topology = _normalize_topology(
+        insert_topology
+    )
+
     vector_validation = _validate_sequence(
         vector_sequence,
         "vector",
@@ -1595,6 +1638,7 @@ def evaluate_cloning_strategy(
         vector_left_enzyme,
         vector_right_enzyme,
         role="vector",
+        topology=vector_topology,
     )
 
     insert_definition = _end_definition(
@@ -1602,6 +1646,7 @@ def evaluate_cloning_strategy(
         insert_left_enzyme,
         insert_right_enzyme,
         role="insert",
+        topology=insert_topology,
     )
 
     if not vector_definition[
@@ -1650,10 +1695,12 @@ def evaluate_cloning_strategy(
     vector_internal = _internal_site_check(
         vector,
         vector_definition,
+        topology=vector_topology,
     )
     insert_internal = _internal_site_check(
         insert,
         insert_definition,
+        topology=insert_topology,
     )
 
     left_junction = analyze_junction(
@@ -1785,7 +1832,7 @@ def evaluate_cloning_strategy(
             vector_left["enzyme"],
             vector_right["enzyme"],
         ],
-        "linear",
+        vector_topology,
     )
 
     insert_digest = _selected_digest(
@@ -1794,8 +1841,19 @@ def evaluate_cloning_strategy(
             insert_left["enzyme"],
             insert_right["enzyme"],
         ],
-        "linear",
+        insert_topology,
     )
+
+    assumptions = [
+        f"The {role} is circular: the segment between its two selected "
+        "sites, in coordinate order, is taken as the region "
+        f"{'replaced' if role == 'vector' else 'excised'}."
+        for role, topology in (
+            ("vector", vector_topology),
+            ("insert", insert_topology),
+        )
+        if topology == "circular"
+    ]
 
     warnings = []
 
@@ -1872,14 +1930,17 @@ def evaluate_cloning_strategy(
         "mode": "two-enzyme",
         "vector": {
             "length": len(vector),
+            "topology": vector_topology,
             "left": vector_left,
             "right": vector_right,
         },
         "insert": {
             "length": len(insert),
+            "topology": insert_topology,
             "left": insert_left,
             "right": insert_right,
         },
+        "assumptions": assumptions,
         "vector_definition": (
             vector_definition
         ),
@@ -1953,6 +2014,8 @@ def analyze_enzyme_pair(
     vector_right_enzyme,
     insert_left_enzyme,
     insert_right_enzyme,
+    vector_topology="linear",
+    insert_topology="linear",
 ):
     return evaluate_cloning_strategy(
         vector_sequence,
@@ -1961,6 +2024,8 @@ def analyze_enzyme_pair(
         vector_right_enzyme,
         insert_left_enzyme,
         insert_right_enzyme,
+        vector_topology=vector_topology,
+        insert_topology=insert_topology,
     )
 
 
@@ -1973,7 +2038,16 @@ def analyze_cloning(
     insert_sequence,
     vector_enzyme,
     insert_enzyme,
+    vector_topology="linear",
+    insert_topology="linear",
 ):
+    vector_topology = _normalize_topology(
+        vector_topology
+    )
+    insert_topology = _normalize_topology(
+        insert_topology
+    )
+
     vector_validation = _validate_sequence(
         vector_sequence,
         "vector",
@@ -2008,12 +2082,14 @@ def analyze_cloning(
             "sequence"
         ],
         vector_enzyme,
+        topology=vector_topology,
     )
     insert_analysis = analyze_enzyme(
         insert_validation[
             "sequence"
         ],
         insert_enzyme,
+        topology=insert_topology,
     )
 
     vector_site = (
@@ -2184,14 +2260,18 @@ def assess_enzyme_suitability(
     vector_sequence,
     insert_sequence,
     enzyme_name,
+    vector_topology="linear",
+    insert_topology="linear",
 ):
     vector = analyze_enzyme(
         vector_sequence,
         enzyme_name,
+        topology=vector_topology,
     )
     insert = analyze_enzyme(
         insert_sequence,
         enzyme_name,
+        topology=insert_topology,
     )
 
     ambiguity = [
@@ -2268,6 +2348,8 @@ def find_compatible_enzymes(
     vector_sequence,
     insert_sequence,
     enzyme_names=None,
+    vector_topology="linear",
+    insert_topology="linear",
 ):
     names = (
         list(
@@ -2286,6 +2368,8 @@ def find_compatible_enzymes(
             vector_sequence,
             insert_sequence,
             name,
+            vector_topology=vector_topology,
+            insert_topology=insert_topology,
         )
         for name in names
     ]
@@ -2491,6 +2575,8 @@ def find_best_cloning_strategies(
     insert_sequence,
     enzyme_names=None,
     top_n=10,
+    vector_topology="linear",
+    insert_topology="linear",
 ):
     """
     Exhaustively evaluate physical two-end architectures.
@@ -2523,6 +2609,8 @@ def find_best_cloning_strategies(
                 vector_right,
                 insert_left,
                 insert_right,
+                vector_topology=vector_topology,
+                insert_topology=insert_topology,
             )
 
             if result.get(
@@ -2544,6 +2632,8 @@ def find_best_cloning_strategies(
             enzyme_name,
             enzyme_name,
             enzyme_name,
+            vector_topology=vector_topology,
+            insert_topology=insert_topology,
         )
 
         if result.get(
@@ -2569,6 +2659,8 @@ def find_best_cloning_strategies(
                 vector_right,
                 insert_enzyme,
                 insert_enzyme,
+                vector_topology=vector_topology,
+                insert_topology=insert_topology,
             )
 
             if result.get(
@@ -2594,6 +2686,8 @@ def find_best_cloning_strategies(
                 vector_enzyme,
                 insert_left,
                 insert_right,
+                vector_topology=vector_topology,
+                insert_topology=insert_topology,
             )
 
             if result.get(
@@ -2641,6 +2735,8 @@ def _find_all_cloning_strategies(
     vector_sequence,
     insert_sequence,
     enzyme_names=None,
+    vector_topology="linear",
+    insert_topology="linear",
 ):
     names = _candidate_enzyme_names(
         enzyme_names
@@ -2667,6 +2763,8 @@ def _find_all_cloning_strategies(
                     vector_right,
                     insert_left,
                     insert_right,
+                    vector_topology=vector_topology,
+                    insert_topology=insert_topology,
                 )
             )
 
@@ -2679,6 +2777,8 @@ def _find_all_cloning_strategies(
                 enzyme_name,
                 enzyme_name,
                 enzyme_name,
+                vector_topology=vector_topology,
+                insert_topology=insert_topology,
             )
         )
 
@@ -2695,6 +2795,8 @@ def _find_all_cloning_strategies(
                     vector_right,
                     insert_enzyme,
                     insert_enzyme,
+                    vector_topology=vector_topology,
+                    insert_topology=insert_topology,
                 )
             )
 
@@ -2711,6 +2813,8 @@ def _find_all_cloning_strategies(
                     vector_enzyme,
                     insert_left,
                     insert_right,
+                    vector_topology=vector_topology,
+                    insert_topology=insert_topology,
                 )
             )
 
@@ -2751,6 +2855,7 @@ def _site_diagnostics(
     sequence,
     names,
     role,
+    topology="linear",
 ):
     rows = []
 
@@ -2758,6 +2863,7 @@ def _site_diagnostics(
         analysis = analyze_enzyme(
             sequence,
             name,
+            topology=topology,
         )
 
         count = analysis[
@@ -2802,16 +2908,20 @@ def _no_strategy_diagnostics(
     vector_sequence,
     insert_sequence,
     names,
+    vector_topology="linear",
+    insert_topology="linear",
 ):
     vector_rows = _site_diagnostics(
         vector_sequence,
         names,
         "vector",
+        topology=vector_topology,
     )
     insert_rows = _site_diagnostics(
         insert_sequence,
         names,
         "insert",
+        topology=insert_topology,
     )
 
     # Rows with ambiguity-dependent sites cannot define a clean end.
@@ -2878,14 +2988,22 @@ def automatic_cloning_planner(
     insert_sequence,
     enzyme_names=None,
     top_n=5,
+    vector_topology="linear",
+    insert_topology="linear",
 ):
     """
     Canonical automatic planner.
 
     The complete search is always performed before top_n is applied.
     Therefore evaluated_count and valid_count describe the full search,
-    not merely the displayed rows.
+    not merely the displayed rows. vector_topology / insert_topology are
+    passed to every evaluated strategy (see evaluate_cloning_strategy).
     """
+    topology = {
+        "vector": _normalize_topology(vector_topology),
+        "insert": _normalize_topology(insert_topology),
+    }
+
     vector_validation = _validate_sequence(
         vector_sequence,
         "vector",
@@ -2908,6 +3026,7 @@ def automatic_cloning_planner(
             "rejected_count": 0,
             "vector_validation": vector_validation,
             "insert_validation": insert_validation,
+            "topology": topology,
             "diagnostics": {
                 "primary_reason": (
                     "The vector sequence is empty or contains "
@@ -2932,6 +3051,7 @@ def automatic_cloning_planner(
             "rejected_count": 0,
             "vector_validation": vector_validation,
             "insert_validation": insert_validation,
+            "topology": topology,
             "diagnostics": {
                 "primary_reason": (
                     "The insert sequence is empty or contains "
@@ -2958,6 +3078,7 @@ def automatic_cloning_planner(
             "rejected_count": 0,
             "vector_validation": vector_validation,
             "insert_validation": insert_validation,
+            "topology": topology,
             "diagnostics": {
                 "primary_reason": (
                     "No recognized restriction enzymes were supplied."
@@ -2976,6 +3097,8 @@ def automatic_cloning_planner(
             "sequence"
         ],
         names,
+        vector_topology=topology["vector"],
+        insert_topology=topology["insert"],
     )
 
     valid_candidates = [
@@ -3039,6 +3162,8 @@ def automatic_cloning_planner(
                 "sequence"
             ],
             names,
+            vector_topology=topology["vector"],
+            insert_topology=topology["insert"],
         )
 
     return {
@@ -3059,6 +3184,7 @@ def automatic_cloning_planner(
         "rejected_count": rejected_count,
         "vector_validation": vector_validation,
         "insert_validation": insert_validation,
+        "topology": topology,
         "search": {
             "enzyme_count": len(names),
             "enzyme_names": names,
@@ -3076,12 +3202,16 @@ def run_advanced_cloning_analysis(
     insert_sequence,
     enzyme_names=None,
     top_n=5,
+    vector_topology="linear",
+    insert_topology="linear",
 ):
     planner = automatic_cloning_planner(
         vector_sequence,
         insert_sequence,
         enzyme_names=enzyme_names,
         top_n=top_n,
+        vector_topology=vector_topology,
+        insert_topology=insert_topology,
     )
 
     valid = (
@@ -3111,12 +3241,16 @@ def run_cloning_analysis(
     mode="auto",
     enzyme_names=None,
     top_n=5,
+    vector_topology="linear",
+    insert_topology="linear",
 ):
     result = run_advanced_cloning_analysis(
         vector_sequence,
         insert_sequence,
         enzyme_names=enzyme_names,
         top_n=top_n,
+        vector_topology=vector_topology,
+        insert_topology=insert_topology,
     )
 
     result["mode"] = mode
@@ -3127,12 +3261,16 @@ def get_best_cloning_strategy(
     vector_sequence,
     insert_sequence,
     enzyme_names=None,
+    vector_topology="linear",
+    insert_topology="linear",
 ):
     return automatic_cloning_planner(
         vector_sequence,
         insert_sequence,
         enzyme_names=enzyme_names,
         top_n=1,
+        vector_topology=vector_topology,
+        insert_topology=insert_topology,
     ).get(
         "best"
     )
@@ -4491,6 +4629,22 @@ def _cloning_ui_select_insert(
         print("Invalid selection.")
 
 
+def _cloning_ui_record_topology(
+    sequences,
+    key,
+):
+    """Topology of the record chosen as insert ("linear" if not recorded)."""
+    try:
+        record = sequences[key]
+    except (KeyError, IndexError, TypeError):
+        return "linear"
+
+    if not isinstance(record, dict):
+        return "linear"
+
+    return record.get("topology", "linear")
+
+
 def _cloning_ui_select_enzyme(
     prompt,
     allow_back=True,
@@ -4574,18 +4728,22 @@ def _cloning_ui_print_sequence_context(
     vector_sequence,
     insert_header,
     insert_sequence,
+    vector_topology="linear",
+    insert_topology="linear",
 ):
     print()
     print(f"Vector: {vector_header}")
-    print(f"Length: {len(normalize_sequence(vector_sequence))} bp")
+    print(f"Length: {len(normalize_sequence(vector_sequence))} bp ({vector_topology})")
     print(f"Insert: {insert_header}")
-    print(f"Length: {len(normalize_sequence(insert_sequence))} bp")
+    print(f"Length: {len(normalize_sequence(insert_sequence))} bp ({insert_topology})")
 
 
 def _cloning_ui_automatic_planner(
     vector_sequence,
     insert_sequence,
     pipeline=None,
+    vector_topology="linear",
+    insert_topology="linear",
 ):
     _cloning_ui_print_header(
         "AUTOMATIC CLONING PLANNER"
@@ -4638,6 +4796,8 @@ def _cloning_ui_automatic_planner(
         vector_sequence,
         insert_sequence,
         top_n=top_n,
+        vector_topology=vector_topology,
+        insert_topology=insert_topology,
     )
 
     _cloning_ui_store_result(
@@ -4654,6 +4814,8 @@ def _cloning_ui_single_enzyme(
     vector_sequence,
     insert_sequence,
     pipeline=None,
+    vector_topology="linear",
+    insert_topology="linear",
 ):
     _cloning_ui_print_header(
         "SINGLE-ENZYME ANALYSIS"
@@ -4693,6 +4855,8 @@ def _cloning_ui_single_enzyme(
         insert_sequence,
         enzyme,
         enzyme,
+        vector_topology=vector_topology,
+        insert_topology=insert_topology,
     )
 
     _cloning_ui_store_result(
@@ -4751,6 +4915,8 @@ def _cloning_ui_two_enzyme_strategy(
     vector_sequence,
     insert_sequence,
     pipeline=None,
+    vector_topology="linear",
+    insert_topology="linear",
 ):
     _cloning_ui_print_header(
         "TWO-ENZYME STRATEGY ANALYSIS"
@@ -4837,6 +5003,8 @@ def _cloning_ui_two_enzyme_strategy(
         vector_right,
         insert_left,
         insert_right,
+        vector_topology=vector_topology,
+        insert_topology=insert_topology,
     )
 
     _cloning_ui_store_result(
@@ -4857,6 +5025,8 @@ def run_cloning_analysis_ui(
     pipeline=None,
     sequences=None,
     vector_index=None,
+    vector_topology="linear",
+    insert_topology=None,
 ):
     """
     Interactive CLI for the canonical cloning engine.
@@ -4871,7 +5041,9 @@ def run_cloning_analysis_ui(
     Sequence-specific input and enzyme selection are requested only
     after the corresponding analysis is selected.
 
-    The cloning engine itself is not modified.
+    The cloning engine itself is not modified. An insert chosen from
+    ``sequences`` keeps the topology of its record; otherwise
+    insert_topology (default linear) applies.
     """
     vector_validation = validate_dna_sequence(
         vector_sequence,
@@ -4894,7 +5066,7 @@ def run_cloning_analysis_ui(
         return None
 
     if insert_sequence is None:
-        _, insert_header, insert_sequence = (
+        insert_key, insert_header, insert_sequence = (
             _cloning_ui_select_insert(
                 sequences,
                 vector_index=vector_index,
@@ -4903,6 +5075,19 @@ def run_cloning_analysis_ui(
 
         if insert_sequence is None:
             return None
+
+        if insert_topology is None:
+            insert_topology = _cloning_ui_record_topology(
+                sequences,
+                insert_key,
+            )
+
+    vector_topology = _normalize_topology(
+        vector_topology
+    )
+    insert_topology = _normalize_topology(
+        insert_topology or "linear"
+    )
 
     insert_validation = validate_dna_sequence(
         insert_sequence,
@@ -4934,6 +5119,8 @@ def run_cloning_analysis_ui(
             vector_sequence,
             insert_header,
             insert_sequence,
+            vector_topology=vector_topology,
+            insert_topology=insert_topology,
         )
 
         print()
@@ -4954,6 +5141,8 @@ def run_cloning_analysis_ui(
                 vector_sequence,
                 insert_sequence,
                 pipeline=pipeline,
+                vector_topology=vector_topology,
+                insert_topology=insert_topology,
             )
             if result is not None:
                 continue
@@ -4964,6 +5153,8 @@ def run_cloning_analysis_ui(
                 vector_sequence,
                 insert_sequence,
                 pipeline=pipeline,
+                vector_topology=vector_topology,
+                insert_topology=insert_topology,
             )
             if result is not None:
                 continue
@@ -4974,6 +5165,8 @@ def run_cloning_analysis_ui(
                 vector_sequence,
                 insert_sequence,
                 pipeline=pipeline,
+                vector_topology=vector_topology,
+                insert_topology=insert_topology,
             )
             if result is not None:
                 continue
