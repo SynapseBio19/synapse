@@ -482,6 +482,29 @@ search, restriction analysis and primer design without a single warning.
 `SequenceRecord` has an `alphabet` field defaulting to `"DNA"` that nothing
 ever sets or checks.
 
+**Follow-up investigation (2026-10-31, read-only, every item reproduced by
+execution).** D14 splits into twelve sub-findings; F12 is the same
+architectural problem as D13, and the two are corrected together.
+
+| ID | Location | Finding |
+|---|---|---|
+| F1 | `blast.py` `infer_sequence_type` | "DNA if every letter is an IUPAC nucleotide code, else PROTEIN": a peptide such as `MKVHDANWYSK…` is run as blastn (0 hits, no warning); RNA and gapped DNA are reported as invalid *protein*. |
+| F2 | `blast.py` `PROGRAMS` vs query check and menu | Program table says `"protein"`, queries say `"PROTEIN"`: local blastp/tblastn always fail, and the menu offers no program for a protein query. Protein BLAST is unusable. |
+| F3 | `genbank.py`, `loader.py`, `models.py` | Declared molecule type is discarded: a GenPept record (`aa`) loads as DNA, a GenBank `RNA` record fails the DNA gate, FASTA `[moltype=protein]` is ignored. |
+| F4 | `validation.py`, `main.py` | A peptide made only of IUPAC-nucleotide letters passes the DNA gate and gets GC content, digests, mutation identity and cloning results without a warning (the original D14 item). The gate also accepts the empty string. |
+| F5 | `seqtools.normalize_dna`, `primer.py` | RNA is silently converted to DNA by `core.api` and primer design but rejected by the menu, restriction, mutation, cloning and CRISPR; a T+U mixture is converted silently. |
+| F6 | `protein.py` | X, B, Z, J, U, O are invalid; one X lowers the molecular weight while `length` is unchanged, and the positional view deletes it, shifting every later window. |
+| F7 | `core/api.py` | No type validation: `sequence_overview(protein)` reports a GC content, `analyze_protein_from_cds(protein)` returns `"????????"`, a gap becomes a `?` codon, empty input returns empty results. |
+| F8 | `orf.find_orfs` | Lower-case (soft-masked) DNA gives 0 ORFs; `core.api` uppercases first and finds them. |
+| F9 | `rna.transcribe_rna` | Transcribes anything (`MKTAY` → `MKUAY`), digits included. |
+| F10 | `sequence.py` GC | RNA GC content omits U from the denominator (64.58 % instead of 51.67 %); a GC value is computed for invalid protein input. |
+| F11 | `pipeline.py`, `report.py` | Sequence type is not kept in the pipeline or the exported report. |
+| F12 | all modules | 15 validators with 7 different alphabet contracts (overlaps D13). |
+
+Note for any design: a sequence of only A/C/G/T(/N) is also a valid
+peptide (Ala, Cys, Gly, Thr, Asn), so content alone can make it a
+*probable* nucleotide sequence, never a confirmed one.
+
 ### D15 – An advertised main-menu feature is a placeholder
 **`main.py:762`** · CONFIRMED · functional
 
@@ -600,6 +623,14 @@ Found during the D1 work (2026-10-31); outside D1's scope and not changed:
 | ID | Location | Level | Finding |
 |---|---|---|---|
 | S19 | `analyses/orf.py`, `classify_start_codon`, `calculate_cds_quality`, `calculate_orf_confidence` | CONFIRMED | Start-codon *classification* and the heuristic scores still use the fixed ATG/GTG/TTG set rather than the genetic code. A CTG ORF found with `table_starts` gets `classify_start_codon("CTG") == "None"`, no "Alternative start codon" reason, and a CDS-quality score of 60 versus 70 for an otherwise identical GTG ORF; table-2 starts such as ATA/ATT are treated the same way. Translation is not affected (D1). |
+
+Found during the D14 investigation (2026-10-31); not reproduced:
+
+| ID | Location | Level | Finding |
+|---|---|---|---|
+| S20 | `analyses/blast.py`, `PROTEIN_AMINO_ACIDS` | SUSPECTED | The protein query alphabet lacks U (selenocysteine) and O (pyrrolysine), so a valid protein containing them is rejected before it reaches BLAST+. Needs checking against the BLAST+ input alphabet. |
+| S21 | `fileio/genbank.py`, `ORIGIN` reader | SUSPECTED | Only letters are kept from `ORIGIN` lines, so a non-letter symbol there (e.g. `*`, `-`) would be dropped silently. Practical impact unverified. |
+| S22 | `analyses/variant_analysis.py`, REF check | SUSPECTED | The supplied reference sequence is not checked for its own alphabet. |
 
 ### Examined and found correct (not defects)
 
