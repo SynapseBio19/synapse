@@ -66,14 +66,11 @@ IUPAC, gapped and invalid input (D14):
 | 15 | S15 variant-to-mutation bridge works; S16 REF_MISMATCH no longer leaks into the input | `c71963b` | internal tests; pyright 134 → 132 (the two S15 diagnostics) | Corrected; suite 215/215 |
 | 16 | S17 cloning digest uses the top-strand cut | `c743beb` | internal tests; agreement with `restriction.perform_digest` for all 231 enzyme pairs, linear and circular | Corrected; suite 217/217 |
 | 17 | S19 start-codon classification and scores use the genetic code | `6c20e69` | internal tests; golden master unchanged | Corrected; suite 219/219 |
-
 | 18 | S23 PAM-proximal guide seed; S3 real RTT coverage check; S4/S5 thresholds documented and sourced | this package | internal tests; literature verified in PubMed (PMIDs 24476820, 27096365, 29160308, 31634902, 33811918) | Corrected; suite 228/228; pyright unchanged. Done by Opus 5 on a restricted assignment after a safeguard interrupted the Opus 5.5 session. |
-
 | 19 | D16 part 1: one definition per name in `analyses/primer.py` | this package | bytecode fingerprint of all 129 module-level callables unchanged; pyright `reportRedeclaration` gone | Partially corrected; v5–v11 chain deferred; suite 229/229 |
-
 | 20 | S21, S10 GenBank reader reports unread symbols and locations; S8 failing `to_dict()` logged; S22 variant reference must be DNA | this package | internal tests; bundled GenBank fixture unaffected | Corrected; suite 236/236 |
-
 | 21 | S1, S2 assessed as not defects (locked by tests); S9 quantified by measurement; S11, S12 resolved in documentation | this package | execution on constructed minus-strand cases; `tracemalloc` measurement at three sizes | Assessed; suite 240/240 |
+| 22 | D16 part 2: superseded primer generations removed after a reachability review | this package | AST binding order + project-wide reference scan + `sys.settrace` on a real design run; bytecode identical for all 105 surviving callables; pyright 134 -> 112 | Corrected; 1,326 lines removed; suite 240/240 |
 
 ## Paused (2026-10-31)
 
@@ -83,10 +80,9 @@ not started.
 
 ## Open after the current package
 
-D16–D18 and S1–S6, S8–S14, S18, S21–S23 (see `docs/PHASE6_INITIAL_AUDIT.md`)
-until a package above closes an item. D12, D1–D11, D13–D15, D19, S7, S15–S17, S19
-and S20
-are corrected.
+D17 and D18 (stages F and G), plus S6/P1-7, S13, S14/P2-2, S18 and P1-9.
+Corrected or assessed: D1–D16, D19, S1–S5, S7–S12, S15–S17 and S19–S23.
+S11 stays open pending the owner's approval for live external requests.
 
 ## Handover notes (working practice)
 
@@ -105,13 +101,13 @@ are corrected.
   (WinError 4551) since 2026-10-31; run it as
   `python -m pyright --pythonversion 3.10` instead. The baseline for
   comparison remains the 134 diagnostics of `ab4bd2a`; the current count is
-  131 (three corrected, none added).
+  112 (22 of them removed with the dead primer code in D16 part 2).
 - Check: `python -m unittest discover -s tests -t .`;
   `git -c core.whitespace=cr-at-eol diff --check`; pyright 1.1.414 with
   `--pythonversion 3.10` compared against the 134-diagnostic baseline of
-  `ab4bd2a` (no new diagnostics allowed; 132 since the S15 fix).
-- Commit messages end with
-  `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+  `ab4bd2a` (no new diagnostics allowed).
+- Commit messages end with a `Co-Authored-By:` line naming the model that
+  actually produced the work, not a fixed model name.
 - Biopython and primer3-py are test-only; comparison tests skip without
   them. BLAST+ 2.17.0 is installed (external-tool tests skip without it);
   bcftools is not.

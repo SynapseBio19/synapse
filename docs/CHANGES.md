@@ -1088,3 +1088,36 @@ interrupted the Opus 5.5 session at the start of this investigation.
   external services; the resource policy requires approval for that. The
   offline fixtures continue to cover parsing, deduplication and retry
   handling. This is recorded as a limitation, not as a defect.
+
+### D16 (part 2) The superseded primer generations are gone (`analyses/primer.py`)
+
+- Investigation first, as the audit required. Three independent checks
+  established what the `_vN_` chain actually does: an AST pass over every
+  module-level binding in source order; a project-wide reference scan; and a
+  `sys.settrace` run of a real `design_primers_professional()` call. The AST
+  pass corrected an assumption carried in the audit - `design_primers_professional`
+  is **not** `_v7_design_primers_professional` but a plain definition near the
+  end of the module that overrides the v7 alias.
+- Result: each public name was rebound up to five times in sequence
+  (`rank_professional_primer_pairs` ran through v5, v8, v9, v10, v11), so a
+  reader had to scan the whole module to learn which implementation runs.
+  Only the last binding was ever reachable.
+- Removed: the 7 superseded alias statements and, by repeating the reference
+  scan to a fixpoint, the 24 private definitions that only those aliases kept
+  reachable. `analyses/primer.py` goes from 6,434 to 5,108 lines.
+- Safety: there are no import-time calls in the module (checked by AST: the
+  only non-declarative top-level nodes are a dict update and two
+  `if __name__ == "__main__":` guards) and no dynamic lookup of module
+  attributes, so an intermediate binding could never have been observed.
+- Equivalence: the SHA-256 of the compiled bytecode of every module-level
+  callable was compared before and after. 129 -> 105 callables, **nothing
+  added, nothing changed**, 24 removed - every surviving function keeps its
+  exact code object. The four live bindings are unchanged.
+- pyright: 134 -> 112 against the `ab4bd2a` baseline. The 22 removed
+  diagnostics all belonged to the deleted code; no new diagnostic appeared.
+- A reading guide above the ranking section now states which public name is
+  bound to which implementation and that an older `_vN_` prefix on a
+  surviving helper is history, not a version switch.
+- Not done: merging the surviving generations into single functions. That
+  would change executed code and has no reachability argument behind it, so
+  it is out of scope.
