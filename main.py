@@ -323,653 +323,665 @@ def run_protein_record(record, selected_index):
             input("\nPress Enter to continue...")
 
 
-sequences = choose_sequence_file()
+def main():
+    """Run the interactive Synapse session.
+
+    Audit S13: this flow used to run at module level, so importing
+    ``main`` started the application and tests could only drive it in a
+    subprocess. It is a function now, called only from the guard below.
+    """
+
+    sequences = choose_sequence_file()
 
 
-# ============================================================
-# SEQUENCE SELECTION LOOP
-# ============================================================
-
-
-while True:
-
-    selected_index, record = (
-        select_gene(sequences)
-    )
-
-    if record is None:
-        sequences = choose_sequence_file()
-        continue
-
-    header = record["header"]
-
-    for note in record.get("notes", []):
-        print(f"\nNote: {note}")
-
-    # ========================================================
-    # SEQUENCE TYPE (DNA, RNA or protein; audit D14)
-    # ========================================================
-
-    sequence_record = resolve_sequence_type(
-        SequenceRecord.from_legacy_dict(record, selected_index)
-    )
-
-    if sequence_record is None:
-        continue
-
-    if sequence_record.alphabet == PROTEIN:
-        run_protein_record(sequence_record, selected_index)
-        continue
-
-    topology = sequence_record.topology
-    dna = sequence_record.sequence
-
-    if sequence_record.alphabet == RNA:
-        # The nucleotide analyses work in the DNA alphabet.
-        dna = dna.replace("U", "T")
-        print("\nNote: RNA sequence, analyzed in the DNA alphabet (U read as T).")
-
-    # ========================================================
-    # SYNAPSE PIPELINE
-    # ========================================================
-
-    pipeline = SynapsePipeline(
-        sequence=dna,
-        header=header,
-        sequence_id=selected_index,
-        topology=topology,
-    )
-
-    try:
-        pipeline.attach_record(sequence_record)
-    except ValueError as error:
-        logger.warning("Provenance not attached: %s", error)
-
-    # Selected ORF is shared by ORF -> RNA -> Protein.
-    selected_orf = None
-
-
-    # ========================================================
-    # SEQUENCE ANALYSIS
-    # ========================================================
-
-
-    nucleotide_counts = (
-        count_nucleotides(dna)
-    )
-
-    nucleotide_percentages = (
-        calculate_nucleotide_percentages(
-            nucleotide_counts
-        )
-    )
-
-    gc_content = (
-        calculate_gc_content(dna)
-    )
-
-    at_content = (
-        calculate_at_content(dna)
-    )
-
-    content_ranges = (
-        calculate_dna_content_ranges(
-            dna
-        )
-    )
-
-    gc_skew = (
-        calculate_gc_skew(dna)
-    )
-
-    at_skew = (
-        calculate_at_skew(dna)
-    )
-
-    sequence_complexity = (
-        calculate_sequence_complexity(
-            dna
-        )
-    )
-
-    homopolymers = (
-        find_homopolymers(dna)
-    )
-
-    cpg_analysis = (
-        analyze_cpg(dna)
-    )
-
-    cpg_islands = (
-        find_cpg_islands(dna)
-    )
-
-    molecular_weight = (
-        calculate_dna_molecular_weight(
-            dna
-        )
-    )
-
-    sequence_quality = (
-        analyze_sequence_quality(
-            dna
-        )
-    )
-
-    ambiguous_counts = (
-        count_ambiguous_bases(
-            dna
-        )
-    )
-
-    complement = (
-        get_complement(dna)
-    )
-
-    reverse_complement = (
-        get_reverse_complement(dna)
-    )
-
-
-    # ========================================================
-    # SEQUENCE OVERVIEW
-    # ========================================================
-
-
-    print_results(
-        selected_index,
-        header,
-        dna,
-        topology,
-        nucleotide_counts,
-        nucleotide_percentages,
-        gc_content,
-        at_content,
-        content_ranges,
-        gc_skew,
-        at_skew,
-        sequence_complexity,
-        homopolymers,
-        cpg_analysis,
-        cpg_islands,
-        molecular_weight,
-        sequence_quality,
-        ambiguous_counts,
-        complement,
-        reverse_complement,
-    )
-
-    pipeline.context.store_sequence_analysis({
-        "nucleotide_counts": nucleotide_counts,
-        "nucleotide_percentages": nucleotide_percentages,
-        "gc_content": gc_content,
-        "at_content": at_content,
-        "content_ranges": content_ranges,
-        "gc_skew": gc_skew,
-        "at_skew": at_skew,
-        "sequence_complexity": sequence_complexity,
-        "homopolymers": homopolymers,
-        "cpg_analysis": cpg_analysis,
-        "cpg_islands": cpg_islands,
-        "molecular_weight": molecular_weight,
-        "sequence_quality": sequence_quality,
-        "ambiguous_counts": ambiguous_counts,
-        "complement": complement,
-        "reverse_complement": reverse_complement,
-    })
-
-
-    # ========================================================
-    # ANALYSIS MENU
-    # ========================================================
+    # ============================================================
+    # SEQUENCE SELECTION LOOP
+    # ============================================================
 
 
     while True:
 
-        choice = (
-            show_menu()
-            .strip()
-            .upper()
+        selected_index, record = (
+            select_gene(sequences)
+        )
+
+        if record is None:
+            sequences = choose_sequence_file()
+            continue
+
+        header = record["header"]
+
+        for note in record.get("notes", []):
+            print(f"\nNote: {note}")
+
+        # ========================================================
+        # SEQUENCE TYPE (DNA, RNA or protein; audit D14)
+        # ========================================================
+
+        sequence_record = resolve_sequence_type(
+            SequenceRecord.from_legacy_dict(record, selected_index)
+        )
+
+        if sequence_record is None:
+            continue
+
+        if sequence_record.alphabet == PROTEIN:
+            run_protein_record(sequence_record, selected_index)
+            continue
+
+        topology = sequence_record.topology
+        dna = sequence_record.sequence
+
+        if sequence_record.alphabet == RNA:
+            # The nucleotide analyses work in the DNA alphabet.
+            dna = dna.replace("U", "T")
+            print("\nNote: RNA sequence, analyzed in the DNA alphabet (U read as T).")
+
+        # ========================================================
+        # SYNAPSE PIPELINE
+        # ========================================================
+
+        pipeline = SynapsePipeline(
+            sequence=dna,
+            header=header,
+            sequence_id=selected_index,
+            topology=topology,
+        )
+
+        try:
+            pipeline.attach_record(sequence_record)
+        except ValueError as error:
+            logger.warning("Provenance not attached: %s", error)
+
+        # Selected ORF is shared by ORF -> RNA -> Protein.
+        selected_orf = None
+
+
+        # ========================================================
+        # SEQUENCE ANALYSIS
+        # ========================================================
+
+
+        nucleotide_counts = (
+            count_nucleotides(dna)
+        )
+
+        nucleotide_percentages = (
+            calculate_nucleotide_percentages(
+                nucleotide_counts
+            )
+        )
+
+        gc_content = (
+            calculate_gc_content(dna)
+        )
+
+        at_content = (
+            calculate_at_content(dna)
+        )
+
+        content_ranges = (
+            calculate_dna_content_ranges(
+                dna
+            )
+        )
+
+        gc_skew = (
+            calculate_gc_skew(dna)
+        )
+
+        at_skew = (
+            calculate_at_skew(dna)
+        )
+
+        sequence_complexity = (
+            calculate_sequence_complexity(
+                dna
+            )
+        )
+
+        homopolymers = (
+            find_homopolymers(dna)
+        )
+
+        cpg_analysis = (
+            analyze_cpg(dna)
+        )
+
+        cpg_islands = (
+            find_cpg_islands(dna)
+        )
+
+        molecular_weight = (
+            calculate_dna_molecular_weight(
+                dna
+            )
+        )
+
+        sequence_quality = (
+            analyze_sequence_quality(
+                dna
+            )
+        )
+
+        ambiguous_counts = (
+            count_ambiguous_bases(
+                dna
+            )
+        )
+
+        complement = (
+            get_complement(dna)
+        )
+
+        reverse_complement = (
+            get_reverse_complement(dna)
         )
 
 
-        # ====================================================
-        # 1 - SEQUENCE OVERVIEW
-        # ====================================================
+        # ========================================================
+        # SEQUENCE OVERVIEW
+        # ========================================================
 
 
-        if choice == "1":
+        print_results(
+            selected_index,
+            header,
+            dna,
+            topology,
+            nucleotide_counts,
+            nucleotide_percentages,
+            gc_content,
+            at_content,
+            content_ranges,
+            gc_skew,
+            at_skew,
+            sequence_complexity,
+            homopolymers,
+            cpg_analysis,
+            cpg_islands,
+            molecular_weight,
+            sequence_quality,
+            ambiguous_counts,
+            complement,
+            reverse_complement,
+        )
 
-            print_results(
-                selected_index,
-                header,
-                dna,
-                topology,
-                nucleotide_counts,
-                nucleotide_percentages,
-                gc_content,
-                at_content,
-                content_ranges,
-                gc_skew,
-                at_skew,
-                sequence_complexity,
-                homopolymers,
-                cpg_analysis,
-                cpg_islands,
-                molecular_weight,
-                sequence_quality,
-                ambiguous_counts,
-                complement,
-                reverse_complement,
+        pipeline.context.store_sequence_analysis({
+            "nucleotide_counts": nucleotide_counts,
+            "nucleotide_percentages": nucleotide_percentages,
+            "gc_content": gc_content,
+            "at_content": at_content,
+            "content_ranges": content_ranges,
+            "gc_skew": gc_skew,
+            "at_skew": at_skew,
+            "sequence_complexity": sequence_complexity,
+            "homopolymers": homopolymers,
+            "cpg_analysis": cpg_analysis,
+            "cpg_islands": cpg_islands,
+            "molecular_weight": molecular_weight,
+            "sequence_quality": sequence_quality,
+            "ambiguous_counts": ambiguous_counts,
+            "complement": complement,
+            "reverse_complement": reverse_complement,
+        })
+
+
+        # ========================================================
+        # ANALYSIS MENU
+        # ========================================================
+
+
+        while True:
+
+            choice = (
+                show_menu()
+                .strip()
+                .upper()
             )
 
-            input(
-                "\nPress Enter to continue..."
-            )
+
+            # ====================================================
+            # 1 - SEQUENCE OVERVIEW
+            # ====================================================
 
 
-        # ====================================================
-        # 2 - ORF ANALYSIS
-        # ====================================================
+            if choice == "1":
 
-
-        elif choice == "2":
-
-            try:
-
-                selected_orf_result = run_orf_analysis_ui(
+                print_results(
+                    selected_index,
+                    header,
                     dna,
-                    include_partial=True,
-                    min_length=DEFAULT_MIN_ORF_LENGTH,
-                )
-
-                if selected_orf_result is not None:
-
-                    selected_orf = selected_orf_result
-
-                    pipeline.set_selected_orf(
-                        selected_orf
-                    )
-
-                    pipeline.store(
-                        "orf",
-                        selected_orf,
-                        parameters=selected_orf.get(
-                            "search_parameters", {}
-                        ),
-                    )
-
-                    print()
-                    print("=" * 68)
-                    print("ORF CONNECTED TO PIPELINE")
-                    print("=" * 68)
-                    print()
-                    print(
-                        f"Selected: ORF-{selected_orf['rank']:03d}"
-                    )
-                    print(
-                        f"Length:   {selected_orf['length']} bp"
-                    )
-                    print(
-                        f"Protein:  {selected_orf['protein_length']} aa"
-                    )
-                    print(
-                        f"Location: {selected_orf['start'] + 1}-"
-                        f"{selected_orf['stop'] + 1} "
-                        f"({selected_orf['strand']} strand, 1-based)"
-                    )
-                    print()
-                    print("✓ ORF stored in pipeline")
-                    print("✓ RNA can use this ORF")
-                    print("✓ Protein can use this ORF")
-                    print("✓ CRISPR Guide Design can use this ORF")
-                    if selected_orf.get("genetic_code", 1) != 1:
-                        print(
-                            "! ORF found with NCBI table "
-                            f"{selected_orf['genetic_code']}; Protein analysis uses this "
-                            "table, the RNA module's codon view uses the standard code."
-                        )
-
-                    input(
-                        "\nPress Enter to continue..."
-                    )
-
-            except Exception as error:
-
-                report_error("ORF ANALYSIS ERROR", error)
-
-
-        # ====================================================
-        # 3 - RNA ANALYSIS
-        # ====================================================
-
-
-        elif choice == "3":
-
-            try:
-
-                rna_analysis = run_rna_analysis_ui(
-                    dna,
-                    pipeline=pipeline,
-                    selected_orf=selected_orf,
-                    header=header,
-                )
-
-                # The RNA module prints the pipeline connection itself and
-                # stores the result (core.pipeline.store_rna_analysis).
-                if rna_analysis is not None:
-                    logger.info(
-                        "RNA analysis stored (source: %s)",
-                        rna_analysis.get("pipeline_input", {}).get("source"),
-                    )
-
-            except Exception as error:
-
-                report_error("RNA ANALYSIS ERROR", error)
-
-
-        # ====================================================
-        # 4 - PROTEIN ANALYSIS
-        # ====================================================
-
-
-        elif choice == "4":
-
-            if selected_orf is None:
-
-                print()
-                print("=" * 68)
-                print("PROTEIN ANALYSIS")
-                print("=" * 68)
-                print()
-                print("No ORF has been selected.")
-                print()
-                print(
-                    "Please run [2] ORF Analysis first and "
-                    "select an ORF."
-                )
-                print()
-                print(
-                    "Protein Analysis will not use the full DNA "
-                    "sequence as a fallback."
+                    topology,
+                    nucleotide_counts,
+                    nucleotide_percentages,
+                    gc_content,
+                    at_content,
+                    content_ranges,
+                    gc_skew,
+                    at_skew,
+                    sequence_complexity,
+                    homopolymers,
+                    cpg_analysis,
+                    cpg_islands,
+                    molecular_weight,
+                    sequence_quality,
+                    ambiguous_counts,
+                    complement,
+                    reverse_complement,
                 )
 
                 input(
                     "\nPress Enter to continue..."
                 )
 
-                continue
 
-            try:
+            # ====================================================
+            # 2 - ORF ANALYSIS
+            # ====================================================
 
-                orf_sequence = selected_orf.get(
-                    "sequence",
-                    ""
-                )
 
-                orf_rank = selected_orf.get(
-                    "rank"
-                )
+            elif choice == "2":
 
-                if orf_rank is not None:
-                    orf_id = f"ORF-{orf_rank:03d}"
-                else:
-                    orf_id = "Selected ORF"
+                try:
 
-                strand = selected_orf.get(
-                    "strand"
-                )
-
-                reading_frame = selected_orf.get(
-                    "reading_frame",
-                    selected_orf.get(
-                        "frame"
+                    selected_orf_result = run_orf_analysis_ui(
+                        dna,
+                        include_partial=True,
+                        min_length=DEFAULT_MIN_ORF_LENGTH,
                     )
-                )
 
-                orf_status = selected_orf.get(
-                    "status"
-                )
+                    if selected_orf_result is not None:
 
-                run_protein_analysis_from_orf(
-                    orf_sequence=orf_sequence,
-                    orf_id=orf_id,
-                    strand=strand,
-                    reading_frame=reading_frame,
-                    orf_status=orf_status,
-                    pipeline=pipeline,
-                    genetic_code=selected_orf.get("genetic_code", 1),
-                )
+                        selected_orf = selected_orf_result
 
-            except Exception as error:
+                        pipeline.set_selected_orf(
+                            selected_orf
+                        )
 
-                report_error("PROTEIN ANALYSIS ERROR", error)
-
-
-        # ====================================================
-        # 5 - RESTRICTION & CLONING
-        # ====================================================
-
-
-        elif choice == "5":
-
-            try:
-
-                run_restriction_cloning_ui(
-                    dna=dna,
-                    header=header,
-                    sequences=sequences,
-                    pipeline=pipeline,
-                    topology=topology,
-                )
-
-            except Exception as error:
-
-                report_error("RESTRICTION & CLONING ERROR", error)
-
-
-        # ====================================================
-        # 6 - PRIMER DESIGN
-        # ====================================================
-
-
-        elif choice == "6":
-
-            try:
-
-                run_primer_analysis_ui(
-                    dna=dna,
-                    header=header,
-                    pipeline=pipeline,
-                )
-
-            except Exception as error:
-
-                report_error("PRIMER DESIGN ERROR", error)
-
-
-        # ====================================================
-        # 7 - MUTATION & VARIANT ANALYSIS
-        # ====================================================
-
-
-        elif choice == "7":
-
-            try:
-
-                run_mutation_variant_ui(
-                    dna=dna,
-                    header=header,
-                    sequences=sequences,
-                    pipeline=pipeline,
-                )
-
-            except Exception as error:
-
-                report_error("MUTATION & VARIANT ANALYSIS ERROR", error)
-
-
-        # ====================================================
-        # 8 - CRISPR GUIDE DESIGN
-        # ====================================================
-
-
-        elif choice == "8":
-
-            try:
-
-                crispr_result = crispr_menu(
-                    sequence=dna,
-                    sequence_name=header,
-                    selected_orf=selected_orf,
-                )
-
-                if crispr_result is not None:
-                    pipeline.store(
-                        "crispr",
-                        crispr_result,
-                        parameters={
-                            "system": crispr_result.system.name,
-                            "region": (
-                                f"{crispr_result.region.start}-"
-                                f"{crispr_result.region.end}"
+                        pipeline.store(
+                            "orf",
+                            selected_orf,
+                            parameters=selected_orf.get(
+                                "search_parameters", {}
                             ),
-                            "feature_type": crispr_result.region.feature_type,
-                        },
-                        limitations=[
-                            "Guide ranking is a sequence-level heuristic, "
-                            "not an editing-efficiency prediction.",
-                            "Off-target screening covers only supplied "
-                            "sequences, not a genome.",
-                        ],
+                        )
+
+                        print()
+                        print("=" * 68)
+                        print("ORF CONNECTED TO PIPELINE")
+                        print("=" * 68)
+                        print()
+                        print(
+                            f"Selected: ORF-{selected_orf['rank']:03d}"
+                        )
+                        print(
+                            f"Length:   {selected_orf['length']} bp"
+                        )
+                        print(
+                            f"Protein:  {selected_orf['protein_length']} aa"
+                        )
+                        print(
+                            f"Location: {selected_orf['start'] + 1}-"
+                            f"{selected_orf['stop'] + 1} "
+                            f"({selected_orf['strand']} strand, 1-based)"
+                        )
+                        print()
+                        print("✓ ORF stored in pipeline")
+                        print("✓ RNA can use this ORF")
+                        print("✓ Protein can use this ORF")
+                        print("✓ CRISPR Guide Design can use this ORF")
+                        if selected_orf.get("genetic_code", 1) != 1:
+                            print(
+                                "! ORF found with NCBI table "
+                                f"{selected_orf['genetic_code']}; Protein analysis uses this "
+                                "table, the RNA module's codon view uses the standard code."
+                            )
+
+                        input(
+                            "\nPress Enter to continue..."
+                        )
+
+                except Exception as error:
+
+                    report_error("ORF ANALYSIS ERROR", error)
+
+
+            # ====================================================
+            # 3 - RNA ANALYSIS
+            # ====================================================
+
+
+            elif choice == "3":
+
+                try:
+
+                    rna_analysis = run_rna_analysis_ui(
+                        dna,
+                        pipeline=pipeline,
+                        selected_orf=selected_orf,
+                        header=header,
                     )
 
-            except Exception as error:
+                    # The RNA module prints the pipeline connection itself and
+                    # stores the result (core.pipeline.store_rna_analysis).
+                    if rna_analysis is not None:
+                        logger.info(
+                            "RNA analysis stored (source: %s)",
+                            rna_analysis.get("pipeline_input", {}).get("source"),
+                        )
 
-                report_error("CRISPR GUIDE DESIGN ERROR", error)
+                except Exception as error:
+
+                    report_error("RNA ANALYSIS ERROR", error)
 
 
-        # ====================================================
-        # 9 - BLAST SEARCH
-        # ====================================================
+            # ====================================================
+            # 4 - PROTEIN ANALYSIS
+            # ====================================================
 
 
-        elif choice == "9":
+            elif choice == "4":
 
-            try:
+                if selected_orf is None:
 
-                store_blast_run(
-                    pipeline,
-                    blast_menu(
+                    print()
+                    print("=" * 68)
+                    print("PROTEIN ANALYSIS")
+                    print("=" * 68)
+                    print()
+                    print("No ORF has been selected.")
+                    print()
+                    print(
+                        "Please run [2] ORF Analysis first and "
+                        "select an ORF."
+                    )
+                    print()
+                    print(
+                        "Protein Analysis will not use the full DNA "
+                        "sequence as a fallback."
+                    )
+
+                    input(
+                        "\nPress Enter to continue..."
+                    )
+
+                    continue
+
+                try:
+
+                    orf_sequence = selected_orf.get(
+                        "sequence",
+                        ""
+                    )
+
+                    orf_rank = selected_orf.get(
+                        "rank"
+                    )
+
+                    if orf_rank is not None:
+                        orf_id = f"ORF-{orf_rank:03d}"
+                    else:
+                        orf_id = "Selected ORF"
+
+                    strand = selected_orf.get(
+                        "strand"
+                    )
+
+                    reading_frame = selected_orf.get(
+                        "reading_frame",
+                        selected_orf.get(
+                            "frame"
+                        )
+                    )
+
+                    orf_status = selected_orf.get(
+                        "status"
+                    )
+
+                    run_protein_analysis_from_orf(
+                        orf_sequence=orf_sequence,
+                        orf_id=orf_id,
+                        strand=strand,
+                        reading_frame=reading_frame,
+                        orf_status=orf_status,
+                        pipeline=pipeline,
+                        genetic_code=selected_orf.get("genetic_code", 1),
+                    )
+
+                except Exception as error:
+
+                    report_error("PROTEIN ANALYSIS ERROR", error)
+
+
+            # ====================================================
+            # 5 - RESTRICTION & CLONING
+            # ====================================================
+
+
+            elif choice == "5":
+
+                try:
+
+                    run_restriction_cloning_ui(
+                        dna=dna,
+                        header=header,
+                        sequences=sequences,
+                        pipeline=pipeline,
+                        topology=topology,
+                    )
+
+                except Exception as error:
+
+                    report_error("RESTRICTION & CLONING ERROR", error)
+
+
+            # ====================================================
+            # 6 - PRIMER DESIGN
+            # ====================================================
+
+
+            elif choice == "6":
+
+                try:
+
+                    run_primer_analysis_ui(
+                        dna=dna,
+                        header=header,
+                        pipeline=pipeline,
+                    )
+
+                except Exception as error:
+
+                    report_error("PRIMER DESIGN ERROR", error)
+
+
+            # ====================================================
+            # 7 - MUTATION & VARIANT ANALYSIS
+            # ====================================================
+
+
+            elif choice == "7":
+
+                try:
+
+                    run_mutation_variant_ui(
+                        dna=dna,
+                        header=header,
+                        sequences=sequences,
+                        pipeline=pipeline,
+                    )
+
+                except Exception as error:
+
+                    report_error("MUTATION & VARIANT ANALYSIS ERROR", error)
+
+
+            # ====================================================
+            # 8 - CRISPR GUIDE DESIGN
+            # ====================================================
+
+
+            elif choice == "8":
+
+                try:
+
+                    crispr_result = crispr_menu(
                         sequence=dna,
                         sequence_name=header,
                         selected_orf=selected_orf,
-                        sequence_type="DNA",
-                    ),
+                    )
+
+                    if crispr_result is not None:
+                        pipeline.store(
+                            "crispr",
+                            crispr_result,
+                            parameters={
+                                "system": crispr_result.system.name,
+                                "region": (
+                                    f"{crispr_result.region.start}-"
+                                    f"{crispr_result.region.end}"
+                                ),
+                                "feature_type": crispr_result.region.feature_type,
+                            },
+                            limitations=[
+                                "Guide ranking is a sequence-level heuristic, "
+                                "not an editing-efficiency prediction.",
+                                "Off-target screening covers only supplied "
+                                "sequences, not a genome.",
+                            ],
+                        )
+
+                except Exception as error:
+
+                    report_error("CRISPR GUIDE DESIGN ERROR", error)
+
+
+            # ====================================================
+            # 9 - BLAST SEARCH
+            # ====================================================
+
+
+            elif choice == "9":
+
+                try:
+
+                    store_blast_run(
+                        pipeline,
+                        blast_menu(
+                            sequence=dna,
+                            sequence_name=header,
+                            selected_orf=selected_orf,
+                            sequence_type="DNA",
+                        ),
+                    )
+
+                except Exception as error:
+
+                    report_error("BLAST SEARCH ERROR", error)
+
+
+            # ====================================================
+            # 10 - LITERATURE SEARCH
+            # ====================================================
+
+
+            elif choice == "10":
+
+                try:
+
+                    literature_main(build_sequence_literature_context(
+                        pipeline.context.header,
+                        pipeline.context.selected_orf if isinstance(pipeline.context.selected_orf, dict) else None))
+
+                except Exception as error:
+
+                    report_error("LITERATURE SEARCH ERROR", error)
+
+
+            # ====================================================
+            # 11 - AI EXPERIMENT PLANNER
+            # ====================================================
+
+
+            elif choice == "11":
+
+                # Audit D15: advertised but not implemented (P3-1, deferred).
+                print(
+                    "\nAI Experiment Planner: not implemented. "
+                    "Nothing is run or stored."
+                )
+                print(
+                    "It is planned as an evidence-bound planner (P3-1, "
+                    "docs/AUDIT_STATUS.md) and is deferred."
                 )
 
-            except Exception as error:
-
-                report_error("BLAST SEARCH ERROR", error)
-
-
-        # ====================================================
-        # 10 - LITERATURE SEARCH
-        # ====================================================
+                input(
+                    "\nPress Enter to continue..."
+                )
 
 
-        elif choice == "10":
-
-            try:
-
-                literature_main(build_sequence_literature_context(
-                    pipeline.context.header,
-                    pipeline.context.selected_orf if isinstance(pipeline.context.selected_orf, dict) else None))
-
-            except Exception as error:
-
-                report_error("LITERATURE SEARCH ERROR", error)
+            # ====================================================
+            # P - PIPELINE STATUS
+            # ====================================================
 
 
-        # ====================================================
-        # 11 - AI EXPERIMENT PLANNER
-        # ====================================================
+            elif choice == "R":
+                export_report_interactive(pipeline)
+
+            elif choice == "P":
+
+                pipeline.print_status()
+
+                input(
+                    "\nPress Enter to continue..."
+                )
 
 
-        elif choice == "11":
-
-            # Audit D15: advertised but not implemented (P3-1, deferred).
-            print(
-                "\nAI Experiment Planner: not implemented. "
-                "Nothing is run or stored."
-            )
-            print(
-                "It is planned as an evidence-bound planner (P3-1, "
-                "docs/AUDIT_STATUS.md) and is deferred."
-            )
-
-            input(
-                "\nPress Enter to continue..."
-            )
+            # ====================================================
+            # S - SELECT ANOTHER SEQUENCE
+            # ====================================================
 
 
-        # ====================================================
-        # P - PIPELINE STATUS
-        # ====================================================
+            elif choice == "S":
+
+                print(
+                    "\nReturning to "
+                    "sequence selection..."
+                )
+
+                break
 
 
-        elif choice == "R":
-            export_report_interactive(pipeline)
-
-        elif choice == "P":
-
-            pipeline.print_status()
-
-            input(
-                "\nPress Enter to continue..."
-            )
+            # ====================================================
+            # 0 - EXIT
+            # ====================================================
 
 
-        # ====================================================
-        # S - SELECT ANOTHER SEQUENCE
-        # ====================================================
+            elif choice == "0":
+
+                print(
+                    "\nThank you for using Synapse!"
+                )
+
+                raise SystemExit
 
 
-        elif choice == "S":
-
-            print(
-                "\nReturning to "
-                "sequence selection..."
-            )
-
-            break
+            # ====================================================
+            # INVALID INPUT
+            # ====================================================
 
 
-        # ====================================================
-        # 0 - EXIT
-        # ====================================================
+            else:
+
+                print(
+                    "\nInvalid selection."
+                )
+
+                input(
+                    "\nPress Enter to continue..."
+                )
 
 
-        elif choice == "0":
-
-            print(
-                "\nThank you for using Synapse!"
-            )
-
-            raise SystemExit
-
-
-        # ====================================================
-        # INVALID INPUT
-        # ====================================================
-
-
-        else:
-
-            print(
-                "\nInvalid selection."
-            )
-
-            input(
-                "\nPress Enter to continue..."
-            )
+if __name__ == "__main__":
+    main()

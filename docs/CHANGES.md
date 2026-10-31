@@ -1220,3 +1220,23 @@ interrupted the Opus 5.5 session at the start of this investigation.
 - Not verified: a real resume against NCBI. That needs a live submission,
   which requires the owner's approval, so it remains an untested path
   against the real service.
+
+### S13 The session runs from `main()`, not at import (`main.py`)
+
+- Problem: `main.py` held its control flow at module level - a call to
+  `choose_sequence_file()` followed by a `while True:` loop - so importing
+  the module started the application. Tests could only drive it in a
+  subprocess, and any accidental `import main` would have blocked on input.
+- Now: that flow is the body of `main()`, called from an
+  `if __name__ == "__main__":` guard. The 650 lines were indented
+  unchanged; `git diff -w` reduces the whole change to the 12 added lines
+  of the function header, its docstring and the guard, which is the
+  equivalence evidence for a move of this size.
+- The helper functions and module constants stay at module level, so
+  `report_error`, `choose_sequence_file`, `run_protein_record` and the rest
+  remain importable and testable on their own.
+- Tests: 2 new (`MainEntryPointTests`): a fresh interpreter imports `main`
+  with no stdin and the session does not start, and the module has no
+  top-level loop and exactly one `__main__` guard calling `main()`. The
+  existing smoke tests still drive `python main.py` end to end.
+  Suite 265 -> 267.

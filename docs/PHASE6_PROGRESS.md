@@ -80,6 +80,8 @@ IUPAC, gapped and invalid input (D14):
 
 | 26 | S6/P1-7 resume an NCBI search from its request ID | this package | internal tests against a stubbed client (asserts no submission); no live NCBI call | Implemented; suite 265/265 |
 
+| 27 | S13 session moved into `main()` behind a `__main__` guard | this package | `git diff -w` shows only the 12 added lines; fresh-interpreter import test | Corrected; suite 267/267; S24 recorded |
+
 ## Paused (2026-10-31)
 
 Planned pause at the owner's request; see `docs/PHASE6_HANDOVER.md` for the

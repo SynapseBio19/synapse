@@ -897,5 +897,44 @@ class BlastResumeTests(unittest.TestCase):
         self.assertIn('choice == "14"', source)
 
 
+# ----------------------------------------------------------------------
+# S13: importing main must not start the application
+# ----------------------------------------------------------------------
+class MainEntryPointTests(unittest.TestCase):
+    def test_importing_main_does_not_run_the_session(self):
+        import os
+        import subprocess
+        import sys
+        import tempfile
+        script = (
+            "import main\n"
+            "print('IMPORTED', callable(main.main))\n"
+        )
+        with tempfile.TemporaryDirectory() as tmp:
+            env = dict(os.environ, SYNAPSE_LOG_DIR=tmp, PYTHONIOENCODING="utf-8")
+            # No stdin: if the module still asked for input, this would fail.
+            completed = subprocess.run(
+                [sys.executable, "-c", script], cwd=PROJECT_ROOT, input="",
+                capture_output=True, text=True, encoding="utf-8", timeout=120, env=env,
+            )
+        output = completed.stdout + completed.stderr
+        self.assertEqual(completed.returncode, 0, output[-2000:])
+        self.assertIn("IMPORTED True", completed.stdout)
+        self.assertNotIn("SYNAPSE - LOAD SEQUENCE FILE", output)
+        self.assertNotIn("Traceback", output)
+
+    def test_module_level_flow_is_behind_the_guard(self):
+        import ast
+        tree = ast.parse((PROJECT_ROOT / "main.py").read_text(encoding="utf-8"))
+        loops = [n for n in tree.body if isinstance(n, (ast.While, ast.For))]
+        self.assertEqual(loops, [], "main.py must not loop at module level")
+        guards = [
+            n for n in tree.body
+            if isinstance(n, ast.If) and ast.unparse(n.test) == "__name__ == '__main__'"
+        ]
+        self.assertEqual(len(guards), 1)
+        self.assertIn("main()", ast.unparse(guards[0]))
+
+
 if __name__ == "__main__":
     unittest.main()
