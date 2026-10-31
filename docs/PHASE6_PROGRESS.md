@@ -64,3 +64,26 @@ IUPAC, gapped and invalid input (D14):
 D8–D11, D15–D19 and S1–S6, S8–S19, S21, S22 (see `docs/PHASE6_INITIAL_AUDIT.md`)
 until a package above closes an item. D12, D1–D7, D13, D14, S7 and S20
 are corrected.
+
+## Handover notes (working practice)
+
+- Work only in this copy; never modify the original `Project Synapse`.
+- 15 files carry the Windows ReadOnly attribute (`main.py`,
+  `analyses/{blast,cloning,crispr,literature,mutation,orf,primer,restriction,rna,variant_analysis}.py`,
+  `core/pipeline.py`, `data/{genetic_code,restriction_enzymes}.py`,
+  `ui/menu.py`). Clear it only for the files a package edits and restore
+  it after the commit. (`main.py` currently shows attribute 33 instead of
+  524321: the OneDrive "pinned" flag is absent; only ReadOnly is managed.)
+- Most source files use CRLF; `core/api.py`, the other `core/` modules
+  except `pipeline.py`/`validation.py`, `fileio/genbank.py`,
+  `fileio/loader.py`, the tests and the docs use LF. `analyses/orf.py` has
+  exactly two intentional bare-LF lines; edit it byte-exactly.
+- Check: `python -m unittest discover -s tests -t .`;
+  `git -c core.whitespace=cr-at-eol diff --check`; pyright 1.1.414 with
+  `--pythonversion 3.10` compared against the 134-diagnostic baseline of
+  `ab4bd2a` (no new diagnostics allowed).
+- Commit messages end with
+  `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
+- Biopython and primer3-py are test-only; comparison tests skip without
+  them. BLAST+ 2.17.0 is installed (external-tool tests skip without it);
+  bcftools is not.
