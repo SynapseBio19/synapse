@@ -93,8 +93,25 @@ RNA_CODON_TABLE = codon_dict(1, rna=True, stop_symbol="STOP")
 # ============================================================
 
 def transcribe_rna(dna):
+    """Transcribe a coding-strand DNA sequence to RNA (T -> U).
 
-    return dna.upper().replace(
+    Whitespace is removed and letters are uppercased; a sequence that is
+    already RNA is returned unchanged. Symbols outside the IUPAC nucleotide
+    alphabet raise ValueError (audit D14-F9).
+    """
+
+    from core.alphabets import DNA_IUPAC, RNA_IUPAC, normalize_sequence, symbols_outside
+
+    sequence = normalize_sequence(dna)
+    invalid = symbols_outside(sequence, DNA_IUPAC | RNA_IUPAC)
+    if invalid:
+        shown = ", ".join(f"{symbol!r} at {position}" for position, symbol in invalid[:5])
+        raise ValueError(
+            f"Transcription needs a nucleotide sequence; found {shown}"
+            + (" ..." if len(invalid) > 5 else "") + "."
+        )
+
+    return sequence.replace(
         "T",
         "U"
     )

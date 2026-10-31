@@ -431,6 +431,11 @@ def _calculate_gc_for_window(window):
 
 
 def count_nucleotides(dna):
+    """Counts of A, T, C and G; U (the RNA form of T) is counted as T.
+
+    Counting U keeps GC/AT content and skews correct for an RNA sequence
+    passed to this DNA module directly (audit D14-F10).
+    """
 
     nucleotide_counts = {
         "A": 0,
@@ -440,6 +445,9 @@ def count_nucleotides(dna):
     }
 
     for nucleotide in dna:
+
+        if nucleotide == "U":
+            nucleotide = "T"
 
         if nucleotide in nucleotide_counts:
 

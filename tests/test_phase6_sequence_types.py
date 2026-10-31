@@ -499,6 +499,36 @@ class ProteinResidueCodeTests(unittest.TestCase):
                 self.assertLess(abs(ours - molecular_weight(sequence, "protein")), 0.1)
 
 
+# ----------------------------------------------------------------------
+# D14-F8, F9, F10: module entry points normalize and check their input
+# ----------------------------------------------------------------------
+class ModuleInputTests(unittest.TestCase):
+    def test_orf_search_is_case_insensitive_and_refuses_other_alphabets(self):
+        from analyses import orf as O
+        upper = O.find_orfs(DNA_SEQ, min_length=18)
+        self.assertGreater(len(upper), 0)
+        self.assertEqual(O.find_orfs(DNA_SEQ.lower(), min_length=18), upper)  # was: 0 ORFs
+        for sequence in (DNA_SEQ.replace("T", "U"), PROTEIN):
+            with self.subTest(sequence=sequence[:10]):
+                with self.assertRaisesRegex(ValueError, "ORF search needs a DNA sequence"):
+                    O.find_orfs(sequence, min_length=30)
+
+    def test_transcription_checks_its_input(self):
+        from analyses.rna import transcribe_rna
+        self.assertEqual(transcribe_rna("atg c\n"), "AUGC")
+        self.assertEqual(transcribe_rna("AUGC"), "AUGC")
+        with self.assertRaisesRegex(ValueError, "found 'E' at"):
+            transcribe_rna("MKTAYE")  # was: "MKUAYE"
+        with self.assertRaisesRegex(ValueError, "'1' at 4"):
+            transcribe_rna("ACG1")
+
+    def test_rna_gc_content_counts_u(self):
+        from analyses import sequence as S
+        rna = DNA_SEQ.replace("T", "U")
+        self.assertAlmostEqual(S.calculate_gc_content(rna), S.calculate_gc_content(DNA_SEQ))
+        self.assertEqual(S.count_nucleotides("AUUG")["T"], 2)
+
+
 class MainMenuSequenceTypeTests(unittest.TestCase):
     """End-to-end: the real main.py with a protein, an undetermined, an RNA and an invalid record."""
 

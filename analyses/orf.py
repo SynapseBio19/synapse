@@ -1007,7 +1007,23 @@ def find_orfs(
 
     Coordinates in the result are 0-based and inclusive on the forward
     strand ("start" <= "stop"), for both strands.
+
+    The sequence is uppercased with whitespace removed (soft-masked input
+    is searched like any other); symbols outside the IUPAC DNA alphabet,
+    RNA's U included, raise ValueError (audit D14-F8). ``core.api``
+    converts RNA explicitly before calling this.
     """
+
+    from core.alphabets import DNA_IUPAC, normalize_sequence, symbols_outside
+
+    dna = normalize_sequence(dna)
+    invalid = symbols_outside(dna, DNA_IUPAC)
+    if invalid:
+        shown = ", ".join(f"{symbol!r} at {position}" for position, symbol in invalid[:5])
+        raise ValueError(
+            f"ORF search needs a DNA sequence; found {shown}"
+            + (" ..." if len(invalid) > 5 else "") + "."
+        )
 
     if ranking not in ORF_RANKING_MODES:
         raise ValueError(

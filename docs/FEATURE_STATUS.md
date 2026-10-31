@@ -33,10 +33,10 @@ simulated keystrokes (see audit §11.5).
 | Functions and classes inventoried | ~1,100 |
 | Main-menu entries | 15 |
 | Sub-menu entries inventoried | 78 |
-| Automated tests | 194, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1 + 5 D2 + 5 D14-F2 + 11 sequence-type classifier + 6 D14-F3/F11 + 7 D14-F1 + 9 D13/D14-F4/F5/F7 + 5 D14-F6) |
+| Automated tests | 197, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1 + 5 D2 + 5 D14-F2 + 11 sequence-type classifier + 6 D14-F3/F11 + 7 D14-F1 + 9 D13/D14-F4/F5/F7 + 5 D14-F6 + 3 D14-F8–F10) |
 | Module self-tests | 12 suites, all passing (CRISPR 28, BLAST 33, mutation 44, variant 27, others aggregated) |
 | Golden-master scenarios | 12 |
-| Confirmed defects | 19 (D1–D19); corrected so far: 7 (D12, D4, D3, D5, D1, D2, D13; 2026-10-31); D14 partly (F1–F7, F11, F12 corrected; F8–F10 open) |
+| Confirmed defects | 19 (D1–D19); corrected so far: 8 (D12, D4, D3, D5, D1, D2, D13, D14 with all sub-findings F1–F12; 2026-10-31) |
 | Suspected / unverified concerns | 14 at the audit (S1–S14); S15–S22 recorded since |
 | External validations performed in this audit | 8 (audit §3, §6) |
 | Features advertised but not implemented | 1 (`[11] AI Experiment Planner`) |

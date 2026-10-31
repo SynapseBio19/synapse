@@ -758,3 +758,26 @@ protein FASTA records get a route to protein analysis. Tests are in
   Biopython).
 - Tests: 5 new (`ProteinResidueCodeTests`). Suite 189 → 194. Golden master
   unchanged.
+
+### D14-F8, F9, F10 Module entry points normalize and check their input (`analyses/orf.py`, `analyses/rna.py`, `analyses/sequence.py`)
+
+- F8: `orf.find_orfs` on lower-case (soft-masked) DNA found 0 ORFs, and
+  RNA or protein input also gave a silent 0. It now uppercases and strips
+  whitespace, and raises `ValueError` naming the first offending symbols
+  for anything outside the IUPAC DNA alphabet (RNA included; `core.api`
+  converts RNA explicitly).
+- F9: `rna.transcribe_rna` transcribed anything (`MKTAY` → `MKUAY`). It
+  now normalizes, returns RNA unchanged, and raises for non-nucleotide
+  symbols.
+- F10: `sequence.count_nucleotides` ignored U, so the GC content of an RNA
+  passed directly to the DNA module omitted U from the denominator
+  (64.58 % instead of 51.67 % in the audit example). U is now counted as
+  T. Since the menu gate and `core.api` already hand RNA to this module
+  in the DNA alphabet, only direct module calls were affected.
+- Tests: 3 new (`ModuleInputTests`). Suite 194 → 197. Golden master
+  unchanged.
+
+With this package every D14 sub-finding (F1–F12) and D13 is corrected.
+A re-run of the read-only probe from the investigation shows each module
+either accepting a type or refusing it with a message; no module returns
+a silent result for a foreign type any more.
