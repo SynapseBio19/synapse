@@ -18,12 +18,15 @@ import datetime as _dt
 import enum
 import hashlib
 import json
+import logging
 import math
 import platform
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from core.models import SYNAPSE_VERSION, AnalysisResult, sha256_text
+
+logger = logging.getLogger("synapse.report")
 
 REPORT_FORMAT_VERSION = 1
 
@@ -70,7 +73,14 @@ def to_jsonable(value: Any, _depth: int = 0) -> Any:
         try:
             return to_jsonable(value.to_dict(), _depth + 1)
         except Exception:  # noqa: BLE001 - fall back to repr below
-            pass
+            # Audit S8: this used to fall through without any trace, so a
+            # payload whose to_dict() raised reached the report as an
+            # unparseable repr() string with nothing to explain it.
+            logger.warning(
+                "to_dict() failed for %s; the report stores repr() instead.",
+                type(value).__name__, exc_info=True,
+            )
+    logger.debug("No JSON mapping for %s; the report stores repr().", type(value).__name__)
     return repr(value)
 
 

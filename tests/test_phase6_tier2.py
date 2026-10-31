@@ -468,5 +468,101 @@ class CrisprThresholdDocumentationTests(unittest.TestCase):
                 self.assertIn(fragment, methods)
 
 
+# ----------------------------------------------------------------------
+# S21, S10: the GenBank reader reports what it could not read
+# ----------------------------------------------------------------------
+class GenBankReaderNoteTests(unittest.TestCase):
+    RECORD = (
+        "LOCUS       ODD                       20 bp    DNA     linear   SYN 31-OCT-2026\n"
+        "DEFINITION  Synthetic record exercising unparsed forms.\n"
+        "ACCESSION   ODD\n"
+        "FEATURES             Location/Qualifiers\n"
+        "     source          1..20\n"
+        "     misc_feature    order(1..5,10..15)\n"
+        "     variation       AB123.1:3..8\n"
+        "ORIGIN\n"
+        "        1 acgtacgt-a cgtacgtacg\n"
+        "//\n"
+    )
+
+    def _load(self, text):
+        import tempfile
+        from pathlib import Path
+        from fileio.genbank import load_genbank
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "record.gb"
+            path.write_text(text)
+            return load_genbank(str(path))
+
+    def test_symbols_dropped_from_origin_are_reported(self):
+        [record] = self._load(self.RECORD)
+        self.assertEqual(record["sequence"], "ACGTACGTACGTACGTACG")  # the '-' was dropped
+        self.assertTrue(any("not sequence letters" in note and "'-'" in note
+                            for note in record["notes"]), record["notes"])
+
+    def test_unparsed_feature_locations_are_reported(self):
+        [record] = self._load(self.RECORD)
+        note = next(n for n in record["notes"] if "does not parse" in n)
+        self.assertIn("2 feature location(s)", note)
+        self.assertIn("misc_feature", note)
+        self.assertIn("variation", note)
+        unparsed = sorted(f["key"] for f in record["features"]
+                          if not f["location_parsed"]["parsed"])
+        self.assertEqual(unparsed, ["misc_feature", "variation"])
+
+    def test_a_clean_record_produces_no_such_notes(self):
+        from fileio.genbank import load_genbank
+        [record] = load_genbank(str(PROJECT_ROOT / "tests" / "fixtures" / "synthetic_circular.gb"))
+        self.assertEqual(record["notes"], [])
+        self.assertTrue(all(f["location_parsed"]["parsed"] for f in record["features"]))
+
+
+# ----------------------------------------------------------------------
+# S8: a failing to_dict() is no longer swallowed silently
+# ----------------------------------------------------------------------
+class ReportSerializationTests(unittest.TestCase):
+    def test_failing_to_dict_is_logged(self):
+        from core.report import to_jsonable
+
+        class Hostile:
+            def to_dict(self):
+                raise RuntimeError("boom")
+
+        with self.assertLogs("synapse.report", level="WARNING") as captured:
+            result = to_jsonable(Hostile())
+        self.assertIsInstance(result, str)
+        self.assertTrue(any("to_dict() failed for Hostile" in line for line in captured.output),
+                        captured.output)
+
+    def test_ordinary_payloads_are_unchanged(self):
+        from core.report import to_jsonable
+        self.assertEqual(to_jsonable({"a": (1, 2), "b": {3}}), {"a": [1, 2], "b": [3]})
+        self.assertEqual(to_jsonable(float("nan")), "NaN")
+
+
+# ----------------------------------------------------------------------
+# S22: the supplied variant reference must be DNA
+# ----------------------------------------------------------------------
+class VariantReferenceAlphabetTests(unittest.TestCase):
+    def test_a_reference_in_another_alphabet_is_refused(self):
+        from analyses import variant_analysis as V
+        variants = [V.Variant("chr1", 2, "C", "T")]
+        for reference in ("MKTAYIAKQRQISFVK", "ACGU", "ACGT-ACGT"):
+            with self.subTest(reference=reference):
+                with self.assertRaisesRegex(V.VariantAnalysisError, "is not DNA"):
+                    V.check_reference_alleles(variants, {"chr1": reference})
+                with self.assertRaisesRegex(V.VariantAnalysisError, "is not DNA"):
+                    V.normalize_variants(variants, contig_references={"chr1": reference})
+        with self.assertRaisesRegex(V.VariantAnalysisError, "is not DNA"):
+            V.normalize_variants(variants, reference_sequence="MKTAYIAKQRQISFVK")
+
+    def test_ambiguity_codes_in_a_reference_are_accepted(self):
+        from analyses import variant_analysis as V
+        reference = "ACGTNRYACGT"  # real assemblies contain N and other IUPAC codes
+        self.assertEqual(V.validate_reference_sequence(reference), reference)
+        report = V.check_reference_alleles([V.Variant("chr1", 1, "A", "G")], {"chr1": reference})
+        self.assertEqual(report["checked"], 1)
+
+
 if __name__ == "__main__":
     unittest.main()

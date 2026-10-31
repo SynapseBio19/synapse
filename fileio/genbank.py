@@ -125,6 +125,7 @@ def load_genbank(path: str) -> List[Dict[str, Any]]:
         accession = None
         feature_lines: List[str] = []
         sequence_parts: List[str] = []
+        dropped_origin_symbols: set = set()
         section = None
         for line in lines:
             if line.startswith("DEFINITION"):
@@ -145,6 +146,12 @@ def load_genbank(path: str) -> List[Dict[str, Any]]:
                 feature_lines.append(line)
             elif section == "origin":
                 sequence_parts.append("".join(ch for ch in line if ch.isalpha()))
+                # Digits are ORIGIN line numbers and whitespace separates the
+                # blocks, so both are dropped by design. Any other symbol would
+                # be sequence content this reader cannot keep (audit S21).
+                dropped_origin_symbols.update(
+                    ch for ch in line if not ch.isalnum() and not ch.isspace()
+                )
 
         sequence = "".join(sequence_parts).upper()
         notes: List[str] = []
@@ -154,6 +161,34 @@ def load_genbank(path: str) -> List[Dict[str, Any]]:
             notes.append(
                 f"LOCUS declares {declared_length} bp but ORIGIN contains {len(sequence)} bp."
             )
+        if dropped_origin_symbols:
+            shown = ", ".join(repr(symbol) for symbol in sorted(dropped_origin_symbols))
+            notes.append(
+                f"ORIGIN contained symbols that are not sequence letters and were not "
+                f"read: {shown}. Only letters are kept, so the stored sequence is "
+                f"shorter than the file suggests."
+            )
+
+        features = _parse_features(feature_lines)
+        # Locations in forms this reader does not parse (order(), remote
+        # accession references, between-base sites) keep only their raw string
+        # and have no interval. Say so per record instead of silently losing
+        # the feature's position (audit S10).
+        unparsed: Dict[str, int] = {}
+        for feature in features:
+            if not feature["location_parsed"]["parsed"]:
+                unparsed[feature["key"]] = unparsed.get(feature["key"], 0) + 1
+        if unparsed:
+            shown = ", ".join(
+                key if count == 1 else f"{key} x{count}"
+                for key, count in sorted(unparsed.items())
+            )
+            notes.append(
+                f"{sum(unparsed.values())} feature location(s) use a form this reader "
+                f"does not parse; they keep their raw location string and have no "
+                f"interval: {shown}."
+            )
+
         definition = " ".join(definition_parts).strip()
         header = f"{accession or name} {definition}".strip()
         records.append({
@@ -163,7 +198,7 @@ def load_genbank(path: str) -> List[Dict[str, Any]]:
             "molecule_type": molecule_type,
             "locus_name": name,
             "accession": accession,
-            "features": _parse_features(feature_lines),
+            "features": features,
             "notes": notes,
         })
 

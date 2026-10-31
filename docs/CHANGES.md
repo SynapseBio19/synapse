@@ -1024,3 +1024,33 @@ interrupted the Opus 5.5 session at the start of this investigation.
   unchanged. Flattening it alters executed code and requires the independent
   review recorded as open validation item 7 in `docs/AUDIT_STATUS.md`. D16 is
   therefore partially corrected.
+
+### S8, S10, S21, S22 Four silent-failure paths now report what happened
+
+- **S21** (`fileio/genbank.py`): the ORIGIN reader keeps only letters, which
+  is correct for the line numbers and block spacing of the format but also
+  discarded any other symbol without a word. Symbols that are neither
+  letters, digits nor whitespace are now collected and reported as a record
+  note, so a sequence shorter than the file suggests is visible.
+- **S10** (`fileio/genbank.py`): locations in forms the reader does not
+  parse - `order()`, remote accession references, between-base sites - keep
+  only their raw string and yield no interval. The record now carries a note
+  naming how many such locations there are and which feature keys they
+  belong to. A record whose locations all parse gets no note; the bundled
+  fixture is unchanged.
+- **S8** (`core/report.py`): `to_jsonable` caught every exception from a
+  payload's `to_dict()` and fell through to `repr()`, so an unparseable
+  string could reach a report with nothing to explain it. The failure is now
+  logged as a warning with the traceback, and the generic repr fallback is
+  logged at debug level. The serialized output is unchanged.
+- **S22** (`analyses/variant_analysis.py`): the supplied reference was never
+  checked, so a sequence in another alphabet was compared against REF
+  alleles base by base and produced mismatches that looked like data
+  problems. `validate_reference_sequence()` and `validate_contig_references()`
+  now require the IUPAC DNA alphabet and are applied by `normalize_variants`
+  and `check_reference_alleles`. Ambiguity codes stay valid, since real
+  assemblies contain N and occasionally other IUPAC codes; U is refused,
+  which matches the VCF specification's ACGTN alleles.
+- Tests: 7 new (`GenBankReaderNoteTests`, `ReportSerializationTests`,
+  `VariantReferenceAlphabetTests`). Suite 229 -> 236; pyright unchanged;
+  golden master unchanged.

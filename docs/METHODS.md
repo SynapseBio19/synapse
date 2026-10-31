@@ -43,6 +43,11 @@ use 0-based inclusive `start <= stop` on the forward strand.
   because both act on DNA; `analyze_protein` takes proteins. Every entry
   point accepts `sequence_type=` for an undetermined sequence.
 - Provenance: file SHA-256, sequence SHA-256, path, format, record index.
+- The GenBank reader reports what it could not read as record notes:
+  symbols dropped from ORIGIN (S21) and feature locations in forms it
+  does not parse, such as `order()`, remote accession references and
+  between-base sites, which keep their raw string and have no interval
+  (S10).
 - GenBank locations: simple spans, `complement()` and `join()` are parsed;
   other forms keep only the raw string.
 

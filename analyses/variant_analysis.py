@@ -985,6 +985,34 @@ def validate_contig_matching(contig_matching: str) -> str:
     return contig_matching
 
 
+def validate_reference_sequence(sequence: str, contig: str = "reference") -> str:
+    """Raise unless *sequence* is written in the IUPAC DNA alphabet.
+
+    Audit S22: the supplied reference was never checked, so a sequence in
+    another alphabet - a peptide, a gapped alignment row, a transcript
+    written with U - was compared against REF alleles base by base and
+    produced mismatches that looked like data problems. Ambiguity codes are
+    accepted: real reference assemblies contain N and occasionally other
+    IUPAC codes.
+    """
+    from core.alphabets import DNA_IUPAC, normalize_sequence, symbols_outside
+
+    invalid = symbols_outside(normalize_sequence(sequence), DNA_IUPAC)
+    if invalid:
+        shown = ", ".join(f"{symbol!r} at {position}" for position, symbol in invalid[:5])
+        raise VariantAnalysisError(
+            f"Reference sequence for '{contig}' is not DNA; found {shown}"
+            + (" ..." if len(invalid) > 5 else "") + "."
+        )
+    return sequence
+
+
+def validate_contig_references(contig_references: Mapping[str, str]) -> None:
+    """Apply validate_reference_sequence() to every supplied reference."""
+    for contig, sequence in contig_references.items():
+        validate_reference_sequence(sequence, contig)
+
+
 def _chr_prefix_partner(name: str) -> Optional[str]:
     """The name differing only by a leading "chr", or None for mitochondria."""
     if name in MITOCHONDRIAL_CONTIG_NAMES:
@@ -1083,8 +1111,11 @@ def normalize_variants(
     modified.
     """
     validate_contig_matching(contig_matching)
+    if reference_sequence is not None:
+        validate_reference_sequence(reference_sequence)
     resolution = None
     if contig_references is not None:
+        validate_contig_references(contig_references)
         resolution = resolve_contig_names(
             (v.chromosome for v in variants),
             contig_references,
@@ -1118,6 +1149,7 @@ def check_reference_alleles(
     variants without a reference and variants with a symbolic or non-ACGTN
     REF; both are also reported separately.
     """
+    validate_contig_references(contig_references)
     resolution = resolve_contig_names(
         (v.chromosome for v in variants),
         contig_references,
@@ -2808,6 +2840,8 @@ __all__ = [
     "CONTIG_MATCHING_MODES",
     "ContigResolution",
     "validate_contig_matching",
+    "validate_contig_references",
+    "validate_reference_sequence",
     "resolve_contig_names",
     "check_reference_alleles",
     "annotate_variant",
