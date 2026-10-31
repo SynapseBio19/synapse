@@ -878,3 +878,16 @@ Tests are in `tests/test_phase6_tier2.py`.
 - Also fixed: `analyses/crispr.py` did not import `os`, needed by the new
   export-directory code (found by the new test before commit).
 - Tests: 4 new (`CrisprConfigurationTests`). Suite 206 → 210.
+
+### D19 The pipeline's ORF runner takes the menu's search settings (`core/pipeline.py`)
+
+- Problem: `SynapsePipeline.run_orf` exposed none of `start_codon_policy`,
+  `nested`, `ranking` or `genetic_code`, so a programmatic pipeline run
+  could not reproduce an interactive ORF search. `PipelineContext.completed`
+  started with six keys and grew with whatever was stored, so `status()`
+  had a history-dependent shape while `print_status` listed twelve.
+- Now: `run_orf` takes the four settings (None = module default) and
+  passes them to the ORF module; its results equal `core.api.find_orfs`
+  for the same settings. `completed` always has the twelve modules of
+  `STATUS_LABELS` (one table, also used by `print_status`).
+- Tests: 2 new (`PipelineOrfRunnerTests`). Suite 210 → 212.

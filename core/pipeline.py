@@ -33,6 +33,25 @@ ORF_DEPENDENT_MODULES = ("rna", "protein", "crispr", "blast")
 # PIPELINE CONTEXT
 # ============================================================
 
+# Every module the pipeline reports on, with its status label. ``completed``
+# always has exactly these keys, so ``status()`` has a fixed shape (audit D19).
+STATUS_LABELS = {
+    "sequence": "Sequence Overview",
+    "orf": "ORF Analysis",
+    "rna": "RNA Analysis",
+    "protein": "Protein Analysis",
+    "restriction": "Restriction Analysis",
+    "cloning": "Cloning Analysis",
+    "primer": "Primer Design",
+    "mutation": "Mutation Analysis",
+    "variant": "Variant Analysis",
+    "crispr": "CRISPR Guide Design",
+    "blast": "BLAST Search",
+    "literature": "Literature Search",
+}
+STATUS_MODULES = tuple(STATUS_LABELS)
+
+
 @dataclass
 class PipelineContext:
     """
@@ -86,14 +105,7 @@ class PipelineContext:
     # --------------------------------------------------------
 
     completed: dict = field(
-        default_factory=lambda: {
-            "sequence": False,
-            "orf": False,
-            "rna": False,
-            "protein": False,
-            "restriction": False,
-            "cloning": False,
-        }
+        default_factory=lambda: dict.fromkeys(STATUS_MODULES, False)
     )
 
     # ========================================================
@@ -152,14 +164,7 @@ class PipelineContext:
 
         self.results = {}
 
-        self.completed = {
-            "sequence": False,
-            "orf": False,
-            "rna": False,
-            "protein": False,
-            "restriction": False,
-            "cloning": False,
-        }
+        self.completed = dict.fromkeys(STATUS_MODULES, False)
 
     # ========================================================
     # BASIC INFORMATION
@@ -419,20 +424,7 @@ class PipelineContext:
 
     def print_status(self):
 
-        labels = {
-            "sequence": "Sequence Overview",
-            "orf": "ORF Analysis",
-            "rna": "RNA Analysis",
-            "protein": "Protein Analysis",
-            "restriction": "Restriction Analysis",
-            "cloning": "Cloning Analysis",
-            "primer": "Primer Design",
-            "mutation": "Mutation Analysis",
-            "variant": "Variant Analysis",
-            "crispr": "CRISPR Guide Design",
-            "blast": "BLAST Search",
-            "literature": "Literature Search",
-        }
+        labels = STATUS_LABELS
 
         print()
         print("=" * 70)
@@ -636,12 +628,20 @@ class SynapsePipeline:
         min_length=None,
         enhanced=True,
         top_n=5,
+        start_codon_policy=None,
+        nested=None,
+        ranking=None,
+        genetic_code=1,
     ):
         """
         Run the existing ORF analysis.
 
         Uses analyze_orfs_enhanced() when available.
         Falls back to analyze_orfs() if necessary.
+
+        start_codon_policy, nested, ranking and genetic_code are the ORF
+        menu's search settings; None means the module default, so a
+        programmatic run can reproduce an interactive one (audit D19).
         """
 
         if not self.context.has_sequence():
@@ -660,6 +660,13 @@ class SynapsePipeline:
                 10
             )
 
+        search_settings = {
+            "start_codon_policy": start_codon_policy,
+            "nested": orf_module.DEFAULT_REPORT_NESTED if nested is None else nested,
+            "ranking": ranking or orf_module.DEFAULT_RANKING,
+            "genetic_code": genetic_code,
+        }
+
         if (
             enhanced
             and hasattr(
@@ -674,6 +681,7 @@ class SynapsePipeline:
                     include_partial=include_partial,
                     min_length=min_length,
                     top_n=top_n,
+                    **search_settings,
                 )
             )
 
@@ -684,6 +692,7 @@ class SynapsePipeline:
                     self.context.sequence,
                     include_partial=include_partial,
                     min_length=min_length,
+                    **search_settings,
                 )
             )
 

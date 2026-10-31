@@ -212,5 +212,36 @@ class CrisprConfigurationTests(unittest.TestCase):
             self.assertEqual(C._default_export_directory(), PROJECT_ROOT / "exports" / "crispr")
 
 
+# ----------------------------------------------------------------------
+# D19: the pipeline's ORF runner takes the menu's search settings
+# ----------------------------------------------------------------------
+class PipelineOrfRunnerTests(unittest.TestCase):
+    SEQUENCE = _random_dna(3000, 5)
+
+    def test_run_orf_reproduces_api_results_for_every_setting(self):
+        from core import api
+        from core.pipeline import SynapsePipeline
+        settings = {"start_codon_policy": "table_starts", "nested": True, "ranking": "heuristic",
+                    "genetic_code": 11, "min_length": 60}
+        pipeline = SynapsePipeline(sequence=self.SEQUENCE, header="x")
+        result = pipeline.run_orf(**settings)
+        expected = api.find_orfs(self.SEQUENCE, **settings).data
+        self.assertEqual(result["parameters"], expected["parameters"])
+        self.assertEqual([o["sequence"] for o in result["orfs"]], [o["sequence"] for o in expected["orfs"]])
+        default = SynapsePipeline(sequence=self.SEQUENCE, header="x").run_orf()
+        self.assertNotEqual(default["parameters"], result["parameters"])
+
+    def test_completed_has_a_fixed_shape(self):
+        from core.pipeline import STATUS_MODULES, SynapsePipeline
+        pipeline = SynapsePipeline(sequence=self.SEQUENCE, header="x")
+        self.assertEqual(tuple(pipeline.context.status()), STATUS_MODULES)
+        pipeline.store("blast", {"hits": []})
+        status = pipeline.context.status()
+        self.assertEqual(tuple(status), STATUS_MODULES)
+        self.assertTrue(status["blast"])
+        pipeline.context.clear_results()
+        self.assertEqual(tuple(pipeline.context.status()), STATUS_MODULES)
+
+
 if __name__ == "__main__":
     unittest.main()
