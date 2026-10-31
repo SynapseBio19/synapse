@@ -74,6 +74,8 @@ IUPAC, gapped and invalid input (D14):
 
 | 23 | P1-9 RNA codon view uses the selected ORF's genetic code | this package | internal tests; +1 frame preview equals `translate_orf_sequence` for a table-2 ORF | Corrected; suite 245/245 |
 
+| 24 | S18 recognition-site scans cached; planner no longer rescans | this package | cProfile before (5,002 scans for 16 combinations); measured 11.8 s -> 0.24 s at 8 enzymes, 100-110 s -> 0.57 s at 10 | Corrected; suite 248/248 |
+
 ## Paused (2026-10-31)
 
 Planned pause at the owner's request; see `docs/PHASE6_HANDOVER.md` for the

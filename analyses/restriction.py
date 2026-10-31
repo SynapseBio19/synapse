@@ -1,3 +1,4 @@
+from functools import lru_cache
 from itertools import combinations
 
 from data.restriction_enzymes import (
@@ -168,6 +169,21 @@ def find_recognition_site_matches(sequence, recognition_sequence, topology="line
     if not recognition:
         return []
 
+    # Fresh dicts per call: the scan is cached, and a caller that edited a
+    # returned match must not reach into the cache.
+    return [dict(match) for match in _scan_recognition_sites(sequence, recognition, circular)]
+
+
+@lru_cache(maxsize=256)
+def _scan_recognition_sites(sequence, recognition, circular):
+    """Scan one sequence for one recognition sequence; cached (audit S18).
+
+    The scan depends only on these three values, but the cloning planner
+    re-ran it for every candidate strategy: a 1.3 kb vector with 8 enzymes
+    produced 5,002 calls for 16 distinct combinations. Caching removes the
+    repetition without changing any result. The bound keeps a planner run's
+    worth of scans and nothing more.
+    """
     matches = []
 
     search_space = sequence
@@ -209,7 +225,7 @@ def find_recognition_site_matches(sequence, recognition_sequence, topology="line
             "wraps_origin": position + len(recognition) > len(sequence),
         })
 
-    return matches
+    return tuple(matches)
 
 
 def find_restriction_sites(sequence, enzyme_name, topology="linear"):

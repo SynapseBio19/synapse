@@ -1141,3 +1141,27 @@ interrupted the Opus 5.5 session at the start of this investigation.
   for. Without a selected ORF the default stays table 1, so existing results
   and the golden master are unchanged.
 - Tests: 5 new (`RnaGeneticCodeTests`). Suite 240 -> 245.
+
+### S18 The cloning planner stops repeating identical site scans (`analyses/restriction.py`)
+
+- Measured cause, by profiling a 1.3 kb vector and a 0.3 kb insert with 8
+  enzymes: 1,240 evaluated strategies produced **5,002** calls to
+  `find_recognition_site_matches` for only **16** distinct combinations of
+  sequence, recognition sequence and topology. The scan itself was 98 % of
+  the runtime. The planner's results were never wrong; it redid the same
+  work about 312 times over.
+- Now: the scan is a private `_scan_recognition_sites()` behind an
+  `lru_cache`, keyed by exactly the three values it depends on.
+  `find_recognition_site_matches` rebuilds fresh dicts from the cached
+  tuple, so a caller that edits a returned match cannot reach into the
+  cache.
+- Measured effect (same input): 8 enzymes 11.8 s -> 0.24 s; 10 enzymes,
+  which the audit timed at 100-110 s, 0.57 s; all 22 enzymes, which the
+  audit timed at over two minutes, 18.7 s. The remaining time is the
+  strategy enumeration itself, not repeated scanning.
+- No scientific behaviour changed: the scan is a pure function of its three
+  inputs, the full suite including the S17 comparison across all 231 enzyme
+  pairs passes unchanged, and the golden master is untouched.
+- Tests: 3 new (`CloningPlannerScanReuseTests`), covering the scan count,
+  isolation from caller mutation, and identical cold/warm results for both
+  topologies. Suite 245 -> 248.

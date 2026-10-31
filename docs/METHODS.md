@@ -248,6 +248,9 @@ Validation:
 - Ranking is a transparent weighted sequence heuristic, not a measured or
   predicted editing efficiency.
 - Off-target search covers only sequences supplied to Synapse, not a genome.
+- Recognition-site scanning is cached on (sequence, recognition sequence,
+  topology), the three values it depends on. This removes the cloning
+  planner's repeated rescanning (S18) and changes no result.
 - Cut site (D8): SpCas9/SpCas9-NG blunt 3 nt 5' of the PAM (after guide
   position 17; Jinek et al. 2012), SaCas9 blunt 3 nt 5' of the PAM
   (after position 18; modelled as SpCas9, Ran et al. 2015), Cas12a

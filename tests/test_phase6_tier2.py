@@ -670,5 +670,46 @@ class RnaGeneticCodeTests(unittest.TestCase):
         self.assertEqual(view["frames"][0]["protein"], translate_orf_sequence(orf))
 
 
+# ----------------------------------------------------------------------
+# S18: the cloning planner no longer repeats identical site scans
+# ----------------------------------------------------------------------
+class CloningPlannerScanReuseTests(unittest.TestCase):
+    VECTOR = _random_dna(1300, 5)
+    INSERT = _random_dna(300, 6)
+
+    def test_each_distinct_scan_runs_once(self):
+        from analyses import cloning as C, restriction as R
+        from data.restriction_enzymes import RESTRICTION_ENZYMES
+        enzymes = sorted(RESTRICTION_ENZYMES)[:8]
+        R._scan_recognition_sites.cache_clear()
+        C.automatic_cloning_planner(self.VECTOR, self.INSERT, enzyme_names=enzymes)
+        info = R._scan_recognition_sites.cache_info()
+        # Two sequences x 8 enzymes x one topology each.
+        self.assertEqual(info.misses, 2 * len(enzymes))
+        # The planner asked far more often than that; the rest was reused.
+        self.assertGreater(info.hits, 100 * info.misses)
+
+    def test_a_cached_result_cannot_be_corrupted_by_a_caller(self):
+        from analyses import restriction as R
+        sequence = "GAATTC" + "A" * 20 + "GAATTC"
+        first = R.find_recognition_site_matches(sequence, "GAATTC")
+        first[0]["status"] = "TAMPERED"
+        first.append({"bogus": True})
+        second = R.find_recognition_site_matches(sequence, "GAATTC")
+        self.assertEqual([m["status"] for m in second], ["CONFIRMED", "CONFIRMED"])
+        self.assertEqual(len(second), 2)
+
+    def test_caching_does_not_change_results(self):
+        from analyses import restriction as R
+        sequence = "GAATTCNNGAATTC" + _random_dna(200, 7)
+        for topology in ("linear", "circular"):
+            with self.subTest(topology=topology):
+                R._scan_recognition_sites.cache_clear()
+                cold = R.find_recognition_site_matches(sequence, "GAATTC", topology=topology)
+                warm = R.find_recognition_site_matches(sequence, "GAATTC", topology=topology)
+                self.assertEqual(cold, warm)
+                self.assertGreater(R._scan_recognition_sites.cache_info().hits, 0)
+
+
 if __name__ == "__main__":
     unittest.main()
