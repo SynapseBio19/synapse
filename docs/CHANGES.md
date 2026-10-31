@@ -803,3 +803,16 @@ Tests are in `tests/test_phase6_tier2.py`.
   database addressed by its prefix gives the two hits of the audit's
   first real run (coverage 100 % and 98.04 %) with full provenance.
 - Tests: 3 new (`LocalBlastDatabasePathTests`). Suite 197 → 200.
+
+### D7 The stale BLAST artifact is labelled as legacy (`blast_results/README.md`)
+
+- Problem: `blast_results/TEST_8_REFERENCE_blast.json` still carries the
+  pre-P0-1 values (100 % coverage for a 32 bp HSP on a 99 bp query, E =
+  7.45 without a band) in an obsolete key schema, and
+  `docs/AUDIT_STATUS.md` cited it as the evidence for the P0-1 fix.
+- Now: the file is kept unchanged as the record of a real NCBI run (RID
+  `CD3MMW95016`) and of the defect; `blast_results/README.md` states that
+  it is not a valid result, what is wrong in it, and where the corrected
+  values are tested. `docs/AUDIT_STATUS.md` P0-1 cites the test, not the
+  file. Deleting the file was not done: it removes the only record of
+  that remote run and needs the owner's decision.

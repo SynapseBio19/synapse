@@ -36,7 +36,7 @@ simulated keystrokes (see audit §11.5).
 | Automated tests | 200, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1 + 5 D2 + 5 D14-F2 + 11 sequence-type classifier + 6 D14-F3/F11 + 7 D14-F1 + 9 D13/D14-F4/F5/F7 + 5 D14-F6 + 3 D14-F8–F10 + 3 D6) |
 | Module self-tests | 12 suites, all passing (CRISPR 28, BLAST 33, mutation 44, variant 27, others aggregated) |
 | Golden-master scenarios | 12 |
-| Confirmed defects | 19 (D1–D19); corrected so far: 9 (D12, D4, D3, D5, D1, D2, D13, D14 with all sub-findings F1–F12, D6; 2026-10-31) |
+| Confirmed defects | 19 (D1–D19); corrected so far: 10 (D12, D4, D3, D5, D1, D2, D13, D14 with all sub-findings F1–F12, D6, D7; 2026-10-31) |
 | Suspected / unverified concerns | 14 at the audit (S1–S14); S15–S22 recorded since |
 | External validations performed in this audit | 8 (audit §3, §6) |
 | Features advertised but not implemented | 1 (`[11] AI Experiment Planner`) |
@@ -368,7 +368,7 @@ relative to size; the 28 self-tests are the module's own fixtures.
 | — | Short-query rescue | `_should_run_short_query_rescue`, task configuration | Implemented | Execution-tested | Not applicable | Self-tested policy for short queries. |
 | 11 | Self-Test | `run_self_test` | Implemented | Execution-tested | Not applicable | 33/33. |
 | 12/13 | Supported programs; database status | `PROGRAMS`, `LOCAL_DATABASE_CATALOG` | Implemented | Execution-tested | Not applicable | |
-| — | Stored run artifact | `blast_results/TEST_8_REFERENCE_blast.json` | **Partially implemented** | Execution-tested | Not applicable | **D7**: stale pre-P0-1 values (100 % coverage at E = 7.45, null query length) and an obsolete key schema; no test reads it. |
+| — | Stored run artifact | `blast_results/TEST_8_REFERENCE_blast.json` | Legacy record | Not applicable | Not applicable | Labelled as a pre-P0-1 legacy record in `blast_results/README.md` (**D7** corrected 2026-10-31; deletion left to the owner). Originally: stale pre-P0-1 values (100 % coverage at E = 7.45, null query length) and an obsolete key schema; no test reads it. |
 
 ---
 
