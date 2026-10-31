@@ -65,7 +65,13 @@ IUPAC, gapped and invalid input (D14):
 | 14 | D15 planner entry labelled "not implemented" | `f3a09c1` | end-to-end `main.py` test | Corrected (planner itself remains P3-1, deferred); suite 213/213 |
 | 15 | S15 variant-to-mutation bridge works; S16 REF_MISMATCH no longer leaks into the input | `c71963b` | internal tests; pyright 134 → 132 (the two S15 diagnostics) | Corrected; suite 215/215 |
 | 16 | S17 cloning digest uses the top-strand cut | `c743beb` | internal tests; agreement with `restriction.perform_digest` for all 231 enzyme pairs, linear and circular | Corrected; suite 217/217 |
-| 17 | S19 start-codon classification and scores use the genetic code | this package | internal tests; golden master unchanged | Corrected; suite 219/219 |
+| 17 | S19 start-codon classification and scores use the genetic code | `6c20e69` | internal tests; golden master unchanged | Corrected; suite 219/219 |
+
+## Paused (2026-10-31)
+
+Planned pause at the owner's request; see `docs/PHASE6_HANDOVER.md` for the
+exact state, the open findings and the continuation steps. Stages F–I have
+not started.
 
 ## Open after the current package
 
