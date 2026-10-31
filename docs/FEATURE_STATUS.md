@@ -28,12 +28,12 @@ simulated keystrokes (see audit §11.5).
 | | Count |
 |---|---|
 | Analysis modules | 12 |
-| Core modules | 8 |
+| Core modules | 9 (`core/alphabets.py` added in Phase 6) |
 | Support modules (`fileio`, `ui`, `data`) | 8 |
 | Functions and classes inventoried | ~1,100 |
 | Main-menu entries | 15 |
 | Sub-menu entries inventoried | 78 |
-| Automated tests | 156, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1 + 5 D2 + 5 D14-F2) |
+| Automated tests | 167, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1 + 5 D2 + 5 D14-F2 + 11 sequence-type classifier) |
 | Module self-tests | 12 suites, all passing (CRISPR 28, BLAST 33, mutation 44, variant 27, others aggregated) |
 | Golden-master scenarios | 12 |
 | Confirmed defects | 19 (D1–D19); corrected so far: 6 (D12, D4, D3, D5, D1, D2; 2026-10-31) |
@@ -406,6 +406,7 @@ relative to size; the 28 self-tests are the module's own fixtures.
 | RNA / protein source resolution | `pipeline.get_rna_source_dna`, `get_protein_source_rna` | Implemented | **Integration-tested** | Selected-ORF-vs-whole-sequence rule confirmed intact. |
 | Pipeline module runners | `pipeline.run_sequence`, `run_orf`, `run_rna`, `run_protein`, `run_restriction`, `run_cloning`, `run_cloning_planner`, `run_core_pipeline` | **Partially implemented** | Execution-tested | **D19**: `run_orf` exposes none of `start_codon_policy`, `nested`, `ranking`, `genetic_code`. |
 | ORF hand-over adapter | `orf_context.resolve_orf_region`, `OrfRegion`, `is_synapse_orf` | Implemented | **Integration-tested** | Validates the ORF against the parent and refuses parent coordinates on mismatch. P0-2's central fix. |
+| Sequence alphabets and type classifier | `alphabets.classify_sequence`, `require_sequence_type`, `normalize_sequence`, `declared_type_from_molecule` | Implemented | Execution-tested | Letter sets **independently validated** against `Bio.Data.IUPACData`. Added in Phase 6 (D14/D13); not yet used by the analyses. |
 | Shared sequence tools | `seqtools.normalize_dna`, `complement`, `reverse_complement`, `gc_fraction`, `GeneticCode`, `codon_dict`, `get_genetic_code` | Implemented | Execution-tested | **Independently validated** against `Bio.Data.CodonTable`. **D13** name clash with `core.validation`. |
 | Legacy validation | `validation.normalize_dna`, `validate_dna`, `get_dna_errors` | Implemented | Execution-tested | **D13** divergent U handling; **D14** no alphabet check. |
 | Reproducible report | `report.build_analysis_report`, `report_to_markdown`, `export_analysis_report`, `to_jsonable`, `canonical_json` | Implemented | **Execution-tested** | JSON and Markdown both written; per-analysis payload SHA-256; rejects other suffixes. **S8** silent `repr()` fallback. |

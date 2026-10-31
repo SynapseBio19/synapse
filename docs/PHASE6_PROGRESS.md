@@ -49,7 +49,8 @@ IUPAC, gapped and invalid input (D14):
 
 | # | Finding | Commit | Validation | Status |
 |---|---|---|---|---|
-| 1 | D14-F2 BLAST query-type vocabulary; protein BLAST usable | "Use one BLAST query-type vocabulary (D14-F2)" | internal tests; external tool execution (BLAST+ 2.17.0 `makeblastdb` + `blastp`) | Corrected; suite 156/156; pyright unchanged |
+| 1 | D14-F2 BLAST query-type vocabulary; protein BLAST usable | `b8f5ea8` | internal tests; external tool execution (BLAST+ 2.17.0 `makeblastdb` + `blastp`) | Corrected; suite 156/156; pyright unchanged |
+| 2 | Central alphabets and classifier (F12/D13 groundwork) | this package | internal tests; external reference comparison (`Bio.Data.IUPACData`); literature (PMIDs 2582368, 6692818) | Added, not yet wired in; suite 167/167; pyright unchanged |
 
 ## Open after the current package
 

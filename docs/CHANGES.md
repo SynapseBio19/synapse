@@ -617,3 +617,23 @@ protein FASTA records get a route to protein analysis. Tests are in
   is not installed).
 - Tests: 5 new (`BlastQueryTypeVocabularyTests`). Suite 151 → 156.
 - Not changed here: how a query's type is inferred (F1, next package).
+
+### Central sequence alphabets and type classifier (`core/alphabets.py`, new)
+
+- Problem (F12/D13): 15 validators with 7 alphabet contracts, and no
+  module able to say whether a sequence is DNA, RNA or protein.
+- Now: one module with the IUPAC nucleotide and protein alphabets, a
+  `normalize_sequence` that never converts or drops symbols, and
+  `classify_sequence(sequence, declared=None)` returning the type
+  (DNA/RNA/PROTEIN), a confidence (CONFIRMED/PROBABLE/AMBIGUOUS/INVALID),
+  the consistent candidate types, reasons and invalid-symbol positions.
+  `require_sequence_type` raises `SequenceTypeError` (a `ValueError`) for
+  INVALID, AMBIGUOUS or a type the caller does not accept. The rules are
+  in `docs/METHODS.md`; there is no frequency threshold.
+- No analysis uses it yet; it is wired in by the following packages, so
+  this commit changes no existing behaviour.
+- Validation: the letter sets equal Biopython's `Bio.Data.IUPACData`
+  (external reference comparison, skipped without Biopython); alphabet
+  sources checked in PubMed (PMIDs 2582368, 6692818).
+- Tests: 11 new (`SequenceClassifierTests`). Suite 156 → 167.
+

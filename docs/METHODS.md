@@ -32,6 +32,33 @@ use 0-based inclusive `start <= stop` on the forward strand.
 - GenBank locations: simple spans, `complement()` and `join()` are parsed;
   other forms keep only the raw string.
 
+## Sequence types (`core/alphabets.py`)
+
+- Alphabets: IUPAC nucleotide codes (Cornish-Bowden 1985) with T for DNA
+  and U for RNA; the IUPAC-IUB one-letter amino-acid codes (JCBN 1984)
+  with the ambiguity codes B, Z, X and the later additions J (Leu/Ile),
+  U (selenocysteine) and O (pyrrolysine), as used by NCBI and Biopython;
+  `*` for a stop. Gaps and digits belong to no alphabet. The letter sets
+  are checked against `Bio.Data.IUPACData` in the tests.
+- Normalization removes whitespace and uppercases; it never converts U to
+  T and never drops a symbol.
+- Classification without a declared type (`classify_sequence`):
+  - symbols that exist only in the protein alphabet (E F I J L O P Q X Z
+    `*`) → protein, CONFIRMED;
+  - only A, C, G, T/U and N → DNA or RNA, PROBABLE (never confirmed:
+    every nucleotide code is also an amino-acid letter);
+  - other nucleotide ambiguity codes, or T and U together → AMBIGUOUS:
+    no type is chosen and the caller must declare one;
+  - empty, or symbols outside every alphabet → INVALID.
+- This is a categorical rule about which letters occur, not a cut-off on
+  their frequency. No published threshold exists for telling a nucleotide
+  sequence from a peptide by letter frequency, so Synapse uses none.
+- A declared type (by the caller, or by file metadata) is CONFIRMED when
+  the sequence fits that alphabet and INVALID when it does not. File
+  metadata usually says only "nucleotide": GenBank and other databases
+  write RNA molecules in the DNA alphabet, so the letters then decide
+  between DNA and RNA.
+
 ## ORF search (`analyses/orf.py`)
 
 | Parameter | Default | Alternatives |
@@ -220,6 +247,12 @@ Validation:
 
 ## References
 
+- Cornish-Bowden A (1985) Nomenclature for incompletely specified bases in
+  nucleic acid sequences: recommendations 1984. Nucleic Acids Res
+  13:3021–3030. PMID 2582368.
+- IUPAC-IUB Joint Commission on Biochemical Nomenclature (1984)
+  Nomenclature and symbolism for amino acids and peptides. Eur J Biochem
+  138:9–37. PMID 6692818.
 - SantaLucia J Jr (1998) A unified view of polymer, dumbbell, and
   oligonucleotide DNA nearest-neighbor thermodynamics. PNAS 95:1460–1465.
 - SantaLucia J Jr, Hicks D (2004) The thermodynamics of DNA structural
