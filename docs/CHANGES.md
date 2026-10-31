@@ -637,3 +637,27 @@ protein FASTA records get a route to protein analysis. Tests are in
   sources checked in PubMed (PMIDs 2582368, 6692818).
 - Tests: 11 new (`SequenceClassifierTests`). Suite 156 → 167.
 
+### D14-F3, F11 Declared molecule type is read, kept and reported (`fileio/`, `core/models.py`, `core/report.py`)
+
+- Problem: a GenPept record (`44 aa`) loaded as DNA, a GenBank RNA record
+  failed the DNA gate, FASTA `[moltype=...]` was ignored, and
+  `SequenceRecord.alphabet` was always `"DNA"`; the type appeared nowhere
+  in the pipeline or the exported report.
+- Now: the GenBank reader records the LOCUS molecule (`protein` for `aa`
+  records, otherwise the token after `bp`, e.g. `mRNA`); the FASTA loader
+  reads the NCBI `[moltype=...]` modifier (`[moltype=protein]` is a
+  Synapse extension). Every loaded record is classified with
+  `core.alphabets` (`alphabet`, `declared_type`, `sequence_classification`);
+  a declared type the letters contradict adds a note. NCBI's own default
+  of "genomic DNA" for a FASTA record without the modifier is not
+  adopted: that default is exactly what let a peptide pass as DNA.
+- `SequenceRecord` classifies itself: `alphabet` is DNA/RNA/PROTEIN or
+  None when undetermined, with `type_confidence`, `type_reasons`,
+  `declared_type`, `molecule_type`, and `with_declared_type()` for a
+  user's declaration. An `alphabet` passed to the constructor counts as a
+  declaration. `provenance()` and the report's input section (JSON and
+  Markdown) include the sequence type and its confidence.
+- Compatibility: `alphabet` was never read before; existing records of
+  plain DNA classify as DNA. The main menu does not use the type yet.
+- Tests: 6 new (`DeclaredMoleculeTypeTests`). Suite 167 → 173.
+

@@ -1,8 +1,9 @@
 """Minimal GenBank flat-file reader (standard library only).
 
-Reads, per record: LOCUS name, declared length and topology, DEFINITION,
-ACCESSION, the ORIGIN sequence and the FEATURES table (feature key, raw
-location string, qualifiers, and intervals for simple locations).
+Reads, per record: LOCUS name, declared length, molecule type and
+topology, DEFINITION, ACCESSION, the ORIGIN sequence and the FEATURES table
+(feature key, raw location string, qualifiers, and intervals for simple
+locations).
 
 Scope and limitations:
 * Locations are parsed for the forms ``a..b``, ``complement(a..b)``,
@@ -89,7 +90,7 @@ def _parse_features(lines: List[str]) -> List[Dict[str, Any]]:
 
 
 def load_genbank(path: str) -> List[Dict[str, Any]]:
-    """Return one dict per record: header, sequence, topology, features, notes."""
+    """Return one dict per record: header, sequence, topology, molecule type, features, notes."""
     with open(path, "r", encoding="utf-8", errors="replace") as handle:
         text = handle.read()
 
@@ -108,9 +109,16 @@ def load_genbank(path: str) -> List[Dict[str, Any]]:
         tokens = locus_line.split()
         name = tokens[1] if len(tokens) > 1 else "unnamed"
         declared_length = None
+        molecule_type = None
         for i, token in enumerate(tokens):
             if token in {"bp", "aa"} and i > 0 and tokens[i - 1].isdigit():
                 declared_length = int(tokens[i - 1])
+                # GenPept records give the length in "aa" and no molecule
+                # token; nucleotide records name it after "bp" (DNA, mRNA, ss-RNA, ...).
+                if token == "aa":
+                    molecule_type = "protein"
+                elif i + 1 < len(tokens) and ("DNA" in tokens[i + 1].upper() or "RNA" in tokens[i + 1].upper()):
+                    molecule_type = tokens[i + 1]
         topology = "circular" if "circular" in tokens else "linear"
 
         definition_parts: List[str] = []
@@ -152,6 +160,7 @@ def load_genbank(path: str) -> List[Dict[str, Any]]:
             "header": header,
             "sequence": sequence,
             "topology": topology,
+            "molecule_type": molecule_type,
             "locus_name": name,
             "accession": accession,
             "features": _parse_features(feature_lines),

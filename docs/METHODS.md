@@ -28,6 +28,12 @@ use 0-based inclusive `start <= stop` on the forward strand.
 
 - FASTA and GenBank (`.gb/.gbk`). GenBank topology is read from the LOCUS
   line; FASTA headers may carry `topology=circular`.
+- Molecule type: GenBank LOCUS (`aa` = protein; `DNA`, `mRNA`, `ss-RNA`, …
+  = nucleotide) and the NCBI FASTA modifier `[moltype=...]`
+  (`[moltype=protein]` is a Synapse extension) are read as a declared
+  type. Each record is classified with `core.alphabets` and carries its
+  type and confidence into provenance and the report. Without a declared
+  type the letters decide (see "Sequence types").
 - Provenance: file SHA-256, sequence SHA-256, path, format, record index.
 - GenBank locations: simple spans, `complement()` and `join()` are parsed;
   other forms keep only the raw string.

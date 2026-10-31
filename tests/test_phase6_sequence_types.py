@@ -129,6 +129,89 @@ def _blast_plus_available(*executables: str) -> bool:
 
 
 # ----------------------------------------------------------------------
+# D14-F3, F11: declared molecule type is read, kept and reported
+# ----------------------------------------------------------------------
+def _genbank(name, length, unit, molecule, sequence):
+    origin = "\n".join(
+        f"{i + 1:>9} " + " ".join(sequence[j:j + 10] for j in range(i, min(i + 60, len(sequence)), 10))
+        for i in range(0, len(sequence), 60)
+    )
+    return (f"LOCUS       {name:<16} {length:>11} {unit} {molecule:<6}  linear   SYN 31-OCT-2026\n"
+            f"DEFINITION  Synthetic {name}.\nACCESSION   {name}\nORIGIN\n{origin.lower()}\n//\n")
+
+
+class DeclaredMoleculeTypeTests(unittest.TestCase):
+    def load(self, filename, text):
+        from fileio.loader import load_sequences
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / filename
+            path.write_text(text)
+            return load_sequences(str(path))
+
+    def test_genbank_protein_record_is_confirmed_protein(self):
+        [record] = self.load("p.gp", _genbank("PEP1", len(IUPAC_LETTER_PEPTIDE), "aa", "", IUPAC_LETTER_PEPTIDE))
+        self.assertEqual(record["molecule_type"], "protein")
+        self.assertEqual((record["alphabet"], record["sequence_classification"]["confidence"]),
+                         ("PROTEIN", "CONFIRMED"))
+
+    def test_genbank_mrna_written_with_t_is_a_confirmed_nucleotide(self):
+        [record] = self.load("m.gb", _genbank("MRNA1", len(DNA_SEQ), "bp", "mRNA", DNA_SEQ))
+        self.assertEqual(record["molecule_type"], "mRNA")
+        self.assertEqual(record["declared_type"], "NUCLEOTIDE")
+        self.assertEqual((record["alphabet"], record["sequence_classification"]["confidence"]),
+                         ("DNA", "CONFIRMED"))
+
+    def test_fasta_moltype_modifier(self):
+        records = self.load("x.fasta", (
+            f">pep [moltype=protein]\n{IUPAC_LETTER_PEPTIDE}\n"
+            f">same_without_modifier\n{IUPAC_LETTER_PEPTIDE}\n"
+            f">dna [moltype=genomic DNA]\n{DNA_SEQ}\n"
+            f">plain\n{DNA_SEQ}\n"
+            f">wrong [moltype=mRNA]\n{PROTEIN}\n"
+        ))
+        summary = [(r["molecule_type"], r["alphabet"], r["sequence_classification"]["confidence"])
+                   for r in records]
+        self.assertEqual(summary, [
+            ("protein", "PROTEIN", "CONFIRMED"),
+            (None, None, "AMBIGUOUS"),
+            ("genomic DNA", "DNA", "CONFIRMED"),
+            (None, "DNA", "PROBABLE"),
+            ("mRNA", None, "INVALID"),
+        ])
+        self.assertTrue(any("does not fit the sequence" in note for note in records[4]["notes"]))
+
+    def test_sequence_record_carries_and_exports_the_type(self):
+        from core.models import SequenceRecord
+        [record] = self.load("x.fasta", f">pep [moltype=protein]\n{IUPAC_LETTER_PEPTIDE}\n")
+        sequence_record = SequenceRecord.from_legacy_dict(record, 1)
+        self.assertEqual((sequence_record.alphabet, sequence_record.type_confidence), ("PROTEIN", "CONFIRMED"))
+        provenance = sequence_record.provenance()
+        self.assertEqual((provenance["sequence_type"], provenance["molecule_type"]), ("PROTEIN", "protein"))
+
+    def test_sequence_record_classifies_and_accepts_a_declaration(self):
+        from core.models import SequenceRecord
+        self.assertEqual(SequenceRecord("x", "acgt").alphabet, "DNA")
+        undecided = SequenceRecord("p", IUPAC_LETTER_PEPTIDE)
+        self.assertEqual((undecided.alphabet, undecided.type_confidence), (None, "AMBIGUOUS"))
+        declared = undecided.with_declared_type("PROTEIN")
+        self.assertEqual((declared.alphabet, declared.type_confidence, declared.declared_type),
+                         ("PROTEIN", "CONFIRMED", "PROTEIN"))
+        self.assertEqual(SequenceRecord("x", "ACGT", alphabet="DNA").type_confidence, "CONFIRMED")
+
+    def test_report_input_section_names_the_sequence_type(self):
+        from core.models import SequenceRecord
+        from core.pipeline import SynapsePipeline
+        from core.report import build_analysis_report, report_to_markdown
+        pipeline = SynapsePipeline(sequence=DNA_SEQ, header="plain")
+        pipeline.attach_record(SequenceRecord("plain", DNA_SEQ))
+        report = build_analysis_report(pipeline)
+        self.assertEqual((report["input"]["sequence_type"], report["input"]["sequence_type_confidence"]),
+                         ("DNA", "PROBABLE"))
+        self.assertEqual(report["input"]["record"]["sequence_type"], "DNA")
+        self.assertIn("- sequence_type: `DNA`", report_to_markdown(report))
+
+
+# ----------------------------------------------------------------------
 # D14-F2: one query-type vocabulary in BLAST
 # ----------------------------------------------------------------------
 class BlastQueryTypeVocabularyTests(unittest.TestCase):

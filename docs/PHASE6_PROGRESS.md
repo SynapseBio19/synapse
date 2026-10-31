@@ -50,7 +50,8 @@ IUPAC, gapped and invalid input (D14):
 | # | Finding | Commit | Validation | Status |
 |---|---|---|---|---|
 | 1 | D14-F2 BLAST query-type vocabulary; protein BLAST usable | `b8f5ea8` | internal tests; external tool execution (BLAST+ 2.17.0 `makeblastdb` + `blastp`) | Corrected; suite 156/156; pyright unchanged |
-| 2 | Central alphabets and classifier (F12/D13 groundwork) | this package | internal tests; external reference comparison (`Bio.Data.IUPACData`); literature (PMIDs 2582368, 6692818) | Added, not yet wired in; suite 167/167; pyright unchanged |
+| 2 | Central alphabets and classifier (F12/D13 groundwork) | `d057ac1` | internal tests; external reference comparison (`Bio.Data.IUPACData`); literature (PMIDs 2582368, 6692818) | Added, not yet wired in; suite 167/167; pyright unchanged |
+| 3 | D14-F3, F11 molecule type from GenBank/FASTA; type in `SequenceRecord`, provenance and report | this package | internal tests; NCBI `[moltype=]` modifier checked in NCBI's FASTA defline documentation | Corrected; suite 173/173; pyright unchanged |
 
 ## Open after the current package
 

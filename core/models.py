@@ -15,9 +15,11 @@ from __future__ import annotations
 
 import hashlib
 import platform
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
+
+from core.alphabets import classify_sequence
 
 SYNAPSE_VERSION = "0.2.0.dev0"
 
@@ -104,23 +106,45 @@ class Feature:
 
 @dataclass
 class SequenceRecord:
-    """A loaded sequence with its provenance."""
+    """A loaded sequence with its provenance and sequence type.
+
+    ``alphabet`` (DNA, RNA, PROTEIN, or None when undetermined) and
+    ``type_confidence`` come from ``core.alphabets.classify_sequence``.
+    ``declared_type`` is a type stated by the user or by file metadata;
+    an ``alphabet`` passed to the constructor counts as a declaration.
+    ``molecule_type`` is the file's own label (e.g. GenBank "mRNA").
+    """
 
     identifier: str
     sequence: str
     description: str = ""
     topology: str = "linear"
-    alphabet: str = "DNA"
+    alphabet: Optional[str] = None
     source_path: Optional[str] = None
     source_format: Optional[str] = None
     source_sha256: Optional[str] = None
     record_index: Optional[int] = None
     features: List[Feature] = field(default_factory=list)
+    declared_type: Optional[str] = None
+    molecule_type: Optional[str] = None
+    type_confidence: str = field(default="", init=False)
+    type_reasons: Tuple[str, ...] = field(default=(), init=False)
 
     def __post_init__(self) -> None:
         self.sequence = "".join(str(self.sequence).split()).upper()
         if self.topology not in {"linear", "circular"}:
             raise ValueError("topology must be 'linear' or 'circular'.")
+        if self.declared_type is None and self.alphabet is not None:
+            self.declared_type = self.alphabet
+        result = classify_sequence(self.sequence, self.declared_type)
+        self.declared_type = result.declared
+        self.alphabet = result.sequence_type
+        self.type_confidence = result.confidence
+        self.type_reasons = result.reasons
+
+    def with_declared_type(self, declared_type: str) -> "SequenceRecord":
+        """A copy with *declared_type* (DNA, RNA, PROTEIN) and its classification."""
+        return replace(self, alphabet=None, declared_type=declared_type)
 
     @property
     def length(self) -> int:
@@ -136,6 +160,10 @@ class SequenceRecord:
             "description": self.description,
             "length": self.length,
             "topology": self.topology,
+            "sequence_type": self.alphabet,
+            "sequence_type_confidence": self.type_confidence,
+            "declared_type": self.declared_type,
+            "molecule_type": self.molecule_type,
             "sequence_sha256": self.sequence_sha256,
             "source_path": self.source_path,
             "source_format": self.source_format,
@@ -153,6 +181,8 @@ class SequenceRecord:
             sequence=record.get("sequence", ""),
             description=header,
             topology=record.get("topology", "linear"),
+            declared_type=record.get("declared_type"),
+            molecule_type=record.get("molecule_type"),
             source_path=record.get("source_path"),
             source_format=record.get("source_format"),
             source_sha256=record.get("source_sha256"),
