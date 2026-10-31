@@ -12,11 +12,11 @@ verification and report) have not been started. The running record is
 | Item | State |
 |---|---|
 | Branch | `main` |
-| HEAD | `8c47b17` (see section 8; `642f31b` was the state at the original pause) |
+| HEAD | `7008cd8` (see section 9; `642f31b` was the state at the original pause) |
 | Working tree | clean |
-| Tests | 240/240 pass, 0 skipped (`python -m unittest discover -s tests -t .`, ~27 s) |
+| Tests | 267/267 pass, 0 skipped (`python -m unittest discover -s tests -t .`, ~27 s) |
 | Golden master | unchanged since the audit; no snapshot was regenerated |
-| pyright 1.1.414 (`python -m pyright --pythonversion 3.10`) | 131 errors; baseline at `ab4bd2a` was 134; no new diagnostic in any package. Removed: the two S15 calls and the D16 redeclaration. `pyright.exe` is blocked by a Windows application control policy (WinError 4551); use `python -m pyright`. |
+| pyright 1.1.414 (`python -m pyright --pythonversion 3.10`) | 112 errors; baseline at `ab4bd2a` was 134; no new diagnostic in any package. 22 of the removals came with the dead primer code in D16 part 2. `pyright.exe` is blocked by a Windows application control policy (WinError 4551); use `python -m pyright`. |
 | ReadOnly attributes | restored on all 15 files (see the handover notes in `PHASE6_PROGRESS.md`) |
 | Optional/test-only tools present | Biopython 1.88, primer3-py 2.4.0, BLAST+ 2.17.0; bcftools absent |
 
@@ -251,3 +251,72 @@ restored on all 15 protected files.
 
 Phase 6 is **not** complete. The defect and S-finding track is close to
 done; stages F through I have not been started.
+
+---
+
+## 9. Addendum: third Opus 5 assignment (2026-10-31)
+
+Six assigned work packages, each its own commit. Phase 6 is **not**
+complete: stages F to I have not been started.
+
+### Commits
+
+| Commit | Package | Evidence |
+|---|---|---|
+| `dfe773d` | **D16 part 2.** The superseded primer generations are gone. | Investigation first, as the audit required: AST pass over every module-level binding in source order, project-wide reference scan, `sys.settrace` on a real design run. Bytecode fingerprint of all module-level callables: 129 -> 105, **nothing added, nothing changed**. 1,326 lines removed; pyright 134 -> 112. |
+| `8d28586` | **P1-9.** The RNA codon view uses the selected ORF's genetic code. | For a table-2 ORF the +1 frame preview now equals `translate_orf_sequence(orf)` exactly. |
+| `87c3fb0` | **S18.** Recognition-site scans are cached. | cProfile: 5,002 scans for 16 distinct combinations. Measured 11.8 s -> 0.24 s at 8 enzymes; 10 enzymes, timed at 100-110 s in the audit, 0.57 s. |
+| `6a8c00c` | **S14.** The API covers cloning, variant filtering, mutation reports, BLAST and literature. | 16 entry points. The two that make external requests refuse to run without an explicit confirmation argument. |
+| `ad843c5` | **S6 / P1-7.** An NCBI search can be resumed from its request ID. | Tested against a stubbed client that asserts `submit()` is never called, so no request left the machine. |
+| `7008cd8` | **S13.** The session runs from `main()` behind a `__main__` guard. | `git diff -w` reduces the whole change to the 12 added lines. |
+
+### Decisions worth knowing
+
+- **D16's investigation corrected the audit.** The audit assumed
+  `design_primers_professional` was the v7 alias. It is not: a plain
+  definition near the end of the module overrides it. Only that pass over
+  binding order in source order revealed it, and it changed which code was
+  identified as dead.
+- **The API must not quietly drop the privacy gate.** The BLAST menu asks
+  before sending a query to NCBI. An API cannot ask, so `blast_search`
+  refuses a remote engine without `send_to_ncbi=True`, `literature_search`
+  requires `send_to_providers=True`, and `blast_resume` requires
+  `contact_ncbi=True`. A script cannot transmit sequences by accident.
+- **Nothing is invented for a resumed run.** BLAST output does not contain
+  the query sequence, so a resumed run keeps an empty sequence and the
+  reported length; when the XML states no length, the query says so.
+- **S18 changed no science.** The cached scan is a pure function of
+  sequence, recognition sequence and topology, and callers get fresh dicts
+  so none can corrupt the cache.
+
+### Still open
+
+1. **Stage F** - terminal UI standardization, with **D17** and the
+   remainder of **P2-2** (the analysis modules still own their menus). The
+   BLAST menu's new entry is numbered `[14]` inside the SEARCH block, so a
+   coherent renumbering belongs to this stage.
+2. **Stage G** - scientific output standardization, with **D18**. This
+   changes the golden master and needs a documented justification.
+3. **Stage H** - `docs/STYLE_GUIDE.md`, editorial review, README.
+4. **Stage I** - final verification and the A-K completion report.
+5. **S11** - live literature-provider behaviour, pending the owner's
+   approval for external requests.
+6. **S24 (new)** - BLAST XML is parsed with `xml.etree.ElementTree`.
+   Modern CPython does not resolve external entities, so XXE is not
+   reachable, but `defusedxml` would be a new runtime dependency needing
+   its own justification. Recorded, not changed.
+7. Deferred audit items unchanged by this assignment: P0-4 (systematic
+   REBASE re-check), P2-3 (CFD scoring - still rejected without a
+   published matrix), P2-4, P2-5, P2-6 (the mutation alignment is still
+   quadratic; S18 addressed only the planner), P2-7 (Type IIS), and the
+   P1-9 sub-items organism mode, 5'-partial ORFs and ORFs across the
+   origin.
+
+### Verification at the end of this assignment
+
+Full suite 267/267, 0 skipped. Golden master 12/12 and the built-in module
+self-tests pass separately. pyright 112 against the 134 baseline with no
+new diagnostics. A cross-module run (DNA -> ORF with table 11 -> RNA ->
+protein -> report) confirmed the ORF's table reaches the RNA view and the
++1 preview matches the protein translation. Working tree clean, ReadOnly
+restored on all 15 protected files.
