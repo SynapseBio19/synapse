@@ -234,8 +234,14 @@ Validation:
   (`DEFAULT_EVIDENCE_EVALUE_THRESHOLD`, configurable); the threshold is a
   screening convention, not a universal significance level.
 - Stored: parameters reported by BLAST, database title/date/version.
-- Not tested here: live remote searches and local databases (excluded from
-  this copy); only parsing and scoring are tested with synthetic data.
+- Query type: from `core.alphabets` (declared, or inferred from the
+  letters). An undetermined query is not guessed: the menu asks for DNA
+  or protein, the programmatic entry points refuse it. RNA is searched as
+  DNA with U read as T, recorded in the query's notes. The protein
+  alphabet includes J, U and O, which BLAST+ accepts.
+- Tested: parsing and scoring with synthetic XML; local blastp against
+  small protein databases built with `makeblastdb` when BLAST+ is
+  installed. Not tested: live remote searches and large local databases.
 
 ## Literature (`analyses/literature.py`)
 

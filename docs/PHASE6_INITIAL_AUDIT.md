@@ -628,7 +628,7 @@ Found during the D14 investigation (2026-10-31); not reproduced:
 
 | ID | Location | Level | Finding |
 |---|---|---|---|
-| S20 | `analyses/blast.py`, `PROTEIN_AMINO_ACIDS` | SUSPECTED | The protein query alphabet lacks U (selenocysteine) and O (pyrrolysine), so a valid protein containing them is rejected before it reaches BLAST+. Needs checking against the BLAST+ input alphabet. |
+| S20 | `analyses/blast.py`, `PROTEIN_AMINO_ACIDS` | CONFIRMED, corrected | The protein query alphabet lacked J, U (selenocysteine) and O (pyrrolysine), so a valid protein containing them was rejected before it reached BLAST+. Checked with BLAST+ 2.17.0 blastp: U and J are accepted, O is scored as X with a warning. Corrected with D14-F1. |
 | S21 | `fileio/genbank.py`, `ORIGIN` reader | SUSPECTED | Only letters are kept from `ORIGIN` lines, so a non-letter symbol there (e.g. `*`, `-`) would be dropped silently. Practical impact unverified. |
 | S22 | `analyses/variant_analysis.py`, REF check | SUSPECTED | The supplied reference sequence is not checked for its own alphabet. |
 

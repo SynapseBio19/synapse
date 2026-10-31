@@ -267,5 +267,77 @@ class BlastQueryTypeVocabularyTests(unittest.TestCase):
         self.assertEqual([hit.hit_id for hit in run.hits][:1], ["target1"])
 
 
+
+# ----------------------------------------------------------------------
+# D14-F1, S20: BLAST takes the query type from core.alphabets
+# ----------------------------------------------------------------------
+class BlastQueryTypeInferenceTests(unittest.TestCase):
+    def test_inference_follows_the_classifier(self):
+        from analyses import blast as B
+        self.assertEqual(B.infer_sequence_type(DNA_SEQ), "DNA")
+        self.assertEqual(B.infer_sequence_type(PROTEIN), "PROTEIN")
+        self.assertEqual(B.infer_sequence_type(DNA_SEQ.replace("T", "U")), "RNA")
+        self.assertEqual(B.infer_sequence_type(IUPAC_LETTER_PEPTIDE, "PROTEIN"), "PROTEIN")
+
+    def test_undetermined_or_invalid_query_is_refused_not_guessed(self):
+        from analyses import blast as B
+        # Before: the peptide was run as blastn, RNA and gapped DNA were "invalid protein".
+        for sequence, fragment in ((IUPAC_LETTER_PEPTIDE, "specify DNA or PROTEIN"),
+                                   ("ATGCATGC" + "AUGCAUGC", "specify DNA or PROTEIN"),
+                                   ("ACGT-ACGT", "alignment gaps"),
+                                   ("", "empty sequence")):
+            with self.subTest(sequence=sequence):
+                with self.assertRaisesRegex(B.BlastAnalysisError, fragment):
+                    B.build_query(sequence)
+
+    def test_rna_query_is_searched_as_dna_with_a_note(self):
+        from analyses import blast as B
+        query = B.build_query(DNA_SEQ.replace("T", "U"))
+        self.assertEqual((query.sequence_type, query.sequence), ("DNA", DNA_SEQ))
+        self.assertEqual(query.notes, ["RNA query searched as DNA: U read as T."])
+        self.assertEqual(B.build_query(DNA_SEQ).notes, [])
+
+    def test_protein_alphabet_includes_j_u_o(self):
+        from analyses import blast as B
+        self.assertEqual(B.build_query("MKTAYJUOAKQRQISF*").sequence_type, "PROTEIN")
+
+    def test_fasta_queries_honor_moltype(self):
+        from analyses import blast as B
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "q.fasta"
+            path.write_text(f">pep [moltype=protein]\n{IUPAC_LETTER_PEPTIDE}\n>dna\n{DNA_SEQ}\n")
+            self.assertEqual([q.sequence_type for q in B.load_fasta_queries(path)], ["PROTEIN", "DNA"])
+            path.write_text(f">pep\n{IUPAC_LETTER_PEPTIDE}\n")
+            with self.assertRaisesRegex(B.BlastAnalysisError, r"record 1 \('pep'\).*moltype=protein"):
+                B.load_fasta_queries(path)
+
+    def test_menu_asks_for_an_undetermined_type(self):
+        from unittest import mock
+        from analyses import blast as B
+        with mock.patch("builtins.input", return_value="2"), mock.patch("builtins.print"):
+            self.assertEqual(B._query_type_for_menu(IUPAC_LETTER_PEPTIDE, None), "PROTEIN")
+        with mock.patch("builtins.input", return_value="0"), mock.patch("builtins.print"):
+            self.assertIsNone(B._query_type_for_menu(IUPAC_LETTER_PEPTIDE, None))
+        # A declared or determinable type is not asked for (input() would fail).
+        self.assertEqual(B._query_type_for_menu(IUPAC_LETTER_PEPTIDE, "PROTEIN"), "PROTEIN")
+        self.assertEqual(B._query_type_for_menu(DNA_SEQ, None), "DNA")
+
+    @unittest.skipUnless(_blast_plus_available("makeblastdb", "blastp"),
+                         "BLAST+ (makeblastdb, blastp) not installed")
+    def test_declared_iupac_letter_peptide_runs_as_blastp(self):
+        """External tool execution: the D14 peptide finds itself once declared a protein."""
+        from analyses import blast as B
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as tmp:
+            fasta = Path(tmp) / "proteins.fasta"
+            fasta.write_text(f">peptide\n{IUPAC_LETTER_PEPTIDE}\n>other\n{PROTEIN}\n")
+            database = B.LocalBlastDatabaseManager(root=tmp).create_custom_database(
+                fasta, "mini_protein", "protein")
+            run = B.LocalBlastEngine().run(
+                B.build_query(IUPAC_LETTER_PEPTIDE, sequence_type="PROTEIN"),
+                B.BlastParameters(program="blastp", database="nr"),
+                database,
+            )
+        self.assertEqual([hit.hit_id for hit in run.hits][:1], ["peptide"])
+
 if __name__ == "__main__":
     unittest.main()

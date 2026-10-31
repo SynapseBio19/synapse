@@ -33,7 +33,7 @@ simulated keystrokes (see audit §11.5).
 | Functions and classes inventoried | ~1,100 |
 | Main-menu entries | 15 |
 | Sub-menu entries inventoried | 78 |
-| Automated tests | 173, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1 + 5 D2 + 5 D14-F2 + 11 sequence-type classifier + 6 D14-F3/F11) |
+| Automated tests | 180, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1 + 5 D2 + 5 D14-F2 + 11 sequence-type classifier + 6 D14-F3/F11 + 7 D14-F1) |
 | Module self-tests | 12 suites, all passing (CRISPR 28, BLAST 33, mutation 44, variant 27, others aggregated) |
 | Golden-master scenarios | 12 |
 | Confirmed defects | 19 (D1–D19); corrected so far: 6 (D12, D4, D3, D5, D1, D2; 2026-10-31) |
@@ -345,7 +345,7 @@ relative to size; the 28 self-tests are the module's own fixtures.
 |---|---|---|---|---|---|---|
 | 1 | Run BLAST Search (local) | `run_blast_analysis(engine="local")`, `LocalBlastEngine.run` | **Partially implemented** | **Execution-tested** | **Independently validated** | **Real BLAST+ 2.17.0+ run executed** (audit §6): 2 hits, coverage 100 % / 98.04 %, correct E-values and bands. **D6**: the programmatic `local_database_path` gate tests a prefix with `.exists()` and always fails. Protein queries (blastp/tblastn) were rejected by a type-vocabulary mismatch and the menu offered them no program (**D14-F2**, corrected 2026-10-31; a real local blastp run is now a test). |
 | 1 | Run BLAST Search (remote) | `NCBIBlastClient.submit/status/fetch_xml/run` | Implemented | **Not tested** | Blocked by external dependency | No live call made in this audit. Privacy confirmation before sending is implemented. |
-| — | Query building | `build_query`, `build_orf_query`, `infer_sequence_type`, `normalize_sequence` | Implemented | Execution-tested | Not applicable | ORF query retains global coordinates and strand. |
+| — | Query building | `build_query`, `build_orf_query`, `infer_sequence_type`, `normalize_sequence` | Implemented | Execution-tested | Not applicable | ORF query retains global coordinates and strand. The query type comes from `core.alphabets`; an undetermined type is asked for (menu) or refused (API), RNA is searched as DNA with a note (**D14-F1**, corrected 2026-10-31). |
 | — | FASTA query loading | `load_fasta_queries`, `_resolve_synapse_user_path` | Implemented | Execution-tested | Not applicable | |
 | 2 | Search Configuration | `BlastParameters`, `.normalized()` | Implemented | Reachable | Not applicable | Program/database compatibility self-tested; program/query-type compatibility via `check_program_query_type` (D14-F2). |
 | 3 | BLAST Database Manager | `blast_database_manager_menu`, `LocalBlastDatabaseManager` | Implemented | Execution-tested | Not applicable | 8 sub-entries: status, download/update, verify, create custom from FASTA, remove, information, BLAST+ tool status, change root. |
@@ -406,7 +406,7 @@ relative to size; the 28 self-tests are the module's own fixtures.
 | RNA / protein source resolution | `pipeline.get_rna_source_dna`, `get_protein_source_rna` | Implemented | **Integration-tested** | Selected-ORF-vs-whole-sequence rule confirmed intact. |
 | Pipeline module runners | `pipeline.run_sequence`, `run_orf`, `run_rna`, `run_protein`, `run_restriction`, `run_cloning`, `run_cloning_planner`, `run_core_pipeline` | **Partially implemented** | Execution-tested | **D19**: `run_orf` exposes none of `start_codon_policy`, `nested`, `ranking`, `genetic_code`. |
 | ORF hand-over adapter | `orf_context.resolve_orf_region`, `OrfRegion`, `is_synapse_orf` | Implemented | **Integration-tested** | Validates the ORF against the parent and refuses parent coordinates on mismatch. P0-2's central fix. |
-| Sequence alphabets and type classifier | `alphabets.classify_sequence`, `require_sequence_type`, `normalize_sequence`, `declared_type_from_molecule` | Implemented | Execution-tested | Letter sets **independently validated** against `Bio.Data.IUPACData`. Added in Phase 6 (D14/D13). Used by `fileio` and `SequenceRecord` (D14-F3, F11); not yet by the analyses. |
+| Sequence alphabets and type classifier | `alphabets.classify_sequence`, `require_sequence_type`, `normalize_sequence`, `declared_type_from_molecule` | Implemented | Execution-tested | Letter sets **independently validated** against `Bio.Data.IUPACData`. Added in Phase 6 (D14/D13). Used by `fileio`, `SequenceRecord` (D14-F3, F11) and BLAST (D14-F1). |
 | Shared sequence tools | `seqtools.normalize_dna`, `complement`, `reverse_complement`, `gc_fraction`, `GeneticCode`, `codon_dict`, `get_genetic_code` | Implemented | Execution-tested | **Independently validated** against `Bio.Data.CodonTable`. **D13** name clash with `core.validation`. |
 | Legacy validation | `validation.normalize_dna`, `validate_dna`, `get_dna_errors` | Implemented | Execution-tested | **D13** divergent U handling; **D14** no alphabet check. |
 | Reproducible report | `report.build_analysis_report`, `report_to_markdown`, `export_analysis_report`, `to_jsonable`, `canonical_json` | Implemented | **Execution-tested** | JSON and Markdown both written; per-analysis payload SHA-256; rejects other suffixes. **S8** silent `repr()` fallback. |

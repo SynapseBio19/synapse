@@ -74,6 +74,15 @@ from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 import xml.etree.ElementTree as ET
 
+from core.alphabets import (
+    AMBIGUOUS,
+    INVALID,
+    PROTEIN_IUPAC,
+    RNA_IUPAC,
+    classify_sequence,
+    declared_type_from_molecule,
+)
+
 
 # ============================================================================
 # CONSTANTS
@@ -195,7 +204,9 @@ BLAST_EXECUTABLES = (
 BLAST_UPDATE_SCRIPT = "update_blastdb.pl"
 
 DNA_BASES = set("ACGT")
-PROTEIN_AMINO_ACIDS = set("ABCDEFGHIKLMNPQRSTVWXYZ*")
+# IUPAC protein letters incl. J, U (Sec) and O (Pyl); BLAST+ 2.17.0 accepts
+# all three in blastp queries (O is scored as X, with a warning).
+PROTEIN_AMINO_ACIDS = set(PROTEIN_IUPAC)
 AMBIGUOUS_DNA = set("NRYKMSWBDHV")
 
 PROGRAMS = {
@@ -538,6 +549,7 @@ class BlastQuery:
     region_end: Optional[int] = None
     feature_type: str = "sequence"
     feature_name: Optional[str] = None
+    notes: List[str] = field(default_factory=list)
 
     @property
     def length(self) -> int:
@@ -695,6 +707,12 @@ def normalize_sequence(sequence: str, sequence_type: str = "DNA") -> str:
             raise BlastAnalysisError(
                 f"Invalid DNA characters: {', '.join(invalid)}"
             )
+    elif sequence_type == "RNA":
+        invalid = sorted(set(cleaned) - RNA_IUPAC)
+        if invalid:
+            raise BlastAnalysisError(
+                f"Invalid RNA characters: {', '.join(invalid)}"
+            )
     elif sequence_type == "PROTEIN":
         invalid = sorted(set(cleaned) - PROTEIN_AMINO_ACIDS)
         if invalid:
@@ -702,19 +720,28 @@ def normalize_sequence(sequence: str, sequence_type: str = "DNA") -> str:
                 f"Invalid protein characters: {', '.join(invalid)}"
             )
     else:
-        raise BlastAnalysisError("sequence_type must be DNA or PROTEIN.")
+        raise BlastAnalysisError("sequence_type must be DNA, RNA or PROTEIN.")
 
     return cleaned
 
 
-def infer_sequence_type(sequence: str) -> str:
-    """Infer DNA vs protein conservatively."""
-    cleaned = "".join(sequence.split()).upper()
-    if not cleaned:
-        raise BlastAnalysisError("Cannot infer type from an empty sequence.")
-    if set(cleaned) <= (DNA_BASES | AMBIGUOUS_DNA):
-        return "DNA"
-    return "PROTEIN"
+def infer_sequence_type(sequence: str, declared: Optional[str] = None) -> str:
+    """Return "DNA", "RNA" or "PROTEIN" using ``core.alphabets.classify_sequence``.
+
+    Raises BlastAnalysisError when the type is invalid or cannot be told
+    from the content (AMBIGUOUS); the caller must then pass it explicitly.
+    *declared* may be a type or "NUCLEOTIDE" (e.g. from file metadata).
+    """
+    result = classify_sequence(sequence, declared)
+    if result.confidence == INVALID:
+        raise BlastAnalysisError(f"Cannot infer the query type: {result.reasons[0]}.")
+    if result.confidence == AMBIGUOUS:
+        raise BlastAnalysisError(
+            "The query type cannot be determined from the sequence "
+            f"({result.reasons[0]}); specify DNA or PROTEIN."
+        )
+    assert result.sequence_type is not None
+    return result.sequence_type
 
 
 def build_query(
@@ -730,6 +757,12 @@ def build_query(
 ) -> BlastQuery:
     inferred = sequence_type.upper() if sequence_type else infer_sequence_type(sequence)
     normalized = normalize_sequence(sequence, inferred)
+    notes: List[str] = []
+    if inferred == "RNA":
+        # BLAST nucleotide databases are searched in the DNA alphabet.
+        normalized = normalized.replace("U", "T")
+        inferred = "DNA"
+        notes.append("RNA query searched as DNA: U read as T.")
     end = region_end if region_end is not None else region_start + len(normalized) - 1
     if region_start < 1 or end < region_start:
         raise BlastAnalysisError("Invalid query coordinates.")
@@ -743,6 +776,7 @@ def build_query(
         region_end=end,
         feature_type=feature_type,
         feature_name=feature_name,
+        notes=notes,
     )
 
 
@@ -780,7 +814,9 @@ def load_fasta_queries(
     The parser is intentionally small and dependency-free because Synapse only
     needs FASTA headers and sequence records for BLAST query preparation.
     Every record is validated through :func:`build_query`, so invalid DNA or
-    protein characters are rejected before a BLAST search is started.
+    protein characters are rejected before a BLAST search is started. An
+    NCBI ``[moltype=...]`` header modifier declares the record's type; a
+    record whose type cannot be told from its letters needs one.
 
     A multi-record FASTA is returned as multiple ``BlastQuery`` objects. The
     interactive menu lets the user explicitly choose which record to search,
@@ -829,10 +865,22 @@ def load_fasta_queries(
             raise BlastAnalysisError(
                 f"FASTA record {index} ('{header}') contains no sequence."
             )
+        from fileio.loader import fasta_molecule_type
+
+        try:
+            query_type = infer_sequence_type(
+                sequence, declared_type_from_molecule(fasta_molecule_type(header))
+            )
+        except BlastAnalysisError as exc:
+            raise BlastAnalysisError(
+                f"FASTA record {index} ('{header}'): {exc} "
+                "Add [moltype=protein] or [moltype=DNA] to its header."
+            ) from exc
         queries.append(
             build_query(
                 sequence,
                 name=header,
+                sequence_type=query_type,
                 source=source,
             )
         )
@@ -4067,10 +4115,29 @@ def blast_database_manager_menu(
         print("Invalid selection.")
 
 
+def _query_type_for_menu(sequence: str, declared: Optional[str]) -> Optional[str]:
+    """Query type for the menu: declared, inferred, or asked when undetermined.
+
+    Returns None when the user cancels. Invalid sequences raise.
+    """
+    try:
+        return infer_sequence_type(sequence, declared)
+    except BlastAnalysisError as exc:
+        if classify_sequence(sequence, declared).confidence != AMBIGUOUS:
+            raise
+        print(f"\r\n{exc}")
+    print("[1] DNA")
+    print("[2] Protein")
+    print("[0] Cancel")
+    choice = input("Query type: ").strip()
+    return {"1": "DNA", "2": "PROTEIN"}.get(choice)
+
+
 def blast_menu(
     sequence: Optional[str] = None,
     sequence_name: str = "Selected Sequence",
     selected_orf: Optional[Any] = None,
+    sequence_type: Optional[str] = None,
 ) -> Optional[BlastRun]:
     """
     Interactive Synapse BLAST Search menu.
@@ -4083,6 +4150,9 @@ def blast_menu(
     global coordinates are retained. A user can also load an external FASTA
     file as an explicit query source; no implicit first-record-only behavior
     is used for multi-record FASTA files.
+
+    *sequence_type* is the selected sequence's declared type, if known; a
+    sequence whose type cannot be told from its letters is asked for.
     """
     base_sequence = sequence
     current_name = sequence_name
@@ -4175,7 +4245,9 @@ def blast_menu(
                             parent_sequence=base_sequence,
                         )
                     else:
-                        selected_type = infer_sequence_type(base_sequence or "")
+                        selected_type = _query_type_for_menu(base_sequence or "", sequence_type)
+                        if selected_type is None:
+                            continue
                         search_query = build_query(
                             base_sequence or "",
                             name=current_name,

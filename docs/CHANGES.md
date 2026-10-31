@@ -661,3 +661,23 @@ protein FASTA records get a route to protein analysis. Tests are in
   plain DNA classify as DNA. The main menu does not use the type yet.
 - Tests: 6 new (`DeclaredMoleculeTypeTests`). Suite 167 → 173.
 
+### D14-F1, S20 BLAST takes the query type from `core.alphabets` (`analyses/blast.py`)
+
+- Problem: `infer_sequence_type` called a sequence DNA when every letter
+  was an IUPAC nucleotide code and protein otherwise. A peptide such as
+  `MKVHDANWYSK...` was searched with blastn (0 hits, no warning); RNA, a
+  T/U mixture and gapped DNA were reported as invalid *protein*. The
+  protein alphabet lacked J, U and O although BLAST+ accepts them (S20,
+  confirmed with BLAST+ 2.17.0 blastp: U and J are accepted, O is scored
+  as X with a warning).
+- Now: `infer_sequence_type(sequence, declared=None)` delegates to
+  `classify_sequence` and refuses INVALID and AMBIGUOUS input instead of
+  guessing. An RNA query is searched as DNA with U read as T, recorded in
+  the new `BlastQuery.notes`. FASTA queries honor `[moltype=...]`; an
+  undetermined record without it is refused with a hint. The menu asks
+  "DNA or Protein" for an undetermined selected sequence, and
+  `blast_menu` takes an optional `sequence_type` so a declared type is
+  not asked again. The protein alphabet is `core.alphabets.PROTEIN_IUPAC`.
+- Validation: external tool execution — the IUPAC-letter peptide,
+  declared a protein, finds itself with local blastp.
+- Tests: 7 new (`BlastQueryTypeInferenceTests`). Suite 173 → 180.
