@@ -452,3 +452,35 @@ in its own commit with its own regression tests in
 - Found and recorded, not changed: S17 (the cloning digest uses the
   recognition start instead of the cut coordinate) and S18 (planner
   runtime); see `docs/PHASE6_INITIAL_AUDIT.md` §5.
+
+### D3 Restriction map and site-based results ignored circular topology (`analyses/restriction.py`)
+
+- Problem: only `perform_digest` honored `topology="circular"`. The
+  restriction map, per-enzyme results, unique cutters, non-cutters,
+  internal-site warnings and enzyme-pair recommendations searched linearly,
+  so `analyze_restriction(..., "circular")` on a plasmid whose EcoRI site
+  spans the origin returned a digest that cuts once together with a map
+  without the site and EcoRI listed as a non-cutter. The map menu offered
+  no topology choice at all.
+- Now: `topology` (default `"linear"`) is accepted and passed through by
+  `find_restriction_sites`, `analyze_restriction_site`, `analyze_enzyme`,
+  `create_restriction_map`, `summarize_restriction_map`,
+  `find_unique_cutters`, `find_non_cutters`, `find_internal_sites`,
+  `recommend_enzyme_pairs`, `summarize_enzyme_sites` and the `get_*`
+  wrappers; `analyze_restriction` passes it everywhere.
+  `get_cloning_compatible_sites` takes `vector_topology` and
+  `insert_topology`. For an origin-spanning site, end and cut coordinates
+  are reported modulo the sequence length (the digest's convention) and
+  the overhang is read across the origin; map entries carry `wraps_origin`.
+  The Restriction Map menu asks for the topology like the other restriction
+  menus, defaulting to the loaded sequence's topology.
+- Unchanged: every linear result, and the keys of `analyze_restriction_site`
+  (part of the golden master); golden snapshots unchanged.
+- Validation: the circular map agrees with Biopython 1.88 `Bio.Restriction`
+  on pUC19 (L09137.2) in 132/132 comparisons (22 enzymes × 2 topologies ×
+  3 rotations, including a site across the origin and a cut exactly at
+  the origin).
+- Tests: 7 new (`RestrictionCircularTopologyTests`), including a check
+  that map and digest cut sets and the non-cutter list agree for all 22
+  enzymes in both topologies with a site rotated across the origin. Suite
+  125 → 132.

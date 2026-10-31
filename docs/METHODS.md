@@ -84,14 +84,21 @@ use 0-based inclusive `start <= stop` on the forward strand.
   molecule is treated as neither a confirmed unique cutter nor a confirmed
   non-cutter there (the number of real sites is undetermined), so it cannot
   define a cloning end in that molecule.
-- Circular topology finds sites spanning the origin.
+- Circular topology finds sites spanning the origin, in the digest and in
+  every site-based result (map, per-enzyme results, unique and non-cutters,
+  enzyme pairs). Positions on a circular sequence are reported modulo its
+  length; a cut exactly at the origin is position 0 (1-based 1).
 - End compatibility requires the same overhang sequence *and* polarity
   (5′ vs 3′); blunt ends are compatible with blunt ends.
 - Methylation sensitivity is shown as a note (ClaI, XbaI, DpnI, HpaII);
   blocking by methylation and star activity are not modelled.
 - Validation: known-answer tests (ClaI cut positions and overhang; overhang
   polarity of EcoRI/BamHI/HindIII vs. PstI-type 3′ ends; origin-spanning
-  EcoRI site); not compared against a reference digest tool.
+  EcoRI site). Compared with Biopython 1.88 `Bio.Restriction` (REBASE-
+  derived data) on pUC19, NCBI L09137.2: enzyme definitions 22/22, digest
+  cut positions and fragments 132/132, circular restriction map 132/132,
+  end-compatibility matrix 484/484 (`docs/PHASE6_INITIAL_AUDIT.md` §3).
+  Not compared against NEBcutter.
 
 ## Primer design (`analyses/primer.py`)
 

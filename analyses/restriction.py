@@ -212,13 +212,14 @@ def find_recognition_site_matches(sequence, recognition_sequence, topology="line
     return matches
 
 
-def find_restriction_sites(sequence, enzyme_name):
+def find_restriction_sites(sequence, enzyme_name, topology="linear"):
     """Legacy-compatible site list: all confirmed or ambiguity-dependent matches."""
     return [
         match["position"]
         for match in find_restriction_site_matches(
             sequence,
             enzyme_name,
+            topology=topology,
         )
     ]
 
@@ -336,8 +337,14 @@ def _site_match_for_position(sequence, site_position, recognition):
     )
 
 
-def analyze_restriction_site(sequence, enzyme_name, site_position):
-    """Complete coordinate-safe analysis of one restriction site."""
+def analyze_restriction_site(sequence, enzyme_name, site_position, topology="linear"):
+    """Complete coordinate-safe analysis of one restriction site.
+
+    topology="circular" also accepts a site that spans the origin; its end
+    and cut coordinates are reported modulo the sequence length (the
+    convention of perform_digest) and its overhang is read across the
+    origin. Linear results are unchanged.
+    """
     sequence = _require_valid_restriction_sequence(sequence)
     enzyme = get_restriction_enzyme(enzyme_name)
 
@@ -350,8 +357,18 @@ def analyze_restriction_site(sequence, enzyme_name, site_position):
         enzyme.get("recognition_sequence", "")
     )
 
+    circular = str(topology).lower() == "circular"
+    length = len(sequence)
+    search_space = sequence
+    if circular and length >= len(recognition):
+        search_space = sequence + sequence[:len(recognition) - 1]
+        if site_position >= length:
+            raise ValueError(
+                "Site positions on a circular sequence must lie within the sequence."
+            )
+
     if not _site_match_for_position(
-        sequence,
+        search_space,
         site_position,
         recognition,
     ):
@@ -362,6 +379,7 @@ def analyze_restriction_site(sequence, enzyme_name, site_position):
     matches = find_restriction_site_matches(
         sequence,
         enzyme_name,
+        topology=topology,
     )
     match = next(
         (
@@ -378,7 +396,7 @@ def analyze_restriction_site(sequence, enzyme_name, site_position):
     )
 
     overhang = get_overhang_sequence(
-        sequence,
+        search_space,
         site_position,
         enzyme,
     )
@@ -395,17 +413,25 @@ def analyze_restriction_site(sequence, enzyme_name, site_position):
         )
     )
 
+    site_end = site_position + len(recognition)
+    top_cut = cuts["top_cut"]
+    bottom_cut = cuts["bottom_cut"]
+    if circular:
+        site_end = (site_end - 1) % length + 1
+        top_cut %= length
+        bottom_cut %= length
+
     return {
         "enzyme": enzyme_name,
         "recognition_sequence": recognition,
         "site_position": site_position + 1,
         "site_position_0based": site_position,
-        "site_end": site_position + len(recognition),
-        "site_end_1based": site_position + len(recognition),
-        "top_cut": cuts["top_cut_1based"],
-        "top_cut_0based": cuts["top_cut"],
-        "bottom_cut": cuts["bottom_cut_1based"],
-        "bottom_cut_0based": cuts["bottom_cut"],
+        "site_end": site_end,
+        "site_end_1based": site_end,
+        "top_cut": top_cut + 1,
+        "top_cut_0based": top_cut,
+        "bottom_cut": bottom_cut + 1,
+        "bottom_cut_0based": bottom_cut,
         "overhang_type": overhang_type,
         "overhang_length": cuts["overhang_length"],
         "overhang_sequence": overhang,
@@ -420,7 +446,7 @@ def analyze_restriction_site(sequence, enzyme_name, site_position):
     }
 
 
-def analyze_enzyme(sequence, enzyme_name):
+def analyze_enzyme(sequence, enzyme_name, topology="linear"):
     """Analyze every compatible site of one enzyme."""
     sequence = _require_valid_restriction_sequence(sequence)
     enzyme = get_restriction_enzyme(enzyme_name)
@@ -433,6 +459,7 @@ def analyze_enzyme(sequence, enzyme_name):
     matches = find_restriction_site_matches(
         sequence,
         enzyme_name,
+        topology=topology,
     )
 
     sites = [
@@ -440,6 +467,7 @@ def analyze_enzyme(sequence, enzyme_name):
             sequence,
             enzyme_name,
             match["position"],
+            topology=topology,
         )
         for match in matches
     ]
@@ -480,8 +508,12 @@ def analyze_enzyme(sequence, enzyme_name):
     }
 
 
-def create_restriction_map(sequence, enzyme_names=None):
-    """Create a complete site map with deterministic ordering."""
+def create_restriction_map(sequence, enzyme_names=None, topology="linear"):
+    """Create a complete site map with deterministic ordering.
+
+    Each entry is an analyze_restriction_site() result plus "wraps_origin"
+    (True for a site spanning the origin of a circular sequence).
+    """
     sequence = _require_valid_restriction_sequence(sequence)
 
     if enzyme_names is None:
@@ -494,17 +526,19 @@ def create_restriction_map(sequence, enzyme_names=None):
         if get_restriction_enzyme(enzyme_name) is None:
             continue
 
-        for position in find_restriction_sites(
+        for match in find_restriction_site_matches(
             sequence,
             enzyme_name,
+            topology=topology,
         ):
-            sites.append(
-                analyze_restriction_site(
-                    sequence,
-                    enzyme_name,
-                    position,
-                )
+            site = analyze_restriction_site(
+                sequence,
+                enzyme_name,
+                match["position"],
+                topology=topology,
             )
+            site["wraps_origin"] = match["wraps_origin"]
+            sites.append(site)
 
     sites.sort(
         key=lambda site: (
@@ -859,10 +893,11 @@ def calculate_gel_bands(fragments):
     return result
 
 
-def summarize_restriction_map(sequence, enzyme_names=None):
+def summarize_restriction_map(sequence, enzyme_names=None, topology="linear"):
     sites = create_restriction_map(
         sequence,
         enzyme_names,
+        topology=topology,
     )
 
     summary = {}
@@ -893,7 +928,7 @@ def summarize_restriction_map(sequence, enzyme_names=None):
     return summary
 
 
-def find_unique_cutters(sequence, enzyme_names=None):
+def find_unique_cutters(sequence, enzyme_names=None, topology="linear"):
     sequence = _require_valid_restriction_sequence(sequence)
 
     if enzyme_names is None:
@@ -903,15 +938,16 @@ def find_unique_cutters(sequence, enzyme_names=None):
         enzyme_name
         for enzyme_name in enzyme_names
         if get_restriction_enzyme(enzyme_name) is not None
-        and len(find_restriction_sites(sequence, enzyme_name)) == 1
+        and len(find_restriction_sites(sequence, enzyme_name, topology=topology)) == 1
         and analyze_enzyme(
             sequence,
             enzyme_name,
+            topology=topology,
         )["confirmed_site_count"] == 1
     ]
 
 
-def find_non_cutters(sequence, enzyme_names=None):
+def find_non_cutters(sequence, enzyme_names=None, topology="linear"):
     sequence = _require_valid_restriction_sequence(sequence)
 
     if enzyme_names is None:
@@ -921,11 +957,11 @@ def find_non_cutters(sequence, enzyme_names=None):
         enzyme_name
         for enzyme_name in enzyme_names
         if get_restriction_enzyme(enzyme_name) is not None
-        and len(find_restriction_sites(sequence, enzyme_name)) == 0
+        and len(find_restriction_sites(sequence, enzyme_name, topology=topology)) == 0
     ]
 
 
-def find_internal_sites(sequence, enzyme_names=None):
+def find_internal_sites(sequence, enzyme_names=None, topology="linear"):
     sequence = _require_valid_restriction_sequence(sequence)
 
     if enzyme_names is None:
@@ -940,6 +976,7 @@ def find_internal_sites(sequence, enzyme_names=None):
         analysis = analyze_enzyme(
             sequence,
             enzyme_name,
+            topology=topology,
         )
 
         if analysis["site_count"] > 1:
@@ -1084,7 +1121,7 @@ def analyze_cloning_compatibility(vector_site, insert_site):
     }
 
 
-def recommend_enzyme_pairs(sequence, enzyme_names=None, top_n=5):
+def recommend_enzyme_pairs(sequence, enzyme_names=None, top_n=5, topology="linear"):
     """Rank distinct enzyme pairs by transparent sequence-level criteria."""
     sequence = _require_valid_restriction_sequence(sequence)
 
@@ -1101,6 +1138,7 @@ def recommend_enzyme_pairs(sequence, enzyme_names=None, top_n=5):
         analysis = analyze_enzyme(
             sequence,
             enzyme_name,
+            topology=topology,
         )
 
         candidates.append({
@@ -1329,6 +1367,7 @@ def analyze_restriction(
         enzyme_name: analyze_enzyme(
             sequence,
             enzyme_name,
+            topology=topology,
         )
         for enzyme_name in enzyme_names
     }
@@ -1336,6 +1375,7 @@ def analyze_restriction(
     restriction_map = create_restriction_map(
         sequence,
         enzyme_names,
+        topology=topology,
     )
 
     digest = perform_digest(
@@ -1351,22 +1391,26 @@ def analyze_restriction(
     unique_cutters = find_unique_cutters(
         sequence,
         enzyme_names,
+        topology=topology,
     )
 
     non_cutters = find_non_cutters(
         sequence,
         enzyme_names,
+        topology=topology,
     )
 
     internal_sites = find_internal_sites(
         sequence,
         enzyme_names,
+        topology=topology,
     )
 
     recommended_pairs = recommend_enzyme_pairs(
         sequence,
         enzyme_names,
         top_n=5,
+        topology=topology,
     )
 
     confirmed_site_total = sum(
@@ -1404,10 +1448,11 @@ def analyze_restriction(
     }
 
 
-def summarize_enzyme_sites(sequence, enzyme_name):
+def summarize_enzyme_sites(sequence, enzyme_name, topology="linear"):
     analysis = analyze_enzyme(
         sequence,
         enzyme_name,
+        topology=topology,
     )
 
     return {
@@ -1677,10 +1722,12 @@ def get_restriction_summary(result):
 def get_restriction_sites_for_enzyme(
     sequence,
     enzyme_name,
+    topology="linear",
 ):
     result = analyze_enzyme(
         sequence,
         enzyme_name,
+        topology=topology,
     )
 
     return {
@@ -1702,10 +1749,11 @@ def get_restriction_sites_for_enzyme(
     }
 
 
-def get_restriction_map(sequence, enzyme_names=None):
+def get_restriction_map(sequence, enzyme_names=None, topology="linear"):
     return create_restriction_map(
         sequence,
         enzyme_names=enzyme_names,
+        topology=topology,
     )
 
 
@@ -1729,17 +1777,19 @@ def get_gel_band_prediction(digest_result):
     )
 
 
-def get_unique_cutters(sequence, enzyme_names=None):
+def get_unique_cutters(sequence, enzyme_names=None, topology="linear"):
     return find_unique_cutters(
         sequence,
         enzyme_names=enzyme_names,
+        topology=topology,
     )
 
 
-def get_non_cutters(sequence, enzyme_names=None):
+def get_non_cutters(sequence, enzyme_names=None, topology="linear"):
     return find_non_cutters(
         sequence,
         enzyme_names=enzyme_names,
+        topology=topology,
     )
 
 
@@ -1747,11 +1797,13 @@ def get_enzyme_pair_recommendations(
     sequence,
     enzyme_names=None,
     top_n=5,
+    topology="linear",
 ):
     return recommend_enzyme_pairs(
         sequence,
         enzyme_names=enzyme_names,
         top_n=top_n,
+        topology=topology,
     )
 
 
@@ -1791,15 +1843,19 @@ def get_cloning_compatible_sites(
     vector_sequence,
     insert_sequence,
     enzyme_name,
+    vector_topology="linear",
+    insert_topology="linear",
 ):
     """Restriction-to-Cloning handoff with explicit site confidence."""
     vector = analyze_enzyme(
         vector_sequence,
         enzyme_name,
+        topology=vector_topology,
     )
     insert = analyze_enzyme(
         insert_sequence,
         enzyme_name,
+        topology=insert_topology,
     )
 
     vector_unique = (
@@ -2374,7 +2430,7 @@ def _restriction_overview_ui(dna, pipeline=None, topology="linear"):
         return None
 
 
-def _restriction_map_ui(dna):
+def _restriction_map_ui(dna, topology="linear"):
     print()
     print("=" * 60)
     print("RESTRICTION MAP")
@@ -2384,10 +2440,15 @@ def _restriction_map_ui(dna):
     if enzymes is None:
         return None
 
+    selected_topology = _synapse_ui_select_topology(topology)
+    if selected_topology is None:
+        return None
+
     try:
         sites = get_restriction_map(
             dna,
             enzyme_names=enzymes,
+            topology=selected_topology,
         )
 
         print()
@@ -2571,7 +2632,7 @@ def run_restriction_analysis_ui(
                 topology=topology,
             )
         elif choice == "2":
-            _restriction_map_ui(dna)
+            _restriction_map_ui(dna, topology=topology)
         elif choice == "3":
             _restriction_digest_gel_ui(
                 dna,

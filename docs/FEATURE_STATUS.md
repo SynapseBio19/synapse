@@ -33,10 +33,10 @@ simulated keystrokes (see audit §11.5).
 | Functions and classes inventoried | ~1,100 |
 | Main-menu entries | 15 |
 | Sub-menu entries inventoried | 78 |
-| Automated tests | 125, all passing (109 at the audit + 9 for D12 + 7 for D4) |
+| Automated tests | 132, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3) |
 | Module self-tests | 12 suites, all passing (CRISPR 28, BLAST 33, mutation 44, variant 27, others aggregated) |
 | Golden-master scenarios | 12 |
-| Confirmed defects | 19 (D1–D19); corrected so far: 2 (D12, D4; 2026-10-31) |
+| Confirmed defects | 19 (D1–D19); corrected so far: 3 (D12, D4, D3; 2026-10-31) |
 | Suspected / unverified concerns | 14 (S1–S14) |
 | External validations performed in this audit | 8 (audit §3, §6) |
 | Features advertised but not implemented | 1 (`[11] AI Experiment Planner`) |
@@ -180,13 +180,13 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 |---|---|---|---|---|---|---|
 | — | Enzyme database (22 enzymes) | `data/restriction_enzymes.py` | Implemented | Execution-tested | **Independently validated** | 22/22 match REBASE data via Biopython on site, both cut offsets, polarity, overhang length. |
 | — | Site finding, CONFIRMED/POSSIBLE | `find_restriction_site_matches` | Implemented | Execution-tested | Independently validated | Supports `topology="circular"` incl. origin-spanning. |
-| — | Legacy site list | `find_restriction_sites` | **Partially implemented** | Execution-tested | Not applicable | **D3** no topology parameter. |
-| 2 | Restriction Map | `create_restriction_map` | **Partially implemented** | Execution-tested | Not applicable | **D3** origin-spanning sites missing from the map while the digest finds them. |
+| — | Legacy site list | `find_restriction_sites` | Implemented | Execution-tested | Not applicable | **D3 corrected 2026-10-31**: `topology` parameter. |
+| 2 | Restriction Map | `create_restriction_map` | Implemented | Execution-tested | **Independently validated** | **D3 corrected 2026-10-31**: circular maps include origin-spanning sites (`wraps_origin`), coordinates modulo length; the menu asks for the topology. Circular map vs Biopython on pUC19: 132/132. |
 | — | Cut positions | `calculate_cut_positions`, `get_cut_positions` | Implemented | Execution-tested | Independently validated | Validates `cut_top`/`cut_bottom` against the site length. |
 | 3 | Digest & fragments (linear) | `perform_digest`, `calculate_linear_fragments` | Implemented | Execution-tested | **Independently validated** | pUC19, 22 enzymes: 0 differences vs Biopython. |
 | 3 | Digest & fragments (circular) | `calculate_circular_fragments` | Implemented | Execution-tested | **Independently validated** | Including two origin-rotation stress cases: 0 differences. |
 | 3 | Gel bands | `calculate_gel_bands` | Implemented | Execution-tested | Not applicable | Groups equal-size fragments. |
-| 1 | Restriction Overview | `_restriction_overview_ui`, `analyze_restriction` | Implemented | Execution-tested | Not applicable | Inherits **D3** through its map. |
+| 1 | Restriction Overview | `_restriction_overview_ui`, `analyze_restriction` | Implemented | Execution-tested | Not applicable | D3 corrected: map, per-enzyme results, unique/non-cutters, internal sites and pairs follow the selected topology and agree with the digest. |
 | — | Unique cutters / non-cutters / internal sites | `find_unique_cutters`, `find_non_cutters`, `find_internal_sites` | Implemented | Execution-tested | Not applicable | |
 | — | Overhangs and polarity | `get_overhang_sequence`, `_site_overhang_polarity` | Implemented | Execution-tested | Independently validated | Derived from cut coordinates, not a hand table. |
 | — | Sticky-end compatibility | `sticky_ends_are_compatible`, `analyze_cloning_compatibility` | Implemented | Execution-tested | Independently validated | Polarity enforced (P0-3). |
@@ -462,6 +462,7 @@ explicitly not implemented.
 | 6 | Protein properties | `Bio.SeqUtils.ProtParam`, ExPASy | pI, GRAVY, instability, aromaticity, extinction, MW all match |
 | 7 | Local BLAST pipeline | BLAST+ 2.17.0+ on the bundled database | Real run; coverage, E-values, bands, provenance correct |
 | 8 | Variant left-alignment | Tan et al. 2015, hand-verified | 5/5 cases correct, incl. correct non-shifts |
+| 9 | Circular restriction map (after D3) | Biopython 1.88 on pUC19, 22 enzymes × 2 topologies × 3 rotations | 132 comparisons, 0 differences |
 
 ### Still open
 

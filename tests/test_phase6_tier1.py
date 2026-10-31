@@ -203,5 +203,101 @@ class CloningAmbiguousSiteTests(unittest.TestCase):
         self.assertEqual(diagnostics[0]["possible_site_count"], 1)
 
 
+# ----------------------------------------------------------------------
+# D3: restriction map and site-based results honor circular topology
+# ----------------------------------------------------------------------
+class RestrictionCircularTopologyTests(unittest.TestCase):
+    # EcoRI G^AATTC split across the origin: ...GAA | TTC...
+    ECORI_ACROSS = "TTC" + _filler(120) + "GAA"
+    # BamHI G^GATCC whose top-strand cut falls exactly at the origin.
+    BAMHI_AT_ORIGIN = "GATCC" + _filler(120) + "G"
+
+    def test_map_reports_origin_spanning_site_only_when_circular(self):
+        from analyses import restriction as R
+        length = len(self.ECORI_ACROSS)
+        self.assertEqual(R.create_restriction_map(self.ECORI_ACROSS, ["EcoRI"]), [])  # linear: no site
+        [site] = R.create_restriction_map(self.ECORI_ACROSS, ["EcoRI"], topology="circular")
+        self.assertTrue(site["wraps_origin"])
+        self.assertEqual(site["match_status"], "CONFIRMED")
+        self.assertEqual(site["site_position"], length - 2)          # 1-based start of GAATTC
+        self.assertEqual(site["site_end_1based"], 3)
+        self.assertEqual((site["top_cut_0based"], site["bottom_cut_0based"]), (length - 2, 2))
+        self.assertEqual((site["top_cut"], site["bottom_cut"]), (length - 1, 3))
+        self.assertEqual(site["overhang_sequence"], "AATT")
+
+    def test_cut_exactly_at_the_origin(self):
+        from analyses import restriction as R
+        [site] = R.create_restriction_map(self.BAMHI_AT_ORIGIN, ["BamHI"], topology="circular")
+        self.assertEqual((site["top_cut_0based"], site["bottom_cut_0based"]), (0, 4))
+        self.assertEqual(site["overhang_sequence"], "GATC")
+        self.assertEqual(R.perform_digest(self.BAMHI_AT_ORIGIN, ["BamHI"], "circular")["cut_positions"], [0])
+
+    def test_analysis_agrees_with_its_own_digest(self):
+        from analyses import restriction as R
+        circular = R.analyze_restriction(self.ECORI_ACROSS, ["EcoRI", "BamHI"], "circular")
+        self.assertEqual(circular["digest"]["cut_count"], 1)
+        self.assertEqual(len(circular["restriction_map"]), 1)
+        self.assertEqual(circular["enzyme_results"]["EcoRI"]["confirmed_site_count"], 1)
+        self.assertEqual(circular["unique_cutters"], ["EcoRI"])
+        self.assertEqual(circular["non_cutters"], ["BamHI"])
+        linear = R.analyze_restriction(self.ECORI_ACROSS, ["EcoRI", "BamHI"], "linear")
+        self.assertEqual(linear["digest"]["cut_count"], 0)
+        self.assertEqual(linear["non_cutters"], ["EcoRI", "BamHI"])
+
+    def test_enzyme_pair_needs_the_origin_spanning_site(self):
+        from analyses import restriction as R
+        sequence = "TTC" + _filler(60) + "AAGCTT" + _filler(60) + "GAA"
+        pairs = {(p["enzyme_a"], p["enzyme_b"])
+                 for p in R.recommend_enzyme_pairs(sequence, ["EcoRI", "HindIII"], topology="circular")}
+        self.assertEqual(pairs, {("EcoRI", "HindIII")})
+        self.assertEqual(R.recommend_enzyme_pairs(sequence, ["EcoRI", "HindIII"]), [])
+
+    def test_map_and_cutter_lists_match_the_digest_for_every_enzyme(self):
+        from analyses import restriction as R
+        from tests._support import deterministic_dna
+        base = deterministic_dna(1500, seed=21)
+        for enzyme in sorted(R.RESTRICTION_ENZYMES):
+            sequences = [base]
+            confirmed = [m for m in R.find_restriction_site_matches(base, enzyme) if m["status"] == "CONFIRMED"]
+            if confirmed:  # rotate so the first site spans the origin
+                split = confirmed[0]["position"] + 1
+                sequences.append(base[split:] + base[:split])
+            for sequence in sequences:
+                for topology in ("linear", "circular"):
+                    with self.subTest(enzyme=enzyme, topology=topology, rotated=sequence is not base):
+                        mapped = sorted({s["top_cut_0based"]
+                                         for s in R.create_restriction_map(sequence, [enzyme], topology=topology)
+                                         if s["match_status"] == "CONFIRMED"
+                                         and (topology == "circular" or 0 < s["top_cut_0based"] < len(sequence))})
+                        self.assertEqual(mapped, R.perform_digest(sequence, [enzyme], topology)["cut_positions"])
+                        has_site = bool(R.find_restriction_site_matches(sequence, enzyme, topology=topology))
+                        self.assertEqual(enzyme in R.find_non_cutters(sequence, [enzyme], topology=topology),
+                                         not has_site)
+
+    def test_wrappers_and_cloning_handoff_pass_topology(self):
+        from analyses import restriction as R
+        self.assertEqual(len(R.get_restriction_map(self.ECORI_ACROSS, ["EcoRI"], topology="circular")), 1)
+        self.assertEqual(R.get_unique_cutters(self.ECORI_ACROSS, ["EcoRI"], topology="circular"), ["EcoRI"])
+        self.assertEqual(R.get_non_cutters(self.ECORI_ACROSS, ["EcoRI"], topology="circular"), [])
+        self.assertEqual(R.summarize_enzyme_sites(self.ECORI_ACROSS, "EcoRI", topology="circular")
+                         ["confirmed_positions"], [len(self.ECORI_ACROSS) - 2])
+        insert = _filler(10) + "GAATTC" + _filler(10)
+        self.assertTrue(R.get_cloning_compatible_sites(self.ECORI_ACROSS, insert, "EcoRI",
+                                                       vector_topology="circular")["ready_for_cloning"])
+        self.assertFalse(R.get_cloning_compatible_sites(self.ECORI_ACROSS, insert, "EcoRI")["ready_for_cloning"])
+
+    def test_map_menu_uses_the_sequence_topology(self):
+        import contextlib
+        import io
+        from unittest import mock
+        from analyses import restriction as R
+        answers = iter(["2", "EcoRI", "", "", "0"])  # map, enzyme, keep topology, pause, back
+        with mock.patch("builtins.input", lambda *_: next(answers)), \
+                mock.patch.object(R, "get_restriction_map", wraps=R.get_restriction_map) as spy, \
+                contextlib.redirect_stdout(io.StringIO()):
+            R.run_restriction_analysis_ui(self.ECORI_ACROSS, topology="circular")
+        self.assertEqual(spy.call_args.kwargs.get("topology"), "circular")
+
+
 if __name__ == "__main__":
     unittest.main()
