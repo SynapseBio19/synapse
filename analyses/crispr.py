@@ -42,6 +42,7 @@ from dataclasses import asdict, dataclass, field
 import csv
 import json
 import math
+import os
 import re
 import tempfile
 from pathlib import Path
@@ -977,11 +978,14 @@ def rank_guides(candidates: Sequence[GuideCandidate], *, config: Optional[Design
         if specificity_score is not None:
             base_components["Specificity"] = specificity_score
             weights["Specificity"] = 0.10
-        else:
-            # Re-normalize without an unavailable component.
-            total = sum(weights.values())
-            for key in list(weights):
-                weights[key] /= total
+        if not cfg.rank_by_gc:
+            # GC content is still reported, but does not enter the rank (audit D10).
+            del weights["GC"]
+        # Re-normalize without unavailable or disabled components; with all
+        # components present the weights already sum to 1.
+        total = sum(weights.values())
+        for key in list(weights):
+            weights[key] /= total
 
         final = sum(base_components[k] * weights[k] for k in weights) - warning_penalty
         candidate.rank_components = {k: round(v, 3) for k, v in base_components.items()}
@@ -1283,6 +1287,14 @@ def base_editing_window(candidate: GuideCandidate, editor: str = "CBE", window: 
     return window or tuple(definition["window"])
 
 
+def config_editing_window(config: DesignConfig) -> Tuple[int, int]:
+    """The editing window set in *config* (protospacer positions, 1-based, inclusive)."""
+    start, end = int(config.editing_window_start), int(config.editing_window_end)
+    if not 1 <= start <= end:
+        raise CRISPRAnalysisError("Editing window must satisfy 1 <= start <= end.")
+    return start, end
+
+
 def _variant_compatible_conversion(
     mutation: MutationTarget,
     conversion: Tuple[str, str],
@@ -1374,13 +1386,15 @@ def find_base_editing_candidates(
     mutation: MutationTarget,
     *,
     system: str = "SpCas9",
-    editor: str = "CBE",
+    editor: Optional[str] = None,
     region_start: int = 1,
     config: Optional[DesignConfig] = None,
 ) -> Tuple[DesignResult, List[BaseEditingCandidate]]:
+    """Base-editing candidates; *editor* and the window default to the configuration's."""
     cfg = config or DesignConfig(system=system)
+    editor = editor or cfg.base_editor
     result = design_guides(sequence, system=system, region_start=region_start, config=cfg, mutations=[mutation])
-    analyses = analyze_base_editing(result.candidates, mutation, editor=editor, window=base_editing_window(result.candidates[0], editor) if result.candidates else None)
+    analyses = analyze_base_editing(result.candidates, mutation, editor=editor, window=config_editing_window(cfg))
     compatible = [a for a in analyses if a.desired_edit_in_window]
     return result, compatible
 
@@ -1633,6 +1647,11 @@ def design_guides(
             require_pam=cfg.require_pam_for_off_targets,
         )
     candidates = rank_guides(candidates, config=cfg)
+    if not cfg.include_low_quality:
+        excluded = sum(not c.is_high_quality for c in candidates)
+        candidates = [c for c in candidates if c.is_high_quality]
+        if excluded:
+            warnings.append(f"{excluded} candidate(s) with FAIL flags were excluded (include_low_quality=False).")
 
     if not candidates:
         warnings.append("No sequence-compatible guide candidates were found.")
@@ -1741,30 +1760,20 @@ def result_to_json(result: DesignResult, *, indent: int = 2) -> str:
 
 
 def _default_export_directory() -> Path:
-    """Return a writable, user-facing default export directory.
+    """Return the default directory for relative CRISPR export paths.
 
-    On Windows this prefers the Desktop (including a OneDrive Desktop), then
-    Documents, and finally a Synapse Exports directory in the user home.
-    The directory is created when possible.
+    ``exports/crispr`` inside the Synapse project, next to the report
+    exports (``.gitignore`` reserves ``/exports/``), unless
+    ``SYNAPSE_EXPORT_DIR`` names another directory. Audit D11: exports
+    previously defaulted to the user's (possibly cloud-synced) Desktop.
     """
-    home = Path.home()
-    candidates = [
-        home / "Desktop",
-        home / "OneDrive" / "Desktop",
-        home / "Documents",
-        home / "OneDrive" / "Documents",
-        home / "Synapse Exports",
-    ]
-    for directory in candidates:
-        if directory.exists() and directory.is_dir():
-            try:
-                directory.mkdir(parents=True, exist_ok=True)
-                return directory
-            except OSError:
-                continue
-    fallback = home / "Synapse Exports"
-    fallback.mkdir(parents=True, exist_ok=True)
-    return fallback
+    configured = os.environ.get("SYNAPSE_EXPORT_DIR", "").strip()
+    if configured:
+        directory = Path(configured).expanduser() / "crispr"
+    else:
+        directory = Path(__file__).resolve().parent.parent / "exports" / "crispr"
+    directory.mkdir(parents=True, exist_ok=True)
+    return directory
 
 
 def resolve_export_path(path: str | Path) -> Path:
@@ -2610,7 +2619,8 @@ def crispr_menu(
             last_base_results = []
             for mutation in selected_mutations:
                 last_base_results.extend(
-                    analyze_base_editing(last_result.candidates, mutation, editor=editor)
+                    analyze_base_editing(last_result.candidates, mutation, editor=editor,
+                                         window=config_editing_window(config))
                 )
             print(format_base_editing_report(last_base_results))
 

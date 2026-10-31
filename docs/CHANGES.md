@@ -856,3 +856,25 @@ Tests are in `tests/test_phase6_tier2.py`.
   checked in PubMed); tests check on both strands that the guide prefix
   up to the cut lies 5' of the break in the sequence.
 - Tests: 3 new (`CrisprCutSiteTests`). Suite 203 → 206.
+
+### D10, D11 CRISPR configuration fields act; exports stay in the project (`analyses/crispr.py`)
+
+- D10 problem: `include_low_quality`, `rank_by_gc`, `editing_window_start`,
+  `editing_window_end` and `base_editor` in `DesignConfig` were never
+  read.
+- Now: `include_low_quality=False` removes candidates with FAIL flags and
+  says how many in `warnings`; `rank_by_gc=False` takes the GC component
+  out of the rank weights (the remaining weights are re-normalized; GC is
+  still reported); the configured editing window is used by the menu's
+  base-editing analysis and by `find_base_editing_candidates`, which also
+  takes `base_editor` when no editor is passed (`config_editing_window`
+  validates `1 <= start <= end`). The defaults equal the previous
+  behaviour (window 4–8 = the CBE/ABE definitions; GC ranked; low-quality
+  candidates included), so default results are unchanged.
+- D11 problem: relative CRISPR export paths resolved to the user's
+  Desktop (here a OneDrive-synced folder).
+- Now: they resolve to `exports/crispr/` in the project (ignored by Git,
+  next to the report exports), or to `$SYNAPSE_EXPORT_DIR/crispr`.
+- Also fixed: `analyses/crispr.py` did not import `os`, needed by the new
+  export-directory code (found by the new test before commit).
+- Tests: 4 new (`CrisprConfigurationTests`). Suite 206 → 210.

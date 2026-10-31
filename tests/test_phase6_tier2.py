@@ -157,5 +157,60 @@ class CrisprCutSiteTests(unittest.TestCase):
         self.assertIn("PMID 22745249", C.format_system_details("SpCas9"))
 
 
+# ----------------------------------------------------------------------
+# D10, D11: CRISPR configuration fields act; exports stay in the project
+# ----------------------------------------------------------------------
+class CrisprConfigurationTests(unittest.TestCase):
+    SEQUENCE = _random_dna(300, 11) + "A" * 9 + _random_dna(100, 12)  # some guides fail (homopolymer)
+
+    def test_include_low_quality(self):
+        from analyses import crispr as C
+        everything = C.design_guides(self.SEQUENCE, config=C.DesignConfig(include_low_quality=True))
+        failing = [c for c in everything.candidates if not c.is_high_quality]
+        self.assertTrue(failing)
+        filtered = C.design_guides(self.SEQUENCE, config=C.DesignConfig(include_low_quality=False))
+        self.assertTrue(all(c.is_high_quality for c in filtered.candidates))
+        self.assertEqual(len(filtered.candidates), len(everything.candidates) - len(failing))
+        self.assertTrue(any("FAIL flags were excluded" in w for w in filtered.warnings))
+
+    def test_rank_by_gc(self):
+        from analyses import crispr as C
+        with_gc = C.design_guides(self.SEQUENCE, config=C.DesignConfig(rank_by_gc=True))
+        without_gc = C.design_guides(self.SEQUENCE, config=C.DesignConfig(rank_by_gc=False))
+        scores = lambda r: {c.guide_start: c.rank_score for c in r.candidates}
+        self.assertNotEqual(scores(with_gc), scores(without_gc))
+        # GC is still reported as a component.
+        self.assertIn("GC", without_gc.candidates[0].rank_components)
+
+    def test_configured_editing_window_and_editor_are_used(self):
+        from analyses import crispr as C
+        mutation = C.MutationTarget("chr1", 150, self.SEQUENCE[149], "T" if self.SEQUENCE[149] != "T" else "C")
+        default = C.config_editing_window(C.DesignConfig())
+        self.assertEqual(default, tuple(C.BASE_EDITOR_DEFINITIONS["CBE"]["window"]))  # behaviour unchanged
+        from unittest import mock
+        real = C.analyze_base_editing
+        with mock.patch.object(C, "analyze_base_editing", wraps=real) as spy:
+            C.find_base_editing_candidates(
+                self.SEQUENCE, mutation, config=C.DesignConfig(editing_window_start=1, editing_window_end=2,
+                                                               base_editor="ABE"))
+        self.assertEqual((spy.call_args.kwargs["editor"], spy.call_args.kwargs["window"]), ("ABE", (1, 2)))
+        analyses = real(C.design_guides(self.SEQUENCE).candidates, mutation, editor="ABE", window=(1, 2))
+        self.assertTrue(analyses)
+        self.assertTrue(all(item.editing_window == (1, 2) for item in analyses))
+        with self.assertRaises(C.CRISPRAnalysisError):
+            C.config_editing_window(C.DesignConfig(editing_window_start=5, editing_window_end=4))
+
+    def test_relative_exports_go_to_the_project_or_the_configured_directory(self):
+        import os
+        import tempfile
+        from pathlib import Path
+        from unittest import mock
+        from analyses import crispr as C
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.dict(os.environ, {"SYNAPSE_EXPORT_DIR": tmp}):
+            self.assertEqual(C._default_export_directory(), Path(tmp) / "crispr")
+        with mock.patch.dict(os.environ, {"SYNAPSE_EXPORT_DIR": ""}):
+            self.assertEqual(C._default_export_directory(), PROJECT_ROOT / "exports" / "crispr")
+
+
 if __name__ == "__main__":
     unittest.main()
