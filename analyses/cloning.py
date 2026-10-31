@@ -1284,12 +1284,21 @@ def _selected_digest(
             topology=topology,
         )
 
+        # A fragment boundary is the top-strand cut, i.e. the number of
+        # bases 5' of the cut: recognition start (1-based) - 1 + cut_top,
+        # taken modulo the length on a circular molecule (audit S17; the
+        # recognition start was used before, wrong by cut_top - 1).
+        cut_top = int(get_enzyme_data(enzyme_name)["cut_top"])
         for position in analysis[
             "sites"
         ]:
+            cut = position - 1 + cut_top
+            if topology == "circular" and sequence:
+                cut %= len(sequence)
             cuts.append({
                 "enzyme": enzyme_name,
-                "position": position,
+                "position": cut,
+                "recognition_start": position,
             })
 
     positions = sorted({

@@ -33,7 +33,7 @@ simulated keystrokes (see audit §11.5).
 | Functions and classes inventoried | ~1,100 |
 | Main-menu entries | 15 |
 | Sub-menu entries inventoried | 78 |
-| Automated tests | 215, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1 + 5 D2 + 5 D14-F2 + 11 sequence-type classifier + 6 D14-F3/F11 + 7 D14-F1 + 9 D13/D14-F4/F5/F7 + 5 D14-F6 + 3 D14-F8–F10 + 3 D6 + 3 D9 + 3 D8 + 4 D10/D11 + 2 D19 + 1 D15 + 2 S15/S16) |
+| Automated tests | 217, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1 + 5 D2 + 5 D14-F2 + 11 sequence-type classifier + 6 D14-F3/F11 + 7 D14-F1 + 9 D13/D14-F4/F5/F7 + 5 D14-F6 + 3 D14-F8–F10 + 3 D6 + 3 D9 + 3 D8 + 4 D10/D11 + 2 D19 + 1 D15 + 2 S15/S16 + 2 S17) |
 | Module self-tests | 12 suites, all passing (CRISPR 28, BLAST 33, mutation 44, variant 27, others aggregated) |
 | Golden-master scenarios | 12 |
 | Confirmed defects | 19 (D1–D19); corrected so far: 16 (D12, D4, D3, D5, D1, D2, D13, D14 with all sub-findings F1–F12, D6, D7, D8, D9, D10, D11, D15, D19; 2026-10-31) |

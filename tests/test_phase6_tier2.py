@@ -283,5 +283,30 @@ class VariantModuleFindingTests(unittest.TestCase):
                          ("SNV", "Missense", "AAA>GAA"))
 
 
+# ----------------------------------------------------------------------
+# S17: the cloning digest cuts where the enzyme cuts
+# ----------------------------------------------------------------------
+class CloningDigestCutTests(unittest.TestCase):
+    def test_audit_example(self):
+        from analyses import cloning as CL
+        sequence = _random_dna(50, 21).replace("GAATTC", "GAATTA") + "GAATTC" + "A" * 50 + "CTGCAG" + "T" * 50
+        digest = CL._selected_digest(sequence, ["EcoRI", "PstI"], "linear")
+        # EcoRI G^AATTC at 51, PstI CTGCA^G at 107: cuts after 51 and 111 (was 51 and 107).
+        self.assertEqual(sorted(f["length"] for f in digest["fragments"]), [51, 51, 60])
+
+    def test_agrees_with_the_restriction_module_for_every_enzyme_pair(self):
+        import itertools
+        from analyses import cloning as CL, restriction as R
+        from data.restriction_enzymes import RESTRICTION_ENZYMES
+        sequence = _random_dna(1500, 9)
+        for topology in ("linear", "circular"):
+            for pair in itertools.combinations(sorted(RESTRICTION_ENZYMES), 2):
+                with self.subTest(topology=topology, pair=pair):
+                    cloning = CL._selected_digest(sequence, list(pair), topology)
+                    restriction = R.perform_digest(sequence, list(pair), topology=topology)
+                    self.assertEqual(sorted(f["length"] for f in cloning["fragments"]),
+                                     sorted(f["length"] for f in restriction["fragments"]))
+
+
 if __name__ == "__main__":
     unittest.main()

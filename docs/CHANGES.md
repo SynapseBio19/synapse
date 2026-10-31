@@ -917,3 +917,21 @@ Tests are in `tests/test_phase6_tier2.py`.
   existing flag list. It now uses the copy-on-write helper introduced for
   D12.
 - Tests: 2 new (`VariantModuleFindingTests`). Suite 213 → 215.
+
+### S17 The cloning digest cuts where the enzyme cuts (`analyses/cloning.py`)
+
+- Problem: `_selected_digest` (used for the vector and insert digests in
+  the cloning strategy) used each site's recognition start as the cut
+  position, so fragment lengths were off by the enzyme's top-strand cut
+  offset minus one (EcoRI agreed only because its offset is 1). Audit
+  example: cuts 51/107 and fragments 51/56/55 bp instead of 51/111 and
+  51/60/51 bp.
+- Now: the boundary is recognition start − 1 + `cut_top` (modulo the
+  length for circular molecules), the convention of
+  `restriction.calculate_cut_positions`; the recognition start is kept
+  in each cut record.
+- Validation: for all 231 enzyme pairs of the database, linear and
+  circular, the cloning digest's fragment lengths equal those of
+  `restriction.perform_digest`, whose circular digest agrees with
+  Biopython `Bio.Restriction` (D3).
+- Tests: 2 new (`CloningDigestCutTests`). Suite 215 → 217.
