@@ -1054,3 +1054,37 @@ interrupted the Opus 5.5 session at the start of this investigation.
 - Tests: 7 new (`GenBankReaderNoteTests`, `ReportSerializationTests`,
   `VariantReferenceAlphabetTests`). Suite 229 -> 236; pyright unchanged;
   golden master unchanged.
+
+### S1, S2, S9, S11, S12 Five suspected findings assessed
+
+- **S1 is not a defect.** The Kozak context of a minus-strand ORF is
+  computed in the reverse-complement frame, which is the biologically
+  correct frame: that frame *is* the minus strand read 5'->3'. Reproduced:
+  a transcript carrying `GCCACC` upstream of its start, placed on the minus
+  strand of the parent, is reported with context `GCCACCATGG` and
+  classification "Strong". The result carries no coordinate, so nothing can
+  be mapped into the wrong frame. The frame is now documented and locked by
+  a test; no code was changed.
+- **S2 is not a defect.** `_keep_longest_per_stop` collapses minus-strand
+  ORFs correctly: two in-frame starts sharing one stop get the same frame
+  and the same 3'-end key, and only the longest survives with
+  `nested=False`. The audit's concern about ORFs "found from different
+  rotations" does not arise, because one call uses one rotation of the
+  reverse complement. Locked by a test; no code was changed.
+- **S9 is confirmed and the note now quantifies it.** Peak memory of the
+  global alignment was measured with `tracemalloc` at 300, 600 and 1,200 nt
+  and scales quadratically at roughly 45 bytes per matrix cell. The note
+  therefore states about 180 MB at 2,000 nt and about 4.5 GB at 10,000 nt,
+  instead of only saying that memory "grows". The algorithm is unchanged;
+  a banded or linear-space alignment remains open as P2-6.
+- **S12 is resolved.** pyright was not run during the audit. It is now run
+  against the 134-diagnostic baseline of `ab4bd2a` for every work package.
+  Note for future sessions: `pyright.exe` is blocked by a Windows
+  application control policy (WinError 4551), so it must be invoked as
+  `python -m pyright --pythonversion 3.10`.
+- **S11 remains unverified, by choice.** The literature module's behaviour
+  against live providers (rate limits, partial outages, cross-source
+  duplicate DOIs) was not tested, because that means sending queries to
+  external services; the resource policy requires approval for that. The
+  offline fixtures continue to cover parsing, deduplication and retry
+  handling. This is recorded as a limitation, not as a defect.

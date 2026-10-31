@@ -564,5 +564,63 @@ class VariantReferenceAlphabetTests(unittest.TestCase):
         self.assertEqual(report["checked"], 1)
 
 
+# ----------------------------------------------------------------------
+# S1, S2: minus-strand ORF context and longest-per-stop collapsing
+# ----------------------------------------------------------------------
+class MinusStrandOrfTests(unittest.TestCase):
+    """Both findings were speculative; these tests record the actual behaviour."""
+
+    def test_kozak_context_of_a_minus_strand_orf_is_the_minus_strand_context(self):
+        from analyses import orf as O
+        from core.seqtools import reverse_complement
+        # Build the intended minus-strand transcript, then place its reverse
+        # complement in the parent, so the parent carries it on the minus strand.
+        minus = "TTTT" + "GCCACC" + "ATG" + "GCT" * 21 + "TAA" + "TTTT"
+        parent = reverse_complement(minus)
+        orf = next(o for o in O.find_orfs(parent, min_length=60) if o["strand"] == "-")
+        kozak = orf["start_context"]["kozak"]
+        self.assertTrue(kozak["available"])
+        self.assertEqual(kozak["context"], "GCCACCATGG")  # read on the minus strand
+        self.assertEqual(kozak["classification"], "Strong")
+        # No coordinate is reported, so none can be mapped to the wrong frame.
+        self.assertEqual(sorted(kozak), ["available", "classification", "context", "score"])
+
+    def test_longest_orf_per_stop_collapses_on_the_minus_strand(self):
+        from analyses import orf as O
+        from core.seqtools import reverse_complement
+        minus = "ATG" + "GCT" * 10 + "ATG" + "GCT" * 10 + "TAA"
+        parent = "CCCC" + reverse_complement(minus) + "CCCC"
+        nested = [o for o in O.find_orfs(parent, min_length=30, nested=True)
+                  if o["strand"] == "-"]
+        collapsed = [o for o in O.find_orfs(parent, min_length=30, nested=False)
+                     if o["strand"] == "-"]
+        self.assertEqual(sorted(o["length"] for o in nested), [36, 69])
+        # Both share one reading frame and one 3' end, so only the longest stays.
+        self.assertEqual({o["frame"] for o in nested}, {-2})
+        self.assertEqual({o["start"] for o in nested}, {4})
+        self.assertEqual([o["length"] for o in collapsed], [69])
+
+
+# ----------------------------------------------------------------------
+# S9: the alignment note states the actual cost
+# ----------------------------------------------------------------------
+class AlignmentCostNoteTests(unittest.TestCase):
+    def test_note_quantifies_the_memory_cost(self):
+        from analyses.mutation import MAX_RECOMMENDED_ALIGNMENT_LENGTH, compare_sequences
+        length = MAX_RECOMMENDED_ALIGNMENT_LENGTH + 10
+        reference = "ACGT" * (length // 4)
+        variant = reference[:100] + "T" + reference[101:]
+        note = next(n for n in compare_sequences(reference, variant).notes
+                    if "aligned globally" in n)
+        self.assertIn("bytes per cell", note)
+        self.assertIn("4.5 GB", note)
+
+    def test_short_sequences_get_no_such_note(self):
+        from analyses.mutation import compare_sequences
+        reference = "ACGT" * 25
+        result = compare_sequences(reference, reference[:50] + "T" + reference[51:])
+        self.assertFalse(any("aligned globally" in n for n in result.notes))
+
+
 if __name__ == "__main__":
     unittest.main()
