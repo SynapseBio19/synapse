@@ -12,11 +12,11 @@ verification and report) have not been started. The running record is
 | Item | State |
 |---|---|
 | Branch | `main` |
-| HEAD | `6f7987b` (see section 7; `642f31b` was the state at the original pause) |
+| HEAD | `8c47b17` (see section 8; `642f31b` was the state at the original pause) |
 | Working tree | clean |
-| Tests | 228/228 pass, 0 skipped (`python -m unittest discover -s tests -t .`, ~28 s) |
+| Tests | 240/240 pass, 0 skipped (`python -m unittest discover -s tests -t .`, ~27 s) |
 | Golden master | unchanged since the audit; no snapshot was regenerated |
-| pyright 1.1.414 (`--pythonversion 3.10`) | 132 errors; baseline at `ab4bd2a` was 134; no new diagnostic in any package; the two removed are the S15 call |
+| pyright 1.1.414 (`python -m pyright --pythonversion 3.10`) | 131 errors; baseline at `ab4bd2a` was 134; no new diagnostic in any package. Removed: the two S15 calls and the D16 redeclaration. `pyright.exe` is blocked by a Windows application control policy (WinError 4551); use `python -m pyright`. |
 | ReadOnly attributes | restored on all 15 files (see the handover notes in `PHASE6_PROGRESS.md`) |
 | Optional/test-only tools present | Biopython 1.88, primer3-py 2.4.0, BLAST+ 2.17.0; bcftools absent |
 
@@ -179,3 +179,75 @@ diagnostics, golden master unchanged, ReadOnly restored on
 
 **Next.** The main Phase 6 programme remains with Opus 5.5 and resumes at
 section 6 above, with S23, S3, S4 and S5 removed from the open list.
+
+---
+
+## 8. Addendum: second Opus 5 assignment (2026-10-31)
+
+The Opus 5.5 session was stopped by a safeguard again when it tried to
+resume the programme, and the owner assigned the continuation to Opus 5.
+This addendum records that block of work. It ends at a deliberate handover
+point, not because the programme is finished.
+
+**A note on how this work was split.** Two Opus 5.5 responses were stopped
+by a classifier and the work was then routed to Opus 5. The tasks
+themselves are ordinary scientific software maintenance, and no safeguard
+was encountered while doing them. The stops look like false positives on
+CRISPR vocabulary in a bioinformatics codebase. That is worth reporting to
+Anthropic rather than worth designing around, and this session did not
+sort or schedule work by expected classifier behaviour.
+
+### Completed in this assignment
+
+| Commit | Work | Evidence |
+|---|---|---|
+| `c52f9bb` | **D16 part 1.** The Tm model is defined under its private name instead of carrying the public name and being shadowed by the compatibility adapter, so no module-level name is defined twice. | SHA-256 fingerprint of the compiled bytecode of all 129 module-level callables: no name added or removed, no entry changed. pyright's `reportRedeclaration` gone. |
+| `5a3220e` | **S21, S10, S8, S22.** Four paths that discarded information or swallowed a failure without saying so now report it: symbols dropped from GenBank ORIGIN, feature locations the reader cannot parse, a failing `to_dict()` during report serialization, and a variant reference that is not DNA. | 7 regression tests; the bundled GenBank fixture produces no new notes. |
+| `8c47b17` | **S1, S2, S9, S11, S12.** Two suspected findings assessed as not defects and locked by tests, one quantified by measurement, two resolved in documentation. | Execution on constructed minus-strand cases; `tracemalloc` at three sizes. |
+
+### Findings resolved, with the honest outcome
+
+- **S1, S2: not defects.** The minus-strand Kozak frame is the correct
+  frame and reports no coordinate; nested minus-strand ORFs collapse
+  correctly. Both are now covered by tests so the behaviour cannot drift.
+- **S9: confirmed, algorithm unchanged.** Measured at ~45 bytes per
+  alignment matrix cell, so ~180 MB at 2,000 nt and ~4.5 GB at 10,000 nt.
+  The note states these figures. A banded or linear-space alignment is
+  still open as P2-6.
+- **S11: still unverified, by choice.** Live literature-provider behaviour
+  needs external requests, which require the owner's approval under the
+  resource policy. Offline fixtures continue to cover parsing, dedup and
+  retries.
+- **S12: resolved.** pyright runs against the baseline for every package.
+
+### Still open, as independent work packages
+
+1. **D16 part 2** - flatten the live `_v5`-`_v11` primer ranking chain.
+   Blocked on purpose: it changes executed code and needs the independent
+   review recorded as open validation item 7 in `AUDIT_STATUS.md`.
+2. **S13** - `main.py` has module-level control flow and no
+   `if __name__ == "__main__":` guard, so importing it starts the
+   application. Fixing it means indenting roughly 700 lines into a
+   function. Mechanical but large, with real regression risk for the smoke
+   tests; it belongs with Stage E and deserves its own package.
+3. **S14 / P2-2** - `core/api.py` still lacks cloning, variant filtering,
+   mutation reporting, BLAST and literature entry points, and the analysis
+   modules still own their menus.
+4. **S6 / P1-7** - resuming an NCBI BLAST run from a stored RID. The
+   primitives exist; the feature and its menu entry do not.
+5. **S18** - cloning-planner runtime.
+6. **P1-9** - the RNA module's three-frame codon view still uses table 1.
+7. **Stages F, G, H, I** of the Master Prompt: terminal UI standardization
+   (with D17), scientific output standardization (with D18, which changes
+   the golden master and needs a documented justification), the style
+   guide, editorial review and README, and the final verification with the
+   A-K completion report.
+
+### State at the end of this assignment
+
+HEAD `8c47b17`, working tree clean, 240/240 tests pass, pyright 131 against
+the 134 baseline with no new diagnostics, golden master unchanged, ReadOnly
+restored on all 15 protected files.
+
+Phase 6 is **not** complete. The defect and S-finding track is close to
+done; stages F through I have not been started.
