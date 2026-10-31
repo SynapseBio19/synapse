@@ -239,6 +239,15 @@ Validation:
 - Ranking is a transparent weighted sequence heuristic, not a measured or
   predicted editing efficiency.
 - Off-target search covers only sequences supplied to Synapse, not a genome.
+- Cut site (D8): SpCas9/SpCas9-NG blunt 3 nt 5' of the PAM (after guide
+  position 17; Jinek et al. 2012), SaCas9 blunt 3 nt 5' of the PAM
+  (after position 18; modelled as SpCas9, Ran et al. 2015), Cas12a
+  staggered after position 18 (PAM strand) and 23 (target strand), 5-nt
+  5' overhang (Zetsche et al. 2015). Reported as forward-strand
+  positions: the break lies between p and p+1. Geometry only, not
+  cleavage efficiency.
+- The guide's own site in a supplied local reference is reported as
+  "on-target" and not counted as an off-target (D9).
 
 ## BLAST (`analyses/blast.py`)
 
@@ -280,6 +289,14 @@ Validation:
 - IUPAC-IUB Joint Commission on Biochemical Nomenclature (1984)
   Nomenclature and symbolism for amino acids and peptides. Eur J Biochem
   138:9–37. PMID 6692818.
+- Jinek M et al. (2012) A programmable dual-RNA-guided DNA endonuclease
+  in adaptive bacterial immunity. Science 337:816–821. PMID 22745249.
+- Ran FA et al. (2015) In vivo genome editing using Staphylococcus aureus
+  Cas9. Nature 520:186–191. PMID 25830891.
+- Zetsche B et al. (2015) Cpf1 is a single RNA-guided endonuclease of a
+  class 2 CRISPR-Cas system. Cell 163:759–771. PMID 26422227.
+- Nishimasu H et al. (2018) Engineered CRISPR-Cas9 nuclease with expanded
+  targeting space. Science 361:1259–1262. PMID 30166441.
 - SantaLucia J Jr (1998) A unified view of polymer, dumbbell, and
   oligonucleotide DNA nearest-neighbor thermodynamics. PNAS 95:1460–1465.
 - SantaLucia J Jr, Hicks D (2004) The thermodynamics of DNA structural

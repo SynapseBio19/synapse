@@ -58,12 +58,13 @@ IUPAC, gapped and invalid input (D14):
 | 7 | D14-F8/F9/F10 ORF search, transcription and GC counting check/normalize input | `d40d328` | internal tests; probe re-run (no silent results for foreign types) | Corrected; D14 and D13 complete; suite 197/197; pyright unchanged |
 | 8 | D6 + S7 programmatic local BLAST by database prefix, with provenance | `5b120ec` | internal tests; external tool execution (bundled database, blastn + blastdbcmd) | Corrected; suite 200/200; pyright unchanged |
 | 9 | D7 stale BLAST artifact labelled as legacy; AUDIT_STATUS cites the test | `e1a48c6` | documentation; the README's numbers match `tests/test_p0_regressions.py` | Corrected (file kept; deletion is the owner's decision) |
-| 10 | D9 CRISPR on-target site excluded from the local specificity screen | this package | internal tests (both strands, identical copy, near match) | Corrected; suite 203/203; pyright unchanged; S23 recorded |
+| 10 | D9 CRISPR on-target site excluded from the local specificity screen | `3514617` | internal tests (both strands, identical copy, near match) | Corrected; suite 203/203; pyright unchanged; S23 recorded |
+| 11 | D8 CRISPR cut site per system, with citations | this package | internal tests (both strands, all four systems); literature (PMIDs 22745249, 25830891, 30166441, 26422227) | Corrected; suite 206/206; pyright unchanged |
 
 ## Open after the current package
 
-D8, D10, D11, D15–D19 and S1–S6, S8–S19, S21–S23 (see `docs/PHASE6_INITIAL_AUDIT.md`)
-until a package above closes an item. D12, D1–D7, D9, D13, D14, S7 and S20
+D10, D11, D15–D19 and S1–S6, S8–S19, S21–S23 (see `docs/PHASE6_INITIAL_AUDIT.md`)
+until a package above closes an item. D12, D1–D9, D13, D14, S7 and S20
 are corrected.
 
 ## Handover notes (working practice)

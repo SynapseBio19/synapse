@@ -104,5 +104,58 @@ class CrisprOnTargetTests(unittest.TestCase):
         self.assertGreaterEqual(profile["one_mismatch_hits"], 1)
 
 
+# ----------------------------------------------------------------------
+# D8: modelled cut site, from cited conventions
+# ----------------------------------------------------------------------
+class CrisprCutSiteTests(unittest.TestCase):
+    SEQUENCE = _random_dna(400, 3)
+
+    def _check(self, system):
+        from analyses import crispr as C
+        from core.seqtools import reverse_complement
+        definition = C.get_crispr_system(system)
+        result = C.design_guides(self.SEQUENCE, system=system)
+        strands = set()
+        for candidate in result.candidates:
+            strands.add(candidate.strand)
+            for site, k in ((candidate.cut_site, definition.cut_after),
+                            (candidate.cut_site_complementary, definition.cut_after_complementary)):
+                if candidate.strand == "+":
+                    before, after = self.SEQUENCE[:site], self.SEQUENCE[site:]
+                else:
+                    before, after = reverse_complement(self.SEQUENCE[site:]), reverse_complement(self.SEQUENCE[:site])
+                self.assertTrue(before.endswith(candidate.guide[:k]), candidate.candidate_id)
+                self.assertTrue(after.startswith(candidate.guide[k:]), candidate.candidate_id)
+        self.assertEqual(strands, {"+", "-"})
+        return result
+
+    def test_cas9_cuts_blunt_three_nt_from_the_pam(self):
+        for system in ("SpCas9", "SpCas9-NG", "SaCas9"):
+            with self.subTest(system=system):
+                for candidate in self._check(system).candidates:
+                    self.assertEqual(candidate.cut_type, "blunt")
+                    self.assertEqual(candidate.cut_site, candidate.cut_site_complementary)
+                    if candidate.strand == "+":
+                        self.assertEqual(candidate.pam_start - (candidate.cut_site + 1), 3)
+                    else:
+                        self.assertEqual(candidate.cut_site - candidate.pam_end, 3)
+
+    def test_cas12a_cuts_staggered_with_a_five_nt_overhang(self):
+        for candidate in self._check("Cas12a").candidates:
+            self.assertEqual(candidate.cut_type, "staggered, 5-nt 5' overhang")
+            self.assertEqual(abs(candidate.cut_site_complementary - candidate.cut_site), 5)
+
+    def test_cut_is_reported_and_exported(self):
+        import json
+        from analyses import crispr as C
+        result = C.design_guides(self.SEQUENCE)
+        candidate = result.candidates[0]
+        self.assertIn(f"between {candidate.cut_site} and {candidate.cut_site + 1}",
+                      C.format_candidate(candidate, 1))
+        exported = json.loads(C.result_to_json(result))["candidates"][0]
+        self.assertEqual((exported["cut_site"], exported["cut_type"]), (candidate.cut_site, "blunt"))
+        self.assertIn("PMID 22745249", C.format_system_details("SpCas9"))
+
+
 if __name__ == "__main__":
     unittest.main()

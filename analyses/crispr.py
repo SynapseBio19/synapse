@@ -78,6 +78,9 @@ SYSTEM_DEFINITIONS: Dict[str, Dict[str, Any]] = {
         "guide_length": 20,
         "pam_side": "3prime",
         "cut_model": "Cas9-like; cleavage model is not an efficacy prediction",
+        "cut_after": 17,
+        "cut_after_complementary": 17,
+        "cut_reference": "Blunt cut 3 nt 5' of the PAM (Jinek et al. 2012, PMID 22745249).",
         "description": "SpCas9 canonical NGG PAM model.",
     },
     "SpCas9-NG": {
@@ -87,6 +90,9 @@ SYSTEM_DEFINITIONS: Dict[str, Dict[str, Any]] = {
         "guide_length": 20,
         "pam_side": "3prime",
         "cut_model": "Cas9-like; relaxed PAM model",
+        "cut_after": 17,
+        "cut_after_complementary": 17,
+        "cut_reference": "SpCas9 variant; cut modelled as SpCas9, 3 nt 5' of the PAM (Nishimasu et al. 2018, PMID 30166441).",
         "description": "SpCas9-NG-like relaxed NG PAM model.",
     },
     "SaCas9": {
@@ -96,6 +102,9 @@ SYSTEM_DEFINITIONS: Dict[str, Dict[str, Any]] = {
         "guide_length": 21,
         "pam_side": "3prime",
         "cut_model": "Cas9-like; cleavage model is not an efficacy prediction",
+        "cut_after": 18,
+        "cut_after_complementary": 18,
+        "cut_reference": "Blunt cut modelled 3 nt 5' of the PAM, as for SpCas9 (Ran et al. 2015, PMID 25830891).",
         "description": "SaCas9 canonical NNGRRT PAM model.",
     },
     "Cas12a": {
@@ -104,7 +113,11 @@ SYSTEM_DEFINITIONS: Dict[str, Dict[str, Any]] = {
         "pam_length": 4,
         "guide_length": 23,
         "pam_side": "5prime",
-        "cut_model": "Cas12a-like; distal cleavage behaviour not simulated",
+        "cut_model": "Cas12a-like; staggered cut distal to the PAM",
+        "cut_after": 18,
+        "cut_after_complementary": 23,
+        "cut_reference": "Staggered cut after position 18 (PAM strand) and 23 (target strand), "
+                         "5-nt 5' overhang (Zetsche et al. 2015, PMID 26422227).",
         "description": "Cas12a-style T-rich 5' PAM model.",
     },
 }
@@ -160,6 +173,9 @@ class CRISPRSystem:
     guide_length: int
     pam_side: str
     cut_model: str = ""
+    cut_after: int = 0
+    cut_after_complementary: int = 0
+    cut_reference: str = ""
     description: str = ""
 
 
@@ -251,6 +267,13 @@ class GuideCandidate:
     base_editing_candidates: List[Dict[str, Any]] = field(default_factory=list)
     prime_editing_candidates: List[Dict[str, Any]] = field(default_factory=list)
     context: Dict[str, Any] = field(default_factory=dict)
+    # Modelled double-strand break (audit D8): the break lies between
+    # forward-strand positions cut_site and cut_site + 1 (1-based). For a
+    # staggered cut, cut_site is on the strand carrying the guide sequence
+    # and cut_site_complementary on the other strand.
+    cut_site: int = 0
+    cut_site_complementary: int = 0
+    cut_type: str = ""
 
     @property
     def is_high_quality(self) -> bool:
@@ -554,6 +577,13 @@ def get_crispr_system(name: str = "SpCas9") -> CRISPRSystem:
     return CRISPRSystem(**data)
 
 
+def _cut_description(system: CRISPRSystem) -> str:
+    if system.cut_after == system.cut_after_complementary:
+        return f"blunt, after guide position {system.cut_after}"
+    return (f"after guide position {system.cut_after} (guide strand) and "
+            f"{system.cut_after_complementary} (complementary strand)")
+
+
 def format_system_details(system_name: str) -> str:
     """Return detailed information for exactly one selected CRISPR system."""
     system = get_crispr_system(system_name)
@@ -567,6 +597,8 @@ def format_system_details(system_name: str) -> str:
         f"Guide length:    {system.guide_length} nt",
         f"PAM orientation: {system.pam_side}",
         f"Cut model:       {system.cut_model}",
+        f"Cut position:    {_cut_description(system)}",
+        f"Cut source:      {system.cut_reference}",
         f"Description:     {system.description}",
         "",
         "Scientific scope: sequence-level computational model; not an",
@@ -670,6 +702,19 @@ def _coordinate_region(region: TargetRegion, local_start: int, local_end: int) -
     return region.start + local_start, region.start + local_end
 
 
+def cut_site_forward(strand: str, guide_start: int, guide_end: int, cut_after: int) -> int:
+    """Forward-strand position after which the break lies (1-based).
+
+    *cut_after* counts along the guide in targeting orientation. On the
+    minus strand guide position i is forward position guide_end - i + 1, so
+    a cut after guide position k lies between forward positions
+    guide_end - k and guide_end - k + 1.
+    """
+    if strand == "+":
+        return guide_start + cut_after - 1
+    return guide_end - cut_after
+
+
 def _candidate_from_oriented_window(
     sequence: str,
     region: TargetRegion,
@@ -694,6 +739,10 @@ def _candidate_from_oriented_window(
     pam_start, pam_end = _coordinate_region(region, pam_start_local, pam_end_local)
     metrics = characterize_guide(guide, config)
     flags = quality_flags(metrics, config)
+    cut_site = cut_site_forward(strand, guide_start, guide_end, system.cut_after)
+    cut_site_complementary = cut_site_forward(strand, guide_start, guide_end,
+                                              system.cut_after_complementary)
+    overhang = abs(system.cut_after_complementary - system.cut_after)
     return GuideCandidate(
         candidate_id=f"G{index:04d}",
         system=system.name,
@@ -719,6 +768,9 @@ def _candidate_from_oriented_window(
             "feature_name": region.feature_name,
             "feature_strand": region.feature_strand,
         },
+        cut_site=cut_site,
+        cut_site_complementary=cut_site_complementary,
+        cut_type="blunt" if overhang == 0 else f"staggered, {overhang}-nt 5' overhang",
     )
 
 
@@ -1836,6 +1888,16 @@ def target_map(candidate: GuideCandidate, sequence_length: int, width: int = 60)
     return "".join(chars) + "  (= guide, # PAM)"
 
 
+def _candidate_cut_text(candidate: GuideCandidate) -> str:
+    if not candidate.cut_site:
+        return "not modelled"
+    if candidate.cut_site == candidate.cut_site_complementary:
+        return f"between {candidate.cut_site} and {candidate.cut_site + 1} ({candidate.cut_type})"
+    return (f"guide strand {candidate.cut_site}/{candidate.cut_site + 1}, other strand "
+            f"{candidate.cut_site_complementary}/{candidate.cut_site_complementary + 1} "
+            f"({candidate.cut_type})")
+
+
 def format_candidate(candidate: GuideCandidate, rank: int) -> str:
     flags = ", ".join(candidate.flags) if candidate.flags else "None"
     mutation = "; ".join(candidate.mutation_overlap) if candidate.mutation_overlap else "None"
@@ -1852,6 +1914,7 @@ def format_candidate(candidate: GuideCandidate, rank: int) -> str:
         f"Strand:                   {candidate.strand}",
         f"Guide position:           {candidate.guide_start}-{candidate.guide_end}",
         f"PAM position:             {candidate.pam_start}-{candidate.pam_end}",
+        f"Modelled cut:             {_candidate_cut_text(candidate)}",
         f"Seed sequence:            {candidate.seed_sequence}",
         f"GC / AT:                  {candidate.metrics.gc_content:.2f}% / {candidate.metrics.at_content:.2f}%",
         f"Complexity:               {candidate.metrics.sequence_complexity:.3f}",

@@ -835,3 +835,24 @@ Tests are in `tests/test_phase6_tier2.py`.
   own site when the reference uses the coordinates of the designed
   sequence (the designed sequence itself, or its parent).
 - Tests: 3 new (`CrisprOnTargetTests`, both strands). Suite 200 → 203.
+
+### D8 CRISPR guides report the modelled cut site (`analyses/crispr.py`)
+
+- Problem: no guide carried a cut position; the only cleavage information
+  was a free-text `cut_model` string.
+- Now: each system defines where it cuts, counted along the guide in
+  targeting orientation, with its source: SpCas9 and SpCas9-NG blunt
+  after guide position 17 (3 nt 5' of the PAM; Jinek et al. 2012), SaCas9
+  blunt after position 18 (3 nt 5' of the PAM, modelled as for SpCas9;
+  Ran et al. 2015), Cas12a staggered after position 18 on the PAM strand
+  and 23 on the target strand, a 5-nt 5' overhang (Zetsche et al. 2015).
+  Every `GuideCandidate` has `cut_site`, `cut_site_complementary` (the
+  break lies between forward positions p and p+1, 1-based) and
+  `cut_type`; they appear in the candidate report, the system details
+  (with the citation) and the JSON export.
+- Scope: this is the canonical cleavage geometry, not a prediction of
+  cleavage efficiency or of the repair outcome.
+- Validation: literature (PMIDs 22745249, 25830891, 30166441, 26422227,
+  checked in PubMed); tests check on both strands that the guide prefix
+  up to the cut lies 5' of the break in the sequence.
+- Tests: 3 new (`CrisprCutSiteTests`). Suite 203 → 206.
