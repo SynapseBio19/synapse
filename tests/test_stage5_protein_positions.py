@@ -13,7 +13,10 @@ AMBIGUOUS = UBIQUITIN[:30] + "?" + UBIQUITIN[31:]
 class PositionalProteinTests(unittest.TestCase):
     def test_positional_helper_keeps_question_marks(self):
         from analyses import protein as P
-        self.assertEqual(P.get_positional_protein("MK?L*x"), "MK?L")
+        # Every position is kept: the internal "*" and the ambiguity code X
+        # become "?" (Phase 6, D14-F6; previously both were deleted).
+        self.assertEqual(P.get_positional_protein("MK?L*x"), "MK?L??")
+        self.assertEqual(P.get_positional_protein("MK?L*"), "MK?L")  # terminal stop
         self.assertEqual(P.get_resolved_protein("MK?L"), "MKL")
 
     def test_window_positions_are_preserved(self):

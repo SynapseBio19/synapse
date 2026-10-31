@@ -33,10 +33,10 @@ simulated keystrokes (see audit §11.5).
 | Functions and classes inventoried | ~1,100 |
 | Main-menu entries | 15 |
 | Sub-menu entries inventoried | 78 |
-| Automated tests | 189, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1 + 5 D2 + 5 D14-F2 + 11 sequence-type classifier + 6 D14-F3/F11 + 7 D14-F1 + 9 D13/D14-F4/F5/F7) |
+| Automated tests | 194, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1 + 5 D2 + 5 D14-F2 + 11 sequence-type classifier + 6 D14-F3/F11 + 7 D14-F1 + 9 D13/D14-F4/F5/F7 + 5 D14-F6) |
 | Module self-tests | 12 suites, all passing (CRISPR 28, BLAST 33, mutation 44, variant 27, others aggregated) |
 | Golden-master scenarios | 12 |
-| Confirmed defects | 19 (D1–D19); corrected so far: 7 (D12, D4, D3, D5, D1, D2, D13; 2026-10-31); D14 partly (F1–F5, F7, F11, F12 corrected; F6, F8–F10 open) |
+| Confirmed defects | 19 (D1–D19); corrected so far: 7 (D12, D4, D3, D5, D1, D2, D13; 2026-10-31); D14 partly (F1–F7, F11, F12 corrected; F8–F10 open) |
 | Suspected / unverified concerns | 14 at the audit (S1–S14); S15–S22 recorded since |
 | External validations performed in this audit | 8 (audit §3, §6) |
 | Features advertised but not implemented | 1 (`[11] AI Experiment Planner`) |
@@ -54,7 +54,7 @@ simulated keystrokes (see audit §11.5).
 | 2 | ORF Analysis | `analyses.orf.run_orf_analysis_ui` | Implemented | Execution-tested | Integration-tested | Independently validated (genetic codes, coordinates) | See §3. |
 | 3 | RNA Analysis | `analyses.rna.run_rna_analysis_ui` | Implemented | Execution-tested | Integration-tested | Not applicable | Selected-ORF vs whole-sequence rule confirmed intact. |
 | 4 | Protein Analysis | `analyses.protein.run_protein_analysis_from_orf` | Implemented | Execution-tested | Integration-tested | Independently validated (ProtParam) | Requires a selected ORF by design; no silent whole-sequence fallback. |
-| — | Protein record menu | `main.run_protein_record`, `analyses.protein.run_protein_analysis_from_record` | Implemented | Execution-tested | Integration-tested | Not applicable | Protein FASTA/GenPept records: protein analysis, BLAST (protein query), report (D14, 2026-10-31). X/B/Z/J/U/O handling is **D14-F6** (open). |
+| — | Protein record menu | `main.run_protein_record`, `analyses.protein.run_protein_analysis_from_record` | Implemented | Execution-tested | Integration-tested | Not applicable | Protein FASTA/GenPept records: protein analysis, BLAST (protein query), report (D14, 2026-10-31). X/B/Z/J/U/O keep their positions (**D14-F6** corrected 2026-10-31). |
 | 5 | Restriction & Cloning | `analyses.restriction.run_restriction_cloning_ui` | Implemented | Execution-tested | Integration-tested | Independently validated (digests, circular map) | D3/D4/D5 corrected 2026-10-31. Open: **S17**, **S18**. |
 | 6 | Primer Design | `analyses.primer.run_primer_analysis_ui` | Implemented | Execution-tested | Integration-tested | Independently validated (primer3-py) | **D16** duplicate/shadowed definitions. |
 | 7 | Mutation & Variant Analysis | `analyses.mutation.run_mutation_variant_ui` | Implemented | Execution-tested | Integration-tested | Partially (algorithm checked, no bcftools) | **D12** in the variant branch — corrected 2026-10-31 (Phase 6 Tier 1). |

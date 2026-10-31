@@ -53,7 +53,8 @@ IUPAC, gapped and invalid input (D14):
 | 2 | Central alphabets and classifier (F12/D13 groundwork) | `d057ac1` | internal tests; external reference comparison (`Bio.Data.IUPACData`); literature (PMIDs 2582368, 6692818) | Added, not yet wired in; suite 167/167; pyright unchanged |
 | 3 | D14-F3, F11 molecule type from GenBank/FASTA; type in `SequenceRecord`, provenance and report | `776de4a` | internal tests; NCBI `[moltype=]` modifier checked in NCBI's FASTA defline documentation | Corrected; suite 173/173; pyright unchanged |
 | 4 | D14-F1 BLAST query type from the classifier; S20 J/U/O accepted | `7c716a2` | internal tests; external tool execution (blastp on the IUPAC-letter peptide; BLAST+ acceptance of U, O, J checked directly) | Corrected; suite 180/180; pyright unchanged |
-| 5 | D13 + D14-F4/F5/F7: one input contract; menu type gate with user declaration; API type checks; protein record route | this package | internal tests; end-to-end `main.py` run with protein, undetermined, RNA and invalid records | Corrected; suite 189/189; pyright unchanged |
+| 5 | D13 + D14-F4/F5/F7: one input contract; menu type gate with user declaration; API type checks; protein record route | `162ca16` | internal tests; end-to-end `main.py` run with protein, undetermined, RNA and invalid records | Corrected; suite 189/189; pyright unchanged |
+| 6 | D14-F6 protein codes B/Z/J/X/U/O keep position; masses and ranges | this package | internal tests; external reference comparison (Biopython `protein_weights`, `molecular_weight`); one Stage 5 assertion updated (encoded the deletion) | Corrected; suite 194/194; pyright unchanged |
 
 ## Open after the current package
 

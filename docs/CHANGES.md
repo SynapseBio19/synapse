@@ -726,3 +726,35 @@ protein FASTA records get a route to protein analysis. Tests are in
 - Not changed here: protein residues X/B/Z/J/U/O in the protein module
   (F6), lower-case ORF search (F8), `transcribe_rna` (F9), RNA GC content
   in the sequence module (F10).
+
+### D14-F6 IUPAC protein codes keep their position and meaning (`analyses/protein.py`)
+
+- Problem: X, B, Z, J, U (selenocysteine) and O (pyrrolysine) were
+  "invalid"; the positional view deleted them, so every later sliding
+  window and dipeptide shifted (the Stage 5 defect, live for user-supplied
+  proteins); U and O had no mass; an internal `*` was deleted the same
+  way.
+- Now: every position is kept. In position-dependent analyses every
+  non-standard symbol becomes `?`, and the windows containing it are
+  skipped, as for unresolved translation positions; one terminal `*` is a
+  stop and is removed. Quality: B, Z, J, X count as ambiguous, U and O as
+  `nonstandard_residues` (valid), an internal `*` as invalid, and
+  `terminal_stop` is reported. Composition reports `nonstandard_counts`.
+  Molecular weight: U and O use residue masses derived from Biopython's
+  `IUPACData.protein_weights`; B, Z, J give a range over their residues
+  (J: I and L have the same mass); X and `?` leave it undetermined, as
+  before. The quality printouts show a "Sec/Pyl (U, O)" line only when
+  such residues occur.
+- Test changed: `tests/test_stage5_protein_positions.py` asserted
+  `get_positional_protein("MK?L*x") == "MK?L"`, i.e. the deletion. It now
+  expects `"MK?L??"` (positions kept) and `"MK?L*" -> "MK?L"` (terminal
+  stop). The new expectation is stricter, not weaker.
+- Limitation: hydropathy, charge and pI scales have no values for U and O;
+  they are treated as unresolved there.
+- Validation: U/O residue masses equal Biopython's within 0.001 Da, and
+  molecular weights of U/O-containing peptides agree with
+  `Bio.SeqUtils.molecular_weight` within 0.1 Da (the standard-residue
+  tables differ slightly; external reference comparison, skipped without
+  Biopython).
+- Tests: 5 new (`ProteinResidueCodeTests`). Suite 189 → 194. Golden master
+  unchanged.

@@ -125,6 +125,13 @@ use 0-based inclusive `start <= stop` on the forward strand.
   coefficient and similar) are computed over the resolved residues only.
 - The transmembrane and signal-peptide outputs are screens based on the
   Kyte–Doolittle scale, not predictions from TMHMM/Phobius or SignalP.
+- Protein letters (D14-F6): every position is kept. B, Z, J, X and `?`
+  are ambiguous; U (selenocysteine) and O (pyrrolysine) are defined
+  residues with masses (Biopython `IUPACData.protein_weights` minus
+  water); one terminal `*` is a stop. Position-dependent scales skip
+  windows containing any non-standard residue. Molecular weight is a range
+  for B/Z/J and undetermined for X and `?`. Hydropathy, charge and pI have
+  no values for U and O.
 
 ## Restriction and cloning (`analyses/restriction.py`, `analyses/cloning.py`)
 

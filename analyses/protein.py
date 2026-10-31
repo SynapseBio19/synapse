@@ -20,6 +20,15 @@ STANDARD_AMINO_ACIDS = set(
 
 AA_ORDER = "ACDEFGHIKLMNPQRSTVWY"
 
+# IUPAC protein codes beyond the 20 standard residues (core.alphabets).
+# U (selenocysteine) and O (pyrrolysine) are defined residues; B, Z, J and
+# X name a set of residues, and "?" marks a position that translation could
+# not resolve. All keep their position in position-dependent analyses.
+NONSTANDARD_RESIDUES = set("UO")
+AMBIGUOUS_RESIDUE_OPTIONS = {"B": "DN", "Z": "EQ", "J": "IL"}
+UNRESOLVED_RESIDUES = set("BZJX?")
+STOP_SYMBOL = "*"
+
 
 RNA_IUPAC = {
     "A": ("A",),
@@ -64,6 +73,10 @@ AMINO_ACID_RESIDUE_MASSES = {
     "W": 186.2132,
     "Y": 163.1760,
     "V": 99.1326,
+    # Selenocysteine and pyrrolysine: Biopython IUPACData.protein_weights
+    # (free amino acid, average) minus WATER_MASS.
+    "U": 150.0380,
+    "O": 237.2982,
 }
 
 # One H2O is retained for the complete peptide chain.
@@ -358,13 +371,19 @@ INSTABILITY_WEIGHTS = (
 # ============================================================
 
 
+def _strip_terminal_stop(sequence):
+    """Drop one terminal "*" (a stop, not a residue)."""
+    return sequence[:-1] if sequence.endswith(STOP_SYMBOL) else sequence
+
+
 def validate_protein_sequence(protein):
+    """True for IUPAC protein letters, "?" and at most a terminal "*"."""
 
     if not isinstance(protein, str):
         return False
 
-    sequence = "".join(
-        protein.upper().split()
+    sequence = _strip_terminal_stop(
+        "".join(protein.upper().split())
     )
 
     if not sequence:
@@ -372,7 +391,8 @@ def validate_protein_sequence(protein):
 
     return all(
         residue in STANDARD_AMINO_ACIDS
-        or residue == "?"
+        or residue in NONSTANDARD_RESIDUES
+        or residue in UNRESOLVED_RESIDUES
         for residue in sequence
     )
 
@@ -391,19 +411,21 @@ def get_resolved_protein(protein):
 
 
 def get_positional_protein(protein):
-    """Keep standard residues and unresolved positions ("?"), drop other symbols.
+    """Keep every position; non-standard residues become "?".
 
     Position-dependent analyses (sliding windows, dipeptide scales, signal
-    peptide) must not simply delete unresolved residues: doing so shifts every
-    later position. They use this function and then skip the windows or
-    dipeptides that contain a "?" (audit P2-5).
+    peptide) must not delete residues: doing so shifts every later position.
+    Standard residues are kept, every other symbol (B, Z, J, X, U, O, an
+    internal "*") becomes "?", and the windows or dipeptides containing a
+    "?" are skipped (audit P2-5, D14-F6). Whitespace and one terminal "*"
+    (a stop) are removed; they are not residues.
     """
     if not isinstance(protein, str):
         return ""
+    sequence = _strip_terminal_stop("".join(protein.upper().split()))
     return "".join(
-        residue
-        for residue in protein.upper()
-        if residue in STANDARD_AMINO_ACIDS or residue == "?"
+        residue if residue in STANDARD_AMINO_ACIDS else "?"
+        for residue in sequence
     )
 
 
@@ -412,11 +434,15 @@ def analyze_protein_quality(protein):
     if not isinstance(protein, str):
         protein = ""
 
-    sequence = "".join(
+    raw = "".join(
         protein.upper().split()
     )
 
+    terminal_stop = raw.endswith(STOP_SYMBOL)
+    sequence = _strip_terminal_stop(raw)
+
     standard = 0
+    nonstandard = 0
     ambiguous = 0
     invalid = 0
 
@@ -429,7 +455,10 @@ def analyze_protein_quality(protein):
         if residue in STANDARD_AMINO_ACIDS:
             standard += 1
 
-        elif residue == "?":
+        elif residue in NONSTANDARD_RESIDUES:
+            nonstandard += 1
+
+        elif residue in UNRESOLVED_RESIDUES:
             ambiguous += 1
 
         else:
@@ -450,8 +479,14 @@ def analyze_protein_quality(protein):
         "standard_residues":
             standard,
 
+        "nonstandard_residues":
+            nonstandard,
+
         "ambiguous_residues":
             ambiguous,
+
+        "terminal_stop":
+            terminal_stop,
 
         "invalid_residues":
             invalid,
@@ -910,13 +945,17 @@ def analyze_protein(protein):
     }
 
     ambiguous = 0
+    nonstandard_counts = {}
 
     for residue in sequence:
 
         if residue in STANDARD_AMINO_ACIDS:
             counts[residue] += 1
 
-        elif residue == "?":
+        elif residue in NONSTANDARD_RESIDUES:
+            nonstandard_counts[residue] = nonstandard_counts.get(residue, 0) + 1
+
+        elif residue in UNRESOLVED_RESIDUES:
             ambiguous += 1
 
     counts = {
@@ -929,6 +968,9 @@ def analyze_protein(protein):
     return {
         "counts":
             counts,
+
+        "nonstandard_counts":
+            nonstandard_counts,
 
         "ambiguous_count":
             ambiguous,
@@ -999,13 +1041,28 @@ def calculate_protein_molecular_weight(
 
     if translation_analysis is None:
 
+        # B, Z and J give a mass range over their residues; X and "?" leave
+        # the mass undetermined; a terminal "*" is a stop, not a residue.
+        sequence = _strip_terminal_stop("".join(sequence.split()))
         total = WATER_MASS
+        total_min = WATER_MASS
+        total_max = WATER_MASS
         unknown = False
+        ranged = False
 
         for residue in sequence:
 
             if residue in AMINO_ACID_RESIDUE_MASSES:
-                total += AMINO_ACID_RESIDUE_MASSES[residue]
+                mass = AMINO_ACID_RESIDUE_MASSES[residue]
+                total += mass
+                total_min += mass
+                total_max += mass
+            elif residue in AMBIGUOUS_RESIDUE_OPTIONS:
+                masses = [AMINO_ACID_RESIDUE_MASSES[option]
+                          for option in AMBIGUOUS_RESIDUE_OPTIONS[residue]]
+                total_min += min(masses)
+                total_max += max(masses)
+                ranged = True
             else:
                 unknown = True
 
@@ -1019,9 +1076,9 @@ def calculate_protein_molecular_weight(
             }
 
         return {
-            "min": total,
-            "max": total,
-            "ambiguous": False,
+            "min": total_min,
+            "max": total_max,
+            "ambiguous": ranged,
             "undetermined": False,
             "known_mass": total,
         }
@@ -2569,6 +2626,12 @@ def print_protein_report(
         f"{quality['standard_residues']}"
     )
 
+    if quality.get("nonstandard_residues"):
+        print(
+            f"Sec/Pyl (U, O):      "
+            f"{quality['nonstandard_residues']}"
+        )
+
     print(
         f"Ambiguous Residues:  "
         f"{quality['ambiguous_residues']}"
@@ -3463,6 +3526,12 @@ def _protein_quality_block(analysis):
         f"Standard residues:   "
         f"{quality['standard_residues']}"
     )
+
+    if quality.get("nonstandard_residues"):
+        print(
+            f"Sec/Pyl (U, O):      "
+            f"{quality['nonstandard_residues']}"
+        )
 
     print(
         f"Ambiguous residues:  "

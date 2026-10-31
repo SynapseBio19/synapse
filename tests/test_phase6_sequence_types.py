@@ -423,6 +423,82 @@ class InputContractTests(unittest.TestCase):
             api.analyze_protein(DNA_SEQ)
 
 
+# ----------------------------------------------------------------------
+# D14-F6: IUPAC protein codes keep their position and meaning
+# ----------------------------------------------------------------------
+class ProteinResidueCodeTests(unittest.TestCase):
+    BASE = "MKTAYIAKQRQISFVKSHFSRQLEERLGLIEVQ"
+
+    def with_residue(self, residue):
+        return self.BASE[:12] + residue + self.BASE[13:]
+
+    def test_every_code_keeps_its_position(self):
+        from analyses import protein as P
+        for residue in "BZJXUO*?":
+            with self.subTest(residue=residue):
+                positional = P.get_positional_protein(self.with_residue(residue))
+                self.assertEqual(len(positional), len(self.BASE))
+                self.assertEqual(positional[12], "?")
+                self.assertEqual(positional[13:], self.BASE[13:])
+        self.assertEqual(P.get_positional_protein(self.BASE + "*"), self.BASE)
+
+    def test_windows_after_the_code_are_unchanged(self):
+        from analyses import protein as P
+        clean = {w["start"]: w["score"] for w in P.calculate_hydropathy_profile(self.BASE, 9)}
+        coded = {w["start"]: w["score"] for w in P.calculate_hydropathy_profile(self.with_residue("X"), 9)}
+        self.assertEqual(len(coded), len(clean) - 9)  # only the 9 windows covering position 13
+        for start, score in coded.items():
+            self.assertAlmostEqual(score, clean[start])
+
+    def test_quality_categories(self):
+        from analyses import protein as P
+        for residue, key in (("X", "ambiguous_residues"), ("B", "ambiguous_residues"),
+                             ("J", "ambiguous_residues"), ("U", "nonstandard_residues"),
+                             ("O", "nonstandard_residues")):
+            with self.subTest(residue=residue):
+                sequence = self.with_residue(residue)
+                quality = P.analyze_protein_quality(sequence)
+                self.assertEqual((quality[key], quality["invalid_residues"], quality["valid"]), (1, 0, True))
+                self.assertTrue(P.validate_protein_sequence(sequence))
+        internal_stop = P.analyze_protein_quality(self.with_residue("*"))
+        self.assertEqual((internal_stop["invalid_residues"], internal_stop["valid"]), (1, False))
+        terminal = P.analyze_protein_quality(self.BASE + "*")
+        self.assertEqual((terminal["length"], terminal["terminal_stop"], terminal["valid"]),
+                         (len(self.BASE), True, True))
+
+    def test_molecular_weight_ranges(self):
+        from analyses import protein as P
+        M = P.AMINO_ACID_RESIDUE_MASSES
+        base = P.calculate_protein_molecular_weight(self.BASE)
+        without_s = base["min"] - M["S"]
+        for residue, (low, high) in (("B", ("D", "N")), ("Z", ("Q", "E")), ("J", ("I", "L"))):
+            with self.subTest(residue=residue):
+                weight = P.calculate_protein_molecular_weight(self.with_residue(residue))
+                expected = sorted((without_s + M[low], without_s + M[high]))
+                self.assertAlmostEqual(weight["min"], expected[0])
+                self.assertAlmostEqual(weight["max"], expected[1])
+                self.assertTrue(weight["ambiguous"])
+                self.assertFalse(weight["undetermined"])
+        undetermined = P.calculate_protein_molecular_weight(self.with_residue("X"))
+        self.assertEqual((undetermined["min"], undetermined["undetermined"]), (None, True))
+        self.assertAlmostEqual(P.calculate_protein_molecular_weight(self.BASE + "*")["min"], base["min"])
+
+    @unittest.skipUnless(__import__("importlib").util.find_spec("Bio"), "Biopython (reference extra) not installed")
+    def test_sec_and_pyl_masses_agree_with_biopython(self):
+        """External reference comparison: Bio.SeqUtils.molecular_weight (average masses)."""
+        from Bio.Data.IUPACData import protein_weights
+        from Bio.SeqUtils import molecular_weight
+        from analyses import protein as P
+        for residue in "UO":
+            with self.subTest(residue=residue):
+                self.assertAlmostEqual(P.AMINO_ACID_RESIDUE_MASSES[residue],
+                                       protein_weights[residue] - P.WATER_MASS, places=3)
+                sequence = self.with_residue(residue)
+                ours = P.calculate_protein_molecular_weight(sequence)["min"]
+                # The standard-residue tables (ExPASy vs Biopython) differ by < 0.1 Da here.
+                self.assertLess(abs(ours - molecular_weight(sequence, "protein")), 0.1)
+
+
 class MainMenuSequenceTypeTests(unittest.TestCase):
     """End-to-end: the real main.py with a protein, an undetermined, an RNA and an invalid record."""
 
