@@ -12,9 +12,9 @@ verification and report) have not been started. The running record is
 | Item | State |
 |---|---|
 | Branch | `main` |
-| HEAD | `6c20e69` (plus the commit that adds this file) |
+| HEAD | `6f7987b` (see section 7; `642f31b` was the state at the original pause) |
 | Working tree | clean |
-| Tests | 219/219 pass, 0 skipped (`python -m unittest discover -s tests -t .`, ~25 s) |
+| Tests | 228/228 pass, 0 skipped (`python -m unittest discover -s tests -t .`, ~28 s) |
 | Golden master | unchanged since the audit; no snapshot was regenerated |
 | pyright 1.1.414 (`--pythonversion 3.10`) | 132 errors; baseline at `ab4bd2a` was 134; no new diagnostic in any package; the two removed are the S15 call |
 | ReadOnly attributes | restored on all 15 files (see the handover notes in `PHASE6_PROGRESS.md`) |
@@ -80,9 +80,7 @@ S16, S17, S19, S20.
 4. Remaining S-findings: review S1–S6, S8–S14 (audit section 5) and
    correct the confirmed ones; S18 (planner runtime, performance, P2-6);
    S21 (GenBank ORIGIN keeps only letters); S22 (variant reference
-   alphabet unchecked); **S23** (Cas12a `seed_sequence` is the PAM-distal
-   end; the off-target screen already uses the right end – a one-line
-   fix in `_candidate_from_oriented_window` plus a test).
+   alphabet unchecked). **S23, S3, S4 and S5 are done** – see section 7.
 5. Not defects but recorded limitations: RNA module's three-frame codon
    view uses table 1 (P1-9); RID resume (P1-7); planner P3-1; deletion of
    `blast_results/TEST_8_REFERENCE_blast.json` is the owner's decision.
@@ -107,15 +105,77 @@ S16, S17, S19, S20.
 
 1. Read `docs/PHASE6_PROGRESS.md` (handover notes: ReadOnly files, line
    endings, `orf.py` bare-LF lines, pyright comparison) and this file.
-2. Verify: `git status` clean at the commit that adds this file; run the
-   suite (expect 219 OK); pyright 132 errors.
-3. Resume with item 4.1 (D16, safe step only), then 4.4 (S23 and the
-   remaining S-findings), then agree on 4.2/4.3 (D17/D18) with the owner
-   before Stages F–G.
-4. One commit per logical package; `Co-Authored-By: Claude Opus 5.5
-   <noreply@anthropic.com>`; restore ReadOnly after each commit.
+2. Verify: `git status` clean at `6f7987b`; run the suite (expect 228 OK);
+   pyright 132 errors.
+3. Resume with item 4.1 (D16, safe step only), then the remaining
+   S-findings of item 4.4 (S1–S6, S8–S14, S18, S21, S22), then agree on
+   4.2/4.3 (D17/D18) with the owner before Stages F–G.
+4. One commit per logical package; restore ReadOnly after each commit.
+   Attribute each commit to the model that actually performed the work.
 
 Tooling hint for this environment: the Bash tool collapses `\\` in
 heredocs; write edit scripts containing backslashes to a file (Write
 tool) and run them, and write files with `newline="\n"` on Windows to
 keep LF files LF.
+
+---
+
+## 7. Addendum: restricted CRISPR assignment (2026-10-31, Opus 5)
+
+A model safeguard stopped the Opus 5.5 session at the start of the CRISPR
+investigation covering S23, S3, S5 and S4. The owner assigned that single
+blocked task to Opus 5, with an explicit instruction not to expand into
+other Phase 6 work. This addendum records what that assignment produced.
+
+**Scope actually permitted and completed.** All four findings proved
+investigable and correctable without any restricted operation. No
+safeguard was encountered during the work, nothing was bypassed, and no
+task was reframed or split to work around one. The scope was limited by
+the assignment, not by a capability limit.
+
+| Finding | Outcome |
+|---|---|
+| S23 | Confirmed by execution and corrected. `seed_sequence` stored the guide's 3' end for every system; for Cas12a (5' PAM) that is the PAM-distal end. The new shared `pam_proximal_seed()` now serves both the stored seed and the local specificity screen, which had already been correct and therefore disagreed with the stored value. |
+| S3 | Confirmed and corrected. `edit_in_rtt` only compared RTT lengths; it is now a coordinate check that the RTT window covers the edit site. The emission filter already checked the length separately, so the change tightens it without loosening anything. |
+| S4 | Resolved by documentation. No threshold value was changed; each is now either cited or explicitly labelled a Synapse convention. |
+| S5 | Partly confirmed. The "position-independent" concern is **not** a defect: Pol III terminates wherever it meets the T-tract. The genuine gap was the missing name and source, now supplied. The threshold was deliberately left unchanged. |
+
+**Evidence.** Literature verified through PubMed rather than from memory:
+Sternberg 2014 (PMID 24476820), Komor 2016 (PMID 27096365), Gaudelli 2017
+(PMID 29160308), Anzalone 2019 (PMID 31634902), Verosloff 2021
+(PMID 33811918). Nine regression tests were added. No external tool
+execution was required for these findings, and none was claimed.
+
+**Remaining limitations, deliberately not addressed here.**
+
+1. The prime-editing RTT is still the **reference** template and does not
+   encode the alternative allele, so it is not a ready-to-use pegRNA RTT.
+   This is now stated in every candidate's notes and in METHODS. Emitting
+   an edited RTT is a functional extension beyond S3 and needs an owner
+   decision, because it changes what the module offers.
+2. The exported field is still named `edit_in_rtt` although it now means
+   "the RTT window spans the edit site". Renaming an export key belongs to
+   the D18 terminology work package, which was out of scope here.
+3. The seed length (8 nt) and the GC/homopolymer thresholds remain Synapse
+   conventions. Deriving tool-specific values would require a benchmark
+   that was not part of this assignment.
+4. S5 was not turned into a position-dependent or promoter-aware check,
+   because the evidence does not support a sharper rule: termination
+   efficiency at U6 depends on tract length and on upstream RNA secondary
+   structure, neither of which Synapse models.
+
+**Incident during this assignment.** While updating this report, a
+one-line Python command truncated it to an empty file: the destination was
+opened for writing, which truncates, before the argument that read it was
+evaluated. The file was unmodified in Git at that moment, so
+`git checkout -- docs/PHASE6_HANDOVER.md` restored it completely and no
+committed work was lost. Recorded here because the master prompt requires
+that problems be reported rather than quietly repaired.
+
+**State at the end of this assignment.** HEAD as recorded in section 1,
+working tree clean, 228/228 tests pass, pyright 132 errors with no new
+diagnostics, golden master unchanged, ReadOnly restored on
+`analyses/crispr.py`.
+
+**Next.** The main Phase 6 programme remains with Opus 5.5 and resumes at
+section 6 above, with S23, S3, S4 and S5 removed from the open list.
