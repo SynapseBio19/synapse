@@ -1240,3 +1240,53 @@ interrupted the Opus 5.5 session at the start of this investigation.
   top-level loop and exactly one `__main__` guard calling `main()`. The
   existing smoke tests still drive `python main.py` end to end.
   Suite 265 -> 267.
+
+## Phase 6 - Stage F: terminal UI standardization (2026-11-01)
+
+### D17 One visual language for every terminal interface
+
+A mechanical inventory of `analyses/`, `ui/`, `core/` and `main.py`
+measured the problem before anything was changed: **11 separator widths**
+(42, 45, 58, 60, 65, 68, 70, 72, 78, 88, 90) across 389 literal sites,
+**7 meanings for `[0]`**, and three spellings of the error prefix. BLAST
+framed its screens at 90 columns, literature at 88, CRISPR at 78.
+
+- **`ui/style.py`** is the new single source of the visual language:
+  rules, headers, sections, aligned fields, menu entries, navigation
+  entries, input prompts and message prefixes. It holds no scientific
+  logic and imports nothing from `analyses/`, `core/`, `data/` or
+  `fileio/`.
+- **One width.** `RULE_WIDTH` is 70 - the width already most common, and
+  it fits an 80-column terminal. 382 literals in 16 files now call
+  `major_rule()` or `minor_rule()`; the inventory reports zero remaining
+  distinct widths. `blast._line()` and `crispr._line()` stay as local
+  shorthands but default to the shared width instead of 90 and 78.
+- **One meaning for `[0]`: leave the screen.** `Back` in a menu, `Cancel`
+  in a dialog that would otherwise commit, `Exit` in the main menu only.
+  Four entries were corrected: `orf.py` "Apply and return" (settings are
+  applied as they are changed, so it was always a Back), `literature.py`
+  "Back / Exit", `main.py` "Choose another sequence" (now "Cancel" with
+  its effect named), and `mutation.py` "Enter sequence manually", which
+  was a choice rather than an exit and moved to `[M]`.
+- **One prefix per message category:** `ERROR:`, `WARNING:`, `NOTE:`,
+  `OK:`. Eight `Error:` and one `Note:` variant were corrected. Scientific
+  wording stays module-specific; result flags such as `WARN: poly-T run`
+  are data, not interface messages, and are untouched.
+- **Two deliberate exceptions, documented in place and in the standard:**
+  the ORF candidate table draws a rule that spans its own table and uses
+  the standard width as a floor; `core/pipeline.py` prints terminal output
+  from inside `core/` and takes `ui.style` through function-local imports
+  so `core` keeps no module-level dependency on `ui`.
+- **One known deviation, recorded rather than hidden:**
+  `mutation._prompt_sequence` now offers no `[0]`, because a real cancel
+  needs a cancel contract and four call sites changed - a control-flow
+  change, not a presentation one.
+- `docs/TERMINAL_UI_STANDARD.md` documents the standard with the measured
+  before/after. `tests/test_terminal_ui.py` enforces it across the whole
+  project: no separator literal outside `ui/style.py`, `[0]` restricted to
+  the three navigation verbs, `Exit` only in the main menu, no prefix
+  variants, and the layering of `ui.style` and `core`. The checks were
+  verified against deliberate violations before being relied on.
+- No wording of a scientific statement, no menu structure and no
+  analytical output changed. Suite 267 -> 277; golden master unchanged;
+  pyright 112 with no new diagnostics.

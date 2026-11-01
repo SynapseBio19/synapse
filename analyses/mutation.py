@@ -3705,7 +3705,7 @@ def _prompt_sequence(
             )
 
         print(
-            "[0] Enter sequence manually"
+            "[M] Enter sequence manually"
         )
 
         print(
@@ -3718,7 +3718,7 @@ def _prompt_sequence(
                 f"{prompt} selection: "
             ).strip()
 
-            if choice == "0":
+            if choice.upper() == "M":
                 break
 
             if (

@@ -2204,7 +2204,7 @@ def _interactive_menu(context: Optional[dict[str, Any]] = None) -> None:
 
         print("[4] Data Sources & Scientific Limitations")
 
-        print("[0] Back / Exit")
+        print("[0] Back")
 
         choice = input("Selection: ").strip()
 

@@ -3233,7 +3233,7 @@ def _orf_settings_menu(settings):
         print(f"[8] Genetic code:        {_genetic_code_name(settings.get('genetic_code', 1))}")
         print("[6] Restore Synapse defaults (ORFfinder-style)")
         print("[7] Restore legacy settings (before 2026-10-29)")
-        print("[0] Apply and return")
+        print("[0] Back")
         print()
         print("Defaults follow NCBI ORFfinder conventions (75 nt, ATG only,")
         print("one ORF per stop). They are screening conventions, not")

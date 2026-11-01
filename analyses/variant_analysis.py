@@ -2588,7 +2588,7 @@ def run_variant_analysis_ui(
                 refresh_result()
                 print(f"Loaded {len(working)} variant(s).")
             except (VariantAnalysisError, ValueError) as error:
-                print(f"Error: {error}")
+                print(f"ERROR: {error}")
 
         elif choice == "2":
             try:
@@ -2600,7 +2600,7 @@ def run_variant_analysis_ui(
                 refresh_result()
                 print(f"Added: {format_variant(variant)}")
             except VariantAnalysisError as error:
-                print(f"Error: {error}")
+                print(f"ERROR: {error}")
 
         elif choice == "3":
             if not working:
@@ -2612,7 +2612,7 @@ def run_variant_analysis_ui(
                     print()
                     print_variant_report(result)
             except VariantAnalysisError as error:
-                print(f"Error: {error}")
+                print(f"ERROR: {error}")
 
         elif choice == "4":
             if not working:
@@ -2624,7 +2624,7 @@ def run_variant_analysis_ui(
                 filtered_view = list(last_filter_result.passed)
                 _print_filter_result(last_filter_result)
             except VariantAnalysisError as error:
-                print(f"Error: {error}")
+                print(f"ERROR: {error}")
 
         elif choice == "5":
             if not working:
@@ -2659,7 +2659,7 @@ def run_variant_analysis_ui(
                 for v in comparison.only_in_right:
                     print(f"  - {format_variant(v)}")
             except (VariantAnalysisError, ValueError) as error:
-                print(f"Error: {error}")
+                print(f"ERROR: {error}")
 
         elif choice == "6":
             if not working:
@@ -2738,7 +2738,7 @@ def run_variant_analysis_ui(
                     f"{without_reference} without one (common bases trimmed only)."
                 )
             except VariantAnalysisError as error:
-                print(f"Error: {error}")
+                print(f"ERROR: {error}")
 
         elif choice == "9":
             if not working:
@@ -2749,7 +2749,7 @@ def run_variant_analysis_ui(
                 write_vcf(working, filename, metadata=metadata, sample_names=sample_names)
                 print(f"VCF exported: {filename}")
             except OSError as error:
-                print(f"Error writing VCF: {error}")
+                print(f"ERROR: could not write the VCF file: {error}")
 
         elif choice == "10":
             if not working:
@@ -2761,7 +2761,7 @@ def run_variant_analysis_ui(
                     handle.write(variants_to_tsv(working))
                 print(f"TSV exported: {filename}")
             except OSError as error:
-                print(f"Error writing TSV: {error}")
+                print(f"ERROR: could not write the TSV file: {error}")
 
         elif choice == "11":
             if not working:

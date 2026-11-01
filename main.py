@@ -243,7 +243,7 @@ def resolve_sequence_type(record):
         print("\n[1] DNA")
         print("[2] RNA")
         print("[3] Protein")
-        print("[0] Choose another sequence")
+        print("[0] Cancel (choose another sequence)")
         choice = input("\nSequence type: ").strip()
         if choice == "0":
             return None

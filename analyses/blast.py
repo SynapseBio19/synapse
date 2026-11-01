@@ -4810,7 +4810,7 @@ def blast_menu(
                 f"{resumed.query.sequence_type.lower()})."
             )
             for note in resumed.metadata.warnings:
-                print(f"Note: {note}")
+                print(f"NOTE: {note}")
 
         else:
             print("Invalid selection.")

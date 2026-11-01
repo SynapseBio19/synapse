@@ -527,7 +527,7 @@ P2-1 records. `analyses/primer.py` is 5,412 lines, the largest module in
 the project, and its public surface no longer reflects its structure.
 
 ### D17 – The terminal interfaces share no visual language
-**all modules** · CONFIRMED · interface
+**all modules** · CONFIRMED · interface · **corrected 2026-11-01 (Stage F)**: one width through `ui/style.py` (11 → 1), `[0]` restricted to Back/Cancel/Exit (7 meanings → 3), uniform message prefixes; documented in `docs/TERMINAL_UI_STANDARD.md` and enforced by `tests/test_terminal_ui.py`
 
 Mechanically counted separator literals (`"=" * n`, `"-" * n`):
 
