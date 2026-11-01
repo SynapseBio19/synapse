@@ -894,7 +894,7 @@ class BlastResumeTests(unittest.TestCase):
         from analyses import blast as B
         source = inspect.getsource(B.blast_menu)
         self.assertIn("Resume Search by Request ID", source)
-        self.assertIn('choice == "14"', source)
+        self.assertIn('choice == "2"', source)
 
 
 # ----------------------------------------------------------------------

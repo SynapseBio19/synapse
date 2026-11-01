@@ -1290,3 +1290,21 @@ framed its screens at 90 columns, literature at 88, CRISPR at 78.
 - No wording of a scientific statement, no menu structure and no
   analytical output changed. Suite 267 -> 277; golden master unchanged;
   pyright 112 with no new diagnostics.
+
+### Stage F: the BLAST menu reads in order again
+
+The RID resume entry added for P1-7 had been given the next free number,
+`[14]`, inside the SEARCH block, so that block read 1, 2, 3, 14. Stage F
+is where a coherent renumbering belongs, so the whole menu was reordered
+to follow the work rather than the order features were added: run,
+resume, configure, manage; then result analysis; then output; then
+system. Numbers now run 1-14 with `[0] Back`.
+
+Both the printed labels and the dispatch branches were rewritten from one
+mapping, and each branch was checked against its new label. The rewrite
+was scoped to `blast_menu` by its AST bounds, because `analyses/blast.py`
+contains several other numbered sub-dialogs that must not shift.
+
+`tests/test_terminal_ui.py` now also checks that a menu's numbers are
+contiguous and that every entry has a branch and every branch an entry,
+for both the BLAST menu and the main menu.

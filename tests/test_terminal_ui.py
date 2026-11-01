@@ -88,6 +88,46 @@ class NavigationTests(unittest.TestCase):
         self.assertFalse(style.is_back(""))
 
 
+class MenuNumberingTests(unittest.TestCase):
+    """A menu's numbers must run in order and every one must be handled."""
+
+    def _menu_source(self, module: str, function: str) -> str:
+        source = read(PROJECT_ROOT / module)
+        tree = ast.parse(source)
+        node = next(n for n in tree.body
+                    if isinstance(n, ast.FunctionDef) and n.name == function)
+        return "\n".join(source.split("\n")[node.lineno - 1:node.end_lineno])
+
+    def test_blast_menu_is_contiguous_and_fully_dispatched(self):
+        body = self._menu_source("analyses/blast.py", "blast_menu")
+        # Entries of the top-level menu, up to and including [0].
+        labels, seen_back = [], False
+        for key, _label in re.findall(r'print\("\[(\d+)\] ([^"]+)"\)', body):
+            if seen_back:
+                break            # anything after [0] belongs to a sub-dialog
+            if key == "0":
+                seen_back = True
+            else:
+                labels.append(int(key))
+        self.assertEqual(labels, list(range(1, len(labels) + 1)),
+                         f"BLAST menu numbers must be contiguous: {labels}")
+        dispatched = {
+            int(key) for key in
+            re.findall(r'\n        (?:el)?if choice == "(\d+)":', body)
+            if key != "0"
+        }
+        self.assertEqual(dispatched, set(labels),
+                         "every BLAST menu entry must have a branch and vice versa")
+
+    def test_the_main_menu_is_contiguous(self):
+        body = read(PROJECT_ROOT / "ui" / "menu.py")
+        # [0] is navigation and sits last, so it is not part of the sequence.
+        numbers = [int(k) for k in re.findall(r'print\("\[(\d+)\]', body) if k != "0"]
+        self.assertEqual(numbers, list(range(1, len(numbers) + 1)),
+                         f"main menu numbers must be contiguous: {numbers}")
+        self.assertIn('print("[0] Exit")', body)
+
+
 class MessageTests(unittest.TestCase):
     def test_message_prefixes_are_uniform(self):
         offenders = []

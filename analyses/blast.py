@@ -4294,25 +4294,25 @@ def blast_menu(
         print()
         print("SEARCH")
         print("[1] Run BLAST Search")
-        print("[2] Search Configuration")
-        print("[3] BLAST Database Manager")
-        print("[14] Resume Search by Request ID (RID)")
+        print("[2] Resume Search by Request ID (RID)")
+        print("[3] Search Configuration")
+        print("[4] BLAST Database Manager")
         print()
         print("RESULT ANALYSIS")
-        print("[4] Result Summary")
-        print("[5] Hit Detail & Alignment")
-        print("[6] Evidence Profile")
-        print("[7] Taxonomic Overview")
-        print("[8] Compare BLAST Runs")
+        print("[5] Result Summary")
+        print("[6] Hit Detail & Alignment")
+        print("[7] Evidence Profile")
+        print("[8] Taxonomic Overview")
+        print("[9] Compare BLAST Runs")
         print()
         print("OUTPUT")
-        print("[9] Export Results")
-        print("[10] Full BLAST Report")
+        print("[10] Export Results")
+        print("[11] Full BLAST Report")
         print()
         print("SYSTEM")
-        print("[11] BLAST Self-Test")
-        print("[12] Supported Programs & Databases")
-        print("[13] Database Status")
+        print("[12] BLAST Self-Test")
+        print("[13] Supported Programs & Databases")
+        print("[14] Database Status")
         print("[0] Back")
         print(_line())
 
@@ -4577,7 +4577,7 @@ def blast_menu(
             except (BlastAnalysisError, AssertionError) as exc:
                 print(f"ERROR: {exc}")
 
-        elif choice == "2":
+        elif choice == "3":
             print("\r\nSEARCH CONFIGURATION")
             print(_line())
             print("Supported programs:")
@@ -4598,17 +4598,17 @@ def blast_menu(
                 "Local searches use installed BLAST+ executables."
             )
 
-        elif choice == "3":
+        elif choice == "4":
             blast_database_manager_menu(manager)
             manager = LocalBlastDatabaseManager(root=manager.root)
 
-        elif choice == "4":
+        elif choice == "5":
             if not last_run:
                 print("Run [1] BLAST Search first.")
                 continue
             print_hit_summary(last_run)
 
-        elif choice == "5":
+        elif choice == "6":
             if not last_run or not last_run.hits:
                 print("No BLAST hits available.")
                 continue
@@ -4634,7 +4634,7 @@ def blast_menu(
             except (ValueError, IndexError, BlastAnalysisError) as exc:
                 print(f"ERROR: {exc}")
 
-        elif choice == "6":
+        elif choice == "7":
             if not last_run:
                 print("Run [1] BLAST Search first.")
                 continue
@@ -4650,7 +4650,7 @@ def blast_menu(
                 for note in profile.notes:
                     print(f"    - {note}")
 
-        elif choice == "7":
+        elif choice == "8":
             if not last_run:
                 print("Run [1] BLAST Search first.")
                 continue
@@ -4695,7 +4695,7 @@ def blast_menu(
                     "fields were not present in the returned result."
                 )
 
-        elif choice == "8":
+        elif choice == "9":
             if not last_run:
                 print("Run [1] BLAST Search first.")
                 continue
@@ -4716,7 +4716,7 @@ def blast_menu(
             print(f"Unique to A:   {len(comparison.unique_to_a)}")
             print(f"Unique to B:   {len(comparison.unique_to_b)}")
 
-        elif choice == "9":
+        elif choice == "10":
             if not last_run:
                 print("Run [1] BLAST Search first.")
                 continue
@@ -4741,16 +4741,16 @@ def blast_menu(
             except OSError as exc:
                 print(f"Export failed: {exc}")
 
-        elif choice == "10":
+        elif choice == "11":
             if not last_run:
                 print("Run [1] BLAST Search first.")
             else:
                 print(build_text_report(last_run))
 
-        elif choice == "11":
+        elif choice == "12":
             run_self_test(verbose=True)
 
-        elif choice == "12":
+        elif choice == "13":
             print("\r\nBLAST PROGRAMS")
             print(_line())
             for name, info in PROGRAMS.items():
@@ -4774,10 +4774,10 @@ def blast_menu(
                     f"{info['description']}"
                 )
 
-        elif choice == "13":
+        elif choice == "14":
             _print_local_database_status(manager)
 
-        elif choice == "14":
+        elif choice == "2":
             # P1-7: collect a search submitted earlier instead of repeating it.
             print("\r\nRESUME A PREVIOUS SEARCH")
             print(

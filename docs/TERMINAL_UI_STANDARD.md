@@ -162,5 +162,21 @@ menus from the analysis modules is the remaining part of audit item P2-2.
 4. No `Error:`/`Warning:` prefix variants in user-facing messages.
 5. `ui/style.py` imports nothing from `analyses/` or `core/`, so the
    presentation layer stays free of scientific logic.
+6. Menu numbers are contiguous, and every entry has a dispatch branch
+   and every branch an entry (BLAST menu and main menu).
+
+## 8. Numbering
+
+Numbers follow the order of the work, not the order features were
+added. When a new entry belongs in the middle of a group, the group is
+renumbered rather than given the next free number at the end: the BLAST
+menu's SEARCH block briefly read 1, 2, 3, 14 after the resume entry was
+added, and now reads 1, 2, 3, 4.
+
+Renumbering means rewriting the printed labels and the dispatch
+branches from one mapping, and checking each branch against its new
+label. In `analyses/blast.py` the rewrite must be scoped to
+`blast_menu` by its AST bounds, because the file contains several other
+numbered sub-dialogs that must not shift.
 
 A change that breaks the standard fails the suite.

@@ -83,6 +83,7 @@ IUPAC, gapped and invalid input (D14):
 | 27 | S13 session moved into `main()` behind a `__main__` guard | this package | `git diff -w` shows only the 12 added lines; fresh-interpreter import test | Corrected; suite 267/267; S24 recorded |
 
 | 28 | Stage F: one separator width through `ui/style.py` (11 -> 1); `[0]` means Back/Cancel/Exit only (7 -> 3); uniform message prefixes; `TERMINAL_UI_STANDARD.md`; enforcement tests | `5db21ab` + this package | interface inventory before and after; enforcement tests verified against deliberate violations | D17 corrected; suite 277/277 |
+| 29 | Stage F: BLAST menu renumbered so SEARCH reads 1-4 instead of 1, 2, 3, 14; numbering rule documented and enforced | this package | each branch checked against its new label; contiguity test for the BLAST and main menus | Corrected; suite 279/279 |
 
 ## Paused (2026-10-31)
 
