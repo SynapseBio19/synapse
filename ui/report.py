@@ -4,6 +4,7 @@ from analyses.sequence import (
     calculate_profile_statistics,
     calculate_average_dna_molecular_weight,
 )
+from ui.style import major_rule, minor_rule
 
 
 # ============================================================
@@ -220,9 +221,9 @@ def print_results(
     # ========================================================
 
     print()
-    print("=" * 70)
+    print(major_rule())
     print("SEQUENCE OVERVIEW")
-    print("=" * 70)
+    print(major_rule())
 
     # ========================================================
     # SEQUENCE INFORMATION
@@ -230,7 +231,7 @@ def print_results(
 
     print()
     print("Sequence Information")
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Sequence:            "
@@ -264,7 +265,7 @@ def print_results(
 
     print()
     print("Sequence Statistics")
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Length:               "
@@ -302,7 +303,7 @@ def print_results(
 
     print()
     print("Sequence Summary")
-    print("-" * 45)
+    print(minor_rule())
 
     if sequence_quality["invalid_symbols"] > 0:
 
@@ -367,7 +368,7 @@ def print_results(
 
     print()
     print("GC / AT Content")
-    print("-" * 45)
+    print(minor_rule())
 
     if content_ranges["ambiguous"]:
 
@@ -406,7 +407,7 @@ def print_results(
 
     print()
     print("Nucleotide Composition")
-    print("-" * 45)
+    print(minor_rule())
 
     for base in (
         "A",
@@ -427,7 +428,7 @@ def print_results(
 
     print()
     print("Nucleotide Skew")
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"GC Skew:             "
@@ -451,7 +452,7 @@ def print_results(
 
     print()
     print("Molecular Weight")
-    print("-" * 45)
+    print(minor_rule())
 
     if molecular_weight["ambiguous"]:
 
@@ -484,7 +485,7 @@ def print_results(
 
     print()
     print("GC Content Profile")
-    print("-" * 45)
+    print(minor_rule())
 
     if len(dna) < profile_window:
 
@@ -514,7 +515,7 @@ def print_results(
 
         print()
         print("Profile Preview")
-        print("-" * 45)
+        print(minor_rule())
 
         preview_points = (
             gc_profile[::max(
@@ -547,7 +548,7 @@ def print_results(
 
     print()
     print("Sequence Complexity Profile")
-    print("-" * 45)
+    print(minor_rule())
 
     if len(dna) < profile_window:
 
@@ -576,7 +577,7 @@ def print_results(
 
         print()
         print("Profile Preview")
-        print("-" * 45)
+        print(minor_rule())
 
         preview_points = (
             complexity_profile[::max(
@@ -599,7 +600,7 @@ def print_results(
 
     print()
     print("Homopolymers")
-    print("-" * 45)
+    print(minor_rule())
 
     if homopolymers:
 
@@ -632,7 +633,7 @@ def print_results(
 
     print()
     print("CpG Analysis")
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"CpG Count:           "
@@ -660,7 +661,7 @@ def print_results(
 
     print()
     print("CpG Islands")
-    print("-" * 45)
+    print(minor_rule())
 
     _print_cpg_criteria()
 
@@ -702,7 +703,7 @@ def print_results(
 
     print()
     print("Sequence Quality")
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Standard Bases:      "
@@ -767,7 +768,7 @@ def print_results(
 
     print()
     print("IUPAC / Ambiguous Bases")
-    print("-" * 45)
+    print(minor_rule())
 
     if ambiguous_counts:
 
@@ -793,7 +794,7 @@ def print_results(
 
     print()
     print("Complementary Sequences")
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         "Original:             5' -> 3'"
@@ -821,7 +822,7 @@ def print_results(
 
     print()
     print("Sequence Preview")
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"5' -> 3':            "
@@ -840,7 +841,7 @@ def print_results(
 
     print()
     print("Interpretation")
-    print("-" * 45)
+    print(minor_rule())
 
     if sequence_quality["invalid_symbols"] > 0:
 
@@ -937,4 +938,4 @@ def print_results(
     )
 
     print()
-    print("=" * 70)
+    print(major_rule())

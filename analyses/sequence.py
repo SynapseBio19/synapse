@@ -1,4 +1,5 @@
 import math
+from ui.style import major_rule, minor_rule
 
 
 # ============================================================
@@ -2464,9 +2465,9 @@ if __name__ == "__main__":
 
     self_test = run_sequence_self_test()
 
-    print("=" * 60)
+    print(major_rule())
     print("SYNAPSE SEQUENCE ENGINE SELF-TEST")
-    print("=" * 60)
+    print(major_rule())
 
     for name, passed in self_test.items():
 
@@ -2475,7 +2476,7 @@ if __name__ == "__main__":
             f"{'PASS' if passed else 'FAIL'}"
         )
 
-    print("-" * 60)
+    print(minor_rule())
 
     if all(
         self_test.values()

@@ -40,6 +40,7 @@ import math
 import re
 import statistics
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Set, Tuple
+from ui.style import major_rule, minor_rule
 
 
 # ============================================================================
@@ -1909,15 +1910,15 @@ def build_variant_report(
     s = result.statistics
 
     lines = [
-        "=" * 70,
+        major_rule(),
         "SYNAPSE VARIANT ANALYSIS",
-        "=" * 70,
+        major_rule(),
         f"Analysis:          {result.name}",
         f"Total variants:    {s.total_variants}",
         f"Unique variants:   {s.unique_variants}",
         "",
         "VARIANT TYPES",
-        "-" * 70,
+        minor_rule(),
         f"SNVs:              {s.snvs}",
         f"MNVs:              {s.mnvs}",
         f"Insertions:        {s.insertions}",
@@ -1927,7 +1928,7 @@ def build_variant_report(
         f"Symbolic:          {s.symbolic}",
         "",
         "QUALITY",
-        "-" * 70,
+        minor_rule(),
         f"PASS:              {s.passed_filters}",
         f"Failed filters:    {s.failed_filters}",
         f"Not filtered (.):  {s.unfiltered}",
@@ -1938,19 +1939,19 @@ def build_variant_report(
         f"Max QUAL:          {'.' if s.max_quality is None else f'{s.max_quality:.2f}'}",
         "",
         "ALLELE FREQUENCY",
-        "-" * 70,
+        minor_rule(),
         f"Mean AF:           {'.' if s.mean_allele_frequency is None else f'{s.mean_allele_frequency:.5f}'}",
         f"Median AF:         {'.' if s.median_allele_frequency is None else f'{s.median_allele_frequency:.5f}'}",
         f"Rare variants:     {s.rare_variants}",
         "",
         "ANNOTATION",
-        "-" * 70,
+        minor_rule(),
         f"Genes affected:    {s.genes_affected}",
         f"Chromosomes:       {s.chromosomes_affected}",
     ]
 
     if s.consequence_counts:
-        lines.extend(["", "CONSEQUENCES", "-" * 70])
+        lines.extend(["", "CONSEQUENCES", minor_rule()])
         for consequence, count in sorted(
             s.consequence_counts.items(),
             key=lambda item: (-item[1], item[0]),
@@ -1965,13 +1966,13 @@ def build_variant_report(
     lines.extend([
         "",
         "SUBSTITUTION SPECTRUM",
-        "-" * 70,
+        minor_rule(),
         f"Transitions:       {s.transition_count}",
         f"Transversions:     {s.transversion_count}",
         f"Ti/Tv ratio:       {ratio}",
         "",
         "VARIANTS",
-        "-" * 70,
+        minor_rule(),
     ])
 
     listed = result.variants if max_variants is None else result.variants[:max_variants]
@@ -1993,7 +1994,7 @@ def build_variant_report(
         lines.extend([
             "",
             "FILTER RESULT",
-            "-" * 70,
+            minor_rule(),
             f"Passed:            {len(result.filter_result.passed)}",
             f"Failed:            {len(result.filter_result.failed)}",
         ])
@@ -2003,17 +2004,17 @@ def build_variant_report(
         lines.extend([
             "",
             "COHORT",
-            "-" * 70,
+            minor_rule(),
             f"Samples:            {c.sample_count}",
             f"Shared variants:    {c.shared_variant_count}",
             f"Private variants:   {c.private_variant_count}",
         ])
 
     if result.notes:
-        lines.extend(["", "NOTES", "-" * 70])
+        lines.extend(["", "NOTES", minor_rule()])
         lines.extend(f"- {note}" for note in result.notes)
 
-    lines.append("=" * 70)
+    lines.append(major_rule())
     return "\n".join(lines)
 
 
@@ -2414,9 +2415,9 @@ def _prompt_variant() -> Variant:
 
 def _prompt_filter() -> VariantFilter:
     print()
-    print("=" * 70)
+    print(major_rule())
     print("VARIANT FILTER")
-    print("=" * 70)
+    print(major_rule())
 
     quality_text = input("Minimum QUAL (Enter for none): ").strip()
     minimum_quality = parse_float(quality_text)
@@ -2459,7 +2460,7 @@ def _print_filter_result(result: VariantFilterResult) -> None:
     if result.failed:
         print()
         print("FILTER FAILURES")
-        print("-" * 70)
+        print(minor_rule())
         for variant in result.failed:
             reasons = result.reasons.get(variant.key, [])
             print(f"{format_variant(variant)}")
@@ -2540,9 +2541,9 @@ def run_variant_analysis_ui(
 
     while True:
         print()
-        print("=" * 70)
+        print(major_rule())
         print("VARIANT ANALYSIS")
-        print("=" * 70)
+        print(major_rule())
         print()
         print(f"Loaded variants: {len(working)}")
         if filtered_view is not None:
@@ -2569,7 +2570,7 @@ def run_variant_analysis_ui(
         print("[12] Run Variant Self-Test")
         print()
         print("[0] Back")
-        print("-" * 70)
+        print(minor_rule())
 
         choice = input("Selection: ").strip()
 
@@ -2643,9 +2644,9 @@ def run_variant_analysis_ui(
                 right, _, _ = parse_vcf("\n".join(lines))
                 comparison = compare_variant_sets(working, right)
                 print()
-                print("=" * 70)
+                print(major_rule())
                 print("VARIANT SET COMPARISON")
-                print("=" * 70)
+                print(major_rule())
                 print(f"Left variants:     {comparison.left_count}")
                 print(f"Right variants:    {comparison.right_count}")
                 print(f"Shared variants:   {comparison.shared_count}")
@@ -2666,9 +2667,9 @@ def run_variant_analysis_ui(
                 continue
             stats = calculate_variant_statistics(working)
             print()
-            print("=" * 70)
+            print(major_rule())
             print("VARIANT STATISTICS")
-            print("=" * 70)
+            print(major_rule())
             print(f"Total:              {stats.total_variants}")
             print(f"Unique:             {stats.unique_variants}")
             print(f"SNVs:               {stats.snvs}")
@@ -2694,9 +2695,9 @@ def run_variant_analysis_ui(
                 continue
             cohort = calculate_cohort_summary(working)
             print()
-            print("=" * 70)
+            print(major_rule())
             print("COHORT / SAMPLE ANALYSIS")
-            print("=" * 70)
+            print(major_rule())
             print(f"Samples:            {cohort.sample_count}")
             print(f"Shared variants:    {cohort.shared_variant_count}")
             print(f"Private variants:   {cohort.private_variant_count}")
@@ -2774,12 +2775,12 @@ def run_variant_analysis_ui(
         elif choice == "12":
             tests = run_variant_analysis_self_test()
             print()
-            print("=" * 70)
+            print(major_rule())
             print("VARIANT ANALYSIS SELF-TEST")
-            print("=" * 70)
+            print(major_rule())
             for test_name, passed in tests.items():
                 print(f"[{'PASS' if passed else 'FAIL'}] {test_name}")
-            print("-" * 70)
+            print(minor_rule())
             print(f"{sum(tests.values())}/{len(tests)} tests passed.")
 
         else:
@@ -2882,12 +2883,12 @@ __all__ = [
 if __name__ == "__main__":
     tests = run_variant_analysis_self_test()
     passed = sum(tests.values())
-    print("=" * 70)
+    print(major_rule())
     print("SYNAPSE VARIANT ANALYSIS SELF-TEST")
-    print("=" * 70)
+    print(major_rule())
     for name, success in tests.items():
         print(f"[{'PASS' if success else 'FAIL'}] {name}")
-    print("-" * 70)
+    print(minor_rule())
     print(f"{passed}/{len(tests)} tests passed.")
     if passed != len(tests):
         raise SystemExit(1)

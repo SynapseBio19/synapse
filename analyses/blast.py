@@ -82,6 +82,7 @@ from core.alphabets import (
     classify_sequence,
     declared_type_from_molecule,
 )
+from ui.style import RULE_WIDTH, major_rule, minor_rule
 
 
 # ============================================================================
@@ -3697,9 +3698,9 @@ def export_csv(run: BlastRun, path: str | Path) -> str:
 
 def build_text_report(run: BlastRun) -> str:
     lines = [
-        "=" * 90,
+        major_rule(),
         "SYNAPSE BLAST REPORT",
-        "=" * 90,
+        major_rule(),
         f"Query:            {run.query.name}",
         f"Query type:       {run.query.sequence_type}",
         f"Query length:     {run.query.length}",
@@ -3712,7 +3713,7 @@ def build_text_report(run: BlastRun) -> str:
         f"Significant hits: {run.significant_hit_count}",
         "",
         "TOP HITS",
-        "-" * 90,
+        minor_rule(),
     ]
 
     for index, hit in enumerate(rank_hits(run.hits)[:20], start=1):
@@ -3731,11 +3732,11 @@ def build_text_report(run: BlastRun) -> str:
     lines.extend(
         [
             "SCIENTIFIC INTERPRETATION NOTES",
-            "-" * 90,
+            minor_rule(),
             *[f"- {note}" for note in run.interpretation_notes],
             "",
             "RUN METADATA",
-            "-" * 90,
+            minor_rule(),
             json.dumps(asdict(run.metadata), indent=2, ensure_ascii=False),
         ]
     )
@@ -3798,7 +3799,8 @@ def compare_blast_runs(run_a: BlastRun, run_b: BlastRun) -> BlastComparison:
 # DISPLAY
 # ============================================================================
 
-def _line(char: str = "-", width: int = 90) -> str:
+def _line(char: str = "-", width: int = RULE_WIDTH) -> str:
+    # Kept as a local shorthand; the width is the shared one (Stage F).
     return char * width
 
 

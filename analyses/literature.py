@@ -43,6 +43,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from typing import Any, Optional
+from ui.style import major_rule, minor_rule
 
 MODULE_NAME = "Synapse Literature Intelligence"
 
@@ -1759,11 +1760,11 @@ def export_results(run: LiteratureSearchRun, path: str | Path) -> Path:
 
 def print_results(run: LiteratureSearchRun, limit: int = 10) -> None:
 
-    print("\n" + "=" * 88)
+    print("\n" + major_rule())
 
     print("SYNAPSE LITERATURE SEARCH RESULTS")
 
-    print("=" * 88)
+    print(major_rule())
 
     print(f"Query: {run.query.query}")
 
@@ -1773,7 +1774,7 @@ def print_results(run: LiteratureSearchRun, limit: int = 10) -> None:
 
     print(f"Unique articles: {len(run.articles)}")
 
-    print("-" * 88)
+    print(minor_rule())
 
     for index, article in enumerate(run.articles[:limit], 1):
 
@@ -1838,11 +1839,11 @@ def print_article_detail(run: LiteratureSearchRun, article_index: int) -> None:
 
     article = run.articles[article_index - 1]
 
-    print("\n" + "=" * 88)
+    print("\n" + major_rule())
 
     print("LITERATURE ARTICLE DETAIL")
 
-    print("=" * 88)
+    print(major_rule())
 
     print(f"Title: {article.title}")
 

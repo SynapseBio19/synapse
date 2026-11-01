@@ -3,6 +3,7 @@ from collections import Counter
 
 from analyses.sequence import get_reverse_complement
 from core.seqtools import codon_dict
+from ui.style import RULE_WIDTH, major_rule, minor_rule
 
 
 # ============================================================
@@ -1946,9 +1947,9 @@ def print_orf_report(
 ):
 
     print()
-    print("=" * 70)
+    print(major_rule())
     print("ORF ANALYSIS")
-    print("=" * 70)
+    print(major_rule())
 
     print(
         f"\nMinimum ORF Length: "
@@ -1960,7 +1961,7 @@ def print_orf_report(
         print("\nNo ORFs found.")
 
         print("\nORF Definition")
-        print("-" * 45)
+        print(minor_rule())
 
         print(
             "Search Space:        "
@@ -1983,7 +1984,7 @@ def print_orf_report(
         )
 
         print()
-        print("=" * 70)
+        print(major_rule())
 
         return
 
@@ -2003,7 +2004,7 @@ def print_orf_report(
     # ========================================================
 
     print("\nORF Summary")
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"ORFs Found:              "
@@ -2080,7 +2081,7 @@ def print_orf_report(
     # ========================================================
 
     print("\nReading Frame Statistics")
-    print("-" * 45)
+    print(minor_rule())
 
     for frame in (
         "+1",
@@ -2115,7 +2116,7 @@ def print_orf_report(
     # ========================================================
 
     print("\nSearch Parameters")
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         "Search Space:        "
@@ -2168,7 +2169,7 @@ def print_orf_report(
     # ========================================================
 
     print("\nRanked ORF Candidates")
-    print("-" * 45)
+    print(minor_rule())
 
     for orf in orfs:
 
@@ -2178,7 +2179,7 @@ def print_orf_report(
             f"ORF #{orf['rank']}"
         )
 
-        print("-" * 45)
+        print(minor_rule())
 
         print(
             f"Heuristic score:     "
@@ -2261,7 +2262,7 @@ def print_orf_report(
         # ====================================================
 
         print("\nStart Context")
-        print("-" * 45)
+        print(minor_rule())
 
         kozak = (
             orf["start_context"]
@@ -2325,7 +2326,7 @@ def print_orf_report(
         )
 
         print("\nCodon Statistics")
-        print("-" * 45)
+        print(minor_rule())
 
         print(
             f"Total Codons:        "
@@ -2364,7 +2365,7 @@ def print_orf_report(
         # ====================================================
 
         print("\nSequence Ambiguity")
-        print("-" * 45)
+        print(minor_rule())
 
         print(
             f"Ambiguous Codons:    "
@@ -2422,7 +2423,7 @@ def print_orf_report(
                 "\nAmbiguous Codon Details"
             )
 
-            print("-" * 45)
+            print(minor_rule())
 
             for item in (
                 orf["ambiguous_codons"]
@@ -2477,7 +2478,7 @@ def print_orf_report(
         # ====================================================
 
         print("\nSequence")
-        print("-" * 45)
+        print(minor_rule())
 
         print(
             create_orf_preview(
@@ -2490,7 +2491,7 @@ def print_orf_report(
     # ========================================================
 
     print("\nInterpretation")
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         "ORFs are sequence-defined candidate "
@@ -2530,7 +2531,7 @@ def print_orf_report(
 
     print()
 
-    print("=" * 70)
+    print(major_rule())
 
 
 
@@ -2881,7 +2882,7 @@ def print_orf_candidate_comparison(orfs, top_n=5):
     candidates = compare_orf_candidates(orfs, top_n=top_n)
 
     print("\nTop ORF Candidate Comparison")
-    print("-" * 70)
+    print(minor_rule())
 
     if not candidates:
         print("No ORF candidates available.")
@@ -2905,7 +2906,7 @@ def print_orf_relationship_report(orfs):
     relationships = analyze_orf_relationships(orfs)
 
     print("\nORF Relationships")
-    print("-" * 70)
+    print(minor_rule())
 
     print(f"Overlapping pairs: {relationships['overlap_count']}")
     print(f"Nested pairs:      {relationships['nested_count']}")
@@ -2929,9 +2930,9 @@ def print_orf_relationship_report(orfs):
 
 def _print_orf_header(title):
     print()
-    print("=" * 68)
+    print(major_rule())
     print(title)
-    print("=" * 68)
+    print(major_rule())
 
 
 def _orf_status_label(orf):
@@ -2990,7 +2991,7 @@ def print_orf_candidates(orfs, top_n=None):
         f"{'Status':<24}"
         f"{'Conf.':<8}"
     )
-    print("-" * 68)
+    print(minor_rule())
 
     for orf in candidates:
         print(
@@ -3021,7 +3022,7 @@ def print_orf_candidate_details(orf):
     print(f"Status:                {orf['status']}")
 
     print("\nQuality")
-    print("-" * 42)
+    print(minor_rule())
     print(
         f"Heuristic score:       {orf['confidence']['score']}/100 "
         f"({orf['confidence']['classification']})"
@@ -3036,7 +3037,7 @@ def print_orf_candidate_details(orf):
     )
 
     print("\nStart Context")
-    print("-" * 42)
+    print(minor_rule())
 
     kozak = orf["start_context"]["kozak"]
     if kozak["available"]:
@@ -3054,7 +3055,7 @@ def print_orf_candidate_details(orf):
         print("Shine-Dalgarno:        Not detected")
 
     print("\nSequence")
-    print("-" * 42)
+    print(minor_rule())
     print(create_orf_preview(orf["sequence"]))
 
 
@@ -3072,7 +3073,9 @@ def print_orf_comparison_table(orfs, top_n=5):
         f"{'Feature':<24}"
         + "".join(f"ORF #{c['rank']:<14}" for c in candidates)
     )
-    print("-" * max(68, 24 + 14 * len(candidates)))
+    # A table rule spans its own table; the standard width is the floor.
+    print(minor_rule() if 24 + 14 * len(candidates) <= RULE_WIDTH
+          else "-" * (24 + 14 * len(candidates)))
 
     rows = [
         ("Strand", lambda c: c["strand"]),
@@ -3133,7 +3136,7 @@ def print_orf_relationships(orfs):
             f"Same frame:            "
             f"{'YES' if item['same_frame'] else 'NO'}"
         )
-        print("-" * 42)
+        print(minor_rule())
 
 
 def select_orf(orfs):
@@ -3152,7 +3155,7 @@ def select_orf(orfs):
     _print_orf_header("SELECT ORF")
 
     print("Available candidates")
-    print("-" * 68)
+    print(minor_rule())
 
     for index, orf in enumerate(orfs, start=1):
         print(
@@ -3203,7 +3206,7 @@ def select_orf(orfs):
                 )
 
                 print("\nPipeline Status")
-                print("-" * 42)
+                print(minor_rule())
                 print("✓ ORF Selected")
                 print("✓ Ready for RNA Analysis")
                 print("✓ Ready for Protein Analysis")

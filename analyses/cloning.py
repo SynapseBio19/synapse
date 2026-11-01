@@ -30,6 +30,7 @@ from data.restriction_enzymes import RESTRICTION_ENZYMES
 # restriction and cloning analyses apply the same CONFIRMED/POSSIBLE rules
 # (audit D4). bases_match is re-exported for existing callers.
 from analyses.restriction import bases_match, find_recognition_site_matches
+from ui.style import major_rule, minor_rule
 
 
 # ============================================================
@@ -3600,7 +3601,7 @@ def print_design_reasons(
         "\nDESIGN EVALUATION"
     )
     print(
-        "-" * 60
+        minor_rule()
     )
 
     for reason in evaluation[
@@ -3638,7 +3639,7 @@ def ascii_orientation_visualization(
         "\nCLONING ARCHITECTURE"
     )
     print(
-        "-" * 68
+        minor_rule()
     )
     print(
         "VECTOR:"
@@ -3670,13 +3671,13 @@ def print_cloning_report(
 ):
     print()
     print(
-        "=" * 70
+        major_rule()
     )
     print(
         "CLONING ANALYSIS"
     )
     print(
-        "=" * 70
+        major_rule()
     )
 
     if not analysis:
@@ -3684,7 +3685,7 @@ def print_cloning_report(
             "\nNo analysis available."
         )
         print(
-            "=" * 70
+            major_rule()
         )
         return
 
@@ -3715,7 +3716,7 @@ def print_cloning_report(
             f"{analysis.get('status', 'UNKNOWN')}"
         )
         print(
-            "=" * 70
+            major_rule()
         )
         return
 
@@ -3747,7 +3748,7 @@ def _print_single_strategy_report(
         "\nVECTOR"
     )
     print(
-        "-" * 60
+        minor_rule()
     )
     print(
         f"Left enzyme:       "
@@ -3786,7 +3787,7 @@ def _print_single_strategy_report(
         "\nINSERT"
     )
     print(
-        "-" * 60
+        minor_rule()
     )
     print(
         f"Left enzyme:       "
@@ -3825,7 +3826,7 @@ def _print_single_strategy_report(
         "\nCLONING JUNCTIONS"
     )
     print(
-        "-" * 60
+        minor_rule()
     )
 
     for side in (
@@ -3852,7 +3853,7 @@ def _print_single_strategy_report(
         "\nORIENTATION"
     )
     print(
-        "-" * 60
+        minor_rule()
     )
     print(
         f"Intended orientation: "
@@ -3875,7 +3876,7 @@ def _print_single_strategy_report(
         "\nDESIGN SCORE"
     )
     print(
-        "-" * 60
+        minor_rule()
     )
     print(
         f"Score:               "
@@ -3898,7 +3899,7 @@ def _print_single_strategy_report(
         "\nVALIDATION"
     )
     print(
-        "-" * 60
+        minor_rule()
     )
     print(
         f"Required sites:       "
@@ -3937,7 +3938,7 @@ def _print_single_strategy_report(
         "\nINTERPRETATION"
     )
     print(
-        "-" * 60
+        minor_rule()
     )
 
     if validity[
@@ -3961,7 +3962,7 @@ def _print_single_strategy_report(
     )
 
     print(
-        "=" * 70
+        major_rule()
     )
 
 
@@ -3970,13 +3971,13 @@ def print_planner_report(
 ):
     print()
     print(
-        "=" * 70
+        major_rule()
     )
     print(
         "AUTOMATIC CLONING PLANNER"
     )
     print(
-        "=" * 70
+        major_rule()
     )
 
     if not planner:
@@ -3984,7 +3985,7 @@ def print_planner_report(
             "\nNo planner result available."
         )
         print(
-            "=" * 70
+            major_rule()
         )
         return
 
@@ -4019,7 +4020,7 @@ def print_planner_report(
             "\nNO STRATEGY AVAILABLE"
         )
         print(
-            "-" * 60
+            minor_rule()
         )
         print(
             diagnostics.get(
@@ -4062,7 +4063,7 @@ def print_planner_report(
                 f"\n{role.upper()} SITE DIAGNOSTICS"
             )
             print(
-                "-" * 60
+                minor_rule()
             )
 
             for row in rows:
@@ -4074,7 +4075,7 @@ def print_planner_report(
                 )
 
         print(
-            "=" * 70
+            major_rule()
         )
         return
 
@@ -4082,7 +4083,7 @@ def print_planner_report(
         "\nBEST STRATEGY"
     )
     print(
-        "-" * 60
+        minor_rule()
     )
 
     print(
@@ -4121,7 +4122,7 @@ def print_planner_report(
         "\nJUNCTIONS"
     )
     print(
-        "-" * 60
+        minor_rule()
     )
 
     for side in (
@@ -4145,7 +4146,7 @@ def print_planner_report(
         "\nORIENTATION CHECK"
     )
     print(
-        "-" * 60
+        minor_rule()
     )
 
     print(
@@ -4161,7 +4162,7 @@ def print_planner_report(
         "\nVALIDATION"
     )
     print(
-        "-" * 60
+        minor_rule()
     )
 
     validity = best[
@@ -4201,7 +4202,7 @@ def print_planner_report(
         "\nRANKED STRATEGIES"
     )
     print(
-        "-" * 72
+        minor_rule()
     )
 
     for index, candidate in enumerate(
@@ -4250,7 +4251,7 @@ def print_planner_report(
     )
 
     print(
-        "=" * 70
+        major_rule()
     )
 
 
@@ -4519,13 +4520,13 @@ if __name__ == "__main__":
 
     print()
     print(
-        "=" * 70
+        major_rule()
     )
     print(
         "SYNAPSE CLONING ENGINE SELF-TEST"
     )
     print(
-        "=" * 70
+        major_rule()
     )
 
     for name, passed in tests.items():
@@ -4535,7 +4536,7 @@ if __name__ == "__main__":
         )
 
     print(
-        "-" * 70
+        minor_rule()
     )
 
     print(
@@ -4551,7 +4552,7 @@ if __name__ == "__main__":
     )
 
     print(
-        "=" * 70
+        major_rule()
     )
 
 # ============================================================
@@ -4569,13 +4570,13 @@ def _cloning_ui_normalize_choice(value):
 
 def _cloning_ui_print_header(title):
     print()
-    print("=" * 70)
+    print(major_rule())
     print(title)
-    print("=" * 70)
+    print(major_rule())
 
 
 def _cloning_ui_print_footer():
-    print("-" * 70)
+    print(minor_rule())
 
 
 def _cloning_ui_select_insert(

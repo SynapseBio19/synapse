@@ -3,6 +3,7 @@ from itertools import product
 
 from data.genetic_code import CODON_TABLE
 from data.amino_acids import AMINO_ACIDS
+from ui.style import major_rule, minor_rule
 
 
 # ============================================================
@@ -2513,9 +2514,9 @@ def print_protein_report(
     protein = analysis["protein"]
 
     print()
-    print("=" * 70)
+    print(major_rule())
     print("PROTEIN ANALYSIS")
-    print("=" * 70)
+    print(major_rule())
 
     # ========================================================
     # TRANSLATION
@@ -2531,7 +2532,7 @@ def print_protein_report(
             "\nTranslation Information"
         )
 
-        print("-" * 45)
+        print(minor_rule())
 
         print(
             f"Reading Frame:       "
@@ -2585,7 +2586,7 @@ def print_protein_report(
         "\nProtein Sequence"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Sequence:            "
@@ -2619,7 +2620,7 @@ def print_protein_report(
         "\nProtein Quality"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Standard Residues:   "
@@ -2679,7 +2680,7 @@ def print_protein_report(
         "\nMolecular Weight"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     if mw.get("undetermined"):
 
@@ -2740,14 +2741,14 @@ def print_protein_report(
         "\nAmino Acid Composition"
     )
 
-    print("-" * 65)
+    print(minor_rule())
 
     print(
         "AA | 3L | Name             | "
         "Type       | Count | Percent"
     )
 
-    print("-" * 65)
+    print(minor_rule())
 
     for code in AA_ORDER:
 
@@ -2802,7 +2803,7 @@ def print_protein_report(
         "\nComposition Properties"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Hydrophobic:         "
@@ -2837,7 +2838,7 @@ def print_protein_report(
         "\nCharge Properties"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     if analysis["pI"] is not None:
 
@@ -2870,7 +2871,7 @@ def print_protein_report(
         "\nHydropathy"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     if analysis["gravy"] is not None:
 
@@ -2914,7 +2915,7 @@ def print_protein_report(
         "\nProtein Molecular Properties"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     instability = (
         analysis[
@@ -2982,7 +2983,7 @@ def print_protein_report(
         "\nExtinction Coefficient"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         "Wavelength:          280 nm"
@@ -3038,7 +3039,7 @@ def print_protein_report(
         "\nSecondary Structure Tendencies"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Helix Propensity:    "
@@ -3078,7 +3079,7 @@ def print_protein_report(
         "\nHydrophobic Regions"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     if regions:
 
@@ -3116,7 +3117,7 @@ def print_protein_report(
         "\nTransmembrane Domain Heuristic"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     if tm_domains:
 
@@ -3154,7 +3155,7 @@ def print_protein_report(
         "\nSignal Peptide Heuristic"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     if signal["predicted"]:
 
@@ -3215,7 +3216,7 @@ def print_protein_report(
         "\nFlexibility Analysis"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     if flexibility:
 
@@ -3275,7 +3276,7 @@ def print_protein_report(
                 "\nAmbiguous Codon Analysis"
             )
 
-            print("-" * 45)
+            print(minor_rule())
 
             for record in (
                 ambiguous_records
@@ -3309,7 +3310,7 @@ def print_protein_report(
         "\nScientific Interpretation"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         "Protein properties are calculated from the "
@@ -3353,7 +3354,7 @@ def print_protein_report(
         "amino-acid assignments."
     )
 
-    print("=" * 70)
+    print(major_rule())
 
 
 # ============================================================
@@ -3375,9 +3376,9 @@ def print_protein_report(
 
 def _protein_ui_header(title):
     print()
-    print("=" * 70)
+    print(major_rule())
     print(title)
-    print("=" * 70)
+    print(major_rule())
 
 
 def _protein_ui_pause():
@@ -3428,7 +3429,7 @@ def _protein_limitations_block(analysis):
     )
 
     print("ANALYSIS APPLICABILITY")
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Level:               {level}"
@@ -3466,7 +3467,7 @@ def _protein_input_context(
     orf_status=None,
 ):
     print("INPUT")
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Source:              {source}"
@@ -3520,7 +3521,7 @@ def _protein_quality_block(analysis):
     quality = analysis["quality"]
 
     print("SEQUENCE QUALITY")
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Standard residues:   "
@@ -3553,7 +3554,7 @@ def _protein_composition_block(analysis):
     properties = analysis["properties"]
 
     print("COMPOSITION")
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Hydrophobic:         "
@@ -3583,7 +3584,7 @@ def _protein_composition_block(analysis):
 
 def _protein_key_properties(analysis):
     print("KEY PROPERTIES")
-    print("-" * 45)
+    print(minor_rule())
 
     mw = analysis["molecular_weight"]
 
@@ -3630,7 +3631,7 @@ def _protein_key_properties(analysis):
 
 def _translation_quality_block(translation):
     print("TRANSLATION QUALITY")
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Start codon:         "
@@ -3787,7 +3788,7 @@ def _print_protein_overview(
 
     print()
     print("PROTEIN")
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Length:              "
@@ -3824,7 +3825,7 @@ def _print_protein_overview(
 
     print()
     print("ANALYSIS QUALITY")
-    print("-" * 45)
+    print(minor_rule())
 
     level, reason = _sequence_applicability(
         analysis["length"]
@@ -3875,7 +3876,7 @@ def _print_translation_and_sequence(analysis):
 
     else:
         print("TRANSLATION")
-        print("-" * 45)
+        print(minor_rule())
 
         print(
             f"Reading frame:       "
@@ -3903,7 +3904,7 @@ def _print_translation_and_sequence(analysis):
 
         print()
         print("CODON TRANSLATION")
-        print("-" * 70)
+        print(minor_rule())
 
         for record in translation[
             "codon_records"
@@ -3940,7 +3941,7 @@ def _print_translation_and_sequence(analysis):
 
     print()
     print("PROTEIN SEQUENCE")
-    print("-" * 70)
+    print(minor_rule())
 
     sequence = analysis[
         "protein"
@@ -4000,7 +4001,7 @@ def _print_amino_acid_composition(analysis):
         "Type       | Count | Percent"
     )
 
-    print("-" * 70)
+    print(minor_rule())
 
     ordered = sorted(
         counts.items(),
@@ -4024,7 +4025,7 @@ def _print_amino_acid_composition(analysis):
             f"{percentages[code]:>6.2f}%"
         )
 
-    print("-" * 70)
+    print(minor_rule())
 
     print(
         f"Resolved residues:   "
@@ -4038,7 +4039,7 @@ def _print_amino_acid_composition(analysis):
 
     print()
     print("COMPOSITION GROUPS")
-    print("-" * 45)
+    print(minor_rule())
 
     _protein_composition_block(
         analysis
@@ -4100,7 +4101,7 @@ def _print_physicochemical_structural(analysis):
 
     print()
     print("MOLECULAR PROPERTIES")
-    print("-" * 45)
+    print(minor_rule())
 
     _protein_key_properties(
         analysis
@@ -4124,7 +4125,7 @@ def _print_physicochemical_structural(analysis):
 
     print()
     print("CHARGE PROFILE")
-    print("-" * 45)
+    print(minor_rule())
 
     for ph, charge in analysis[
         "charges"
@@ -4136,7 +4137,7 @@ def _print_physicochemical_structural(analysis):
 
     print()
     print("EXTINCTION COEFFICIENT")
-    print("-" * 45)
+    print(minor_rule())
 
     extinction, reduced, oxidized = (
         _safe_extinction_values(
@@ -4186,7 +4187,7 @@ def _print_physicochemical_structural(analysis):
 
     print()
     print("SECONDARY STRUCTURE SCREENING")
-    print("-" * 45)
+    print(minor_rule())
 
     secondary = analysis[
         "secondary_structure"
@@ -4219,7 +4220,7 @@ def _print_physicochemical_structural(analysis):
 
     print()
     print("HYDROPHOBIC REGION SCREENING")
-    print("-" * 45)
+    print(minor_rule())
 
     regions = analysis[
         "hydrophobic_regions"
@@ -4244,7 +4245,7 @@ def _print_physicochemical_structural(analysis):
 
     print()
     print("TRANSMEMBRANE SCREENING")
-    print("-" * 45)
+    print(minor_rule())
 
     tm_domains = analysis[
         "transmembrane_domains"
@@ -4275,7 +4276,7 @@ def _print_physicochemical_structural(analysis):
 
     print()
     print("SIGNAL PEPTIDE SCREENING")
-    print("-" * 45)
+    print(minor_rule())
 
     signal = analysis[
         "signal_peptide"
@@ -4306,7 +4307,7 @@ def _print_physicochemical_structural(analysis):
 
     print()
     print("FLEXIBILITY SCREENING")
-    print("-" * 45)
+    print(minor_rule())
 
     flexibility = analysis[
         "flexibility"
@@ -4365,7 +4366,7 @@ def _print_complete_protein_report(
     )
 
     print("1. INPUT")
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Source:              {source}"
@@ -4404,7 +4405,7 @@ def _print_complete_protein_report(
 
     print()
     print("2. TRANSLATION")
-    print("-" * 45)
+    print(minor_rule())
 
     translation = analysis[
         "translation"
@@ -4452,7 +4453,7 @@ def _print_complete_protein_report(
 
     print()
     print("3. SEQUENCE QUALITY")
-    print("-" * 45)
+    print(minor_rule())
 
     _protein_quality_block(
         analysis
@@ -4460,7 +4461,7 @@ def _print_complete_protein_report(
 
     print()
     print("4. COMPOSITION")
-    print("-" * 45)
+    print(minor_rule())
 
     _protein_composition_block(
         analysis
@@ -4491,7 +4492,7 @@ def _print_complete_protein_report(
 
     print()
     print("5. PHYSICOCHEMISTRY")
-    print("-" * 45)
+    print(minor_rule())
 
     _protein_key_properties(
         analysis
@@ -4514,7 +4515,7 @@ def _print_complete_protein_report(
 
     print()
     print("6. STRUCTURAL SCREENING")
-    print("-" * 45)
+    print(minor_rule())
 
     secondary = analysis[
         "secondary_structure"
@@ -4556,7 +4557,7 @@ def _print_complete_protein_report(
 
     print()
     print("7. EXTINCTION COEFFICIENT")
-    print("-" * 45)
+    print(minor_rule())
 
     extinction, reduced, oxidized = (
         _safe_extinction_values(
@@ -4606,7 +4607,7 @@ def _print_complete_protein_report(
 
     print()
     print("8. INTERPRETATION")
-    print("-" * 45)
+    print(minor_rule())
 
     level, reason = _sequence_applicability(
         analysis["length"]
@@ -4635,7 +4636,7 @@ def _print_complete_protein_report(
     )
 
     print()
-    print("=" * 70)
+    print(major_rule())
 
 
 # ============================================================
@@ -4646,9 +4647,9 @@ def _print_complete_protein_report(
 def _protein_ui_menu():
 
     print()
-    print("=" * 70)
+    print(major_rule())
     print("PROTEIN ANALYSIS MENU")
-    print("=" * 70)
+    print(major_rule())
 
     print()
     print("[1] Protein Overview")
@@ -4660,7 +4661,7 @@ def _protein_ui_menu():
     print()
     print("[0] Back")
 
-    print("-" * 70)
+    print(minor_rule())
 
 
 # ============================================================

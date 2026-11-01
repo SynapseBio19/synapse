@@ -1,5 +1,6 @@
 import math
 from core.seqtools import codon_dict
+from ui.style import major_rule, minor_rule
 
 
 # ============================================================
@@ -1626,9 +1627,9 @@ def print_rna_translation_report(rna, genetic_code=1):
     translation = analyze_rna_three_frames(rna, genetic_code=genetic_code)
 
     print()
-    print("=" * 70)
+    print(major_rule())
     print("RNA TRANSLATION & CODON ANALYSIS")
-    print("=" * 70)
+    print(major_rule())
 
     for frame in translation["frames"]:
 
@@ -1637,7 +1638,7 @@ def print_rna_translation_report(rna, genetic_code=1):
             f"Frame +{frame['frame']}"
         )
 
-        print("-" * 45)
+        print(minor_rule())
 
         print(
             f"Codons:              "
@@ -1680,7 +1681,7 @@ def print_rna_translation_report(rna, genetic_code=1):
         "and does not establish biological translation."
     )
 
-    print("=" * 70)
+    print(major_rule())
 
 
 # ============================================================
@@ -1693,13 +1694,13 @@ def print_rna_feature_report(analysis):
     score = analysis["feature_score"]
 
     print()
-    print("=" * 70)
+    print(major_rule())
     print("RNA FEATURES")
-    print("=" * 70)
+    print(major_rule())
 
     print()
     print("Sequence Feature Screening")
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Screening score:     "
@@ -1713,7 +1714,7 @@ def print_rna_feature_report(analysis):
 
     print()
     print("Sequence Features")
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Complexity:           "
@@ -1742,13 +1743,13 @@ def print_rna_feature_report(analysis):
 
     print()
     print("Structure Screening")
-    print("-" * 45)
+    print(minor_rule())
     print("Method:              Heuristic stem-loop screening")
     print("Thermodynamics:      Not calculated")
 
     print()
     print("Start / Stop Landscape")
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"AUG starts:            "
@@ -1762,7 +1763,7 @@ def print_rna_feature_report(analysis):
 
     print()
     print("Interpretation")
-    print("-" * 45)
+    print(minor_rule())
 
     for reason in score["reasons"]:
         print(f"- {reason}")
@@ -1774,7 +1775,7 @@ def print_rna_feature_report(analysis):
         "stability or biological function."
     )
 
-    print("=" * 70)
+    print(major_rule())
 
 
 # ============================================================
@@ -2058,9 +2059,9 @@ def print_rna_report(
     )
 
     print()
-    print("=" * 70)
+    print(major_rule())
     print("COMPLETE RNA REPORT")
-    print("=" * 70)
+    print(major_rule())
 
     # ========================================================
     # INPUT CONTEXT
@@ -2070,7 +2071,7 @@ def print_rna_report(
         "\nInput Context"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Source:              {source_name}"
@@ -2132,7 +2133,7 @@ def print_rna_report(
         "\nTranscription Information"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     if pipeline_info.get("mode") == "orf":
         orf = pipeline_info.get("selected_orf")
@@ -2198,7 +2199,7 @@ def print_rna_report(
         "\nRNA Sequence Information"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"RNA Length:          "
@@ -2249,7 +2250,7 @@ def print_rna_report(
         "\nRNA Base Composition"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     for base in (
         "A",
@@ -2272,7 +2273,7 @@ def print_rna_report(
         "\nMolecular Weight"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     if molecular_weight["ambiguous"]:
 
@@ -2302,7 +2303,7 @@ def print_rna_report(
         "\nRNA Sequence Complexity"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Normalized Entropy:  "
@@ -2319,7 +2320,7 @@ def print_rna_report(
         "\nCodon Statistics"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         "Reading Frame:       "
@@ -2369,7 +2370,7 @@ def print_rna_report(
         "\nTranslation Initiation Context"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     kozak = analysis["kozak"]
 
@@ -2426,7 +2427,7 @@ def print_rna_report(
         "\nHomopolymer Regions"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     if analysis["homopolymers"]:
 
@@ -2455,7 +2456,7 @@ def print_rna_report(
         "\nPoly-A / Poly-U Regions"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Poly-A Regions:      "
@@ -2477,7 +2478,7 @@ def print_rna_report(
         "\nRNA Secondary Structure Screening"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Potential Hairpins:  "
@@ -2534,7 +2535,7 @@ def print_rna_report(
         "\nRNA Sequence Quality"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Standard Bases:      "
@@ -2587,7 +2588,7 @@ def print_rna_report(
             "\nIUPAC Ambiguous Base Composition"
         )
 
-        print("-" * 45)
+        print(minor_rule())
 
         for code, count in (
             ambiguity["ambiguous_counts"].items()
@@ -2609,7 +2610,7 @@ def print_rna_report(
             "\nAmbiguous Positions"
         )
 
-        print("-" * 45)
+        print(minor_rule())
 
         for item in (
             ambiguity["ambiguous_positions"]
@@ -2636,7 +2637,7 @@ def print_rna_report(
             "\nInvalid Symbols"
         )
 
-        print("-" * 45)
+        print(minor_rule())
 
         for item in quality["invalid_positions"]:
 
@@ -2654,7 +2655,7 @@ def print_rna_report(
         "\nRNA Strand Transformations"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Complement:         "
@@ -2674,7 +2675,7 @@ def print_rna_report(
         "\nSequence Preview"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"DNA 5' -> 3':       "
@@ -2696,7 +2697,7 @@ def print_rna_report(
         "\nStart / Stop Landscape"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"AUG Start Codons:   "
@@ -2740,7 +2741,7 @@ def print_rna_report(
         "\nThree-Frame Translation Preview"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     for frame in translation_frames["frames"]:
 
@@ -2761,7 +2762,7 @@ def print_rna_report(
         "\nSequence Feature Screening"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Screening Score:     "
@@ -2783,7 +2784,7 @@ def print_rna_report(
         "\nRNA Summary"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Length:              "
@@ -2828,7 +2829,7 @@ def print_rna_report(
         "\nScientific Interpretation"
     )
 
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         "The supplied DNA is interpreted as the coding "
@@ -2871,7 +2872,7 @@ def print_rna_report(
 
     print()
 
-    print("=" * 70)
+    print(major_rule())
 
 # ============================================================
 # SYNAPSE PIPELINE INTEGRATION
@@ -3082,7 +3083,7 @@ def print_rna_pipeline_input(analysis):
 
     print()
     print("Pipeline Input")
-    print("-" * 58)
+    print(minor_rule())
 
     print(
         f"Source:              "
@@ -3166,9 +3167,9 @@ def print_rna_pipeline_connection(analysis):
     )
 
     print()
-    print("=" * 70)
+    print(major_rule())
     print("RNA CONNECTED TO PIPELINE")
-    print("=" * 70)
+    print(major_rule())
 
     print()
     print(
@@ -3204,13 +3205,13 @@ def print_rna_overview(analysis):
     info = analysis.get("pipeline_input", {})
 
     print()
-    print("=" * 70)
+    print(major_rule())
     print("RNA OVERVIEW")
-    print("=" * 70)
+    print(major_rule())
 
     print()
     print("Input Context")
-    print("-" * 45)
+    print(minor_rule())
 
     print(
         f"Source:              "
@@ -3290,7 +3291,7 @@ def print_rna_overview(analysis):
 
     print()
     print("Composition")
-    print("-" * 45)
+    print(minor_rule())
     print(
         f"GC content:          "
         f"{summary['gc_content']:.2f}%"
@@ -3308,7 +3309,7 @@ def print_rna_overview(analysis):
 
     print()
     print("Sequence Quality")
-    print("-" * 45)
+    print(minor_rule())
     print(
         f"Ambiguous bases:     "
         f"{summary['ambiguous_count']}"
@@ -3335,7 +3336,7 @@ def print_rna_overview(analysis):
 
     print()
     print("Coding Landscape")
-    print("-" * 45)
+    print(minor_rule())
     print(
         f"AUG starts:          "
         f"{summary['start_count']}"
@@ -3348,7 +3349,7 @@ def print_rna_overview(analysis):
 
     print()
     print("Feature Screening")
-    print("-" * 45)
+    print(minor_rule())
     print(
         f"Feature score:       "
         f"{score['score']}/100"
@@ -3375,9 +3376,9 @@ def print_rna_sequence_view(analysis):
     )
 
     print()
-    print("=" * 70)
+    print(major_rule())
     print("RNA SEQUENCE")
-    print("=" * 70)
+    print(major_rule())
 
     print()
     print(
@@ -3386,7 +3387,7 @@ def print_rna_sequence_view(analysis):
 
     print()
     print("5' -> 3'")
-    print("-" * 70)
+    print(minor_rule())
 
     if not rna:
         print("[empty]")
@@ -3409,7 +3410,7 @@ def print_rna_sequence_view(analysis):
             f"{rna[start:end]}"
         )
 
-    print("-" * 70)
+    print(minor_rule())
 
 
 def _pause_rna_ui():
@@ -3448,9 +3449,9 @@ def run_rna_analysis_ui(
     )
 
     print()
-    print("=" * 70)
+    print(major_rule())
     print("RNA ANALYSIS")
-    print("=" * 70)
+    print(major_rule())
 
     print_rna_pipeline_input(
         analysis
@@ -3465,9 +3466,9 @@ def run_rna_analysis_ui(
     while True:
 
         print()
-        print("=" * 70)
+        print(major_rule())
         print("RNA ANALYSIS MENU")
-        print("=" * 70)
+        print(major_rule())
 
         print()
         print("[1] RNA Overview")
@@ -3478,7 +3479,7 @@ def run_rna_analysis_ui(
         print()
         print("[0] Back")
 
-        print("-" * 70)
+        print(minor_rule())
 
         choice = input(
             "Selection: "

@@ -48,6 +48,7 @@ import tempfile
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 from core.seqtools import IUPAC_COMPLEMENT as _CORE_IUPAC_COMPLEMENT
+from ui.style import RULE_WIDTH, major_rule, minor_rule
 
 
 # ============================================================================
@@ -1925,7 +1926,8 @@ def export_batch_summary(results: Mapping[str, DesignResult], path: str | Path) 
 # REPORTING / VISUAL TEXT
 # ============================================================================
 
-def _line(char: str = "-", width: int = 78) -> str:
+def _line(char: str = "-", width: int = RULE_WIDTH) -> str:
+    # Kept as a local shorthand; the width is the shared one (Stage F).
     return char * width
 
 
@@ -2042,9 +2044,9 @@ def format_prime_editing_report(results: Sequence[PrimeEditingCandidate], top_n:
 
 def format_report(result: DesignResult, *, top_n: int = 10) -> str:
     lines = [
-        "=" * 78,
+        major_rule(),
         "SYNAPSE CRISPR GUIDE ANALYSIS REPORT",
-        "=" * 78,
+        major_rule(),
         f"Sequence:              {result.sequence_name}",
         f"Sequence length:       {result.sequence_length} bp",
         f"Target region:         {result.region.name}",
@@ -2251,9 +2253,9 @@ def _load_orf_or_region(current_sequence: str) -> Tuple[str, int, int, str, str]
 
 
 def _cli_design() -> None:
-    print("\n" + "=" * 78)
+    print("\n" + major_rule())
     print("CRISPR GUIDE DESIGN")
-    print("=" * 78)
+    print(major_rule())
     name, sequence = _manual_sequence()
     if not sequence:
         print("No sequence entered.")
@@ -2319,9 +2321,9 @@ def crispr_menu(
         nonlocal region_name, feature_type, last_result
 
         while True:
-            print("\n" + "=" * 78)
+            print("\n" + major_rule())
             print("SEQUENCE & REGION")
-            print("=" * 78)
+            print(major_rule())
             print("[1] Select DNA Sequence")
             print("[2] Select ORF / Region")
             print("[0] Back")
@@ -2370,9 +2372,9 @@ def crispr_menu(
         nonlocal region_end, region_name, feature_type, last_result
 
         while True:
-            print("\n" + "=" * 78)
+            print("\n" + major_rule())
             print("BATCH ANALYSIS")
-            print("=" * 78)
+            print(major_rule())
             print("[1] Load FASTA / Batch Analysis")
             print("[2] Use First Record as Current Sequence")
             print("[0] Back")
@@ -2435,9 +2437,9 @@ def crispr_menu(
     def system_menu() -> None:
         nonlocal config
         while True:
-            print("\n" + "=" * 78)
+            print("\n" + major_rule())
             print("CRISPR SYSTEM")
-            print("=" * 78)
+            print(major_rule())
             print(f"Current system: {config.system}")
             print()
             print("[1] Select CRISPR System")
@@ -2465,9 +2467,9 @@ def crispr_menu(
             print("Run [4] Target Discovery first.")
             return
         while True:
-            print("\n" + "=" * 78)
+            print("\n" + major_rule())
             print("GUIDE ANALYSIS & RANKING")
-            print("=" * 78)
+            print(major_rule())
             print("[1] Analyze Individual Guide")
             print("[2] Rank Guides")
             print("[0] Back")
@@ -2490,9 +2492,9 @@ def crispr_menu(
             print("No analysis results available.")
             return
         while True:
-            print("\n" + "=" * 78)
+            print("\n" + major_rule())
             print("REPORTS & EXPORT")
-            print("=" * 78)
+            print(major_rule())
             print("[1] Full Guide Report")
             print("[2] Export Guides")
             print("[3] Export Batch Summary")
@@ -2558,9 +2560,9 @@ def crispr_menu(
                 print("Invalid selection.")
 
     while True:
-        print("\n" + "=" * 78)
+        print("\n" + major_rule())
         print("CRISPR ANALYSIS ENGINE")
-        print("=" * 78)
+        print(major_rule())
         print(f"Sequence: {current_name}")
         print(f"Length:   {len(base_sequence) if base_sequence else 0} bp")
         print(
@@ -3064,9 +3066,9 @@ def run_self_test(verbose: bool = True) -> bool:
         except Exception as exc:
             results.append(SelfTestResult(name, False, str(exc)))
     if verbose:
-        print("\n" + "=" * 78)
+        print("\n" + major_rule())
         print("SYNAPSE CRISPR SELF-TEST")
-        print("=" * 78)
+        print(major_rule())
         for result in results:
             marker = "PASS" if result.passed else "FAIL"
             suffix = f" - {result.detail}" if result.detail else ""

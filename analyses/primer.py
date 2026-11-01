@@ -37,6 +37,7 @@ from dataclasses import dataclass, field, replace
 from math import log, log10, sqrt
 from typing import Optional, Sequence
 from core.seqtools import IUPAC_COMPLEMENT as _CORE_IUPAC_COMPLEMENT
+from ui.style import major_rule, minor_rule
 
 DNA_ALPHABET = set("ACGT")
 IUPAC_ALPHABET = set("ACGTRYSWKMBDHVN")
@@ -892,9 +893,9 @@ def summarize_primer_pair(pair: PrimerPair, rank: int = 1) -> str:
 
 def print_primer_report(report: PrimerDesignReport) -> None:
     """Print the complete Synapse primer report."""
-    print("=" * 72)
+    print(major_rule())
     print("SYNAPSE — PRIMER DESIGN")
-    print("=" * 72)
+    print(major_rule())
     print(f"Sequence length:            {report.sequence_length} bp")
     print(f"Target region:              {report.target_start}-{report.target_end} ({report.target_length} bp)")
     print()
@@ -933,7 +934,7 @@ def print_primer_report(report: PrimerDesignReport) -> None:
         print("WARNINGS")
         for warning in report.warnings:
             print(f"- {warning}")
-    print("=" * 72)
+    print(major_rule())
 
 
 # ============================================================================
@@ -1146,12 +1147,12 @@ def run_primer_self_test() -> dict[str, bool]:
 
 if __name__ == "__main__":
     test_results = run_primer_self_test()
-    print("=" * 72)
+    print(major_rule())
     print("SYNAPSE — PRIMER MODULE SELF-TEST")
-    print("=" * 72)
+    print(major_rule())
     for test_name, passed in test_results.items():
         print(f"[{'PASS' if passed else 'FAIL'}] {test_name}")
-    print("=" * 72)
+    print(major_rule())
     print("ALL TESTS PASSED:", all(test_results.values()))
 # ============================================================================
 # SYNAPSE — PRIMER DESIGN ENGINE V3 THERMODYNAMIC EXTENSION
@@ -2518,7 +2519,7 @@ def _print_thermodynamic_conditions(
 
     print()
     print("THERMODYNAMIC CONDITIONS")
-    print("-" * 72)
+    print(minor_rule())
 
     print(
         f"Na+:                    "
@@ -3566,11 +3567,11 @@ PRIMER_V3_PUBLIC_API = (
 if __name__ == "__main__":
     results = run_primer_v3_self_test()
 
-    print("=" * 72)
+    print(major_rule())
     print(
         "SYNAPSE — PROFESSIONAL PRIMER ENGINE V3 SELF-TEST"
     )
-    print("=" * 72)
+    print(major_rule())
 
     for name, passed in results.items():
         print(
@@ -3578,7 +3579,7 @@ if __name__ == "__main__":
             f"{name}"
         )
 
-    print("=" * 72)
+    print(major_rule())
 
     print(
         "TOTAL TESTS:",
@@ -3590,7 +3591,7 @@ if __name__ == "__main__":
         all(results.values()),
     )
 
-    print("=" * 72)
+    print(major_rule())
 # ============================================================================
 # BACKWARD-COMPATIBILITY ADAPTER
 # ============================================================================
@@ -3783,9 +3784,9 @@ def run_primer_v3_self_test_final() -> dict[str, bool]:
 
 def _primer_ui_header(title):
     print()
-    print("=" * 72)
+    print(major_rule())
     print(title)
-    print("=" * 72)
+    print(major_rule())
 
 
 def _primer_ui_store_result(pipeline, result):
@@ -3810,7 +3811,7 @@ def _primer_ui_read_target(sequence):
     """Read an optional target region."""
     print()
     print("TARGET REGION")
-    print("-" * 72)
+    print(minor_rule())
     print("Enter coordinates as 0-based half-open [start, end).")
     print("Press Enter to use the complete sequence.")
     print()
@@ -3832,7 +3833,7 @@ def _primer_ui_read_conditions():
     """Read thermodynamic conditions using documented defaults."""
     print()
     print("THERMODYNAMIC CONDITIONS")
-    print("-" * 72)
+    print(minor_rule())
     print("Press Enter to keep the default value.")
     print()
 
@@ -3864,13 +3865,13 @@ def _primer_ui_select_tm_model():
     """Select the Tm model."""
     print()
     print("TM MODEL")
-    print("-" * 72)
+    print(minor_rule())
     print("[1] Nearest-neighbor")
     print("[2] Wallace")
     print("[3] Salt-adjusted")
     print()
     print("[0] Back")
-    print("-" * 72)
+    print(minor_rule())
 
     choice = input("Selection [1]: ").strip()
 
@@ -3913,13 +3914,13 @@ def _primer_ui_single_analysis(pipeline=None):
 
     print()
     print("TM MODEL")
-    print("-" * 72)
+    print(minor_rule())
     print("[1] Nearest-neighbor")
     print("[2] Wallace")
     print("[3] Salt-adjusted")
     print()
     print("[0] Back")
-    print("-" * 72)
+    print(minor_rule())
 
     choice = input("Selection [1]: ").strip()
 
@@ -3952,9 +3953,9 @@ def _primer_ui_single_analysis(pipeline=None):
             )
 
             print()
-            print("=" * 72)
+            print(major_rule())
             print("PRIMER ANALYSIS")
-            print("=" * 72)
+            print(major_rule())
             print(f"Sequence:               {result['sequence']}")
             print(f"Length:                 {result['length']} bp")
             print(f"GC content:             {result['gc_percent']:.2f}%")
@@ -3978,7 +3979,7 @@ def _primer_ui_single_analysis(pipeline=None):
                 f"{result['self_dimer'].max_stem} bp "
                 f"({result['self_dimer'].severity})"
             )
-            print("=" * 72)
+            print(major_rule())
 
         else:
             result = analyze_primer(
@@ -3991,9 +3992,9 @@ def _primer_ui_single_analysis(pipeline=None):
             )
 
             print()
-            print("=" * 72)
+            print(major_rule())
             print("PRIMER ANALYSIS")
-            print("=" * 72)
+            print(major_rule())
             print(f"Sequence:               {result['sequence']}")
             print(f"Length:                 {result['length']} bp")
             print(f"GC content:             {result['gc_percent']:.2f}%")
@@ -4012,7 +4013,7 @@ def _primer_ui_single_analysis(pipeline=None):
                 f"{result['self_dimer'].max_stem} bp "
                 f"({result['self_dimer'].severity})"
             )
-            print("=" * 72)
+            print(major_rule())
 
         return result
 
@@ -4064,9 +4065,9 @@ def print_professional_primer_report(
     report: ProfessionalPrimerDesignReport,
 ) -> None:
     """Print the improved professional report with explicit screening status."""
-    print("=" * 72)
+    print(major_rule())
     print("SYNAPSE — PROFESSIONAL PRIMER DESIGN")
-    print("=" * 72)
+    print(major_rule())
     print(f"Sequence length:            {report.sequence_length} bp")
     print(
         f"Target region:              {report.target_start}-{report.target_end} "
@@ -4077,7 +4078,7 @@ def print_professional_primer_report(
 
     print()
     print("CANDIDATE GENERATION")
-    print("-" * 72)
+    print(minor_rule())
     print(f"Forward evaluated:          {report.forward_candidates_evaluated}")
     print(f"Forward selected:           {report.forward_candidates_accepted}")
     print(f"Reverse evaluated:          {report.reverse_candidates_evaluated}")
@@ -4085,7 +4086,7 @@ def print_professional_primer_report(
 
     print()
     print("SCREENING POLICY")
-    print("-" * 72)
+    print(minor_rule())
     print("Tier 1: strict preferred criteria")
     print("Tier 2: relaxed Tm window (+/- 2 °C)")
     print("Tier 3: best measured fallback candidates")
@@ -4093,7 +4094,7 @@ def print_professional_primer_report(
 
     print()
     print("PAIR EVALUATION")
-    print("-" * 72)
+    print(minor_rule())
     print(f"Pairs evaluated:            {report.pairs_evaluated}")
     print(f"Pairs accepted/ranked:      {report.pairs_accepted}")
 
@@ -4117,7 +4118,7 @@ def print_professional_primer_report(
         for warning in report.warnings:
             print(f"- {warning}")
 
-    print("=" * 72)
+    print(major_rule())
 
 
 def _primer_ui_design_menu_v4(dna, header, pipeline):
@@ -4133,7 +4134,7 @@ def _primer_ui_design_menu_v4(dna, header, pipeline):
         print("[2] Single Primer Analysis")
         print()
         print("[0] Back")
-        print("-" * 72)
+        print(minor_rule())
 
         choice = input("Selection: ").strip()
 

@@ -1,35 +1,36 @@
+from ui.style import major_rule, minor_rule
 def show_menu():
 
     print()
-    print("=" * 60)
+    print(major_rule())
     print("Choose Analysis")
-    print("=" * 60)
+    print(major_rule())
 
     print("[1] Sequence Overview")
     print("[2] ORF Analysis")
     print("[3] RNA Analysis")
     print("[4] Protein Analysis")
 
-    print("-" * 60)
+    print(minor_rule())
 
     print("[5] Restriction & Cloning Analysis")
     print("[6] Primer Design")
     print("[7] Mutation & Variant Analysis")
     print("[8] CRISPR Guide Design")
 
-    print("-" * 60)
+    print(minor_rule())
 
     print("[9] BLAST Search")
     print("[10] Literature Search")
     print("[11] AI Experiment Planner (not implemented)")
 
-    print("-" * 60)
+    print(minor_rule())
 
     print("[P] Pipeline Status & Stored Results")
     print("[R] Export Analysis Report (JSON / Markdown)")
     print("[S] Select Another Sequence")
 
-    print("-" * 60)
+    print(minor_rule())
 
     print("[0] Exit")
 
@@ -38,9 +39,9 @@ def show_menu():
 
 def select_gene(sequences):
 
-    print("=" * 60)
+    print(major_rule())
     print("SYNAPSE")
-    print("=" * 60)
+    print(major_rule())
 
     print("\nLoaded Genes\n")
 

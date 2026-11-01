@@ -77,6 +77,7 @@ from analyses.literature import (
 
 from ui.report import print_results
 from ui.menu import select_gene, show_menu
+from ui.style import major_rule, minor_rule
 
 
 LOG_PATH = configure_logging()
@@ -87,9 +88,9 @@ def report_error(title, error):
     """Show an actionable error and keep the full traceback in the log file."""
     logger.exception("%s", title)
     print()
-    print("=" * 68)
+    print(major_rule())
     print(title)
-    print("=" * 68)
+    print(major_rule())
     print()
     print(f"{type(error).__name__}: {error}")
     print()
@@ -122,9 +123,9 @@ def choose_sequence_file():
     while True:
 
         print()
-        print("=" * 60)
+        print(major_rule())
         print("SYNAPSE - LOAD SEQUENCE FILE")
-        print("=" * 60)
+        print(major_rule())
         print("FASTA (.fasta/.fa) or GenBank (.gb/.gbk).")
         print("FASTA headers may contain topology=circular.")
         print(f"Press Enter for the example: {default_sequence_file}")
@@ -150,9 +151,9 @@ def choose_sequence_file():
         except (OSError, ValueError) as error:
             logger.warning("Could not load %s: %s", path, error)
             print()
-            print("=" * 60)
+            print(major_rule())
             print("SEQUENCE FILE ERROR")
-            print("=" * 60)
+            print(major_rule())
             print(f"\n{error}")
 
 
@@ -214,15 +215,15 @@ def print_sequence_type_error(record):
     result = classify_sequence(record.sequence, record.declared_type)
     reason = result.reasons[0]
     print()
-    print("=" * 60)
+    print(major_rule())
     print("SEQUENCE VALIDATION ERROR")
-    print("=" * 60)
+    print(major_rule())
     print(f"\n{reason[0].upper()}{reason[1:]}.\n")
     for position, symbol in result.invalid_symbols[:20]:
         print(f"Invalid character '{symbol}' at position {position}")
     if len(result.invalid_symbols) > 20:
         print(f"... and {len(result.invalid_symbols) - 20} more")
-    print("=" * 60)
+    print(major_rule())
     input("\nPress Enter to select another sequence...")
 
 
@@ -234,9 +235,9 @@ def resolve_sequence_type(record):
     """
     while record.type_confidence == AMBIGUOUS:
         print()
-        print("=" * 60)
+        print(major_rule())
         print("SEQUENCE TYPE")
-        print("=" * 60)
+        print(major_rule())
         print("\nThe type of this sequence cannot be determined from its letters:")
         print(f"{record.type_reasons[0]}.")
         print("\n[1] DNA")
@@ -274,9 +275,9 @@ def run_protein_record(record, selected_index):
 
     while True:
         print()
-        print("=" * 60)
+        print(major_rule())
         print("SYNAPSE - PROTEIN RECORD")
-        print("=" * 60)
+        print(major_rule())
         print(f"\n{record.description}")
         print(
             f"Length: {record.length} aa | "
@@ -608,9 +609,9 @@ def main():
                         )
 
                         print()
-                        print("=" * 68)
+                        print(major_rule())
                         print("ORF CONNECTED TO PIPELINE")
-                        print("=" * 68)
+                        print(major_rule())
                         print()
                         print(
                             f"Selected: ORF-{selected_orf['rank']:03d}"
@@ -686,9 +687,9 @@ def main():
                 if selected_orf is None:
 
                     print()
-                    print("=" * 68)
+                    print(major_rule())
                     print("PROTEIN ANALYSIS")
-                    print("=" * 68)
+                    print(major_rule())
                     print()
                     print("No ORF has been selected.")
                     print()

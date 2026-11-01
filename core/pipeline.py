@@ -423,17 +423,21 @@ class PipelineContext:
     # ========================================================
 
     def print_status(self):
+        # Terminal output living in core; it uses the shared presentation
+        # module through a local import so core keeps no module-level
+        # dependency on ui (Stage F).
+        from ui.style import major_rule, minor_rule
 
         labels = STATUS_LABELS
 
         print()
-        print("=" * 70)
+        print(major_rule())
         print("SYNAPSE PIPELINE STATUS")
-        print("=" * 70)
+        print(major_rule())
 
         print()
         print("Current Sequence")
-        print("-" * 45)
+        print(minor_rule())
 
         print(
             f"Header:       "
@@ -485,7 +489,7 @@ class PipelineContext:
 
         print()
         print("Analysis Status")
-        print("-" * 45)
+        print(minor_rule())
 
         for key, label in labels.items():
 
@@ -502,7 +506,7 @@ class PipelineContext:
             )
 
         print()
-        print("=" * 70)
+        print(major_rule())
 
 
 # ============================================================
@@ -1333,6 +1337,7 @@ def create_pipeline(
 # ============================================================
 
 if __name__ == "__main__":
+    from ui.style import major_rule
 
     test_sequence = (
         "ATGCGTACGAATTCGGGATCCATGCGAAGCTTACGTCGAGCTCGGTACCT"
@@ -1347,9 +1352,9 @@ if __name__ == "__main__":
     )
 
     print()
-    print("=" * 70)
+    print(major_rule())
     print("SYNAPSE PIPELINE TEST")
-    print("=" * 70)
+    print(major_rule())
 
     print(
         f"\nSequence: "

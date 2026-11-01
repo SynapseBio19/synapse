@@ -57,6 +57,7 @@ from typing import (
     Set,
     Tuple,
 )
+from ui.style import major_rule, minor_rule
 
 
 # ============================================================================
@@ -3167,9 +3168,9 @@ def build_mutation_report(
 ) -> str:
 
     lines = [
-        "=" * 70,
+        major_rule(),
         "MUTATION ANALYSIS REPORT",
-        "=" * 70,
+        major_rule(),
         f"Reference:        {result.reference_name}",
         f"Variant:          {result.variant_name}",
         f"Reference length: {result.reference_length} bp",
@@ -3179,7 +3180,7 @@ def build_mutation_report(
         f"Mutations:             {len(result.mutations)}",
         "",
         "MUTATION SUMMARY",
-        "-" * 70,
+        minor_rule(),
         "Alignment identity = exact matches among aligned non-gap bases.",
         "Sequence similarity = normalized edit-distance similarity.",
     ]
@@ -3214,7 +3215,7 @@ def build_mutation_report(
             f"Mutation density: {s.mutation_density_per_kb:.2f}/kb",
             "",
             "CODING CONSEQUENCES",
-            "-" * 70,
+            minor_rule(),
             f"Synonymous:       {s.synonymous}",
             f"Missense:         {s.missense}",
             f"Nonsense:         {s.nonsense}",
@@ -3224,7 +3225,7 @@ def build_mutation_report(
             f"In-frame indels:  {s.in_frame_indels}",
             "",
             "MUTATIONS",
-            "-" * 70,
+            minor_rule(),
         ]
     )
 
@@ -3252,7 +3253,7 @@ def build_mutation_report(
             [
                 "",
                 "CODING ANALYSIS",
-                "-" * 70,
+                minor_rule(),
                 f"Reference protein: {c.reference_protein}",
                 f"Variant protein:   {c.alternative_protein}",
                 f"Affected codons:  {len(c.affected_codons)}",
@@ -3279,7 +3280,7 @@ def build_mutation_report(
             [
                 "",
                 "GLOBAL ALIGNMENT",
-                "-" * 70,
+                minor_rule(),
                 result.aligned_reference,
                 result.aligned_variant,
             ]
@@ -3428,7 +3429,7 @@ def advanced_mutation_report(
         ),
         "",
         "ADVANCED SEQUENCE ANALYSIS",
-        "-" * 70,
+        minor_rule(),
     ]
 
     if (
@@ -3449,7 +3450,7 @@ def advanced_mutation_report(
         [
             "",
             "MUTATION SPECTRUM",
-            "-" * 70,
+            minor_rule(),
         ]
     )
 
@@ -3469,7 +3470,7 @@ def advanced_mutation_report(
         [
             "",
             "HOTSPOTS",
-            "-" * 70,
+            minor_rule(),
         ]
     )
 
@@ -3495,7 +3496,7 @@ def advanced_mutation_report(
             [
                 "",
                 "AMBIGUITY / QUALITY WARNINGS",
-                "-" * 70,
+                minor_rule(),
             ]
         )
 
@@ -3688,7 +3689,7 @@ def _prompt_sequence(
         )
 
         print(
-            "-" * 70
+            minor_rule()
         )
 
         for i, (
@@ -3708,7 +3709,7 @@ def _prompt_sequence(
         )
 
         print(
-            "-" * 70
+            minor_rule()
         )
 
         while True:
@@ -3843,7 +3844,7 @@ def run_mutation_analysis_ui(
         print()
 
         print(
-            "=" * 70
+            major_rule()
         )
 
         print(
@@ -3851,7 +3852,7 @@ def run_mutation_analysis_ui(
         )
 
         print(
-            "=" * 70
+            major_rule()
         )
 
         print()
@@ -3883,7 +3884,7 @@ def run_mutation_analysis_ui(
         )
 
         print(
-            "-" * 70
+            minor_rule()
         )
 
         choice = input(
@@ -4017,7 +4018,7 @@ def run_mutation_analysis_ui(
             print()
 
             print(
-                "=" * 70
+                major_rule()
             )
 
             print(
@@ -4025,7 +4026,7 @@ def run_mutation_analysis_ui(
             )
 
             print(
-                "=" * 70
+                major_rule()
             )
 
             print(
@@ -4223,7 +4224,7 @@ def run_mutation_analysis_ui(
                 print()
 
                 print(
-                    "=" * 70
+                    major_rule()
                 )
 
                 print(
@@ -4231,7 +4232,7 @@ def run_mutation_analysis_ui(
                 )
 
                 print(
-                    "=" * 70
+                    major_rule()
                 )
 
                 print(
@@ -4341,7 +4342,7 @@ def run_mutation_analysis_ui(
             print()
 
             print(
-                "=" * 70
+                major_rule()
             )
 
             print(
@@ -4349,7 +4350,7 @@ def run_mutation_analysis_ui(
             )
 
             print(
-                "=" * 70
+                major_rule()
             )
 
             for name, passed in (
@@ -4362,7 +4363,7 @@ def run_mutation_analysis_ui(
                 )
 
             print(
-                "-" * 70
+                minor_rule()
             )
 
             print(
@@ -4393,7 +4394,7 @@ def run_mutation_variant_ui(
         print()
 
         print(
-            "=" * 70
+            major_rule()
         )
 
         print(
@@ -4401,7 +4402,7 @@ def run_mutation_variant_ui(
         )
 
         print(
-            "=" * 70
+            major_rule()
         )
 
         print()
@@ -4421,7 +4422,7 @@ def run_mutation_variant_ui(
         )
 
         print(
-            "-" * 70
+            minor_rule()
         )
 
         choice = input(
@@ -4461,7 +4462,7 @@ def run_mutation_variant_ui(
                 print()
 
                 print(
-                    "=" * 70
+                    major_rule()
                 )
 
                 print(
@@ -4469,7 +4470,7 @@ def run_mutation_variant_ui(
                 )
 
                 print(
-                    "=" * 70
+                    major_rule()
                 )
 
                 print()
@@ -4496,7 +4497,7 @@ def run_mutation_variant_ui(
                 print()
 
                 print(
-                    "=" * 70
+                    major_rule()
                 )
 
                 print(
@@ -4504,7 +4505,7 @@ def run_mutation_variant_ui(
                 )
 
                 print(
-                    "=" * 70
+                    major_rule()
                 )
 
                 print()
@@ -5369,7 +5370,7 @@ if __name__ == "__main__":
     )
 
     print(
-        "=" * 70
+        major_rule()
     )
 
     print(
@@ -5377,7 +5378,7 @@ if __name__ == "__main__":
     )
 
     print(
-        "=" * 70
+        major_rule()
     )
 
     for name, success in (
@@ -5390,7 +5391,7 @@ if __name__ == "__main__":
         )
 
     print(
-        "-" * 70
+        minor_rule()
     )
 
     print(
