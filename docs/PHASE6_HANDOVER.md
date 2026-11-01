@@ -12,9 +12,9 @@ verification and report) have not been started. The running record is
 | Item | State |
 |---|---|
 | Branch | `main` |
-| HEAD | `7008cd8` (see section 9; `642f31b` was the state at the original pause) |
+| HEAD | `f803577` (see section 10; `642f31b` was the state at the original pause) |
 | Working tree | clean |
-| Tests | 267/267 pass, 0 skipped (`python -m unittest discover -s tests -t .`, ~27 s) |
+| Tests | 283/283 pass, 0 skipped (`python -m unittest discover -s tests -t .`, ~26 s) |
 | Golden master | unchanged since the audit; no snapshot was regenerated |
 | pyright 1.1.414 (`python -m pyright --pythonversion 3.10`) | 112 errors; baseline at `ab4bd2a` was 134; no new diagnostic in any package. 22 of the removals came with the dead primer code in D16 part 2. `pyright.exe` is blocked by a Windows application control policy (WinError 4551); use `python -m pyright`. |
 | ReadOnly attributes | restored on all 15 files (see the handover notes in `PHASE6_PROGRESS.md`) |
@@ -320,3 +320,65 @@ new diagnostics. A cross-module run (DNA -> ORF with table 11 -> RNA ->
 protein -> report) confirmed the ORF's table reaches the RNA view and the
 +1 preview matches the protein translation. Working tree clean, ReadOnly
 restored on all 15 protected files.
+
+---
+
+## 10. Addendum: Stage F complete (2026-11-01)
+
+Stage F is done and verified. Stages G, H and I have not been started.
+
+### Commits
+
+| Commit | Work |
+|---|---|
+| `5db21ab` | One separator width through the new `ui/style.py`. The inventory counted **11 widths** across 389 literal sites; 382 literals in 16 files now call `major_rule()`/`minor_rule()` and the inventory reports **zero** remaining distinct widths. |
+| `b1fa927` | `[0]` means one thing - leave the screen - as Back, Cancel or Exit (**7 meanings → 3**). Message prefixes unified to `ERROR:`/`WARNING:`/`NOTE:`/`OK:`. `docs/TERMINAL_UI_STANDARD.md` written; `tests/test_terminal_ui.py` enforces the standard project-wide. |
+| `10431d6` | The BLAST menu renumbered: its SEARCH block read 1, 2, 3, 14 after the resume entry was added, and now reads 1-4, with the whole menu running 1-14. |
+| `f803577` | S24 measured rather than assumed, and every outstanding audit item classified against the Master Prompt. |
+
+### What Stage F deliberately did not do
+
+- **No wording of a scientific statement changed.** Stage F moved frames,
+  keys and prefixes only. Terminology belongs to Stages G and H.
+- **Menus stay in the analysis modules.** `core/api.py` already covers
+  every analysis, so nothing is forced through the menus; relocating them
+  is the rest of P2-2 and a structural change of its own.
+- **One deviation is recorded, not hidden.**
+  `mutation._prompt_sequence` offers no `[0]`, because a real cancel needs
+  a cancel contract and four changed call sites - control flow, not
+  presentation.
+
+### S24, measured
+
+Not a clean pass and not a clean fail. **XXE is not reachable**:
+`xml.etree.ElementTree` does not resolve external entities. **Entity
+expansion is reachable but capped** by Expat's amplification guard (1 MB
+expands in 0.02 s; 10 MB is blocked in 0.09 s). **The cap is
+version-dependent** - an Expat 2.4.0 feature - which matters because
+Synapse targets Python 3.10. The test skips rather than falsely passing on
+an older build. `defusedxml` remains unjustified; the dependency-free
+hardening, if ever needed, is to set the limits through
+`xml.parsers.expat`.
+
+### Remaining work
+
+1. **Stage G** - scientific output standardization, with **D18**: the
+   "confidence" vocabulary still in the data model and exports. This
+   changes the golden master and needs a documented, scientifically
+   justified snapshot update. It is a self-contained package and was not
+   started here rather than left half-applied.
+2. **Stage H** - `docs/STYLE_GUIDE.md`, editorial review, README.
+3. **Stage I** - final verification and the A-K completion report.
+4. The classified audit items in `docs/PHASE6_PROGRESS.md`: **P0-4** and
+   **S11** are blocked on the owner's approval for external access;
+   **P2-3**'s CFD scoring stays rejected without a published matrix;
+   **P2-4**, **P2-6** (mutation alignment), **P2-7**, **P2-2** and the
+   **P1-9** sub-items are open and unblocked.
+
+### Verification
+
+Suite 283/283, 0 skipped. Golden master and the built-in module
+self-tests pass separately. The 12 interface-standard checks pass, and
+were verified against deliberate violations before being relied on.
+pyright 112 against the 134 baseline, no new diagnostics. Working tree
+clean, ReadOnly restored on exactly the original 15 files.
