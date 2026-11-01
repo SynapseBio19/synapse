@@ -936,5 +936,62 @@ class MainEntryPointTests(unittest.TestCase):
         self.assertIn("main()", ast.unparse(guards[0]))
 
 
+# ----------------------------------------------------------------------
+# S24: what the BLAST XML parser is and is not exposed to
+# ----------------------------------------------------------------------
+class XmlParsingExposureTests(unittest.TestCase):
+    """Turns the S24 assumption into measurements that hold across versions."""
+
+    HEAD = '<?xml version="1.0"?>\n'
+    BODY = "<BlastOutput><BlastOutput_program>{}</BlastOutput_program></BlastOutput>"
+
+    def test_external_entities_are_not_resolved(self):
+        """XXE: the stdlib parser never fetches an external entity."""
+        import xml.etree.ElementTree as ET
+        from analyses.blast import BlastAnalysisError, describe_run_from_xml
+        payload = (self.HEAD
+                   + '<!DOCTYPE r [<!ENTITY xxe SYSTEM "file:///C:/Windows/win.ini">]>\n'
+                   + self.BODY.format("&xxe;"))
+        with self.assertRaises(ET.ParseError) as caught:
+            ET.fromstring(payload)
+        self.assertIn("undefined entity", str(caught.exception))
+        # The module turns that into its own error rather than leaking a parse error.
+        with self.assertRaises(BlastAnalysisError):
+            describe_run_from_xml(payload)
+
+    def test_an_external_dtd_is_not_fetched(self):
+        import xml.etree.ElementTree as ET
+        payload = (self.HEAD
+                   + '<!DOCTYPE r SYSTEM "http://example.invalid/evil.dtd">\n'
+                   + "<BlastOutput/>")
+        # Parses, and the unreachable host is never contacted.
+        self.assertEqual(ET.fromstring(payload).tag, "BlastOutput")
+
+    @staticmethod
+    def _nested_entities(levels, fan=10):
+        entities = ['<!ENTITY e0 "aaaaaaaaaa">']
+        for index in range(1, levels):
+            entities.append(f'<!ENTITY e{index} "{("&e%d;" % (index - 1)) * fan}">')
+        return ("<?xml version=\"1.0\"?>\n<!DOCTYPE r [\n" + "\n".join(entities)
+                + f"\n]>\n<BlastOutput><BlastOutput_program>&e{levels - 1};"
+                  "</BlastOutput_program></BlastOutput>")
+
+    def test_entity_expansion_is_bounded_by_expat(self):
+        """Billion laughs is reachable but capped, when Expat is new enough."""
+        import xml.etree.ElementTree as ET
+        import xml.parsers.expat as expat
+        if expat.version_info < (2, 4, 0):
+            self.skipTest(f"Expat {expat.version_info} predates the amplification guard")
+        with self.assertRaises(ET.ParseError) as caught:
+            ET.fromstring(self._nested_entities(8))
+        self.assertIn("amplification", str(caught.exception))
+
+    def test_a_realistic_document_still_parses(self):
+        from analyses import blast as B
+        query, parameters = B.describe_run_from_xml(B.SAMPLE_XML)
+        self.assertEqual(parameters.program, "blastn")
+        self.assertIsNotNone(query)
+
+
 if __name__ == "__main__":
     unittest.main()

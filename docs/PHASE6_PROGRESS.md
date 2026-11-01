@@ -97,6 +97,25 @@ D17 and D18 (stages F and G), plus S6/P1-7, S13, S14/P2-2, S18 and P1-9.
 Corrected or assessed: D1–D16, D19, S1–S5, S7–S12, S15–S17 and S19–S23.
 S11 stays open pending the owner's approval for live external requests.
 
+## Classification of the outstanding audit items (2026-11-01)
+
+Every item is classified against the original Master Prompt, with the
+reason it stands where it does. None is silently closed.
+
+| Item | Master Prompt reference | State | Why |
+|---|---|---|---|
+| **P0-4** enzyme definitions vs REBASE | 3.6 "Verify enzyme definitions against authoritative sources" | **Partially done; blocked for the rest** | ClaI was corrected and NdeI confirmed in the previous cycle, and `ENZYME_DATABASE_VERSION` records the review date. A systematic re-check of all 22 entries needs REBASE itself. That is an external data source, so it needs the owner's approval under the resource policy; it has not been requested. Not a defect, an unfinished validation. |
+| **P2-3** CRISPR improvements | 3.9 | **Mostly done; CFD still rejected** | Cut position (D8) and on-target exclusion (D9) are implemented and tested; the U6/Pol III poly-T consideration is named and sourced (S5). CFD scoring stays rejected: it needs the published mismatch weight matrix, and 14.3 forbids inventing it. Implementing it requires the matrix supplied as a cited data file. |
+| **P2-4** cross-checks | 3.13, 10.8 | **Partially done** | REF against the reference sequence is implemented (P0-7) and the reference alphabet is now validated (S22). Primer and guide consistency against called variants is not implemented. It is feasible without external data and is the natural next functional item. |
+| **P2-5** honest labels, G·U, RNAfold | 3.3, 3.4, 8.2 | **Partially done** | Unresolved residues keep their positions (Stage 5, extended by D14-F6), and the ORF label is "Heuristic score". G·U pairing and an optional RNAfold integration are not implemented; RNAfold would be an external tool and needs the dependency justification of 1.3.1. The "complexity" renaming belongs with Stage G terminology. |
+| **P2-6** performance | 3.13, 11.4 | **Partially done** | The cloning planner no longer rescans (S18): 10 enzymes went from 100-110 s to 0.57 s. The mutation alignment is still quadratic in time and memory; S9 measured it at ~45 bytes per matrix cell, so 10 kb needs about 4.5 GB. A banded or linear-space alignment is a real algorithmic change and is the remaining part. |
+| **P2-7** Type IIS enzymes | 3.6 "Pay particular attention to Type IIS enzymes" | **Not implemented, currently harmless** | The database holds no Type IIS enzyme, so the forward-strand search cannot produce a wrong result today. Adding one without Type IIS support would. The guard is that both arrive together. |
+| **S11** live literature providers | 3.11, 1.3 | **Blocked, awaiting the owner** | Testing against live providers means sending queries to external services, which needs explicit approval. Offline fixtures cover parsing, deduplication and retries. |
+| **S24** XML parsing exposure | 14.3, 1.3.1 dependency policy | **Measured, residual risk documented** | XXE is not reachable; entity expansion is capped by Expat >= 2.4.0. The cap is version-dependent, which matters because Synapse targets Python 3.10. See the audit entry. |
+| **P2-2** menus inside analysis modules | 7.2 | **Partially done** | `core/api.py` now covers every analysis (S14), so a non-interactive caller never needs the menus. The menus still live in the analysis modules; moving them is a structural change of its own. |
+| **P1-9** organism mode, 5'-partial, circular ORFs | 3.2 | **Deferred sub-items** | The genetic-code part is complete (RNA codon view). Organism mode, 5'-partial ORFs and ORFs spanning the origin remain unimplemented. |
+| **P3-1** experiment planner | 4.3 | **Not implemented, honestly labelled** | The menu entry says "not implemented" (D15) rather than advertising a feature that does nothing. |
+
 ## Handover notes (working practice)
 
 - Work only in this copy; never modify the original `Project Synapse`.

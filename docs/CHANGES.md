@@ -1308,3 +1308,31 @@ contains several other numbered sub-dialogs that must not shift.
 `tests/test_terminal_ui.py` now also checks that a menu's numbers are
 contiguous and that every entry has a branch and every branch an entry,
 for both the BLAST menu and the main menu.
+
+### S24 The XML parsing exposure is measured, not assumed
+
+The finding was recorded as a suspicion. It is now measured on the
+interpreter in use (Python 3.14.6, Expat 2.8.1), and the result is mixed
+rather than a clean pass or fail:
+
+- **XXE is not reachable.** `xml.etree.ElementTree` does not resolve
+  external entities: an entity pointing at a local file raises
+  `ParseError: undefined entity`, and an external DTD is ignored rather
+  than fetched.
+- **Entity expansion is reachable but capped.** A billion-laughs document
+  does expand - 1 MB in 0.02 s - until Expat's input-amplification guard
+  stops it (`limit on input amplification factor ... breached`, 10 MB
+  blocked in 0.09 s). The practical cost is about a megabyte of work, not
+  a denial of service.
+- **The residual risk is version-dependent.** That guard arrived in Expat
+  2.4.0. Synapse targets Python 3.10, and a 3.10 build bundling an older
+  Expat would expand without a cap. The test skips the amplification check
+  on such a build rather than reporting a pass it did not observe.
+
+`defusedxml` is still not justified as a runtime dependency under the
+standard-library-first policy, and the generic advice to adopt it does not
+match what was measured here. If the project ever has to run on a build
+without the guard, setting the limits explicitly through `xml.parsers.expat`
+is the dependency-free hardening.
+
+Tests: 4 new (`XmlParsingExposureTests`).
