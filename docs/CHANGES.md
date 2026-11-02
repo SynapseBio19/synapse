@@ -1632,11 +1632,15 @@ interpretation text is not part of any golden snapshot.
 
 ### External reference comparison: primer Tm against primer3-py (P1-3)
 
-`docs/METHODS.md` recorded that Primer3 could not be installed in the
-development environment, so the audit criterion for P1-3 ("±1 °C against
-Biopython/Primer3 at three Mg²⁺ levels") had never been run. primer3-py
-2.4.0 is now installed as a test-only reference (the `reference` extra),
-and the comparison was run locally, with no network access:
+`docs/METHODS.md` and `docs/AUDIT_STATUS.md` still recorded that Primer3
+could not be installed, so the audit criterion for P1-3 ("±1 °C against
+Biopython/Primer3 at three Mg²⁺ levels") was shown as not run. The Phase 6
+initial audit had in fact run 40 comparisons against primer3-py 2.4.0
+(max 0.003 °C, `FEATURE_STATUS.md` validation ledger), but neither
+document was updated and no test kept the check. (The commit message of
+`2851e11` says the criterion "had never been run"; that is corrected
+here.) The comparison was now extended and run locally, with no network
+access:
 
 - 81 primers: the Primer3 manual example and 18-, 20-, 22- and 25-nt
   windows of a fixed test sequence.
@@ -1656,3 +1660,35 @@ experimental melting temperatures, which no software comparison can.
 Test: 1 new (`Primer3ReferenceComparison`, a reduced grid of 31 primers
 x 4 conditions, tolerance 0.01 °C), skipped with a reason when primer3-py
 is not installed.
+
+### Instability index: the IG dipeptide weight corrected (`analyses/protein.py`)
+
+Found by the new Biopython reference tests (audit Tier 3 item 11, which
+asked for the audit's ad-hoc comparisons to become tests that skip
+without the reference libraries).
+
+- **Previous behavior.** The dipeptide instability weight for IG
+  (isoleucine followed by glycine) was −7.49. Every protein containing IG
+  got an instability index lower by 8.49 × 10/L per occurrence. In 31
+  random test proteins of 41-400 aa, 20 contained IG and differed from
+  ProtParam by up to 1.29 index units.
+- **Corrected behavior.** The weight is 1.0, the value in Biopython 1.88
+  `Bio.SeqUtils.ProtParamData.DIWV`, which reproduces the ExPASy
+  ProtParam table. The rest of Synapse's table equals Biopython's except
+  FY (33.6 vs 33.601, a 0.001 difference that is left as is).
+- **Reasoning.** The I row read `1.0, 1.0, 44.94, 1.0, -7.49, ...` against
+  Biopython's `1.0, 1.0, 44.94, 1.0, 1.0, ...`; -7.49 occurs twice more in
+  the same row (IK, IV), which makes a transcription error plausible.
+- **Reference.** Guruprasad et al. (1990) through its established
+  implementation (ExPASy ProtParam, as carried by Biopython). The paper's
+  table itself was not consulted in this session, because no external
+  access was used; checking it is the recommended confirmation.
+- **Why the audit missed it.** The two proteins compared with ExPASy in
+  the audit (ubiquitin and lysozyme) contain no IG dipeptide.
+- **Golden master.** Unchanged: the protein scenario contains no IG.
+- **Tests.** `tests/test_external_reference.py` (new, 6 tests): enzyme
+  definitions, digests on two topologies and three rotations, the 22 × 22
+  end-compatibility matrix, the ProtParam descriptors, the full weight
+  table, and a known-answer test for IG that needs no Biopython
+  (`AIGA` = 10/4 × (1.0 + 1.0 − 7.49)). On the previous code 20 protein
+  subtests, the table test and the known-answer test fail.

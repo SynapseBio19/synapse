@@ -94,6 +94,8 @@ IUPAC, gapped and invalid input (D14):
 | 37 | `docs/STYLE_GUIDE.md` (9.1-9.6) with an enforcement table checked by the suite | this package | guide-consistency test verified with a deliberate violation | Done |
 | 38 | README rewritten to 15.1 (purpose, modules, installation, dependencies, usage, configuration, architecture, testing, limitations) | this package | each statement checked against the code | Done |
 | 39 | P2-5 complexity: one measure in four modules, now defined with its limit in METHODS and the interpretation; new METHODS section for the sequence overview | this package | `ACGT`x100 = 1.000 and `AT`x100 = 0.500 checked by execution | Done; field names kept |
+| 40 | Stage I: primer Tm vs primer3-py extended to 2,916 comparisons (max 0.0032 °C) and kept in the suite | `2851e11` | external reference comparison, local library | Done |
+| 41 | Stage I: Biopython reference tests (enzymes, digests, end compatibility, ProtParam); **IG instability weight corrected** (-7.49 -> 1.0) | this package | 22/22, 132/132, 484/484; 31 proteins within tolerance after the fix, 20 failing before | Corrected; suite 305/305 |
 
 ## Paused (2026-10-31)
 

@@ -160,7 +160,7 @@ Test coverage: 2 test references.
 | — | Molecular weight | `calculate_protein_molecular_weight` | Implemented | Execution-tested | Independently validated | Ubiquitin 8564.84 Da = ExPASy. Returns a dict with min/max/ambiguity flags. |
 | — | Isoelectric point | `calculate_isoelectric_point` | Implemented | Execution-tested | Independently validated | 6.5616 vs ProtParam 6.56; lysozyme 9.3238 vs 9.32. |
 | — | GRAVY | `calculate_gravy` | Implemented | Execution-tested | Independently validated | −0.48947 vs −0.489. |
-| — | Instability index | `calculate_instability_index` | Implemented | Execution-tested | Independently validated | 36.055 vs 36.06; 16.091 vs 16.09. |
+| — | Instability index | `calculate_instability_index` | Implemented | Execution-tested | Independently validated | 36.055 vs 36.06; 16.091 vs 16.09. **IG weight corrected 2026-11-02** (−7.49 -> 1.0, the ExPASy/Biopython value): the two audit proteins contain no IG dipeptide, so the error was invisible there; 20 of 31 random test proteins changed. Now within 2e-4 of Biopython on 31 proteins. |
 | — | Aromaticity | `calculate_aromaticity` | Implemented | Execution-tested | Independently validated | Exact match. |
 | — | Extinction coefficient | `calculate_extinction_coefficient` | Implemented | Execution-tested | Independently validated | Reduced/oxidized both match, incl. 4 disulfide pairs in lysozyme. |
 | — | Charge at pH | `calculate_charge_at_ph`, `_get_pka_tables` | Implemented | Execution-tested | Not applicable | |
@@ -468,6 +468,9 @@ explicitly not implemented.
 | 7 | Local BLAST pipeline | BLAST+ 2.17.0+ on the bundled database | Real run; coverage, E-values, bands, provenance correct |
 | 8 | Variant left-alignment | Tan et al. 2015, hand-verified | 5/5 cases correct, incl. correct non-shifts |
 | 9 | Circular restriction map (after D3) | Biopython 1.88 on pUC19, 22 enzymes × 2 topologies × 3 rotations | 132 comparisons, 0 differences |
+| 10 | Melting temperature, extended (Stage I, 2026-11-02) | primer3-py 2.4.0, 81 primers × 36 conditions (Mg²⁺ 0-3 mM) | 2,916 comparisons, max 0.0032 °C; in the suite |
+| 11 | Enzymes, digests, end compatibility (Stage I) | Biopython 1.88 `Bio.Restriction`, 6-kb test sequence, 2 topologies × 3 rotations | 22/22 enzymes, 132 digests and 484 pairs, 0 differences; in the suite |
+| 12 | Protein descriptors (Stage I) | Biopython 1.88 `ProtParam`, 31 proteins | found the IG instability weight error (corrected); then all within tolerance; in the suite |
 
 ### Still open
 
@@ -478,7 +481,7 @@ explicitly not implemented.
 | NEBcutter comparison | Web service | Substantively superseded by validation 2 |
 | Live remote NCBI BLAST | Not run by choice | One confirmed run recording RID and provenance |
 | Local BLAST on a real database | `nt` is ~100 GB+ | `swissprot` (~0.5 GB) as a proportionate step |
-| Python 3.10 suite + `pyright` | 3.10 not installed; pyright not run | Install 3.10; run both |
+| Python 3.10 suite | 3.10 not installed (only 3.14.6); installing an interpreter needs the owner's approval | Install 3.10 and run the suite. `pyright --pythonversion 3.10` runs on every package (112 diagnostics, baseline 134) |
 | HGVS conformance | No validator | `hgvs` package or Mutalyzer; currently labeled "HGVS-like" |
 | Primer hairpin/dimer screens | Heuristic by design | `primer3.calc_hairpin` / `calc_heterodimer` are available and would be a direct comparison |
 

@@ -158,12 +158,24 @@ use 0-based inclusive `start <= stop` on the forward strand.
   a selected ORF, `core.api.analyze_protein_from_cds`) the first codon is
   decoded as Met only if it is an initiation codon of the genetic code —
   the same rule as the ORF translator.
-- Protein analysis uses the genetic code of the selected ORF. The RNA
-  module's three-frame codon view always uses table 1.
+- Protein analysis uses the genetic code of the selected ORF, and so
+  does the RNA module's codon view (see below).
 - Physicochemical values (mass, pI, GRAVY and similar) are sequence-based
   estimates. Checked against ExPASy ProtParam for ubiquitin (MW 8564.84 Da,
-  pI 6.56, GRAVY −0.489, ε 1490 M⁻¹cm⁻¹); otherwise not independently
-  validated.
+  pI 6.56, GRAVY −0.489, ε 1490 M⁻¹cm⁻¹).
+- External reference comparison (2026-11-02, Biopython 1.88
+  `Bio.SeqUtils.ProtParam`, 31 proteins of 41-400 aa): pI within 1e-4,
+  GRAVY and aromaticity identical, extinction coefficients identical,
+  instability index within 2e-4, average mass within 2e-5 relative (the
+  residue mass tables differ slightly). `tests/test_external_reference.py`
+  repeats it, skipped without Biopython.
+- Instability index (Guruprasad et al. 1990): 10/L times the sum of the
+  dipeptide weights. The weight for the dipeptide IG was −7.49 in Synapse
+  and 1.0 in Biopython's table, which reproduces ExPASy ProtParam; it is
+  now 1.0 (2026-11-02). The only remaining difference is FY, 33.6 here and
+  33.601 there. The primary table was not consulted for this correction
+  (no external access in this session), so the reference is the
+  established implementation, not the paper.
 - Unresolved residues ("?", from ambiguous codons) keep their position.
   Sliding windows (hydropathy, flexibility, transmembrane screen, signal
   peptide) and the instability index skip the windows or dipeptides that
@@ -438,3 +450,14 @@ Validation:
   Bioinformatics 10:421.
 - NCBI: The Genetic Codes; ORFfinder documentation; Primer3 manual
   (`PRIMER_TM_FORMULA`, `PRIMER_SALT_CORRECTIONS`).
+- Gardiner-Garden M, Frommer M (1987) CpG islands in vertebrate genomes.
+  J Mol Biol 196:261–282.
+- Guruprasad K, Reddy BVB, Pandit MW (1990) Correlation between stability
+  of a protein and its dipeptide composition: a novel approach for
+  predicting in vivo stability of a protein from its primary sequence.
+  Protein Eng 4:155–161.
+- Cock PJA et al. (2009) Biopython: freely available Python tools for
+  computational molecular biology and bioinformatics. Bioinformatics
+  25:1422–1423. (Reference implementation in the tests, version 1.88.)
+- Untergasser A et al. (2012) Primer3 - new capabilities and interfaces.
+  Nucleic Acids Res 40:e115. (primer3-py 2.4.0 wraps Primer3 in the tests.)
