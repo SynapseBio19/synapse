@@ -41,6 +41,7 @@ import re
 import statistics
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Set, Tuple
 from ui.style import major_rule, minor_rule
+from ui import style
 
 
 # ============================================================================
@@ -2414,10 +2415,7 @@ def _prompt_variant() -> Variant:
 
 
 def _prompt_filter() -> VariantFilter:
-    print()
-    print(major_rule())
-    print("VARIANT FILTER")
-    print(major_rule())
+    style.header('VARIANT FILTER')
 
     quality_text = input("Minimum QUAL (Enter for none): ").strip()
     minimum_quality = parse_float(quality_text)
@@ -2426,13 +2424,13 @@ def _prompt_filter() -> VariantFilter:
     maximum_af = parse_float(max_af_text)
 
     require_pass = (
-        input("Require FILTER=PASS? [y/N]: ").strip().lower() == "y"
+        style.ask('Require FILTER=PASS?', default='y/N').lower() == "y"
     )
     include_unknown_quality = (
-        input("Include variants with unknown QUAL? [y/N]: ").strip().lower() == "y"
+        style.ask('Include variants with unknown QUAL?', default='y/N').lower() == "y"
     )
     include_unknown_frequency = (
-        input("Include variants with unknown AF? [y/N]: ").strip().lower() == "y"
+        style.ask('Include variants with unknown AF?', default='y/N').lower() == "y"
     )
 
     return VariantFilter(
@@ -2455,12 +2453,10 @@ def _prompt_filename(default_name: str, extension: str) -> str:
 
 def _print_filter_result(result: VariantFilterResult) -> None:
     print()
-    print(f"Passed: {len(result.passed)}")
-    print(f"Failed: {len(result.failed)}")
+    style.field('Passed', f"{len(result.passed)}")
+    style.field('Failed', f"{len(result.failed)}")
     if result.failed:
-        print()
-        print("FILTER FAILURES")
-        print(minor_rule())
+        style.section('FILTER FAILURES')
         for variant in result.failed:
             reasons = result.reasons.get(variant.key, [])
             print(f"{format_variant(variant)}")
@@ -2493,13 +2489,13 @@ def _prompt_contig_reference(pipeline, variants: Sequence[Variant]) -> Dict[str,
     context = getattr(pipeline, "context", None)
     sequence = getattr(context, "sequence", "") if context is not None else ""
     if not sequence:
-        print("No Synapse sequence loaded: variants are trimmed only (no REF check, no repeat shift).")
+        style.note("No Synapse sequence loaded: variants are trimmed only (no REF check, no repeat shift).")
         return {}
     contigs = sorted({v.chromosome for v in variants})
     header = getattr(context, "header", "") or "loaded sequence"
     print()
-    print(f"Loaded Synapse sequence: {header} ({len(sequence)} bp)")
-    print(f"Contigs in the VCF: {', '.join(contigs)}")
+    style.field('Loaded Synapse sequence', f"{header} ({len(sequence)} bp)")
+    style.field('Contigs in the VCF', f"{', '.join(contigs)}")
     print("VCF positions must be 1-based positions on this exact sequence.")
     choice = input("Contig to map onto the loaded sequence (Enter = none): ").strip()
     if not choice:
@@ -2540,39 +2536,25 @@ def run_variant_analysis_ui(
         return last_result
 
     while True:
-        print()
-        print(major_rule())
-        print("VARIANT ANALYSIS")
-        print(major_rule())
-        print()
-        print(f"Loaded variants: {len(working)}")
+        style.header('VARIANT ANALYSIS')
+        style.field('Loaded variants', f"{len(working)}")
         if filtered_view is not None:
-            print(f"Current filter view: {len(filtered_view)} passed")
-        print()
-        print("INPUT")
-        print("[1] Load VCF")
-        print("[2] Add Variant Manually")
-        print()
-        print("ANALYSIS")
-        print("[3] Analyze Variants")
-        print("[4] Filter Variants")
-        print("[5] Compare Variant Sets")
-        print("[6] Variant Statistics")
-        print("[7] Cohort / Sample Analysis")
-        print("[8] Normalize Variants")
-        print()
-        print("OUTPUT")
-        print("[9] Export VCF")
-        print("[10] Export TSV")
-        print("[11] Full Variant Report")
-        print()
-        print("SYSTEM")
-        print("[12] Run Variant Self-Test")
-        print()
-        print("[0] Back")
-        print(minor_rule())
+            style.field('Current filter view', f"{len(filtered_view)} passed")
+        style.menu([
+            ('Input', [('1', 'Load VCF'), ('2', 'Add Variant Manually')]),
+            ('Analysis', [
+                ('3', 'Analyze Variants'),
+                ('4', 'Filter Variants'),
+                ('5', 'Compare Variant Sets'),
+                ('6', 'Variant Statistics'),
+                ('7', 'Cohort / Sample Analysis'),
+                ('8', 'Normalize Variants'),
+            ]),
+            ('Output', [('9', 'Export VCF'), ('10', 'Export TSV'), ('11', 'Full Variant Report')]),
+            ('System', [('12', 'Run Variant Self-Test')]),
+        ])
 
-        choice = input("Selection: ").strip()
+        choice = style.ask_choice()
 
         if choice == "0":
             return last_result
@@ -2588,7 +2570,7 @@ def run_variant_analysis_ui(
                 refresh_result()
                 print(f"Loaded {len(working)} variant(s).")
             except (VariantAnalysisError, ValueError) as error:
-                print(f"ERROR: {error}")
+                style.error(f"{error}")
 
         elif choice == "2":
             try:
@@ -2598,13 +2580,14 @@ def run_variant_analysis_ui(
                 filtered_view = None
                 last_filter_result = None
                 refresh_result()
-                print(f"Added: {format_variant(variant)}")
+                style.field('Added', f"{format_variant(variant)}")
             except VariantAnalysisError as error:
-                print(f"ERROR: {error}")
+                style.error(f"{error}")
 
         elif choice == "3":
             if not working:
-                print("No variants loaded.")
+                style.note("No variants loaded.")
+                style.pause()
                 continue
             try:
                 result = refresh_result()
@@ -2612,11 +2595,12 @@ def run_variant_analysis_ui(
                     print()
                     print_variant_report(result)
             except VariantAnalysisError as error:
-                print(f"ERROR: {error}")
+                style.error(f"{error}")
 
         elif choice == "4":
             if not working:
-                print("No variants loaded.")
+                style.note("No variants loaded.")
+                style.pause()
                 continue
             try:
                 criteria = _prompt_filter()
@@ -2624,11 +2608,12 @@ def run_variant_analysis_ui(
                 filtered_view = list(last_filter_result.passed)
                 _print_filter_result(last_filter_result)
             except VariantAnalysisError as error:
-                print(f"ERROR: {error}")
+                style.error(f"{error}")
 
         elif choice == "5":
             if not working:
-                print("No variants loaded.")
+                style.note("No variants loaded.")
+                style.pause()
                 continue
             try:
                 print()
@@ -2643,14 +2628,11 @@ def run_variant_analysis_ui(
                     raise VariantAnalysisError("No second VCF set supplied.")
                 right, _, _ = parse_vcf("\n".join(lines))
                 comparison = compare_variant_sets(working, right)
-                print()
-                print(major_rule())
-                print("VARIANT SET COMPARISON")
-                print(major_rule())
-                print(f"Left variants:     {comparison.left_count}")
-                print(f"Right variants:    {comparison.right_count}")
-                print(f"Shared variants:   {comparison.shared_count}")
-                print(f"Jaccard similarity: {comparison.jaccard_similarity:.4f}")
+                style.header('VARIANT SET COMPARISON')
+                style.field('Left variants', f"{comparison.left_count}")
+                style.field('Right variants', f"{comparison.right_count}")
+                style.field('Shared variants', f"{comparison.shared_count}")
+                style.field('Jaccard similarity', f"{comparison.jaccard_similarity:.4f}")
                 print()
                 print("Only in current set:")
                 for v in comparison.only_in_left:
@@ -2659,48 +2641,44 @@ def run_variant_analysis_ui(
                 for v in comparison.only_in_right:
                     print(f"  - {format_variant(v)}")
             except (VariantAnalysisError, ValueError) as error:
-                print(f"ERROR: {error}")
+                style.error(f"{error}")
 
         elif choice == "6":
             if not working:
-                print("No variants loaded.")
+                style.note("No variants loaded.")
+                style.pause()
                 continue
             stats = calculate_variant_statistics(working)
-            print()
-            print(major_rule())
-            print("VARIANT STATISTICS")
-            print(major_rule())
-            print(f"Total:              {stats.total_variants}")
-            print(f"Unique:             {stats.unique_variants}")
-            print(f"SNVs:               {stats.snvs}")
-            print(f"MNVs:               {stats.mnvs}")
-            print(f"Insertions:         {stats.insertions}")
-            print(f"Deletions:          {stats.deletions}")
-            print(f"Indels:             {stats.indels}")
-            print(f"Missing QUAL:       {stats.missing_quality}")
-            print(f"Mean QUAL:          {'.' if stats.mean_quality is None else f'{stats.mean_quality:.2f}'}")
-            print(f"Mean AF:            {'.' if stats.mean_allele_frequency is None else f'{stats.mean_allele_frequency:.5f}'}")
-            print(f"Median AF:          {'.' if stats.median_allele_frequency is None else f'{stats.median_allele_frequency:.5f}'}")
-            print(f"Rare variants:      {stats.rare_variants}")
-            print(f"Genes affected:     {stats.genes_affected}")
-            print(f"Chromosomes:        {stats.chromosomes_affected}")
-            print(f"Transitions:        {stats.transition_count}")
-            print(f"Transversions:      {stats.transversion_count}")
+            style.header('VARIANT STATISTICS')
+            style.field('Total', f"{stats.total_variants}")
+            style.field('Unique', f"{stats.unique_variants}")
+            style.field('SNVs', f"{stats.snvs}")
+            style.field('MNVs', f"{stats.mnvs}")
+            style.field('Insertions', f"{stats.insertions}")
+            style.field('Deletions', f"{stats.deletions}")
+            style.field('Indels', f"{stats.indels}")
+            style.field('Missing QUAL', f"{stats.missing_quality}")
+            style.field('Mean QUAL', f"{'.' if stats.mean_quality is None else f'{stats.mean_quality:.2f}'}")
+            style.field('Mean AF', f"{'.' if stats.mean_allele_frequency is None else f'{stats.mean_allele_frequency:.5f}'}")
+            style.field('Median AF', f"{'.' if stats.median_allele_frequency is None else f'{stats.median_allele_frequency:.5f}'}")
+            style.field('Rare variants', f"{stats.rare_variants}")
+            style.field('Genes affected', f"{stats.genes_affected}")
+            style.field('Chromosomes', f"{stats.chromosomes_affected}")
+            style.field('Transitions', f"{stats.transition_count}")
+            style.field('Transversions', f"{stats.transversion_count}")
             ratio = stats.transition_transversion_ratio
-            print(f"Ti/Tv ratio:        {'inf' if ratio == math.inf else '.' if ratio is None else f'{ratio:.3f}'}")
+            style.field('Ti/Tv ratio', f"{'inf' if ratio == math.inf else '.' if ratio is None else f'{ratio:.3f}'}")
 
         elif choice == "7":
             if not working:
-                print("No variants loaded.")
+                style.note("No variants loaded.")
+                style.pause()
                 continue
             cohort = calculate_cohort_summary(working)
-            print()
-            print(major_rule())
-            print("COHORT / SAMPLE ANALYSIS")
-            print(major_rule())
-            print(f"Samples:            {cohort.sample_count}")
-            print(f"Shared variants:    {cohort.shared_variant_count}")
-            print(f"Private variants:   {cohort.private_variant_count}")
+            style.header('COHORT / SAMPLE ANALYSIS')
+            style.field('Samples', f"{cohort.sample_count}")
+            style.field('Shared variants', f"{cohort.shared_variant_count}")
+            style.field('Private variants', f"{cohort.private_variant_count}")
             for sample in cohort.sample_summaries:
                 print(
                     f"{sample.sample}: called={sample.called_variants}, "
@@ -2712,7 +2690,8 @@ def run_variant_analysis_ui(
 
         elif choice == "8":
             if not working:
-                print("No variants loaded.")
+                style.note("No variants loaded.")
+                style.pause()
                 continue
             try:
                 contig_map = _prompt_contig_reference(pipeline, working)
@@ -2738,34 +2717,37 @@ def run_variant_analysis_ui(
                     f"{without_reference} without one (common bases trimmed only)."
                 )
             except VariantAnalysisError as error:
-                print(f"ERROR: {error}")
+                style.error(f"{error}")
 
         elif choice == "9":
             if not working:
-                print("No variants loaded.")
+                style.note("No variants loaded.")
+                style.pause()
                 continue
             try:
                 filename = _prompt_filename("synapse_variants", "vcf")
                 write_vcf(working, filename, metadata=metadata, sample_names=sample_names)
-                print(f"VCF exported: {filename}")
+                style.success(f"VCF exported: {filename}")
             except OSError as error:
-                print(f"ERROR: could not write the VCF file: {error}")
+                style.error(f"could not write the VCF file: {error}")
 
         elif choice == "10":
             if not working:
-                print("No variants loaded.")
+                style.note("No variants loaded.")
+                style.pause()
                 continue
             try:
                 filename = _prompt_filename("synapse_variants", "tsv")
                 with open(filename, "w", encoding="utf-8", newline="") as handle:
                     handle.write(variants_to_tsv(working))
-                print(f"TSV exported: {filename}")
+                style.success(f"TSV exported: {filename}")
             except OSError as error:
-                print(f"ERROR: could not write the TSV file: {error}")
+                style.error(f"could not write the TSV file: {error}")
 
         elif choice == "11":
             if not working:
-                print("No variants loaded.")
+                style.note("No variants loaded.")
+                style.pause()
                 continue
             result = refresh_result()
             if result is not None:
@@ -2774,17 +2756,14 @@ def run_variant_analysis_ui(
 
         elif choice == "12":
             tests = run_variant_analysis_self_test()
-            print()
-            print(major_rule())
-            print("VARIANT ANALYSIS SELF-TEST")
-            print(major_rule())
+            style.header('VARIANT ANALYSIS SELF-TEST')
             for test_name, passed in tests.items():
                 print(f"[{'PASS' if passed else 'FAIL'}] {test_name}")
             print(minor_rule())
             print(f"{sum(tests.values())}/{len(tests)} tests passed.")
 
         else:
-            print("Invalid selection.")
+            style.invalid_selection()
 
 
 def _store_variant_pipeline_result(pipeline, key: str, value: object) -> None:
@@ -2883,9 +2862,7 @@ __all__ = [
 if __name__ == "__main__":
     tests = run_variant_analysis_self_test()
     passed = sum(tests.values())
-    print(major_rule())
-    print("SYNAPSE VARIANT ANALYSIS SELF-TEST")
-    print(major_rule())
+    style.header('SYNAPSE VARIANT ANALYSIS SELF-TEST')
     for name, success in tests.items():
         print(f"[{'PASS' if success else 'FAIL'}] {name}")
     print(minor_rule())
