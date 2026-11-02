@@ -1,5 +1,6 @@
 import math
 from ui.style import major_rule, minor_rule
+from ui import style
 
 
 # ============================================================
@@ -2467,9 +2468,7 @@ if __name__ == "__main__":
 
     self_test = run_sequence_self_test()
 
-    print(major_rule())
-    print("SYNAPSE SEQUENCE ENGINE SELF-TEST")
-    print(major_rule())
+    style.header('SYNAPSE SEQUENCE ENGINE SELF-TEST')
 
     for name, passed in self_test.items():
 

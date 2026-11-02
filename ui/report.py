@@ -5,6 +5,7 @@ from analyses.sequence import (
     calculate_average_dna_molecular_weight,
 )
 from ui.style import major_rule, minor_rule
+from ui import style
 
 
 # ============================================================
@@ -60,30 +61,15 @@ def _print_profile_unavailable(
     sequence_length,
     window_size,
 ):
-    print(
-        f"{profile_name} is not available for this sequence."
-    )
-    print(
-        f"Sequence length:     {sequence_length} bp"
-    )
-    print(
-        f"Minimum window:      {window_size} bp"
-    )
-    print(
-        "Reason:               "
-        "Sequence is shorter than the configured window."
-    )
+    style.note(f"{profile_name} is not available for this sequence.")
+    style.field('Sequence length', f"{sequence_length} bp")
+    style.field('Minimum window', f"{window_size} bp")
+    style.field('Reason', "Sequence is shorter than the configured window.")
 
 
 def _print_cpg_criteria():
-    print(
-        "Criteria:             "
-        "200 bp window | >=50% GC | O/E >=0.60"
-    )
-    print(
-        "Definition:           "
-        "Classical CpG island screening criteria"
-    )
+    style.field('Criteria', "200 bp window | >=50% GC | O/E >=0.60")
+    style.field('Definition', "Classical CpG island screening criteria")
 
 
 
@@ -116,20 +102,11 @@ def _print_profile_statistics(
 
         return
 
-    print(
-        f"Average:             "
-        f"{statistics['average']:.2f}{unit}"
-    )
+    style.field('Average', f"{statistics['average']:.2f}{unit}")
 
-    print(
-        f"Minimum:             "
-        f"{statistics['minimum']:.2f}{unit}"
-    )
+    style.field('Minimum', f"{statistics['minimum']:.2f}{unit}")
 
-    print(
-        f"Maximum:             "
-        f"{statistics['maximum']:.2f}{unit}"
-    )
+    style.field('Maximum', f"{statistics['maximum']:.2f}{unit}")
 
     minimum_position = (
         statistics["minimum_position"]
@@ -141,19 +118,13 @@ def _print_profile_statistics(
 
     if minimum_position is not None:
 
-        print(
-            f"Minimum position:    "
-            f"{minimum_position['start']}-"
-            f"{minimum_position['end']} bp"
-        )
+        style.field('Minimum position', f"{minimum_position['start']}-"
+            f"{minimum_position['end']} bp")
 
     if maximum_position is not None:
 
-        print(
-            f"Maximum position:    "
-            f"{maximum_position['start']}-"
-            f"{maximum_position['end']} bp"
-        )
+        style.field('Maximum position', f"{maximum_position['start']}-"
+            f"{maximum_position['end']} bp")
 
 
 # ============================================================
@@ -220,38 +191,21 @@ def print_results(
     # HEADER
     # ========================================================
 
-    print()
-    print(major_rule())
-    print("SEQUENCE OVERVIEW")
-    print(major_rule())
+    style.header('SEQUENCE OVERVIEW')
 
     # ========================================================
     # SEQUENCE INFORMATION
     # ========================================================
 
-    print()
-    print("Sequence Information")
-    print(minor_rule())
+    style.section('Sequence Information')
 
-    print(
-        f"Sequence:            "
-        f"{selected_index}"
-    )
+    style.field('Sequence', f"{selected_index}")
 
-    print(
-        f"Header:              "
-        f"{header}"
-    )
+    style.field('Header', f"{header}")
 
-    print(
-        f"Topology:            "
-        f"{topology}"
-    )
+    style.field('Topology', f"{topology}")
 
-    print(
-        f"Sequence Length:     "
-        f"{len(dna)} bp"
-    )
+    style.field('Sequence Length', f"{len(dna)} bp")
 
     # ========================================================
     # SEQUENCE STATISTICS
@@ -263,47 +217,25 @@ def print_results(
         nucleotide_percentages
     )
 
-    print()
-    print("Sequence Statistics")
-    print(minor_rule())
+    style.section('Sequence Statistics')
 
-    print(
-        f"Length:               "
-        f"{statistics['length']} bp"
-    )
+    style.field('Length', f"{statistics['length']} bp")
 
-    print(
-        f"Standard Bases:       "
-        f"{statistics['standard_length']}"
-    )
+    style.field('Standard Bases', f"{statistics['standard_length']}")
 
-    print(
-        f"GC Count:             "
-        f"{statistics['gc_count']}"
-    )
+    style.field('GC Count', f"{statistics['gc_count']}")
 
-    print(
-        f"AT Count:             "
-        f"{statistics['at_count']}"
-    )
+    style.field('AT Count', f"{statistics['at_count']}")
 
-    print(
-        f"GC Content:           "
-        f"{statistics['gc_content']:.2f}%"
-    )
+    style.field('GC Content', f"{statistics['gc_content']:.2f}%")
 
-    print(
-        f"AT Content:           "
-        f"{statistics['at_content']:.2f}%"
-    )
+    style.field('AT Content', f"{statistics['at_content']:.2f}%")
 
     # ========================================================
     # SEQUENCE SUMMARY
     # ========================================================
 
-    print()
-    print("Sequence Summary")
-    print(minor_rule())
+    style.section('Sequence Summary')
 
     if sequence_quality["invalid_symbols"] > 0:
 
@@ -317,97 +249,51 @@ def print_results(
 
         sequence_status = "VALID"
 
-    print(
-        f"Status:              "
-        f"{sequence_status}"
-    )
+    style.field('Status', f"{sequence_status}")
 
-    print(
-        f"GC Content:          "
-        f"{gc_content:.2f}%"
-    )
+    style.field('GC Content', f"{gc_content:.2f}%")
 
-    print(
-        f"AT Content:          "
-        f"{at_content:.2f}%"
-    )
+    style.field('AT Content', f"{at_content:.2f}%")
 
-    print(
-        f"Complexity:          "
-        f"{sequence_complexity:.3f}"
-    )
+    style.field('Complexity', f"{sequence_complexity:.3f}")
 
-    print(
-        f"CpG Sites:           "
-        f"{cpg_analysis['count']}"
-    )
+    style.field('CpG Sites', f"{cpg_analysis['count']}")
 
-    print(
-        f"CpG Islands:         "
-        f"{len(cpg_islands)}"
-    )
+    style.field('CpG Islands', f"{len(cpg_islands)}")
 
-    print(
-        f"Homopolymer Regions: "
-        f"{len(homopolymers)}"
-    )
+    style.field('Homopolymer Regions', f"{len(homopolymers)}")
 
-    print(
-        f"Ambiguous Bases:     "
-        f"{sequence_quality['ambiguous_bases']}"
-    )
+    style.field('Ambiguous Bases', f"{sequence_quality['ambiguous_bases']}")
 
-    print(
-        f"Invalid Symbols:     "
-        f"{sequence_quality['invalid_symbols']}"
-    )
+    style.field('Invalid Symbols', f"{sequence_quality['invalid_symbols']}")
 
     # ========================================================
     # GC / AT CONTENT
     # ========================================================
 
-    print()
-    print("GC / AT Content")
-    print(minor_rule())
+    style.section('GC / AT Content')
 
     if content_ranges["ambiguous"]:
 
-        print(
-            f"GC Content Range:    "
-            f"{content_ranges['gc_min']:.2f}% - "
-            f"{content_ranges['gc_max']:.2f}%"
-        )
+        style.field('GC Content Range', f"{content_ranges['gc_min']:.2f}% - "
+            f"{content_ranges['gc_max']:.2f}%")
 
-        print(
-            f"AT Content Range:    "
-            f"{content_ranges['at_min']:.2f}% - "
-            f"{content_ranges['at_max']:.2f}%"
-        )
+        style.field('AT Content Range', f"{content_ranges['at_min']:.2f}% - "
+            f"{content_ranges['at_max']:.2f}%")
 
-        print(
-            "Content Status:      "
-            "Range due to ambiguous IUPAC bases"
-        )
+        style.field('Content Status', "Range due to ambiguous IUPAC bases")
 
     else:
 
-        print(
-            f"GC Content:          "
-            f"{gc_content:.2f}%"
-        )
+        style.field('GC Content', f"{gc_content:.2f}%")
 
-        print(
-            f"AT Content:          "
-            f"{at_content:.2f}%"
-        )
+        style.field('AT Content', f"{at_content:.2f}%")
 
     # ========================================================
     # NUCLEOTIDE COMPOSITION
     # ========================================================
 
-    print()
-    print("Nucleotide Composition")
-    print(minor_rule())
+    style.section('Nucleotide Composition')
 
     for base in (
         "A",
@@ -416,76 +302,46 @@ def print_results(
         "G"
     ):
 
-        print(
-            f"{base}:                  "
-            f"{nucleotide_counts[base]:>6}  "
-            f"{nucleotide_percentages[base]:>6.2f}%"
-        )
+        style.field(base, f"{nucleotide_counts[base]:>6}  "
+                    f"{nucleotide_percentages[base]:>6.2f}%")
 
     # ========================================================
     # NUCLEOTIDE SKEW
     # ========================================================
 
-    print()
-    print("Nucleotide Skew")
-    print(minor_rule())
+    style.section('Nucleotide Skew')
 
-    print(
-        f"GC Skew:             "
-        f"{gc_skew:+.3f}"
-    )
+    style.field('GC Skew', f"{gc_skew:+.3f}")
 
-    print(
-        f"AT Skew:             "
-        f"{at_skew:+.3f}"
-    )
+    style.field('AT Skew', f"{at_skew:+.3f}")
 
-    print(
-        "Interpretation:      "
-        "Positive values indicate relative enrichment "
-        "of the first nucleotide in the pair."
-    )
+    style.field('Interpretation', "Positive values indicate relative enrichment "
+        "of the first nucleotide in the pair.")
 
     # ========================================================
     # MOLECULAR WEIGHT
     # ========================================================
 
-    print()
-    print("Molecular Weight")
-    print(minor_rule())
+    style.section('Molecular Weight')
 
     if molecular_weight["ambiguous"]:
 
-        print(
-            f"Estimated dsDNA MW:  "
-            f"{molecular_weight['min'] / 1000:,.2f} - "
-            f"{molecular_weight['max'] / 1000:,.2f} kDa"
-        )
+        style.field('Estimated dsDNA MW', f"{molecular_weight['min'] / 1000:,.2f} - "
+            f"{molecular_weight['max'] / 1000:,.2f} kDa")
 
-        print(
-            "MW Status:           "
-            "Range due to ambiguous IUPAC bases"
-        )
+        style.field('MW Status', "Range due to ambiguous IUPAC bases")
 
     else:
 
-        print(
-            f"Estimated dsDNA MW:  "
-            f"{molecular_weight['min'] / 1000:,.2f} kDa"
-        )
+        style.field('Estimated dsDNA MW', f"{molecular_weight['min'] / 1000:,.2f} kDa")
 
-    print(
-        "Method:              "
-        "Composition-based nucleotide residue estimate"
-    )
+    style.field('Method', "Composition-based nucleotide residue estimate")
 
     # ========================================================
     # GC CONTENT PROFILE
     # ========================================================
 
-    print()
-    print("GC Content Profile")
-    print(minor_rule())
+    style.section('GC Content Profile')
 
     if len(dna) < profile_window:
 
@@ -497,15 +353,9 @@ def print_results(
 
     else:
 
-        print(
-            f"Window:              "
-            f"{profile_window} bp"
-        )
+        style.field('Window', f"{profile_window} bp")
 
-        print(
-            f"Step:                "
-            f"{profile_step} bp"
-        )
+        style.field('Step', f"{profile_step} bp")
 
         _print_profile_statistics(
             gc_profile_statistics,
@@ -513,9 +363,7 @@ def print_results(
             "%"
         )
 
-        print()
-        print("Profile Preview")
-        print(minor_rule())
+        style.section('Profile Preview')
 
         preview_points = (
             gc_profile[::max(
@@ -546,9 +394,7 @@ def print_results(
     # COMPLEXITY PROFILE
     # ========================================================
 
-    print()
-    print("Sequence Complexity Profile")
-    print(minor_rule())
+    style.section('Sequence Complexity Profile')
 
     if len(dna) < profile_window:
 
@@ -560,24 +406,16 @@ def print_results(
 
     else:
 
-        print(
-            f"Window:              "
-            f"{profile_window} bp"
-        )
+        style.field('Window', f"{profile_window} bp")
 
-        print(
-            f"Step:                "
-            f"{profile_step} bp"
-        )
+        style.field('Step', f"{profile_step} bp")
 
         _print_profile_statistics(
             complexity_profile_statistics,
             "Complexity"
         )
 
-        print()
-        print("Profile Preview")
-        print(minor_rule())
+        style.section('Profile Preview')
 
         preview_points = (
             complexity_profile[::max(
@@ -598,9 +436,7 @@ def print_results(
     # HOMOPOLYMERS
     # ========================================================
 
-    print()
-    print("Homopolymers")
-    print(minor_rule())
+    style.section('Homopolymers')
 
     if homopolymers:
 
@@ -631,37 +467,21 @@ def print_results(
     # CpG ANALYSIS
     # ========================================================
 
-    print()
-    print("CpG Analysis")
-    print(minor_rule())
+    style.section('CpG Analysis')
 
-    print(
-        f"CpG Count:           "
-        f"{cpg_analysis['count']}"
-    )
+    style.field('CpG Count', f"{cpg_analysis['count']}")
 
-    print(
-        f"CpG Density:         "
-        f"{cpg_analysis['density']:.3f}%"
-    )
+    style.field('CpG Density', f"{cpg_analysis['density']:.3f}%")
 
-    print(
-        f"Observed/Expected:   "
-        f"{cpg_analysis['oe_ratio']:.3f}"
-    )
+    style.field('Observed/Expected', f"{cpg_analysis['oe_ratio']:.3f}")
 
-    print(
-        f"Ambiguous Contexts:  "
-        f"{cpg_analysis['ambiguous_contexts']}"
-    )
+    style.field('Ambiguous Contexts', f"{cpg_analysis['ambiguous_contexts']}")
 
     # ========================================================
     # CpG ISLANDS
     # ========================================================
 
-    print()
-    print("CpG Islands")
-    print(minor_rule())
+    style.section('CpG Islands')
 
     _print_cpg_criteria()
 
@@ -701,46 +521,26 @@ def print_results(
     # SEQUENCE QUALITY
     # ========================================================
 
-    print()
-    print("Sequence Quality")
-    print(minor_rule())
+    style.section('Sequence Quality')
 
-    print(
-        f"Standard Bases:      "
-        f"{sequence_quality['standard_bases']}"
-    )
+    style.field('Standard Bases', f"{sequence_quality['standard_bases']}")
 
-    print(
-        f"Ambiguous Bases:     "
-        f"{sequence_quality['ambiguous_bases']}"
-    )
+    style.field('Ambiguous Bases', f"{sequence_quality['ambiguous_bases']}")
 
-    print(
-        f"Invalid Symbols:     "
-        f"{sequence_quality['invalid_symbols']}"
-    )
+    style.field('Invalid Symbols', f"{sequence_quality['invalid_symbols']}")
 
-    print(
-        f"Standard:            "
-        f"{sequence_quality['standard_percentage']:.2f}%"
-    )
+    style.field('Standard', f"{sequence_quality['standard_percentage']:.2f}%")
 
-    print(
-        f"Ambiguous:           "
-        f"{sequence_quality['ambiguous_percentage']:.2f}%"
-    )
+    style.field('Ambiguous', f"{sequence_quality['ambiguous_percentage']:.2f}%")
 
-    print(
-        f"Invalid:             "
-        f"{sequence_quality['invalid_percentage']:.2f}%"
-    )
+    style.field('Invalid', f"{sequence_quality['invalid_percentage']:.2f}%")
 
     if sequence_quality["invalid_positions"]:
 
         print()
-        print(
-            "Invalid Positions:   "
-            + ", ".join(
+        style.field(
+            "Invalid positions",
+            ", ".join(
                 str(item["position_1_based"])
                 for item in
                 sequence_quality[
@@ -751,9 +551,9 @@ def print_results(
 
     if sequence_quality["ambiguous_positions"]:
 
-        print(
-            "Ambiguous Positions: "
-            + ", ".join(
+        style.field(
+            "Ambiguous positions",
+            ", ".join(
                 str(item["position_1_based"])
                 for item in
                 sequence_quality[
@@ -766,9 +566,7 @@ def print_results(
     # IUPAC ANALYSIS
     # ========================================================
 
-    print()
-    print("IUPAC / Ambiguous Bases")
-    print(minor_rule())
+    style.section('IUPAC / Ambiguous Bases')
 
     if ambiguous_counts:
 
@@ -792,64 +590,36 @@ def print_results(
     # COMPLEMENTARY SEQUENCES
     # ========================================================
 
-    print()
-    print("Complementary Sequences")
-    print(minor_rule())
+    style.section('Complementary Sequences')
 
-    print(
-        "Original:             5' -> 3'"
-    )
+    style.field('Orientation', "complement 3' -> 5'; reverse complement 5' -> 3'")
 
-    print(
-        "Complement:           3' -> 5'"
-    )
+    style.field('Complement', _preview(complement))
 
-    print(
-        f"                     {_preview(complement)}"
-    )
-
-    print(
-        "Reverse Complement:   5' -> 3'"
-    )
-
-    print(
-        f"                     {_preview(reverse_complement)}"
-    )
+    style.field('Reverse complement', _preview(reverse_complement))
 
     # ========================================================
     # SEQUENCE PREVIEW
     # ========================================================
 
-    print()
-    print("Sequence Preview")
-    print(minor_rule())
+    style.section('Sequence Preview')
 
-    print(
-        f"5' -> 3':            "
-        f"{_preview(dna)}"
-    )
+    style.field("Sequence (5' -> 3')", _preview(dna))
 
-    print(
-        f"Length shown:        "
-        f"{min(len(dna), 80)} / "
-        f"{len(dna)} bp"
-    )
+    style.field('Length shown', f"{min(len(dna), 80)} / "
+        f"{len(dna)} bp")
 
     # ========================================================
     # INTERPRETATION
     # ========================================================
 
-    print()
-    print("Interpretation")
-    print(minor_rule())
+    style.section('Interpretation')
 
     if sequence_quality["invalid_symbols"] > 0:
 
-        print(
-            "Sequence status:     INVALID"
-        )
+        style.field('Sequence status', "INVALID")
 
-        print(
+        style.warning(
             "The sequence contains invalid "
             "symbols and should be reviewed "
             "before downstream analysis."
@@ -857,11 +627,9 @@ def print_results(
 
     elif sequence_quality["ambiguous_bases"] > 0:
 
-        print(
-            "Sequence status:     VALID - AMBIGUOUS"
-        )
+        style.field('Sequence status', "VALID - AMBIGUOUS")
 
-        print(
+        style.note(
             "The sequence is valid but contains "
             "IUPAC ambiguity codes. Some values "
             "are therefore represented as ranges."
@@ -869,9 +637,7 @@ def print_results(
 
     else:
 
-        print(
-            "Sequence status:     VALID"
-        )
+        style.field('Sequence status', "VALID")
 
         print(
             "The sequence contains only standard "
@@ -881,57 +647,36 @@ def print_results(
 
     if sequence_complexity >= 0.75:
 
-        print(
-            "Complexity class:    HIGH"
-        )
+        style.field('Complexity class', "HIGH")
 
     elif sequence_complexity >= 0.50:
 
-        print(
-            "Complexity class:    MODERATE"
-        )
+        style.field('Complexity class', "MODERATE")
 
     else:
 
-        print(
-            "Complexity class:    LOW"
-        )
+        style.field('Complexity class', "LOW")
 
     if gc_content >= 60:
 
-        print(
-            "GC composition:      Relatively high"
-        )
+        style.field('GC composition', "Relatively high")
 
     elif gc_content <= 40:
 
-        print(
-            "GC composition:      Relatively low"
-        )
+        style.field('GC composition', "Relatively low")
 
     else:
 
-        print(
-            "GC composition:      Relatively balanced"
-        )
+        style.field('GC composition', "Relatively balanced")
 
-    print(
-        f"CpG enrichment:      "
-        f"O/E {cpg_analysis['oe_ratio']:.3f}"
-    )
+    style.field('CpG enrichment', f"O/E {cpg_analysis['oe_ratio']:.3f}")
 
-    print(
-        f"CpG island screen:   "
-        f"{'Detected' if cpg_islands else 'Not detected'}"
-    )
+    style.field('CpG island screen', f"{'Detected' if cpg_islands else 'Not detected'}")
 
-    print(
-        f"Homopolymers:        "
-        f"{'Detected' if homopolymers else 'None detected'}"
-    )
+    style.field('Homopolymers', f"{'Detected' if homopolymers else 'None detected'}")
 
     print()
-    print(
+    style.note(
         "Profile analyses are sequence-level "
         "descriptors and do not establish biological "
         "function or experimental behavior."
