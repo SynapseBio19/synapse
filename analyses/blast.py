@@ -3721,8 +3721,8 @@ def build_text_report(run: BlastRun) -> str:
             [
                 f"[{index}] {hit.accession or hit.hit_id}",
                 f"    Definition: {hit.definition}",
-                f"    Identity:   {hit.best_identity_percent:.2f} %",
-                f"    Coverage:   {hit.best_coverage_percent:.2f} %",
+                f"    Identity:   {hit.best_identity_percent:.2f}%",
+                f"    Coverage:   {hit.best_coverage_percent:.2f}%",
                 f"    E-value:    {hit.best_evalue}",
                 f"    Bit score:  {hit.best_bit_score:.2f}",
                 "",

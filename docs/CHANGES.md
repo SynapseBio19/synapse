@@ -1415,3 +1415,44 @@ record of that change.
 Tests: the existing sequence-type tests now read the new names, and the
 source check from part 1 covers `core/`, `fileio/`, `ui/` and `main.py`
 as well as `analyses/`.
+
+### Stage G One notation for units and for primer coordinates (`analyses/primer.py`, `analyses/blast.py`, `analyses/rna.py`)
+
+An inventory of every f-string literal in `analyses/`, `core/`, `fileio/`,
+`ui/` and `main.py` found one dominant notation per unit and a few
+deviations:
+
+| Quantity | Dominant notation | Deviations | Now |
+|---|---|---|---|
+| Percentage | `45.20%` (59 sites) | BLAST identity and coverage `45.20 %` (2) | `45.20%` |
+| Temperature | `60.00 °C` (10 sites) | primer `ΔG @25°C` (3) | `ΔG at 25 °C` |
+| Entropy | - | `cal/mol/K` (2) and `cal/(mol*K)` (3) | `cal/(mol·K)` |
+| Molecular mass | `Da` (protein, 5; DNA as `kDa`) | RNA `g/mol` (2) | `Da` |
+
+Values and precision are unchanged; only the unit text changed. Da and
+g/mol are numerically identical here, so the RNA figures are the same
+numbers under the unit the other modules use.
+
+**Primer coordinates.** `docs/METHODS.md` states that user-facing
+positions are 1-based and inclusive, and the ORF, CRISPR, variant and
+main menus follow it. The primer menu did not: it printed the internal
+0-based half-open `start-end` unlabelled, so a primer covering bases 117
+to 135 was shown as `116-135`, and it asked for the target region as
+0-based half-open. It now prints `117-135 (1-based)` for primers and the
+target region and asks for 1-based inclusive positions, which it converts
+to the half-open interval the design functions take. Out-of-range input
+is refused with the 1-based rule (`1 <= start <= end <= length`). The
+design functions, `core.api` and exported results keep their 0-based
+half-open fields, so no programmatic caller changes.
+
+Not changed, recorded instead: in `analyses/restriction.py` the key
+`site_position` is 1-based in the restriction map and 0-based in digest
+cut records (which also carry explicit `site_position_1based`). The key
+is part of `tests/golden/restriction.json` and of the results compared
+with Biopython on pUC19; making it uniform changes stored values, which
+is an interface change of its own and not a notation fix.
+
+Tests: 3 new (`OutputNotationTests`): a source check of every f-string
+literal for the four unit rules, the 1-based primer display, and the
+1-based target input with six cases including out-of-range values. Each
+fails on the previous code.

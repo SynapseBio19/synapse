@@ -203,8 +203,14 @@ Alternatives: `nn_parameter_set` = `santalucia_2004` or `synapse_legacy`;
 `salt_model` = `na_only` or `synapse_legacy_4x` (the previous rule
 [Na⁺] + 4·([Mg²⁺] − [dNTP])).
 
-Design defaults: primer 18–25 nt (optimum 20), GC 40–60 %, Tm 57–63 °C
+Design defaults: primer 18–25 nt (optimum 20), GC 40–60%, Tm 57–63 °C
 (optimum 60), ΔTm ≤ 2 °C, amplicon 80–1000 bp, homopolymer ≤ 4.
+
+Coordinates: the menu takes the target region as 1-based inclusive
+positions and prints primer and target positions the same way. The
+design functions, `core.api` and exported results keep 0-based half-open
+`start`/`end` (`sequence[start:end]` is the primer, reverse-complemented
+for the reverse primer).
 
 Validation:
 

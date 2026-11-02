@@ -86,6 +86,7 @@ IUPAC, gapped and invalid input (D14):
 | 29 | Stage F: BLAST menu renumbered so SEARCH reads 1-4 instead of 1, 2, 3, 14; numbering rule documented and enforced | this package | each branch checked against its new label; contiguity test for the BLAST and main menus | Corrected; suite 279/279 |
 | 30 | D18 heuristic scores renamed from "confidence" in data, exports and messages (ORF, signal-peptide screen, cloning score component, primer warning); golden key renamed with values proven identical | this package | golden before/after hashes; key-mapped-back equality; unmodified golden test; new tests fail on the previous code | Corrected; suite 288/288 |
 | 31 | D18 part 2: the sequence-type classifier reports an `evidence` level (CONFIRMED/PROBABLE/AMBIGUOUS/INVALID), not a "confidence"; source check extended to `core/`, `fileio/`, `ui/`, `main.py` | this package | the extended checks fail on the previous code; values and rules unchanged; no golden snapshot affected | Corrected; suite 289/289 |
+| 32 | Stage G: one notation per unit in printed output (%, °C, cal/(mol·K), Da); primer positions and target input 1-based inclusive like the other menus | this package | inventory of every f-string literal; source check fails on the previous code; primer coordinates verified by slicing | Corrected; suite 292/292 |
 
 ## Paused (2026-10-31)
 

@@ -2280,14 +2280,14 @@ def print_rna_report(
         print(
             f"Estimated ssRNA MW:  "
             f"{molecular_weight['min']:,.0f} - "
-            f"{molecular_weight['max']:,.0f} g/mol"
+            f"{molecular_weight['max']:,.0f} Da"
         )
 
     else:
 
         print(
             f"Estimated ssRNA MW:  "
-            f"{molecular_weight['min']:,.0f} g/mol"
+            f"{molecular_weight['min']:,.0f} Da"
         )
 
     print(

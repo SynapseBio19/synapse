@@ -1077,5 +1077,68 @@ class HeuristicScoreVocabularyTests(unittest.TestCase):
         self.assertEqual(record.type_evidence, result.evidence)
 
 
+# ----------------------------------------------------------------------
+# Stage G: units and coordinate notation in printed output
+# ----------------------------------------------------------------------
+def _fstring_literal_parts(directories):
+    """(location, text) for every literal part of every f-string."""
+    import ast
+    parts = []
+    for directory in directories:
+        for path in sorted((PROJECT_ROOT / directory).glob("*.py")):
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            for node in ast.walk(tree):
+                if isinstance(node, ast.JoinedStr):
+                    for value in node.values:
+                        if isinstance(value, ast.Constant) and isinstance(value.value, str):
+                            parts.append((f"{directory}/{path.name}:{node.lineno}", value.value))
+    return parts
+
+
+class OutputNotationTests(unittest.TestCase):
+    DIRECTORIES = ("analyses", "core", "fileio", "ui", ".")
+
+    def test_printed_units_use_one_notation(self):
+        import re
+        rules = {
+            "space before percent sign": re.compile(r"^ %"),
+            "no space before degree Celsius": re.compile(r"[^ ]°C"),
+            "entropy unit other than cal/(mol·K)": re.compile(r"cal/mol/K|mol\*K"),
+            "molar mass unit instead of Da": re.compile(r"\bg/mol\b"),
+        }
+        violations = [f"{where}: {name}: {text!r}"
+                      for where, text in _fstring_literal_parts(self.DIRECTORIES)
+                      for name, rule in rules.items() if rule.search(text)]
+        self.assertEqual(violations, [])
+
+    def _pair(self):
+        from analyses import primer as P
+        from tests._support import deterministic_dna
+        sequence = deterministic_dna(400)
+        ranked = P.design_primers(sequence).ranked_pairs[0]
+        return P, sequence, getattr(ranked, "pair", ranked)
+
+    def test_primer_positions_are_shown_one_based(self):
+        P, sequence, pair = self._pair()
+        text = P.summarize_primer_pair(pair)
+        forward = pair.forward
+        self.assertEqual(sequence[forward.start:forward.end], forward.sequence)
+        self.assertIn(f"Position:              {forward.start + 1}-{forward.end} (1-based)", text)
+
+    def test_primer_target_input_is_one_based_inclusive(self):
+        import builtins
+        import contextlib
+        import io
+        from unittest import mock
+        from analyses import primer as P
+        sequence = "A" * 200
+        cases = {("11", "60"): (10, 60), ("", ""): (0, 200), ("1", "200"): (0, 200),
+                 ("0", "60"): None, ("61", "60"): None, ("1", "201"): None}
+        for answers, expected in cases.items():
+            with mock.patch.object(builtins, "input", side_effect=list(answers)), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(P._primer_ui_read_target(sequence), expected, answers)
+
+
 if __name__ == "__main__":
     unittest.main()

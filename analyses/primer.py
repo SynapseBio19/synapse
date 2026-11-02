@@ -857,26 +857,26 @@ def summarize_primer_pair(pair: PrimerPair, rank: int = 1) -> str:
         "",
         "FORWARD",
         f"Sequence:              {forward.sequence}",
-        f"Position:              {forward.start}-{forward.end}",
+        f"Position:              {forward.start + 1}-{forward.end} (1-based)",
         f"Length:                {forward.length} bp",
         f"GC:                    {forward.gc_percent:.2f}%",
         f"Tm:                    {forward.tm:.2f} °C",
         f"Tm model:              {forward.tm_model}",
         f"ΔH:                    {forward.thermodynamics.delta_h_kcal:.2f} kcal/mol",
-        f"ΔS:                    {forward.thermodynamics.delta_s_cal:.2f} cal/mol/K",
+        f"ΔS:                    {forward.thermodynamics.delta_s_cal:.2f} cal/(mol·K)",
         f"3' GC clamp:           {forward.gc_clamp} bp",
         f"Hairpin stem:          {forward.hairpin.max_stem} bp ({forward.hairpin.severity})",
         f"Self-dimer stem:       {forward.self_dimer.max_stem} bp ({forward.self_dimer.severity})",
         "",
         "REVERSE",
         f"Sequence:              {reverse.sequence}",
-        f"Position:              {reverse.start}-{reverse.end}",
+        f"Position:              {reverse.start + 1}-{reverse.end} (1-based)",
         f"Length:                {reverse.length} bp",
         f"GC:                    {reverse.gc_percent:.2f}%",
         f"Tm:                    {reverse.tm:.2f} °C",
         f"Tm model:              {reverse.tm_model}",
         f"ΔH:                    {reverse.thermodynamics.delta_h_kcal:.2f} kcal/mol",
-        f"ΔS:                    {reverse.thermodynamics.delta_s_cal:.2f} cal/mol/K",
+        f"ΔS:                    {reverse.thermodynamics.delta_s_cal:.2f} cal/(mol·K)",
         f"3' GC clamp:           {reverse.gc_clamp} bp",
         f"Hairpin stem:          {reverse.hairpin.max_stem} bp ({reverse.hairpin.severity})",
         f"Self-dimer stem:       {reverse.self_dimer.max_stem} bp ({reverse.self_dimer.severity})",
@@ -897,7 +897,7 @@ def print_primer_report(report: PrimerDesignReport) -> None:
     print("SYNAPSE — PRIMER DESIGN")
     print(major_rule())
     print(f"Sequence length:            {report.sequence_length} bp")
-    print(f"Target region:              {report.target_start}-{report.target_end} ({report.target_length} bp)")
+    print(f"Target region:              {report.target_start + 1}-{report.target_end} (1-based; {report.target_length} bp)")
     print()
     print("THERMODYNAMIC SETTINGS")
     print(f"Tm model:                   {report.tm_model}")
@@ -3812,16 +3812,22 @@ def _primer_ui_read_target(sequence):
     print()
     print("TARGET REGION")
     print(minor_rule())
-    print("Enter coordinates as 0-based half-open [start, end).")
+    print("Enter 1-based, inclusive positions (the first base is 1).")
     print("Press Enter to use the complete sequence.")
     print()
 
-    start_input = input("Target start [0]: ").strip()
+    start_input = input("Target start [1]: ").strip()
     end_input = input(f"Target end [{len(sequence)}]: ").strip()
 
     try:
-        target_start = 0 if not start_input else int(start_input)
-        target_end = len(sequence) if not end_input else int(end_input)
+        first = 1 if not start_input else int(start_input)
+        last = len(sequence) if not end_input else int(end_input)
+        if not 1 <= first <= last <= len(sequence):
+            raise ValueError(
+                f"Positions must satisfy 1 <= start <= end <= {len(sequence)}."
+            )
+        # The design functions take a 0-based, half-open interval.
+        target_start, target_end = first - 1, last
         validate_target_region(sequence, target_start, target_end)
         return target_start, target_end
     except (TypeError, ValueError) as exc:
@@ -3963,8 +3969,8 @@ def _primer_ui_single_analysis(pipeline=None):
             print(f"Wallace Tm:             {result['wallace_tm']:.2f} °C")
             print(f"Salt-adjusted Tm:       {result['salt_adjusted_tm']:.2f} °C")
             print(f"ΔH:                     {result['delta_h_kcal_mol']:.2f} kcal/mol")
-            print(f"ΔS:                     {result['delta_s_cal_mol_k']:.2f} cal/(mol*K)")
-            print(f"ΔG @25°C:               {result['delta_g_kcal_mol']:.2f} kcal/mol")
+            print(f"ΔS:                     {result['delta_s_cal_mol_k']:.2f} cal/(mol·K)")
+            print(f"ΔG at 25 °C:            {result['delta_g_kcal_mol']:.2f} kcal/mol")
             print(f"Effective salt:         {result['effective_salt_mM']:.2f} mM")
             print(f"3' GC clamp:            {result['gc_clamp']} bp")
             print(f"Longest homopolymer:    {result['max_homopolymer']}")
@@ -4070,8 +4076,8 @@ def print_professional_primer_report(
     print(major_rule())
     print(f"Sequence length:            {report.sequence_length} bp")
     print(
-        f"Target region:              {report.target_start}-{report.target_end} "
-        f"({report.target_length} bp)"
+        f"Target region:              {report.target_start + 1}-{report.target_end} "
+        f"(1-based; {report.target_length} bp)"
     )
     print(f"Tm method:                  {report.tm_method}")
     _print_thermodynamic_conditions(report.thermodynamic_conditions)
@@ -5013,13 +5019,13 @@ def summarize_professional_primer_pair(advanced_pair: AdvancedPrimerPair, rank: 
         "",
         "FORWARD",
         f"Sequence:              {forward.sequence}",
-        f"Position:              {forward.start}-{forward.end}",
+        f"Position:              {forward.start + 1}-{forward.end} (1-based)",
         f"Length:                {forward.length} bp",
         f"GC:                    {forward.gc_percent:.2f}%",
         f"Tm:                    {f_thermo.tm_C:.2f} °C",
         f"ΔH:                    {f_thermo.delta_h_kcal_mol:.2f} kcal/mol",
-        f"ΔS:                    {f_thermo.delta_s_cal_mol_k:.2f} cal/(mol*K)",
-        f"ΔG @25°C:              {f_thermo.delta_g_kcal_mol:.2f} kcal/mol",
+        f"ΔS:                    {f_thermo.delta_s_cal_mol_k:.2f} cal/(mol·K)",
+        f"ΔG at 25 °C:           {f_thermo.delta_g_kcal_mol:.2f} kcal/mol",
         f"Effective salt:        {f_thermo.effective_salt_mM:.2f} mM",
         f"3' GC clamp:           {forward.gc_clamp} bp",
         f"Hairpin stem:          {forward.hairpin.max_stem} bp ({forward.hairpin.severity})",
@@ -5027,13 +5033,13 @@ def summarize_professional_primer_pair(advanced_pair: AdvancedPrimerPair, rank: 
         "",
         "REVERSE",
         f"Sequence:              {reverse.sequence}",
-        f"Position:              {reverse.start}-{reverse.end}",
+        f"Position:              {reverse.start + 1}-{reverse.end} (1-based)",
         f"Length:                {reverse.length} bp",
         f"GC:                    {reverse.gc_percent:.2f}%",
         f"Tm:                    {r_thermo.tm_C:.2f} °C",
         f"ΔH:                    {r_thermo.delta_h_kcal_mol:.2f} kcal/mol",
-        f"ΔS:                    {r_thermo.delta_s_cal_mol_k:.2f} cal/(mol*K)",
-        f"ΔG @25°C:              {r_thermo.delta_g_kcal_mol:.2f} kcal/mol",
+        f"ΔS:                    {r_thermo.delta_s_cal_mol_k:.2f} cal/(mol·K)",
+        f"ΔG at 25 °C:           {r_thermo.delta_g_kcal_mol:.2f} kcal/mol",
         f"Effective salt:        {r_thermo.effective_salt_mM:.2f} mM",
         f"3' GC clamp:           {reverse.gc_clamp} bp",
         f"Hairpin stem:          {reverse.hairpin.max_stem} bp ({reverse.hairpin.severity})",
