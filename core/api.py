@@ -221,7 +221,7 @@ def restriction_digest(record_or_sequence: Any, enzymes: Sequence[str], *,
                                "include_possible": include_possible,
                                "enzyme_database_version": _enzyme_database_version()},
                    warnings=warnings,
-                   limitations=["Methylation notes are informational; blocking by methylation and star activity are not modelled."])
+                   limitations=["Methylation notes are informational; blocking by methylation and star activity are not modeled."])
 
 
 def design_primers(record_or_sequence: Any, target_start: int = 0,

@@ -40,7 +40,7 @@ simulated keystrokes (see audit §11.5).
 | Confirmed defects | 19 (D1–D19); corrected so far: 16 (D12, D4, D3, D5, D1, D2, D13, D14 with all sub-findings F1–F12, D6, D7, D8, D9, D10, D11, D15, D19; 2026-10-31) and D16 partially (duplicate definition removed; v5–v11 chain deferred) |
 | Suspected / unverified concerns | 14 at the audit (S1–S14); S15–S24 recorded since |
 | External validations performed in this audit | 8 (audit §3, §6) |
-| Features advertised but not implemented | 1 (`[11] AI Experiment Planner`, labelled "not implemented" since D15) |
+| Features advertised but not implemented | 1 (`[11] AI Experiment Planner`, labeled "not implemented" since D15) |
 
 ---
 
@@ -78,10 +78,10 @@ simulated keystrokes (see audit §11.5).
 | Ambiguous-base counting | `count_ambiguous_bases` | Implemented | Execution-tested | Not applicable | |
 | GC / AT content, content ranges | `calculate_gc_content`, `calculate_at_content`, `calculate_dna_content_ranges` | Implemented | Execution-tested | Not applicable | |
 | GC / AT skew | `calculate_gc_skew`, `calculate_at_skew` | Implemented | Execution-tested | Not applicable | |
-| GC and complexity profiles | `calculate_gc_content_profile`, `calculate_complexity_profile`, `calculate_profile_statistics` | Implemented | Execution-tested | Not applicable | Window/step parameterised via `core.api`. |
+| GC and complexity profiles | `calculate_gc_content_profile`, `calculate_complexity_profile`, `calculate_profile_statistics` | Implemented | Execution-tested | Not applicable | Window/step parameterized via `core.api`. |
 | Sequence complexity | `calculate_sequence_complexity` | Implemented | Execution-tested | Not applicable | P2-5 "rename complexity" still open. |
 | Homopolymer detection | `find_homopolymers` | Implemented | Execution-tested | Not applicable | |
-| CpG analysis and islands | `analyze_cpg`, `find_cpg_islands` | Implemented | Execution-tested | Not applicable | P2-6 sliding-count optimisation deferred. |
+| CpG analysis and islands | `analyze_cpg`, `find_cpg_islands` | Implemented | Execution-tested | Not applicable | P2-6 sliding-count optimization deferred. |
 | Molecular weight (DNA) | `calculate_dna_molecular_weight`, `calculate_average_dna_molecular_weight` | Implemented | Execution-tested | Not applicable | |
 | Quality assessment | `analyze_sequence_quality` | Implemented | Execution-tested | Not applicable | |
 | Complement / reverse complement | `get_complement`, `get_reverse_complement` | Implemented | Execution-tested | Independently validated | Agrees with Biopython on IUPAC symbols. |
@@ -162,11 +162,11 @@ Test coverage: 2 test references.
 | — | GRAVY | `calculate_gravy` | Implemented | Execution-tested | Independently validated | −0.48947 vs −0.489. |
 | — | Instability index | `calculate_instability_index` | Implemented | Execution-tested | Independently validated | 36.055 vs 36.06; 16.091 vs 16.09. |
 | — | Aromaticity | `calculate_aromaticity` | Implemented | Execution-tested | Independently validated | Exact match. |
-| — | Extinction coefficient | `calculate_extinction_coefficient` | Implemented | Execution-tested | Independently validated | Reduced/oxidised both match, incl. 4 disulfide pairs in lysozyme. |
+| — | Extinction coefficient | `calculate_extinction_coefficient` | Implemented | Execution-tested | Independently validated | Reduced/oxidized both match, incl. 4 disulfide pairs in lysozyme. |
 | — | Charge at pH | `calculate_charge_at_ph`, `_get_pka_tables` | Implemented | Execution-tested | Not applicable | |
 | — | Hydropathy profile, hydrophobic regions | `calculate_hydropathy_profile`, `find_hydrophobic_regions` | Implemented | Execution-tested | Not applicable | Kyte–Doolittle. |
-| — | Transmembrane screen | `find_transmembrane_domains` | Implemented | Execution-tested | Not applicable | **A screen, not TMHMM/Phobius** — correctly labelled. |
-| — | Signal-peptide screen | `predict_signal_peptide` | Implemented | Execution-tested | Not applicable | **Not SignalP** — correctly labelled. |
+| — | Transmembrane screen | `find_transmembrane_domains` | Implemented | Execution-tested | Not applicable | **A screen, not TMHMM/Phobius** — correctly labeled. |
+| — | Signal-peptide screen | `predict_signal_peptide` | Implemented | Execution-tested | Not applicable | **Not SignalP** — correctly labeled. |
 | — | Flexibility profile | `calculate_flexibility_profile` | Implemented | Execution-tested | Not applicable | |
 | — | Secondary-structure propensity | `calculate_secondary_structure_propensity`, `…_fraction` | Implemented | Execution-tested | Not applicable | Propensity scales, not a predictor. |
 | — | Aliphatic index | `calculate_aliphatic_index` | Implemented | Execution-tested | Not applicable | |
@@ -196,7 +196,7 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 | — | Enzyme-pair recommendation | `recommend_enzyme_pairs` | Implemented | Execution-tested | Not applicable | |
 | — | Double digest | `analyze_double_digest`, `run_double_digest` | Implemented | Execution-tested | Not applicable | |
 | — | Database validation | `validate_enzyme_database` | Implemented | Execution-tested | Not applicable | |
-| — | Methylation notes | enzyme `methylation_note` | Implemented | Execution-tested | Not applicable | Display only; blocking and star activity not modelled. |
+| — | Methylation notes | enzyme `methylation_note` | Implemented | Execution-tested | Not applicable | Display only; blocking and star activity not modeled. |
 | 4 | Complete Restriction Report | `print_restriction_report` | Implemented | Reachable | Not applicable | |
 | — | Topology selection UI | `_synapse_ui_select_topology` | Implemented | Reachable | Not applicable | |
 | — | Type IIS enzymes | — | **Not implemented** | Not applicable | Not applicable | P2-7. No Type IIS enzyme is in the database, so no wrong result arises today; a reverse-strand search is required before one is added. |
@@ -261,15 +261,15 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 | — | Mutation detection | `detect_mutations`, `detect_mutations_from_alignment`, `_detect_simple_indel` | Implemented | Execution-tested | Not applicable | Pure length changes use a prefix/suffix representation. |
 | — | Substitution classification | `classify_substitution`, `is_transition` | Implemented | Execution-tested | Not applicable | |
 | — | Coding consequences | `analyze_coding_consequences`, `classify_coding_substitution`, `annotate_mutations_with_coding_consequences` | Implemented | Execution-tested | Not applicable | Synonymous / missense / nonsense / start-loss / stop-loss / frameshift / in-frame indel all covered by self-tests. |
-| — | Start-loss restricted to codon 1 | `classify_coding_substitution(codon_index=)` | Implemented | Execution-tested | Not applicable | P0-6 holds. Limitation: alternative initiation codons in the reference are not recognised as starts. |
+| — | Start-loss restricted to codon 1 | `classify_coding_substitution(codon_index=)` | Implemented | Execution-tested | Not applicable | P0-6 holds. Limitation: alternative initiation codons in the reference are not recognized as starts. |
 | — | CDS from the selected ORF | `orf_reference_cds`, `assess_coding_frame` | Implemented | Integration-tested | Not applicable | Both strands; variant CDS derived only at equal length. |
 | 2 | Mutation Statistics | `calculate_mutation_statistics` | Implemented | Execution-tested | Not applicable | |
 | — | Mutation spectrum, hotspots | `build_mutation_spectrum`, `find_mutation_hotspots` | Implemented | Execution-tested | Not applicable | |
-| — | HGVS-*like* notation | `mutation_hgvs_c`, `mutation_hgvs_p`, `_mutation_notation` | Partially implemented | Execution-tested | **Not validated** | Explicitly labelled HGVS-like; not checked against den Dunnen et al. 2016. |
-| — | Indel left-normalisation | `normalize_indel_left` | Implemented | Execution-tested | Not applicable | Separate from the variant module's implementation — duplication. |
+| — | HGVS-*like* notation | `mutation_hgvs_c`, `mutation_hgvs_p`, `_mutation_notation` | Partially implemented | Execution-tested | **Not validated** | Explicitly labeled HGVS-like; not checked against den Dunnen et al. 2016. |
+| — | Indel left-normalization | `normalize_indel_left` | Implemented | Execution-tested | Not applicable | Separate from the variant module's implementation — duplication. |
 | — | Context extraction | `extract_mutation_context` | Implemented | Execution-tested | Not applicable | |
 | — | Restriction-site impact | `restriction_site_impact` | Implemented | Execution-tested | Not applicable | Cross-module check. |
-| — | Primer / CRISPR overlap | `primer_mutation_overlap`, `crispr_mutation_overlap` | Implemented | Execution-tested | Not applicable | P2-4's cross-check, partially realised. |
+| — | Primer / CRISPR overlap | `primer_mutation_overlap`, `crispr_mutation_overlap` | Implemented | Execution-tested | Not applicable | P2-4's cross-check, partially realized. |
 | — | Protein comparison | `compare_proteins` | Implemented | Execution-tested | Not applicable | |
 | 3 | Coding Consequence Analysis (UI) | `run_mutation_analysis_ui` branch 3 | Implemented | Reachable | Not applicable | |
 | 4 | Mutation Report | `build_mutation_report`, `print_mutation_report`, `advanced_mutation_report`, `mutation_map` | Implemented | Reachable | Not applicable | |
@@ -302,7 +302,7 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 | 9 | Export VCF | `variants_to_vcf`, `write_vcf` | Implemented | Execution-tested | Not applicable | Round-trip self-tested. |
 | 10 | Export TSV | `variants_to_tsv` | Implemented | Execution-tested | Not applicable | |
 | 11 | Full Variant Report | `build_variant_report`, `print_variant_report` | Implemented | Reachable | Not applicable | |
-| — | Prioritisation, intervals, grouping | `prioritize_variants`, `variants_in_interval`, `interval_variant_density`, `variants_by_*` | Implemented | Execution-tested | Not applicable | |
+| — | Prioritization, intervals, grouping | `prioritize_variants`, `variants_in_interval`, `interval_variant_density`, `variants_by_*` | Implemented | Execution-tested | Not applicable | |
 | — | Evidence container | `VariantEvidence`, `attach_evidence` | Implemented | Execution-tested | Not applicable | |
 | — | Mutation-module bridge | `annotate_from_mutation_analysis` | Implemented | Execution-tested | Not applicable | |
 | 12 | Self-test | `run_variant_analysis_self_test` | Implemented | Execution-tested | Not applicable | 27/27. |
@@ -318,19 +318,19 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 | 2 | Batch Analysis | `batch_design_guides`, `batch_summary`, `load_fasta`, `parse_fasta_text` | Implemented | Execution-tested | Not applicable | |
 | 3 | CRISPR System selection | `get_crispr_system`, `list_crispr_systems`, `format_system_details` | Implemented | Execution-tested | Not applicable | 4 systems: SpCas9 NGG/20, SpCas9-NG NG/20, SaCas9 NNGRRT/21, Cas12a TTTV/23. |
 | 4 | Target Discovery | `find_targets`, `_find_targets_in_region`, `_candidate_from_oriented_window`, `pam_matches` | Implemented | **Execution-tested** | Not applicable | Both strands; 0 coordinate mismatches over all candidates in 3 sequences. Cas12a 5′-PAM geometry verified (PAM 41–44, guide 45–67). |
-| — | Guide characterisation | `characterize_guide`, `GuideMetrics`, `quality_flags` | Implemented | Execution-tested | Not applicable | GC, homopolymer, repeats, complexity, self-complementarity, hairpin proxy, ambiguity. **S4** uncited constants. |
+| — | Guide characterization | `characterize_guide`, `GuideMetrics`, `quality_flags` | Implemented | Execution-tested | Not applicable | GC, homopolymer, repeats, complexity, self-complementarity, hairpin proxy, ambiguity. **S4** uncited constants. |
 | 5 | Guide Analysis & Ranking | `rank_guides`, `_component_*`, `ranking_mode_label` | Partially implemented | Execution-tested | Not applicable | Transparent weighted heuristic, correctly disclaimed. **D9** distorts the specificity component. |
 | — | **Cut-site / cleavage position** | — | **Not implemented** | Not applicable | Not applicable | **D8**: no cut field anywhere in the model or exports. P2-3 item 1. |
 | — | PAM quality | `pam_quality` | Implemented | Execution-tested | Not applicable | Pattern degeneracy only, explicitly not an activity score. |
 | 6 | Mutation / Variant Targeting | `annotate_mutation_targets`, `mutation_position_in_guide`, `parse_mutation_target`, `parse_vcf_variant_line` | Implemented | Execution-tested | Not applicable | |
 | 7 | Base Editing | `analyze_base_editing`, `analyze_base_editing_candidate`, `base_editing_window`, `get_base_editor` | Partially implemented | Execution-tested | Not applicable | 4 editor models (CBE/ABE/CBE+/ABE+). Guide-relative window verified (position 5 in window 4–8). **D10**: a configured window is ignored. Bystander detection works. |
-| 8 | Prime Editing | `design_prime_editing_candidates`, `_prime_edit_for_candidate` | Partially implemented | Execution-tested | Not applicable | **S3**: `edit_in_rtt` only checks the length, not that the edit is contained. Honest heuristic labelling. |
+| 8 | Prime Editing | `design_prime_editing_candidates`, `_prime_edit_for_candidate` | Partially implemented | Execution-tested | Not applicable | **S3**: `edit_in_rtt` only checks the length, not that the edit is contained. Honest heuristic labeling. |
 | 9 | Off-Target Analysis | `search_local_off_targets`, `search_local_off_targets_detailed`, `annotate_local_off_targets`, `_oriented_candidate_windows` | Partially implemented | **Execution-tested** | Not applicable | PAM-aware, seed-aware, mismatch positions reported. **D9**: on-target not excluded. Scope limited to supplied sequences — correctly stated. |
 | 10 | Specificity Profile | `specificity_profile`, `has_specificity_analysis` | Partially implemented | Execution-tested | Not applicable | **D9** inflates `exact_matches` by 1. |
 | — | **CFD scoring** | — | **Not implemented** | Not applicable | Not applicable | P2-3: deliberately rejected pending a cited published mismatch matrix. **Correct decision — do not fabricate weights.** |
 | — | U6 poly-T rule | `quality_flags` poly-T warning | Partially implemented | Execution-tested | Not applicable | **S5**: generic ≥4 T run anywhere, position-independent; "U6" appears nowhere. P2-3 item 2 only incidentally addressed. |
 | 11 | Reports & Export | `format_report`, `print_report`, `export_json`, `export_csv`, `export_guides_fasta`, `export_batch_summary`, `resolve_export_path` | Implemented | Execution-tested | Not applicable | **D11**: defaults to the user's Desktop. |
-| — | Serialisation | `guide_to_dict`, `result_to_dict`, `result_to_json` | Implemented | Execution-tested | Not applicable | Schema has no cut-position key (**D8**). |
+| — | Serialization | `guide_to_dict`, `result_to_dict`, `result_to_json` | Implemented | Execution-tested | Not applicable | Schema has no cut-position key (**D8**). |
 | 12 | Self-Test | `run_self_test` | Implemented | Execution-tested | Not applicable | 28/28. |
 | 13 | Supported Systems | `list_crispr_systems` | Implemented | Execution-tested | Not applicable | |
 | — | Config fields `include_low_quality`, `rank_by_gc`, `editing_window_start/end`, `base_editor` | `DesignConfig` | **Not implemented** | Execution-tested | Not applicable | **D10**: present, never read; toggling provably changes nothing. |
@@ -369,7 +369,7 @@ relative to size; the 28 self-tests are the module's own fixtures.
 | — | Short-query rescue | `_should_run_short_query_rescue`, task configuration | Implemented | Execution-tested | Not applicable | Self-tested policy for short queries. |
 | 11 | Self-Test | `run_self_test` | Implemented | Execution-tested | Not applicable | 33/33. |
 | 12/13 | Supported programs; database status | `PROGRAMS`, `LOCAL_DATABASE_CATALOG` | Implemented | Execution-tested | Not applicable | |
-| — | Stored run artifact | `blast_results/TEST_8_REFERENCE_blast.json` | Legacy record | Not applicable | Not applicable | Labelled as a pre-P0-1 legacy record in `blast_results/README.md` (**D7** corrected 2026-10-31; deletion left to the owner). Originally: stale pre-P0-1 values (100 % coverage at E = 7.45, null query length) and an obsolete key schema; no test reads it. |
+| — | Stored run artifact | `blast_results/TEST_8_REFERENCE_blast.json` | Legacy record | Not applicable | Not applicable | Labeled as a pre-P0-1 legacy record in `blast_results/README.md` (**D7** corrected 2026-10-31; deletion left to the owner). Originally: stale pre-P0-1 values (100 % coverage at E = 7.45, null query length) and an obsolete key schema; no test reads it. |
 
 ---
 
@@ -479,7 +479,7 @@ explicitly not implemented.
 | Live remote NCBI BLAST | Not run by choice | One confirmed run recording RID and provenance |
 | Local BLAST on a real database | `nt` is ~100 GB+ | `swissprot` (~0.5 GB) as a proportionate step |
 | Python 3.10 suite + `pyright` | 3.10 not installed; pyright not run | Install 3.10; run both |
-| HGVS conformance | No validator | `hgvs` package or Mutalyzer; currently labelled "HGVS-like" |
+| HGVS conformance | No validator | `hgvs` package or Mutalyzer; currently labeled "HGVS-like" |
 | Primer hairpin/dimer screens | Heuristic by design | `primer3.calc_hairpin` / `calc_heterodimer` are available and would be a direct comparison |
 
 ---
@@ -495,4 +495,4 @@ explicitly not implemented.
 4. When a defect is fixed, cite the test that would now catch it.
 5. Re-check the "advertised-but-absent" table (§16) at the end of Phase 6;
    every row must be implemented, removed from the interface, or
-   explicitly labelled unavailable to the user.
+   explicitly labeled unavailable to the user.

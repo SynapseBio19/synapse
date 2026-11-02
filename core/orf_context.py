@@ -15,7 +15,7 @@ Synapse ORF dictionaries (``analyses.orf.find_orfs``) use:
   the reverse complement of ``dna[start:stop + 1]``).
 
 Generic ORF-like objects from elsewhere (tests, external callers) may carry a
-1-based ``start``; they are recognised by the absence of Synapse fields and
+1-based ``start``; they are recognized by the absence of Synapse fields and
 can state ``coordinate_base`` explicitly.
 """
 

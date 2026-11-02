@@ -68,8 +68,8 @@ blocks line up across modules.
 The conceptual order is general information, input and context, main
 analysis, advanced options, output, system. It is a guide, not a cage:
 each module arranges the sections its science actually has. ORF analysis
-organises discovery, evaluation, comparison and selection; CRISPR design
-organises region, system, discovery, ranking, editing and specificity.
+organizes discovery, evaluation, comparison and selection; CRISPR design
+organizes region, system, discovery, ranking, editing and specificity.
 Forcing identical menus on different sciences would be worse than
 inconsistency.
 
@@ -127,7 +127,7 @@ statement it is.
 | `OK:` | Confirmation of a completed action. | `style.success()` |
 
 Scientific wording stays module-specific. A CRISPR off-target warning, a
-primer thermodynamics warning and a variant normalisation warning carry
+primer thermodynamics warning and a variant normalization warning carry
 the same prefix and entirely different text, because they say different
 things. Uniform prefixes, individual science.
 

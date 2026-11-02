@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import pathlib
 import unittest
 
 from tests import _support  # noqa: F401
@@ -105,7 +106,7 @@ class CrisprOnTargetTests(unittest.TestCase):
 
 
 # ----------------------------------------------------------------------
-# D8: modelled cut site, from cited conventions
+# D8: modeled cut site, from cited conventions
 # ----------------------------------------------------------------------
 class CrisprCutSiteTests(unittest.TestCase):
     SEQUENCE = _random_dna(400, 3)
@@ -186,7 +187,7 @@ class CrisprConfigurationTests(unittest.TestCase):
         from analyses import crispr as C
         mutation = C.MutationTarget("chr1", 150, self.SEQUENCE[149], "T" if self.SEQUENCE[149] != "T" else "C")
         default = C.config_editing_window(C.DesignConfig())
-        self.assertEqual(default, tuple(C.BASE_EDITOR_DEFINITIONS["CBE"]["window"]))  # behaviour unchanged
+        self.assertEqual(default, tuple(C.BASE_EDITOR_DEFINITIONS["CBE"]["window"]))  # behavior unchanged
         from unittest import mock
         real = C.analyze_base_editing
         with mock.patch.object(C, "analyze_base_editing", wraps=real) as spy:
@@ -244,7 +245,7 @@ class PipelineOrfRunnerTests(unittest.TestCase):
 
 
 # ----------------------------------------------------------------------
-# D15: the unimplemented planner is labelled as such
+# D15: the unimplemented planner is labeled as such
 # ----------------------------------------------------------------------
 class PlannerPlaceholderTests(unittest.TestCase):
     def test_menu_says_not_implemented(self):
@@ -568,7 +569,7 @@ class VariantReferenceAlphabetTests(unittest.TestCase):
 # S1, S2: minus-strand ORF context and longest-per-stop collapsing
 # ----------------------------------------------------------------------
 class MinusStrandOrfTests(unittest.TestCase):
-    """Both findings were speculative; these tests record the actual behaviour."""
+    """Both findings were speculative; these tests record the actual behavior."""
 
     def test_kozak_context_of_a_minus_strand_orf_is_the_minus_strand_context(self):
         from analyses import orf as O
@@ -1187,6 +1188,38 @@ class ExportedWarningsTests(unittest.TestCase):
                                   "enzyme_database_version": ENZYME_DATABASE_VERSION})
         digest = api.restriction_digest(sequence, ["EcoRI"])
         self.assertEqual(digest.parameters["enzyme_database_version"], ENZYME_DATABASE_VERSION)
+
+
+# ----------------------------------------------------------------------
+# Stage H (8.6, 9.6): one spelling, American English as in the identifiers
+# ----------------------------------------------------------------------
+class SpellingStandardTests(unittest.TestCase):
+    BRITISH = ("behaviour", "analyse", "analysed", "labelled", "labelling", "modelled",
+               "modelling", "normalise", "normalised", "normalisation", "organise",
+               "organised", "organises", "serialise", "serialised", "serialisation",
+               "recognise", "recognised", "unrecognised", "initialised", "optimisation",
+               "prioritised", "prioritisation", "parameterised", "characterisation",
+               "standardised", "standardisation", "summarise", "summarised", "colour",
+               "centre")
+
+    def test_text_and_documentation_use_american_spelling(self):
+        import re
+        pattern = re.compile(r"\b(" + "|".join(self.BRITISH) + r")\b", re.IGNORECASE)
+        paths = [PROJECT_ROOT / "README.md", PROJECT_ROOT / "main.py"]
+        for directory in ("docs", "analyses", "core", "fileio", "ui", "tests"):
+            paths.extend(sorted((PROJECT_ROOT / directory).glob("*.md")))
+            paths.extend(sorted((PROJECT_ROOT / directory).glob("*.py")))
+        # docs/CHANGES.md must quote the original wording of an editorial
+        # change (Master Prompt 8.7), so it is the one exempt document.
+        exempt = {pathlib.Path(__file__).resolve(), (PROJECT_ROOT / "docs" / "CHANGES.md").resolve()}
+        hits = []
+        for path in paths:
+            if path.resolve() in exempt:
+                continue
+            for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+                hits.extend(f"{path.relative_to(PROJECT_ROOT).as_posix()}:{number} {m.group(0)}"
+                            for m in pattern.finditer(line))
+        self.assertEqual(hits, [])
 
 
 if __name__ == "__main__":

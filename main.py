@@ -317,7 +317,7 @@ def run_protein_record(record, selected_index):
             print("\nReturning to sequence selection...")
             return
         elif choice == "0":
-            print("\nThank you for using Synapse!")
+            print("\nThank you for using Synapse.")
             raise SystemExit
         else:
             print("\nInvalid selection.")
@@ -962,7 +962,7 @@ def main():
             elif choice == "0":
 
                 print(
-                    "\nThank you for using Synapse!"
+                    "\nThank you for using Synapse."
                 )
 
                 raise SystemExit

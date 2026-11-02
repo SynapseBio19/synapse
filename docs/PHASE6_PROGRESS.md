@@ -57,12 +57,12 @@ IUPAC, gapped and invalid input (D14):
 | 6 | D14-F6 protein codes B/Z/J/X/U/O keep position; masses and ranges | `343ffb7` | internal tests; external reference comparison (Biopython `protein_weights`, `molecular_weight`); one Stage 5 assertion updated (encoded the deletion) | Corrected; suite 194/194; pyright unchanged |
 | 7 | D14-F8/F9/F10 ORF search, transcription and GC counting check/normalize input | `d40d328` | internal tests; probe re-run (no silent results for foreign types) | Corrected; D14 and D13 complete; suite 197/197; pyright unchanged |
 | 8 | D6 + S7 programmatic local BLAST by database prefix, with provenance | `5b120ec` | internal tests; external tool execution (bundled database, blastn + blastdbcmd) | Corrected; suite 200/200; pyright unchanged |
-| 9 | D7 stale BLAST artifact labelled as legacy; AUDIT_STATUS cites the test | `e1a48c6` | documentation; the README's numbers match `tests/test_p0_regressions.py` | Corrected (file kept; deletion is the owner's decision) |
+| 9 | D7 stale BLAST artifact labeled as legacy; AUDIT_STATUS cites the test | `e1a48c6` | documentation; the README's numbers match `tests/test_p0_regressions.py` | Corrected (file kept; deletion is the owner's decision) |
 | 10 | D9 CRISPR on-target site excluded from the local specificity screen | `3514617` | internal tests (both strands, identical copy, near match) | Corrected; suite 203/203; pyright unchanged; S23 recorded |
 | 11 | D8 CRISPR cut site per system, with citations | `ca2ec39` | internal tests (both strands, all four systems); literature (PMIDs 22745249, 25830891, 30166441, 26422227) | Corrected; suite 206/206; pyright unchanged |
 | 12 | D10 dead CRISPR config fields act; D11 exports in `exports/crispr` | `8145556` | internal tests (defaults unchanged) | Corrected; suite 210/210; pyright unchanged |
 | 13 | D19 pipeline `run_orf` search settings; fixed `completed` shape | `e47cb85` | internal tests (equality with `core.api.find_orfs`) | Corrected; suite 212/212; pyright unchanged |
-| 14 | D15 planner entry labelled "not implemented" | `f3a09c1` | end-to-end `main.py` test | Corrected (planner itself remains P3-1, deferred); suite 213/213 |
+| 14 | D15 planner entry labeled "not implemented" | `f3a09c1` | end-to-end `main.py` test | Corrected (planner itself remains P3-1, deferred); suite 213/213 |
 | 15 | S15 variant-to-mutation bridge works; S16 REF_MISMATCH no longer leaks into the input | `c71963b` | internal tests; pyright 134 → 132 (the two S15 diagnostics) | Corrected; suite 215/215 |
 | 16 | S17 cloning digest uses the top-strand cut | `c743beb` | internal tests; agreement with `restriction.perform_digest` for all 231 enzyme pairs, linear and circular | Corrected; suite 217/217 |
 | 17 | S19 start-codon classification and scores use the genetic code | `6c20e69` | internal tests; golden master unchanged | Corrected; suite 219/219 |
@@ -89,6 +89,7 @@ IUPAC, gapped and invalid input (D14):
 | 32 | Stage G: one notation per unit in printed output (%, °C, cal/(mol·K), Da); primer positions and target input 1-based inclusive like the other menus | this package | inventory of every f-string literal; source check fails on the previous code; primer coordinates verified by slicing | Corrected; suite 292/292 |
 | 33 | Stage G (6.4): payload warnings (primer, CRISPR) reach the exported summary and the Markdown report on every path | this package | measurement over every offline `core.api` analysis; new tests fail on the previous code | Corrected; suite 294/294; menu-path parameters for sequence/restriction/cloning recorded as open |
 | 34 | Stage G (6.4): menu-path restriction results record enzymes and topology; restriction and cloning results record the enzyme data version on both paths | this package | new test fails on the previous code | Corrected; suite 295/295; menu-path sequence-overview and cloning input parameters still open |
+| 35 | Stage H editorial review part 1: American spelling throughout (92 words in docs, 6 code text sites); one wording for recurring messages; tone and precision fixes; enforcement test | this package | inventory of every string literal and document; spelling test fails on the previous text | Done; suite 296/296 |
 
 ## Paused (2026-10-31)
 
@@ -119,7 +120,7 @@ reason it stands where it does. None is silently closed.
 | **S24** XML parsing exposure | 14.3, 1.3.1 dependency policy | **Measured, residual risk documented** | XXE is not reachable; entity expansion is capped by Expat >= 2.4.0. The cap is version-dependent, which matters because Synapse targets Python 3.10. See the audit entry. |
 | **P2-2** menus inside analysis modules | 7.2 | **Partially done** | `core/api.py` now covers every analysis (S14), so a non-interactive caller never needs the menus. The menus still live in the analysis modules; moving them is a structural change of its own. |
 | **P1-9** organism mode, 5'-partial, circular ORFs | 3.2 | **Deferred sub-items** | The genetic-code part is complete (RNA codon view). Organism mode, 5'-partial ORFs and ORFs spanning the origin remain unimplemented. |
-| **P3-1** experiment planner | 4.3 | **Not implemented, honestly labelled** | The menu entry says "not implemented" (D15) rather than advertising a feature that does nothing. |
+| **P3-1** experiment planner | 4.3 | **Not implemented, honestly labeled** | The menu entry says "not implemented" (D15) rather than advertising a feature that does nothing. |
 
 ## Handover notes (working practice)
 

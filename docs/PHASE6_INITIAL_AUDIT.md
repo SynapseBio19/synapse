@@ -207,7 +207,7 @@ table 4: 8 starts; table 11: 7 starts).
 | GRAVY | −0.48947 / −0.489 | −0.47209 / −0.472 |
 | Instability index | 36.055 / 36.06 | 16.091 / 16.09 |
 | Aromaticity | 0.039474 / 0.0395 | 0.093023 / 0.093 |
-| Extinction (reduced / oxidised) | 1490 / 1490 | 37470, 37970 / 37470, 37970 |
+| Extinction (reduced / oxidized) | 1490 / 1490 | 37470, 37970 / 37470, 37970 |
 | Molecular weight | 8564.84 | 8564.74 (Biopython) |
 
 The molecular-weight difference is a residue-mass-table difference;
@@ -317,7 +317,7 @@ Neither `find_restriction_sites`, `analyze_enzyme`, `build_restriction_map`
 nor `_digest_fragments`' callers accept or propagate a topology for site
 discovery (`_digest_fragments` itself has a `topology` parameter, but the
 sites fed to it are found linearly). A circular vector — the normal case in
-cloning — is analysed as if it were linear, so sites and junctions spanning
+cloning — is analyzed as if it were linear, so sites and junctions spanning
 the origin are invisible to the planner.
 
 ### D6 – Programmatic local BLAST is unreachable
@@ -374,7 +374,7 @@ times; `guide_to_dict` and the CSV/JSON exports contain no cut key. The
 only cleavage information is the free-text `CRISPRSystem.cut_model` string.
 P2-3 item 1 ("correct CRISPR cut-position handling") is not implemented,
 and the menu offers "Target Discovery" and "Guide Analysis & Ranking"
-without ever stating where the enzyme is modelled to cut.
+without ever stating where the enzyme is modeled to cut.
 
 ### D9 – The on-target site is scored as an off-target
 **`analyses/crispr.py:1146, 846`** · CONFIRMED · scientific
@@ -389,7 +389,7 @@ specificity_profile: exact_matches = 1, total_hits = 1
 _component_specificity -> 60.0      (100.0 − 1 × 40.0)
 ```
 
-A perfectly specific guide is penalised 40 points for matching its target,
+A perfectly specific guide is penalized 40 points for matching its target,
 and that penalty enters `rank_guides` with weight 0.10. Guide ranking is
 therefore distorted in the one workflow the module advertises for
 specificity. P2-3 item 3 not implemented.
@@ -424,7 +424,7 @@ Guide exports land on the user's Desktop (here, inside a cloud-synced
 folder) rather than in a project-controlled export directory. `.gitignore`
 already reserves `/exports/`, which is what the report exporter uses.
 
-### D12 – Variant normalisation fails silently on contig-name mismatch
+### D12 – Variant normalization fails silently on contig-name mismatch
 **`analyses/variant_analysis.py:979, 958`** · CONFIRMED · scientific
 
 `check_reference_alleles` looks the contig up by exact name
@@ -447,7 +447,7 @@ normalize_variants([Variant("1", 7, "AA", "A")], {"chr1": "GGGAAAAAGGG"})
 
 while `core/api.analyze_vcf` records `parameters["normalized"] = True`
 because a reference mapping was supplied. A user with a `1`-style reference
-and a `chr1`-style VCF is told the variants were normalised and REF-checked
+and a `chr1`-style VCF is told the variants were normalized and REF-checked
 when neither happened. `mismatched: 0` reads as success; the real signal is
 buried in `not_checked`, which no caller surfaces.
 
@@ -576,7 +576,7 @@ change all four, and `core/api.find_orfs` accepts all four, but the
 pipeline's own runner is stuck on the defaults — so a programmatic
 pipeline run cannot reproduce an interactive session's ORF result.
 
-`PipelineContext.completed` is initialised with six keys while
+`PipelineContext.completed` is initialized with six keys while
 `store_result` writes `self.completed[result.module] = True` for any
 module name, so the dict silently grows to whatever has been stored and
 `status()` returns a history-dependent shape, while `print_status` prints a
@@ -590,15 +590,15 @@ fixed list of twelve labels. Not a crash; an inconsistent contract.
 |---|---|---|---|
 | S1 | `analyses/orf.py:483` | NOT A DEFECT, verified by execution 2026-10-31 (Opus 5); the reverse-complement frame is the biologically correct frame and no coordinate is reported | `analyze_kozak_context` is called with the *strand-local* sequence and index, so for a minus-strand ORF the reported Kozak context belongs to the reverse-complement coordinate frame. Observed output is `classification: "Unavailable"` for the minus ORFs tested (the window ran off the sequence end), so no wrong value was produced here, but the coordinate frame is undocumented and a longer flanking region would produce a context whose position cannot be mapped back to the parent sequence. |
 | S2 | `analyses/orf.py:942` | NOT A DEFECT, verified by execution 2026-10-31 (Opus 5); nested minus-strand ORFs share frame and 3' end and collapse correctly | `_keep_longest_per_stop` keys on `(strand, frame, three_prime, status)`. Including `status` means a complete ORF and a partial ORF sharing a 3′ end are both kept, which is defensible, but the key uses `orf["stop"]` for `+` and `orf["start"]` for `−` as the 3′ end — correct — while `frame` for the minus strand is derived from the reverse-complement offset, so two minus ORFs in the same biological frame but found from different rotations would not collide. Needs a targeted test. |
-| S3 | `analyses/crispr.py:1326` | CONFIRMED, corrected 2026-10-31 (Opus 5) | Prime-editing PBS/RTT construction is anchored on `mutation.position` and emits a candidate only when the requested lengths fit. The construction is labelled heuristic and carries explicit notes, which is honest, but there is no check that the RTT actually contains the intended edit — `edit_in_rtt` only tests `len(rtt) == rtt_length`. The field name overstates what is verified. |
-| S4 | `analyses/crispr.py:135` | RESOLVED by documentation 2026-10-31 (Opus 5) | `DEFAULT_MIN_GC = 30`, `DEFAULT_MAX_GC = 70`, `DEFAULT_MAX_HOMOPOLYMER = 4`, `DEFAULT_SEED_LENGTH = 8`, base-editing window `(4, 8)`. These are plausible community conventions but carry no citation in the module or in `docs/METHODS.md`. They should either be referenced or explicitly labelled as Synapse conventions. |
+| S3 | `analyses/crispr.py:1326` | CONFIRMED, corrected 2026-10-31 (Opus 5) | Prime-editing PBS/RTT construction is anchored on `mutation.position` and emits a candidate only when the requested lengths fit. The construction is labeled heuristic and carries explicit notes, which is honest, but there is no check that the RTT actually contains the intended edit — `edit_in_rtt` only tests `len(rtt) == rtt_length`. The field name overstates what is verified. |
+| S4 | `analyses/crispr.py:135` | RESOLVED by documentation 2026-10-31 (Opus 5) | `DEFAULT_MIN_GC = 30`, `DEFAULT_MAX_GC = 70`, `DEFAULT_MAX_HOMOPOLYMER = 4`, `DEFAULT_SEED_LENGTH = 8`, base-editing window `(4, 8)`. These are plausible community conventions but carry no citation in the module or in `docs/METHODS.md`. They should either be referenced or explicitly labeled as Synapse conventions. |
 | S5 | `analyses/crispr.py:642` | PARTLY CONFIRMED, addressed 2026-10-31 (Opus 5) | The poly-T flag fires on any run of ≥4 T anywhere in the guide. The U6-promoter consideration that motivated P2-3 item 2 concerns a TTTT terminator motif; the current flag is a generic homopolymer warning, is position-independent, and the string "U6" appears nowhere in the module. The item is addressed only incidentally. |
 | S6 | `analyses/blast.py` | CONFIRMED, implemented 2026-10-31 (Opus 5): `NCBIBlastClient.resume()`, menu entry [14] and `core.api.blast_resume()`; tested against a stub, not against the live service | `NCBIBlastClient` exposes `submit`/`status`/`fetch_xml`/`run`, i.e. the primitives needed to resume a search from a saved RID, and "rid" occurs 40 times, but "resume" occurs 0 times and no menu entry offers it. P1-7's "RID resume deferred" is accurate; the capability is one small function away from existing. |
 | S7 | `analyses/blast.py:3385` | SUSPECTED | On the user-supplied-path branch, `database_details` is populated with `title`, `database_date`, `blastdb_version`, `sequence_count` all `None` because `blastdbcmd -info` is not invoked. Confirmed in the §6 run. Provenance is weaker on that path than on the managed path. |
-| S8 | `core/report.py:72` | CONFIRMED, corrected 2026-10-31 (Opus 5) | `to_jsonable` catches bare `Exception` around `value.to_dict()` and falls through to `repr(value)`. A payload whose `to_dict` raises is silently serialised as a Python repr string, which is unparseable downstream and gives no warning in the report. |
+| S8 | `core/report.py:72` | CONFIRMED, corrected 2026-10-31 (Opus 5) | `to_jsonable` catches bare `Exception` around `value.to_dict()` and falls through to `repr(value)`. A payload whose `to_dict` raises is silently serialized as a Python repr string, which is unparseable downstream and gives no warning in the report. |
 | S9 | `analyses/mutation.py` | CONFIRMED and quantified 2026-10-31 (Opus 5); ~45 bytes per matrix cell measured, note now states the figures; algorithm unchanged (P2-6) | The global Needleman–Wunsch alignment is O(n·m) in time *and memory*; the only mitigation is a note above 2,000 nt (P1-10). P2-6 records the 10 kb target as unmet. For a 10 kb × 10 kb comparison the DP matrix is ~10⁸ cells, which will exhaust memory on a typical machine rather than merely being slow. The note should state the limit, not just flag it. |
 | S10 | `fileio/genbank.py` | CONFIRMED, corrected 2026-10-31 (Opus 5) | Location parsing covers simple spans, `complement()` and `join()`; other forms keep only the raw string. A record using `order()`, `<`/`>` partial bounds or a remote accession reference therefore yields a feature with no usable interval, silently. The limitation is documented in METHODS but not surfaced as a per-record note. |
-| S11 | `analyses/literature.py` | STILL UNVERIFIED by choice 2026-10-31 (Opus 5); live provider behaviour needs external requests, which require approval | Four providers (PubMed, Europe PMC, OpenAlex, Crossref) each fail independently, and `_enrich_missing_metadata` fills gaps across sources. Dedup (`deduplicate_articles`) and relevance ranking were exercised only through the module's offline fixtures. No live call was made in this audit, by design. Real-world behaviour on rate limits, partial outages and cross-source duplicate DOIs is therefore unverified. |
+| S11 | `analyses/literature.py` | STILL UNVERIFIED by choice 2026-10-31 (Opus 5); live provider behavior needs external requests, which require approval | Four providers (PubMed, Europe PMC, OpenAlex, Crossref) each fail independently, and `_enrich_missing_metadata` fills gaps across sources. Dedup (`deduplicate_articles`) and relevance ranking were exercised only through the module's offline fixtures. No live call was made in this audit, by design. Real-world behavior on rate limits, partial outages and cross-source duplicate DOIs is therefore unverified. |
 | S12 | project-wide | RESOLVED 2026-10-31 (Opus 5); pyright runs against the `ab4bd2a` baseline for every work package, invoked as `python -m pyright` because `pyright.exe` is blocked by a Windows application control policy | `pyproject.toml` sets `[tool.pyright] pythonVersion = "3.10"`, `typeCheckingMode = "standard"`. `pyright` is installed but **was not run** in this audit (read-only scope; it writes caches). Running it is the cheapest available check for the 3.10 compatibility risk in §1. |
 | S13 | `main.py` | CONFIRMED, corrected 2026-10-31 (Opus 5): the session is `main()` behind a `__main__` guard; `git diff -w` shows only the 12 added lines | `main.py` is a top-level script with module-level control flow (`sequences = choose_sequence_file()` at import, `while True:` loops at module scope) and no `if __name__ == "__main__":` guard. `tests/test_main_smoke.py` therefore has to drive it by patching `builtins.input`. Any import of `main` starts the application. |
 | S14 | `analyses/*` | PARTLY RESOLVED 2026-10-31 (Opus 5): the API now covers every analysis (cloning, variant filtering, mutation reporting, BLAST, literature); the modules still own their menus, which belongs with Stage F | Eleven of twelve analysis modules own their terminal menus (`run_*_ui`, `*_menu`), so `print()`/`input()` and scientific computation live in the same file: 1,966 `print(` and 126 `input(` calls across `analyses/`. `core/api.py` provides a clean non-interactive layer for ten analyses, which is the P2-2 compromise, but the modules themselves are not UI-free and `core/api.py` does not yet cover cloning, variant filtering, mutation reporting, BLAST or literature. |
@@ -653,9 +653,9 @@ investigation began):
   field *name* remains imprecise and belongs to the D18 export-vocabulary
   work package.
 - **S4 resolved by documentation.** The GC range, homopolymer limit and
-  local-mismatch limit are now explicitly labelled Synapse screening
+  local-mismatch limit are now explicitly labeled Synapse screening
   conventions; the seed length cites Sternberg et al. 2014 for the concept
-  while labelling 8 nt as a Synapse choice; the base-editing windows cite
+  while labeling 8 nt as a Synapse choice; the base-editing windows cite
   Komor et al. 2016 and Gaudelli et al. 2017. No value was changed.
 - **S5 partly confirmed.** The audit's concern that the flag is
   "position-independent" is **not** a defect: Pol III terminates wherever it
@@ -685,7 +685,7 @@ Found during the D9 work (2026-10-31); not changed there:
 - `fileio` rejects an empty file and a header-less file with a clear message, and content-sniffs rather than trusting the extension.
 - Report export rejects any suffix other than `.json`/`.md`.
 - Literature date bounds: `2020-03` → lower `2020-03-01`, upper `2020-03-31`; `2020` → upper `2020-12-31`.
-- Evidence bands are gated on E ≤ 1e-3 (`DEFAULT_EVIDENCE_EVALUE_THRESHOLD = 0.001`) with a `NOT_SIGNIFICANT` band, and the threshold is parameterised.
+- Evidence bands are gated on E ≤ 1e-3 (`DEFAULT_EVIDENCE_EVALUE_THRESHOLD = 0.001`) with a `NOT_SIGNIFICANT` band, and the threshold is parameterized.
 - BLAST hit identity of 100 % alongside 98.04 % coverage (§6) is correct BLAST semantics — identity is per-HSP over the aligned length — and matches how NCBI reports it.
 
 ---
@@ -736,10 +736,10 @@ database is referenced anywhere in `tests/`.
 | Selected ORF → BLAST | **Partly** | `build_orf_query` retains global coordinates; the remote path is untested (no live call) and the programmatic local path is blocked by D6. |
 | Restriction → cloning | **Broken for circular DNA and ambiguity** | D3, D4, D5. The two modules have independent site finders with different semantics. |
 | Primer ← restriction site selection | **Not wired** | `core/api.design_primers` takes only a target window; no restriction-site-driven primer path exists, although §10.2 of the Phase 6 brief describes one and the primer module has `restriction` references in its scoring. Needs a decision, not a fix. |
-| VCF → parse → normalise → filter → statistics → export | **Works, with a silent failure mode** | Multi-allelic splitting, `Number=A/R/G` remapping, FILTER semantics and round-trip all pass their tests; D12 is the gap. |
-| Mutation → coding consequences | **Works** | Start-loss restricted to codon 1, frame warnings, HGVS-*like* labelling all confirmed by the 44-test self-suite including the TEST_8 family. |
+| VCF → parse → normalize → filter → statistics → export | **Works, with a silent failure mode** | Multi-allelic splitting, `Number=A/R/G` remapping, FILTER semantics and round-trip all pass their tests; D12 is the gap. |
+| Mutation → coding consequences | **Works** | Start-loss restricted to codon 1, frame warnings, HGVS-*like* labeling all confirmed by the 44-test self-suite including the TEST_8 family. |
 | Analysis → pipeline store → report | **Works** | JSON and Markdown exports produced; input SHA-256, parameters, warnings, limitations and per-analysis payload hashes present. |
-| Literature | **Works offline** | Self-test passes on fixtures; live behaviour unverified (S11). |
+| Literature | **Works offline** | Self-test passes on fixtures; live behavior unverified (S11). |
 
 ---
 
@@ -780,7 +780,7 @@ Identified gaps:
 6. **No Python 3.10 run** and **no `pyright` run**, despite both being
    configured.
 7. `tests/golden/orf_legacy_baseline.json` and the twelve snapshots protect
-   behaviour but, by construction, cannot detect that the behaviour is wrong.
+   behavior but, by construction, cannot detect that the behavior is wrong.
 
 ---
 
@@ -805,7 +805,7 @@ the absence of a cut-site model (D8).
 
 ---
 
-## 10. Prioritised implementation roadmap
+## 10. Prioritized implementation roadmap
 
 Ordering principle: **scientific correctness before architecture before
 presentation**, and within each tier, defects that silently produce wrong
@@ -819,12 +819,12 @@ numbers before defects that merely block a feature.
   explicit approval before any application source file is changed.
 
 ### Tier 1 — silent scientific errors (do first)
-1. **D12** variant contig matching and silent non-normalisation — a user is
-   actively told that normalisation and REF checking happened when they did
+1. **D12** variant contig matching and silent non-normalization — a user is
+   actively told that normalization and REF checking happened when they did
    not. Add contig-name unification, and make an unmatched contig a
    warning on the result, not a counter nobody reads.
 2. **D4 + D3 + D5** the cloning/restriction split — phantom sites from
-   ambiguity, and circular DNA analysed as linear in the cloning planner.
+   ambiguity, and circular DNA analyzed as linear in the cloning planner.
    Converge both modules on one site finder with CONFIRMED/POSSIBLE status
    and a topology parameter.
 3. **D2 + D1** ORF translation — make `translate_orf_sequence` read the
@@ -834,7 +834,7 @@ numbers before defects that merely block a feature.
    record at load time; set and check `SequenceRecord.alphabet`.
 5. **D9** CRISPR on-target exclusion, and **D8** a cut-site model with a
    cited convention per system (or an explicit statement that none is
-   modelled). D8 needs a scientific decision first, so it may follow.
+   modeled). D8 needs a scientific decision first, so it may follow.
 
 ### Tier 2 — misleading or dead functionality
 6. **D7** regenerate or remove the stale BLAST artifact; if it is kept as a
@@ -864,7 +864,7 @@ numbers before defects that merely block a feature.
 16. **D13** unify the two `normalize_dna` contracts; one validation module,
     one documented contract.
 17. **D16** flatten the `_v5`–`_v11` primer ranking chain behind a
-    behaviour-preserving test, as P2-1 recommends.
+    behavior-preserving test, as P2-1 recommends.
 18. Extend `core/api.py` to the analyses it does not yet cover (cloning,
     variant filtering, mutation reporting, BLAST, literature) so the
     non-interactive layer is complete (**S14**).
@@ -880,7 +880,7 @@ numbers before defects that merely block a feature.
     model and exports, with a documented golden-master update.
 22. Editorial pass over all user-facing text; add the missing METHODS
     entries for the CRISPR constants (**S4**) and the cut-site question (**D8**).
-23. Fix the one language inconsistency found: `core/api.py:107` "analyse"
+23. Fix the one language inconsistency found: `core/api.py:107` "analyze"
     against the project's "analyze".
 
 ### Still-open external validations
@@ -927,14 +927,14 @@ numbers before defects that merely block a feature.
    and the base-editing, prime-editing and ORF-integration sections of that
    range were subsequently audited under Opus 5 by targeted execution
    (D8–D10, S3, S5) rather than by re-reading the whole range. No finding
-   was dropped, but that range was analysed by execution and targeted
+   was dropped, but that range was analyzed by execution and targeted
    search rather than continuous reading.
 7. **Skills and MCP providers:** the eleven project-local K-Dense skills
    under `.claude/skills/` were inventoried from disk. None was invoked;
    the external comparisons in §3 were run directly against Biopython and
    primer3-py, which is stronger evidence than a skill recommendation. The
    Bio Research MCP servers were not queried. `biorender`, `owkin`,
-   `synapse` and `wiley` require authorisation and were unavailable.
+   `synapse` and `wiley` require authorization and were unavailable.
 8. **No claim in this document rests on an unexecuted assumption.** Every
    CONFIRMED finding quotes observed output; SUSPECTED and UNVERIFIED
-   CONCERN items are labelled as such and state what would settle them.
+   CONCERN items are labeled as such and state what would settle them.

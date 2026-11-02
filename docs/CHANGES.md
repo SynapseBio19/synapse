@@ -14,7 +14,7 @@ Verification levels used below:
 
 ## Stage 0 – baseline (2026-10-29)
 
-- Git repository initialised; tag `baseline-audit` = project exactly as audited.
+- Git repository initialized; tag `baseline-audit` = project exactly as audited.
 - Added `tests/` (standard-library `unittest`, no extra dependencies):
   - `test_builtin_selftests.py` runs the 13 built-in module self-tests.
   - `test_golden_master.py` + `golden/*.json`: snapshots of current behavior
@@ -46,7 +46,7 @@ literature and primer did not change.
 - Problem: `BlastHSP.query_coverage` returned the non-gap fraction of the
   alignment, i.e. 100 % for every gap-free HSP. The stored run
   `blast_results/TEST_8_REFERENCE_blast.json` reported 100 % for a 32-bp HSP on
-  a 99-bp query. Evidence bands ignored significance: E = 7.45 was labelled
+  a 99-bp query. Evidence bands ignored significance: E = 7.45 was labeled
   "MODERATE_SEQUENCE_EVIDENCE".
 - Now: HSP coverage = HSP query interval / query length; hit coverage
   (`best_coverage_percent`) = union of all HSP query intervals / query length,
@@ -105,7 +105,7 @@ literature and primer did not change.
 - Problem: every Met->X change was "Start-loss".
 - Now: `classify_coding_substitution(..., codon_index=)`; Start-loss only for
   codon 1. Limitation: alternative initiation codons in the reference (GTG/TTG)
-  are not recognised as starts by the mutation module.
+  are not recognized as starts by the mutation module.
 
 ### P0-7 Variant normalization (`analyses/variant_analysis.py`)
 
@@ -485,7 +485,7 @@ in its own commit with its own regression tests in
   enzymes in both topologies with a site rotated across the origin. Suite
   125 → 132.
 
-### D5 Cloning analysed circular vectors as linear (`analyses/cloning.py`, `core/pipeline.py`, `analyses/restriction.py`)
+### D5 Cloning analyzed circular vectors as linear (`analyses/cloning.py`, `core/pipeline.py`, `analyses/restriction.py`)
 
 - Problem: no cloning function accepted a topology; vector and insert
   digests were hard-coded `"linear"`. A recognition site spanning the
@@ -631,7 +631,7 @@ protein FASTA records get a route to protein analysis. Tests are in
   INVALID, AMBIGUOUS or a type the caller does not accept. The rules are
   in `docs/METHODS.md`; there is no frequency threshold.
 - No analysis uses it yet; it is wired in by the following packages, so
-  this commit changes no existing behaviour.
+  this commit changes no existing behavior.
 - Validation: the letter sets equal Biopython's `Bio.Data.IUPACData`
   (external reference comparison, skipped without Biopython); alphabet
   sources checked in PubMed (PMIDs 2582368, 6692818).
@@ -715,7 +715,7 @@ protein FASTA records get a route to protein analysis. Tests are in
   loaded in the DNA alphabet; BLAST and report export in the main menu use
   shared helpers (`store_blast_run`, `export_report_interactive`) so the
   DNA and protein menus behave the same.
-- Behaviour change, intended: DNA records with IUPAC ambiguity codes
+- Behavior change, intended: DNA records with IUPAC ambiguity codes
   other than N now ask for the type once (e.g. `TEST_8_AMBIGUOUS` in
   `examples/dna.fasta`); a header modifier `[moltype=genomic DNA]`
   declares it in the file. Plain DNA records behave as before; the golden
@@ -804,7 +804,7 @@ Tests are in `tests/test_phase6_tier2.py`.
   first real run (coverage 100 % and 98.04 %) with full provenance.
 - Tests: 3 new (`LocalBlastDatabasePathTests`). Suite 197 → 200.
 
-### D7 The stale BLAST artifact is labelled as legacy (`blast_results/README.md`)
+### D7 The stale BLAST artifact is labeled as legacy (`blast_results/README.md`)
 
 - Problem: `blast_results/TEST_8_REFERENCE_blast.json` still carries the
   pre-P0-1 values (100 % coverage for a 32 bp HSP on a 99 bp query, E =
@@ -836,14 +836,14 @@ Tests are in `tests/test_phase6_tier2.py`.
   sequence (the designed sequence itself, or its parent).
 - Tests: 3 new (`CrisprOnTargetTests`, both strands). Suite 200 → 203.
 
-### D8 CRISPR guides report the modelled cut site (`analyses/crispr.py`)
+### D8 CRISPR guides report the modeled cut site (`analyses/crispr.py`)
 
 - Problem: no guide carried a cut position; the only cleavage information
   was a free-text `cut_model` string.
 - Now: each system defines where it cuts, counted along the guide in
   targeting orientation, with its source: SpCas9 and SpCas9-NG blunt
   after guide position 17 (3 nt 5' of the PAM; Jinek et al. 2012), SaCas9
-  blunt after position 18 (3 nt 5' of the PAM, modelled as for SpCas9;
+  blunt after position 18 (3 nt 5' of the PAM, modeled as for SpCas9;
   Ran et al. 2015), Cas12a staggered after position 18 on the PAM strand
   and 23 on the target strand, a 5-nt 5' overhang (Zetsche et al. 2015).
   Every `GuideCandidate` has `cut_site`, `cut_site_complementary` (the
@@ -869,7 +869,7 @@ Tests are in `tests/test_phase6_tier2.py`.
   base-editing analysis and by `find_base_editing_candidates`, which also
   takes `base_editor` when no editor is passed (`config_editing_window`
   validates `1 <= start <= end`). The defaults equal the previous
-  behaviour (window 4–8 = the CBE/ABE definitions; GC ranked; low-quality
+  behavior (window 4–8 = the CBE/ABE definitions; GC ranked; low-quality
   candidates included), so default results are unchanged.
 - D11 problem: relative CRISPR export paths resolved to the user's
   Desktop (here a OneDrive-synced folder).
@@ -892,7 +892,7 @@ Tests are in `tests/test_phase6_tier2.py`.
   `STATUS_LABELS` (one table, also used by `print_status`).
 - Tests: 2 new (`PipelineOrfRunnerTests`). Suite 210 → 212.
 
-### D15 The unimplemented planner is labelled as such (`main.py`, `ui/menu.py`)
+### D15 The unimplemented planner is labeled as such (`main.py`, `ui/menu.py`)
 
 - Problem: the main menu advertised `[11] AI Experiment Planner` and only
   printed "coming soon"; `docs/AUDIT_STATUS.md` lists it as P3-1
@@ -974,11 +974,11 @@ interrupted the Opus 5.5 session at the start of this investigation.
   and does not encode the alternative allele, so it is not a ready-to-use
   pegRNA RTT. Renaming the exported field belongs to D18.
 - **S4 (resolved by documentation).** No threshold was changed. The GC
-  range, homopolymer limit and local-mismatch limit are now labelled Synapse
+  range, homopolymer limit and local-mismatch limit are now labeled Synapse
   screening conventions; the seed length cites the PAM-proximal seed concept
-  (Sternberg et al. 2014) while labelling 8 nt as a Synapse choice; the
+  (Sternberg et al. 2014) while labeling 8 nt as a Synapse choice; the
   base-editing windows cite Komor et al. 2016 (CBE) and Gaudelli et al. 2017
-  (ABE), with the `+` variants labelled as Synapse windows.
+  (ABE), with the `+` variants labeled as Synapse windows.
 - **S5 (partly confirmed, addressed).** The audit's concern that the poly-T
   flag is position-independent is not a defect: Pol III terminates wherever
   it meets the T-tract. The real gap was that the motif was neither named
@@ -1001,7 +1001,7 @@ interrupted the Opus 5.5 session at the start of this investigation.
 - Problem: `calculate_tm_nearest_neighbor` was defined twice at module
   level. The first definition was the V3 model; it was then rebound to
   `_calculate_tm_nearest_neighbor_v3_raw` and the public name was replaced
-  by a backward-compatible adapter. The behaviour was correct, but the
+  by a backward-compatible adapter. The behavior was correct, but the
   definition a reader finds first was not the one that runs, and pyright
   reported the shadowing as `reportRedeclaration`.
 - Now: the model is defined directly under its private name and the alias
@@ -1082,7 +1082,7 @@ interrupted the Opus 5.5 session at the start of this investigation.
   Note for future sessions: `pyright.exe` is blocked by a Windows
   application control policy (WinError 4551), so it must be invoked as
   `python -m pyright --pythonversion 3.10`.
-- **S11 remains unverified, by choice.** The literature module's behaviour
+- **S11 remains unverified, by choice.** The literature module's behavior
   against live providers (rate limits, partial outages, cross-source
   duplicate DOIs) was not tested, because that means sending queries to
   external services; the resource policy requires approval for that. The
@@ -1159,7 +1159,7 @@ interrupted the Opus 5.5 session at the start of this investigation.
   which the audit timed at 100-110 s, 0.57 s; all 22 enzymes, which the
   audit timed at over two minutes, 18.7 s. The remaining time is the
   strategy enumeration itself, not repeated scanning.
-- No scientific behaviour changed: the scan is a pure function of its three
+- No scientific behavior changed: the scan is a pure function of its three
   inputs, the full suite including the S17 comparison across all 231 enzyme
   pairs passes unchanged, and the golden master is untouched.
 - Tests: 3 new (`CloningPlannerScanReuseTests`), covering the scan count,
@@ -1489,3 +1489,62 @@ choosing per module which inputs matter rather than copying the payload.
 
 Tests: 3 new (`ExportedWarningsTests`), each failing on the previous
 code.
+
+## Phase 6 - Stage H: language and documentation (2026-11-02)
+
+### Editorial review, part 1: spelling, recurring messages, tone
+
+The review began with a mechanical inventory of every string literal in
+`analyses/`, `core/`, `fileio/`, `ui/` and `main.py` (docstrings counted
+separately) and of every Markdown document, against five questions:
+German text in the interface (none found), mixed spelling, casual tone,
+claims stronger than the evidence, and several wordings for one recurring
+message. Claims of certainty were checked word by word: every "prove" and
+"guarantee" in the interface is a negation ("does not prove translation"),
+which is the intended, evidence-limited statement.
+
+**Spelling.** The identifiers are American English (`normalize_sequence`,
+`analyze_orfs`, "behavior" in 10 code sites), while the documentation
+mixed both systems ("behaviour" 18 times next to "behavior" 11 times,
+"labelled", "modelled", "-ise" forms). American English is now used
+throughout: 92 words in 10 documents and 6 code text sites, grouped:
+
+| Category | Original | Revised | Where |
+|---|---|---|---|
+| consistency | behaviour, analysed, labelled, labelling, modelled, normalise(d), normalisation, organises, serialised, recognised, initialised, optimisation, prioritised, parameterised, characterisation, authorisation, ... | behavior, analyzed, labeled, labeling, modeled, normalize(d), normalization, organizes, serialized, recognized, initialized, optimization, prioritized, parameterized, characterization, authorization, ... | all documents in `docs/` |
+| consistency | "cut modelled as SpCas9", "Blunt cut modelled", "not modelled", "Modelled cut:" | "modeled" in each; the label keeps its column | `analyses/crispr.py` |
+| consistency | "... star activity are not modelled." | "... not modeled." | `core/api.py` (restriction limitation) |
+| consistency | "Unrecognised sequence file: ..." | "Unrecognized sequence file: ..." | `fileio/loader.py` |
+
+Words that are correctly spelled with "-ise" in American English
+(otherwise, precise, advertise, excise, ...) were excluded by list.
+
+**Recurring messages (8.4).** The interface standard names `Invalid
+selection.` as the reply to an unknown menu key; 35 sites used it and two
+did not.
+
+| File | Original | Revised | Reason |
+|---|---|---|---|
+| `analyses/orf.py` (settings menu) | "Invalid option." | "Invalid selection." | one wording per message |
+| `analyses/orf.py` (ORF menu) | "Invalid option. Please choose 0-6." | "Invalid selection. Please choose 0-6." | same; the range matches the menu ([1]-[6], [0] Back) |
+| `analyses/crispr.py` (guide menu) | "No sequence selected." | "No DNA sequence selected." | the same module says "No DNA sequence selected." elsewhere, and CRISPR targets are DNA |
+
+The primer dialog keeps `ERROR: Invalid selection.`: there the dialog
+ends rather than asking again, so the operation did not happen, which is
+what `ERROR:` means in the standard.
+
+**Tone and precision.**
+
+| File | Original | Revised | Reason |
+|---|---|---|---|
+| `main.py` (exit, 2 sites) | "Thank you for using Synapse!" | "Thank you for using Synapse." | professional presentation |
+| `analyses/mutation.py` (frame warning) | "frame +1 is probably not the coding frame." | "reading frame +1 is unlikely to be the coding frame." | names the quantity and states the inference as a likelihood (scientific accuracy) |
+
+Left as written after review: "an older RID may simply have expired"
+(BLAST) states the ordinary explanation plainly, and the quality bands
+"Very Good", "Very Low", "VERY HIGH" are category names, not prose.
+
+Tests: 1 new (`SpellingStandardTests`) checks code and documentation for
+31 British forms; it found three sites the first pass had missed (a
+docstring in `core/orf_context.py` and a helper name in
+`tests/test_stage2_foundation.py`), which were corrected.

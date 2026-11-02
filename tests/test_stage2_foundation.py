@@ -25,11 +25,11 @@ class GeneticCodeTests(unittest.TestCase):
         reference = get_genetic_code(1).codons
         self.assertEqual(reference, {k: ("*" if v == "STOP" else v) for k, v in STANDARD_CODE.items()})
 
-        def normalised(table):
+        def normalized(table):
             return {k.replace("U", "T"): ("*" if v in ("STOP", "*") else v) for k, v in table.items()}
 
         for table in (orf.GENETIC_CODE, mutation.CODON_TABLE, rna.RNA_CODON_TABLE, CODON_TABLE):
-            self.assertEqual(reference, normalised(table))
+            self.assertEqual(reference, normalized(table))
 
     def test_known_differences_of_other_tables(self):
         from core.seqtools import get_genetic_code

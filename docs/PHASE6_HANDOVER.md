@@ -45,13 +45,13 @@ remaining S-findings and Stages F–I are untouched.
 | `343ffb7` | D14-F6 protein codes keep position; Sec/Pyl masses; B/Z/J ranges | internal tests; Biopython masses; one Stage 5 assertion updated (it encoded the deletion) |
 | `d40d328` | D14-F8/F9/F10 ORF search, transcription, GC counting | internal tests; probe re-run |
 | `5b120ec` | D6 + S7 local BLAST by database prefix, with provenance | external tool execution (bundled database) |
-| `e1a48c6` | D7 stale BLAST artifact labelled as legacy (file kept) | docs |
+| `e1a48c6` | D7 stale BLAST artifact labeled as legacy (file kept) | docs |
 | `7a4a718` | Handover notes (working practice) | docs |
 | `3514617` | D9 CRISPR on-target site not an off-target | internal tests |
 | `ca2ec39` | D8 CRISPR cut site per system, cited | internal tests; PubMed (PMIDs 22745249, 25830891, 30166441, 26422227) |
 | `8145556` | D10 CRISPR config fields act; D11 exports in `exports/crispr` | internal tests (defaults unchanged) |
 | `e47cb85` | D19 pipeline `run_orf` search settings; fixed `completed` shape | internal tests (equal to `core.api.find_orfs`) |
-| `f3a09c1` | D15 planner entry labelled "not implemented" | end-to-end `main.py` |
+| `f3a09c1` | D15 planner entry labeled "not implemented" | end-to-end `main.py` |
 | `c71963b` | S15 variant→mutation bridge works; S16 flag leak | internal tests; pyright −2 |
 | `c743beb` | S17 cloning digest uses the top-strand cut | agreement with `restriction.perform_digest` for 231 pairs, linear and circular |
 | `6c20e69` | S19 start-codon classification and scores use the genetic code | internal tests; golden unchanged |
@@ -88,7 +88,7 @@ S16, S17, S19, S20.
 **Then:** Stages F–H and Stage I as specified by the Master Prompt
 (`TERMINAL_UI_STANDARD.md`, `STYLE_GUIDE.md`, README, final report A–K).
 
-## 5. Behaviour changes a user will notice
+## 5. Behavior changes a user will notice
 
 - A DNA record containing IUPAC ambiguity codes other than N (e.g.
   `TEST_8_AMBIGUOUS` in `examples/dna.fasta`) asks once for its type
@@ -98,7 +98,7 @@ S16, S17, S19, S20.
 - RNA records are analyzed in the DNA alphabet with a printed note.
 - `core.api` refuses wrong or undetermined sequence types
   (`SequenceTypeError`); every entry point accepts `sequence_type=`.
-- CRISPR guides show the modelled cut; relative CRISPR exports go to
+- CRISPR guides show the modeled cut; relative CRISPR exports go to
   `exports/crispr/`; the planner entry says "not implemented".
 
 ## 6. Continuation steps
@@ -137,7 +137,7 @@ the assignment, not by a capability limit.
 |---|---|
 | S23 | Confirmed by execution and corrected. `seed_sequence` stored the guide's 3' end for every system; for Cas12a (5' PAM) that is the PAM-distal end. The new shared `pam_proximal_seed()` now serves both the stored seed and the local specificity screen, which had already been correct and therefore disagreed with the stored value. |
 | S3 | Confirmed and corrected. `edit_in_rtt` only compared RTT lengths; it is now a coordinate check that the RTT window covers the edit site. The emission filter already checked the length separately, so the change tightens it without loosening anything. |
-| S4 | Resolved by documentation. No threshold value was changed; each is now either cited or explicitly labelled a Synapse convention. |
+| S4 | Resolved by documentation. No threshold value was changed; each is now either cited or explicitly labeled a Synapse convention. |
 | S5 | Partly confirmed. The "position-independent" concern is **not** a defect: Pol III terminates wherever it meets the T-tract. The genuine gap was the missing name and source, now supplied. The threshold was deliberately left unchanged. |
 
 **Evidence.** Literature verified through PubMed rather than from memory:
@@ -195,7 +195,7 @@ themselves are ordinary scientific software maintenance, and no safeguard
 was encountered while doing them. The stops look like false positives on
 CRISPR vocabulary in a bioinformatics codebase. That is worth reporting to
 Anthropic rather than worth designing around, and this session did not
-sort or schedule work by expected classifier behaviour.
+sort or schedule work by expected classifier behavior.
 
 ### Completed in this assignment
 
@@ -209,12 +209,12 @@ sort or schedule work by expected classifier behaviour.
 
 - **S1, S2: not defects.** The minus-strand Kozak frame is the correct
   frame and reports no coordinate; nested minus-strand ORFs collapse
-  correctly. Both are now covered by tests so the behaviour cannot drift.
+  correctly. Both are now covered by tests so the behavior cannot drift.
 - **S9: confirmed, algorithm unchanged.** Measured at ~45 bytes per
   alignment matrix cell, so ~180 MB at 2,000 nt and ~4.5 GB at 10,000 nt.
   The note states these figures. A banded or linear-space alignment is
   still open as P2-6.
-- **S11: still unverified, by choice.** Live literature-provider behaviour
+- **S11: still unverified, by choice.** Live literature-provider behavior
   needs external requests, which require the owner's approval under the
   resource policy. Offline fixtures continue to cover parsing, dedup and
   retries.
@@ -299,7 +299,7 @@ complete: stages F to I have not been started.
    changes the golden master and needs a documented justification.
 3. **Stage H** - `docs/STYLE_GUIDE.md`, editorial review, README.
 4. **Stage I** - final verification and the A-K completion report.
-5. **S11** - live literature-provider behaviour, pending the owner's
+5. **S11** - live literature-provider behavior, pending the owner's
    approval for external requests.
 6. **S24 (new)** - BLAST XML is parsed with `xml.etree.ElementTree`.
    Modern CPython does not resolve external entities, so XXE is not

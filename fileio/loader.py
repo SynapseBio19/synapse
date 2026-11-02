@@ -49,7 +49,7 @@ def detect_format(path: str) -> str:
                 return "genbank"
             break
     raise ValueError(
-        "Unrecognised sequence file: expected FASTA ('>' header) or GenBank ('LOCUS')."
+        "Unrecognized sequence file: expected FASTA ('>' header) or GenBank ('LOCUS')."
     )
 
 

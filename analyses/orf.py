@@ -3294,7 +3294,7 @@ def _orf_settings_menu(settings):
             except ValueError as exc:
                 print(f"Not available: {exc}")
         else:
-            print("Invalid option.")
+            print("Invalid selection.")
 
 
 def run_orf_analysis_ui(
@@ -3408,7 +3408,7 @@ def run_orf_analysis_ui(
             return None
 
         else:
-            print("\nInvalid option. Please choose 0-6.")
+            print("\nInvalid selection. Please choose 0-6.")
 
 
 # Backward-compatible UI aliases

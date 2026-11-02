@@ -2739,7 +2739,7 @@ def assess_coding_frame(cds: str) -> List[str]:
         warnings.append(
             f"{len(internal_stops)} in-frame stop codon(s) before the end "
             f"(codon {shown}{', ...' if len(internal_stops) > 5 else ''}); "
-            "frame +1 is probably not the coding frame."
+            "reading frame +1 is unlikely to be the coding frame."
         )
     if codons and codons[-1] not in {"TAA", "TAG", "TGA"}:
         warnings.append("Does not end with a stop codon (possibly partial CDS).")

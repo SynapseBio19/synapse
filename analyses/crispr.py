@@ -19,7 +19,7 @@ Capabilities
   sequences, including mismatch position, seed-region and PAM compatibility.
 - Base-editing candidate analysis with configurable editing windows.
 - Prime-editing sequence-level candidate construction (PBS/RTT candidates),
-  explicitly labelled heuristic rather than experimentally validated design.
+  explicitly labeled heuristic rather than experimentally validated design.
 - ORF/region/context integration and batch FASTA analysis.
 - Reproducible JSON/CSV/FASTA reports and a detailed text report.
 - Comprehensive deterministic self-test suite.
@@ -94,7 +94,7 @@ SYSTEM_DEFINITIONS: Dict[str, Dict[str, Any]] = {
         "cut_model": "Cas9-like; relaxed PAM model",
         "cut_after": 17,
         "cut_after_complementary": 17,
-        "cut_reference": "SpCas9 variant; cut modelled as SpCas9, 3 nt 5' of the PAM (Nishimasu et al. 2018, PMID 30166441).",
+        "cut_reference": "SpCas9 variant; cut modeled as SpCas9, 3 nt 5' of the PAM (Nishimasu et al. 2018, PMID 30166441).",
         "description": "SpCas9-NG-like relaxed NG PAM model.",
     },
     "SaCas9": {
@@ -106,7 +106,7 @@ SYSTEM_DEFINITIONS: Dict[str, Dict[str, Any]] = {
         "cut_model": "Cas9-like; cleavage model is not an efficacy prediction",
         "cut_after": 18,
         "cut_after_complementary": 18,
-        "cut_reference": "Blunt cut modelled 3 nt 5' of the PAM, as for SpCas9 (Ran et al. 2015, PMID 25830891).",
+        "cut_reference": "Blunt cut modeled 3 nt 5' of the PAM, as for SpCas9 (Ran et al. 2015, PMID 25830891).",
         "description": "SaCas9 canonical NNGRRT PAM model.",
     },
     "Cas12a": {
@@ -293,7 +293,7 @@ class GuideCandidate:
     base_editing_candidates: List[Dict[str, Any]] = field(default_factory=list)
     prime_editing_candidates: List[Dict[str, Any]] = field(default_factory=list)
     context: Dict[str, Any] = field(default_factory=dict)
-    # Modelled double-strand break (audit D8): the break lies between
+    # Modeled double-strand break (audit D8): the break lies between
     # forward-strand positions cut_site and cut_site + 1 (1-based). For a
     # staggered cut, cut_site is on the strand carrying the guide sequence
     # and cut_site_complementary on the other strand.
@@ -1955,7 +1955,7 @@ def target_map(candidate: GuideCandidate, sequence_length: int, width: int = 60)
 
 def _candidate_cut_text(candidate: GuideCandidate) -> str:
     if not candidate.cut_site:
-        return "not modelled"
+        return "not modeled"
     if candidate.cut_site == candidate.cut_site_complementary:
         return f"between {candidate.cut_site} and {candidate.cut_site + 1} ({candidate.cut_type})"
     return (f"guide strand {candidate.cut_site}/{candidate.cut_site + 1}, other strand "
@@ -1979,7 +1979,7 @@ def format_candidate(candidate: GuideCandidate, rank: int) -> str:
         f"Strand:                   {candidate.strand}",
         f"Guide position:           {candidate.guide_start}-{candidate.guide_end}",
         f"PAM position:             {candidate.pam_start}-{candidate.pam_end}",
-        f"Modelled cut:             {_candidate_cut_text(candidate)}",
+        f"Modeled cut:              {_candidate_cut_text(candidate)}",
         f"Seed sequence:            {candidate.seed_sequence}",
         f"GC / AT:                  {candidate.metrics.gc_content:.2f}% / {candidate.metrics.at_content:.2f}%",
         f"Complexity:               {candidate.metrics.sequence_complexity:.3f}",
@@ -2614,7 +2614,7 @@ def crispr_menu(
 
         elif choice == "4":
             if not base_sequence:
-                print("No sequence selected.")
+                print("No DNA sequence selected.")
                 continue
             config.min_gc = _input_float(f"Minimum GC [{config.min_gc}]: ", config.min_gc)
             config.max_gc = _input_float(f"Maximum GC [{config.max_gc}]: ", config.max_gc)

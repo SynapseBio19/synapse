@@ -569,7 +569,7 @@ class MainMenuSequenceTypeTests(unittest.TestCase):
         self.assertIn("SEQUENCE TYPE", output)
         self.assertIn("RNA sequence, analyzed in the DNA alphabet (U read as T).", output)
         self.assertIn("Invalid character '1' at position 5", output)
-        self.assertIn("Thank you for using Synapse!", output)
+        self.assertIn("Thank you for using Synapse.", output)
 
 
 if __name__ == "__main__":

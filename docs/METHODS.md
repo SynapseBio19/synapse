@@ -177,7 +177,7 @@ use 0-based inclusive `start <= stop` on the forward strand.
 - End compatibility requires the same overhang sequence *and* polarity
   (5′ vs 3′); blunt ends are compatible with blunt ends.
 - Methylation sensitivity is shown as a note (ClaI, XbaI, DpnI, HpaII);
-  blocking by methylation and star activity are not modelled.
+  blocking by methylation and star activity are not modeled.
 - Validation: known-answer tests (ClaI cut positions and overhang; overhang
   polarity of EcoRI/BamHI/HindIII vs. PstI-type 3′ ends; origin-spanning
   EcoRI site). Compared with Biopython 1.88 `Bio.Restriction` (REBASE-
@@ -271,7 +271,7 @@ Validation:
   planner's repeated rescanning (S18) and changes no result.
 - Cut site (D8): SpCas9/SpCas9-NG blunt 3 nt 5' of the PAM (after guide
   position 17; Jinek et al. 2012), SaCas9 blunt 3 nt 5' of the PAM
-  (after position 18; modelled as SpCas9, Ran et al. 2015), Cas12a
+  (after position 18; modeled as SpCas9, Ran et al. 2015), Cas12a
   staggered after position 18 (PAM strand) and 23 (target strand), 5-nt
   5' overhang (Zetsche et al. 2015). Reported as forward-strand
   positions: the break lies between p and p+1. Geometry only, not
