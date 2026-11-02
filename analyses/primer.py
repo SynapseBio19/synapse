@@ -38,6 +38,7 @@ from math import log, log10, sqrt
 from typing import Optional, Sequence
 from core.seqtools import IUPAC_COMPLEMENT as _CORE_IUPAC_COMPLEMENT
 from ui.style import major_rule, minor_rule
+from ui import style
 
 DNA_ALPHABET = set("ACGT")
 IUPAC_ALPHABET = set("ACGTRYSWKMBDHVN")
@@ -893,30 +894,28 @@ def summarize_primer_pair(pair: PrimerPair, rank: int = 1) -> str:
 
 def print_primer_report(report: PrimerDesignReport) -> None:
     """Print the complete Synapse primer report."""
-    print(major_rule())
-    print("SYNAPSE — PRIMER DESIGN")
-    print(major_rule())
-    print(f"Sequence length:            {report.sequence_length} bp")
-    print(f"Target region:              {report.target_start + 1}-{report.target_end} (1-based; {report.target_length} bp)")
+    style.header('PRIMER DESIGN')
+    style.field('Sequence length', f"{report.sequence_length} bp")
+    style.field('Target region', f"{report.target_start + 1}-{report.target_end} (1-based; {report.target_length} bp)")
     print()
     print("THERMODYNAMIC SETTINGS")
-    print(f"Tm model:                   {report.tm_model}")
+    style.field('Tm model', f"{report.tm_model}")
     conditions = report.thermodynamic_conditions
-    print(f"Na+ / salt:                 {conditions['salt_mM']:.2f} mM")
-    print(f"Mg2+:                       {conditions['mg_mM']:.2f} mM")
-    print(f"dNTPs:                      {conditions['dntp_mM']:.2f} mM")
-    print(f"Primer concentration:       {conditions['primer_concentration_nM']:.1f} nM")
-    print(f"Symmetry correction:        {'YES' if conditions['include_symmetry_correction'] else 'NO'}")
+    style.field('Na+ / salt', f"{conditions['salt_mM']:.2f} mM")
+    style.field('Mg2+', f"{conditions['mg_mM']:.2f} mM")
+    style.field('dNTPs', f"{conditions['dntp_mM']:.2f} mM")
+    style.field('Primer concentration', f"{conditions['primer_concentration_nM']:.1f} nM")
+    style.field('Symmetry correction', f"{'YES' if conditions['include_symmetry_correction'] else 'NO'}")
     print()
     print("CANDIDATE GENERATION")
-    print(f"Forward evaluated:          {report.forward_candidates_evaluated}")
-    print(f"Forward accepted:           {report.forward_candidates_accepted}")
-    print(f"Reverse evaluated:          {report.reverse_candidates_evaluated}")
-    print(f"Reverse accepted:           {report.reverse_candidates_accepted}")
+    style.field('Forward evaluated', f"{report.forward_candidates_evaluated}")
+    style.field('Forward accepted', f"{report.forward_candidates_accepted}")
+    style.field('Reverse evaluated', f"{report.reverse_candidates_evaluated}")
+    style.field('Reverse accepted', f"{report.reverse_candidates_accepted}")
     print()
     print("PAIR EVALUATION")
-    print(f"Pairs evaluated:             {report.pairs_evaluated}")
-    print(f"Pairs accepted/ranked:       {report.pairs_accepted}")
+    style.field('Pairs evaluated', f"{report.pairs_evaluated}")
+    style.field('Pairs accepted/ranked', f"{report.pairs_accepted}")
     print()
     if report.ranked_pairs:
         for index, pair in enumerate(report.ranked_pairs, start=1):
@@ -1147,9 +1146,7 @@ def run_primer_self_test() -> dict[str, bool]:
 
 if __name__ == "__main__":
     test_results = run_primer_self_test()
-    print(major_rule())
-    print("SYNAPSE — PRIMER MODULE SELF-TEST")
-    print(major_rule())
+    style.header('PRIMER MODULE SELF-TEST')
     for test_name, passed in test_results.items():
         print(f"[{'PASS' if passed else 'FAIL'}] {test_name}")
     print(major_rule())
@@ -2517,29 +2514,15 @@ def _print_thermodynamic_conditions(
 ) -> None:
     """Print the exact thermodynamic assumptions."""
 
-    print()
-    print("THERMODYNAMIC CONDITIONS")
-    print(minor_rule())
+    style.section('THERMODYNAMIC CONDITIONS')
 
-    print(
-        f"Na+:                    "
-        f"{conditions.sodium_mM:.3f} mM"
-    )
+    style.field('Na+', f"{conditions.sodium_mM:.3f} mM")
 
-    print(
-        f"Mg2+:                   "
-        f"{conditions.magnesium_mM:.3f} mM"
-    )
+    style.field('Mg2+', f"{conditions.magnesium_mM:.3f} mM")
 
-    print(
-        f"dNTPs:                  "
-        f"{conditions.dntp_mM:.3f} mM"
-    )
+    style.field('dNTPs', f"{conditions.dntp_mM:.3f} mM")
 
-    print(
-        f"Primer concentration:   "
-        f"{conditions.primer_nM:.3f} nM"
-    )
+    style.field('Primer concentration', f"{conditions.primer_nM:.3f} nM")
 
     effective = (
         calculate_effective_ionic_strength(
@@ -2550,15 +2533,9 @@ def _print_thermodynamic_conditions(
         )
     )
 
-    print(
-        f"Effective salt:         "
-        f"{effective:.3f} mM"
-    )
+    style.field('Effective salt', f"{effective:.3f} mM")
 
-    print(
-        f"Concentration mode:     "
-        f"{conditions.dna_concentration_mode}"
-    )
+    style.field('Concentration mode', f"{conditions.dna_concentration_mode}")
 
     print(
         f"Salt model:             "
@@ -2570,11 +2547,8 @@ def _print_thermodynamic_conditions(
         )
     )
 
-    print(
-        f"NN parameters:          "
-        f"{conditions.nn_parameter_set} - "
-        f"{NN_PARAMETER_SETS[conditions.nn_parameter_set]['reference']}"
-    )
+    style.field('NN parameters', f"{conditions.nn_parameter_set} - "
+        f"{NN_PARAMETER_SETS[conditions.nn_parameter_set]['reference']}")
 
 
 # Superseded definition of summarize_professional_primer_pair() removed in Stage 4 (never reachable;
@@ -3567,11 +3541,7 @@ PRIMER_V3_PUBLIC_API = (
 if __name__ == "__main__":
     results = run_primer_v3_self_test()
 
-    print(major_rule())
-    print(
-        "SYNAPSE — PROFESSIONAL PRIMER ENGINE V3 SELF-TEST"
-    )
-    print(major_rule())
+    style.header('PROFESSIONAL PRIMER ENGINE V3 SELF-TEST')
 
     for name, passed in results.items():
         print(
@@ -3782,13 +3752,6 @@ def run_primer_v3_self_test_final() -> dict[str, bool]:
 # The primer engine above is intentionally preserved.
 # ============================================================================
 
-def _primer_ui_header(title):
-    print()
-    print(major_rule())
-    print(title)
-    print(major_rule())
-
-
 def _primer_ui_store_result(pipeline, result):
     """Store a primer result when the active pipeline supports it."""
     if pipeline is None:
@@ -3809,14 +3772,12 @@ def _primer_ui_store_result(pipeline, result):
 
 def _primer_ui_read_target(sequence):
     """Read an optional target region."""
-    print()
-    print("TARGET REGION")
-    print(minor_rule())
+    style.section('TARGET REGION')
     print("Enter 1-based, inclusive positions (the first base is 1).")
     print("Press Enter to use the complete sequence.")
     print()
 
-    start_input = input("Target start [1]: ").strip()
+    start_input = style.ask('Target start', default='1')
     end_input = input(f"Target end [{len(sequence)}]: ").strip()
 
     try:
@@ -3831,23 +3792,21 @@ def _primer_ui_read_target(sequence):
         validate_target_region(sequence, target_start, target_end)
         return target_start, target_end
     except (TypeError, ValueError) as exc:
-        print(f"ERROR: {exc}")
+        style.error(f"{exc}")
         return None
 
 
 def _primer_ui_read_conditions():
     """Read thermodynamic conditions using documented defaults."""
-    print()
-    print("THERMODYNAMIC CONDITIONS")
-    print(minor_rule())
+    style.section('THERMODYNAMIC CONDITIONS')
     print("Press Enter to keep the default value.")
     print()
 
     try:
-        sodium_input = input("Na+ / salt [50.0 mM]: ").strip()
-        mg_input = input("Mg2+ [1.5 mM]: ").strip()
+        sodium_input = style.ask('Na+ / salt', default='50.0 mM')
+        mg_input = style.ask('Mg2+', default='1.5 mM')
         dntp_input = input("dNTPs [0.2 mM]: ").strip()
-        primer_input = input("Primer concentration [250 nM]: ").strip()
+        primer_input = style.ask('Primer concentration', default='250 nM')
 
         sodium_mM = 50.0 if not sodium_input else float(sodium_input)
         magnesium_mM = 1.5 if not mg_input else float(mg_input)
@@ -3863,39 +3822,27 @@ def _primer_ui_read_conditions():
         conditions.validate()
         return conditions
     except (TypeError, ValueError) as exc:
-        print(f"ERROR: {exc}")
+        style.error(f"{exc}")
         return None
 
 
 def _primer_ui_select_tm_model():
     """Select the Tm model."""
-    print()
-    print("TM MODEL")
-    print(minor_rule())
-    print("[1] Nearest-neighbor")
-    print("[2] Wallace")
-    print("[3] Salt-adjusted")
-    print()
-    print("[0] Back")
-    print(minor_rule())
-
-    choice = input("Selection [1]: ").strip()
-
     methods = {
-        "": "nearest_neighbor",
         "1": "nearest_neighbor",
         "2": "wallace",
         "3": "salt_adjusted",
     }
-
-    if choice == "0":
-        return None
-
-    if choice not in methods:
-        print("ERROR: Invalid selection.")
-        return None
-
-    return methods[choice]
+    while True:
+        style.menu([
+            ("Tm model", [('1', 'Nearest-neighbor'), ('2', 'Wallace'), ('3', 'Salt-adjusted')]),
+        ], zero="Cancel")
+        choice = style.ask('Selection', default='1')
+        if choice == "0":
+            return None
+        if choice in methods:
+            return methods[choice]
+        style.invalid_selection()
 
 
 # Superseded definition of _primer_ui_design() removed in Stage 4 (never reachable;
@@ -3904,47 +3851,23 @@ def _primer_ui_select_tm_model():
 
 def _primer_ui_single_analysis(pipeline=None):
     """Analyze one existing primer sequence."""
-    _primer_ui_header("SYNAPSE — SINGLE PRIMER ANALYSIS")
+    style.header("Single primer analysis")
 
     primer_input = input("Primer sequence: ").strip()
 
     if not primer_input:
-        print("ERROR: Primer sequence is empty.")
+        style.error("Primer sequence is empty.")
         return None
 
     try:
         primer = normalize_dna_sequence(primer_input)
     except (TypeError, ValueError) as exc:
-        print(f"ERROR: {exc}")
+        style.error(f"{exc}")
         return None
 
-    print()
-    print("TM MODEL")
-    print(minor_rule())
-    print("[1] Nearest-neighbor")
-    print("[2] Wallace")
-    print("[3] Salt-adjusted")
-    print()
-    print("[0] Back")
-    print(minor_rule())
-
-    choice = input("Selection [1]: ").strip()
-
-    if choice == "0":
+    method = _primer_ui_select_tm_model()
+    if method is None:
         return None
-
-    methods = {
-        "": "nearest_neighbor",
-        "1": "nearest_neighbor",
-        "2": "wallace",
-        "3": "salt_adjusted",
-    }
-
-    if choice not in methods:
-        print("ERROR: Invalid selection.")
-        return None
-
-    method = methods[choice]
 
     conditions = _primer_ui_read_conditions()
 
@@ -3958,33 +3881,24 @@ def _primer_ui_single_analysis(pipeline=None):
                 conditions=conditions,
             )
 
-            print()
-            print(major_rule())
-            print("PRIMER ANALYSIS")
-            print(major_rule())
-            print(f"Sequence:               {result['sequence']}")
-            print(f"Length:                 {result['length']} bp")
-            print(f"GC content:             {result['gc_percent']:.2f}%")
-            print(f"Nearest-neighbor Tm:    {result['nearest_neighbor_tm']:.2f} °C")
-            print(f"Wallace Tm:             {result['wallace_tm']:.2f} °C")
-            print(f"Salt-adjusted Tm:       {result['salt_adjusted_tm']:.2f} °C")
+            style.header('PRIMER ANALYSIS')
+            style.field('Sequence', f"{result['sequence']}")
+            style.field('Length', f"{result['length']} bp")
+            style.field('GC content', f"{result['gc_percent']:.2f}%")
+            style.field('Nearest-neighbor Tm', f"{result['nearest_neighbor_tm']:.2f} °C")
+            style.field('Wallace Tm', f"{result['wallace_tm']:.2f} °C")
+            style.field('Salt-adjusted Tm', f"{result['salt_adjusted_tm']:.2f} °C")
             print(f"ΔH:                     {result['delta_h_kcal_mol']:.2f} kcal/mol")
             print(f"ΔS:                     {result['delta_s_cal_mol_k']:.2f} cal/(mol·K)")
             print(f"ΔG at 25 °C:            {result['delta_g_kcal_mol']:.2f} kcal/mol")
-            print(f"Effective salt:         {result['effective_salt_mM']:.2f} mM")
+            style.field('Effective salt', f"{result['effective_salt_mM']:.2f} mM")
             print(f"3' GC clamp:            {result['gc_clamp']} bp")
-            print(f"Longest homopolymer:    {result['max_homopolymer']}")
-            print(f"Longest tandem repeat:  {result['max_tandem_repeat_copies']}")
-            print(
-                f"Hairpin stem:           "
-                f"{result['hairpin'].max_stem} bp "
-                f"({result['hairpin'].severity})"
-            )
-            print(
-                f"Self-dimer stem:        "
-                f"{result['self_dimer'].max_stem} bp "
-                f"({result['self_dimer'].severity})"
-            )
+            style.field('Longest homopolymer', f"{result['max_homopolymer']}")
+            style.field('Longest tandem repeat', f"{result['max_tandem_repeat_copies']}")
+            style.field('Hairpin stem', f"{result['hairpin'].max_stem} bp "
+                f"({result['hairpin'].severity})")
+            style.field('Self-dimer stem', f"{result['self_dimer'].max_stem} bp "
+                f"({result['self_dimer'].severity})")
             print(major_rule())
 
         else:
@@ -3997,34 +3911,25 @@ def _primer_ui_single_analysis(pipeline=None):
                 primer_concentration_nM=conditions.primer_nM,
             )
 
-            print()
-            print(major_rule())
-            print("PRIMER ANALYSIS")
-            print(major_rule())
-            print(f"Sequence:               {result['sequence']}")
-            print(f"Length:                 {result['length']} bp")
-            print(f"GC content:             {result['gc_percent']:.2f}%")
-            print(f"Tm:                     {result['tm']:.2f} °C")
-            print(f"Tm model:               {result['tm_model']}")
+            style.header('PRIMER ANALYSIS')
+            style.field('Sequence', f"{result['sequence']}")
+            style.field('Length', f"{result['length']} bp")
+            style.field('GC content', f"{result['gc_percent']:.2f}%")
+            style.field('Tm', f"{result['tm']:.2f} °C")
+            style.field('Tm model', f"{result['tm_model']}")
             print(f"3' GC clamp:            {result['gc_clamp']} bp")
-            print(f"Longest homopolymer:    {result['max_homopolymer']}")
-            print(f"Longest tandem repeat:  {result['max_tandem_repeat_copies']}")
-            print(
-                f"Hairpin stem:           "
-                f"{result['hairpin'].max_stem} bp "
-                f"({result['hairpin'].severity})"
-            )
-            print(
-                f"Self-dimer stem:        "
-                f"{result['self_dimer'].max_stem} bp "
-                f"({result['self_dimer'].severity})"
-            )
+            style.field('Longest homopolymer', f"{result['max_homopolymer']}")
+            style.field('Longest tandem repeat', f"{result['max_tandem_repeat_copies']}")
+            style.field('Hairpin stem', f"{result['hairpin'].max_stem} bp "
+                f"({result['hairpin'].severity})")
+            style.field('Self-dimer stem', f"{result['self_dimer'].max_stem} bp "
+                f"({result['self_dimer'].severity})")
             print(major_rule())
 
         return result
 
     except (TypeError, ValueError, ZeroDivisionError) as exc:
-        print(f"ERROR: {exc}")
+        style.error(f"{exc}")
         return None
 
 
@@ -4071,38 +3976,28 @@ def print_professional_primer_report(
     report: ProfessionalPrimerDesignReport,
 ) -> None:
     """Print the improved professional report with explicit screening status."""
-    print(major_rule())
-    print("SYNAPSE — PROFESSIONAL PRIMER DESIGN")
-    print(major_rule())
-    print(f"Sequence length:            {report.sequence_length} bp")
-    print(
-        f"Target region:              {report.target_start + 1}-{report.target_end} "
-        f"(1-based; {report.target_length} bp)"
-    )
-    print(f"Tm method:                  {report.tm_method}")
+    style.header('PROFESSIONAL PRIMER DESIGN')
+    style.field('Sequence length', f"{report.sequence_length} bp")
+    style.field('Target region', f"{report.target_start + 1}-{report.target_end} "
+        f"(1-based; {report.target_length} bp)")
+    style.field('Tm method', f"{report.tm_method}")
     _print_thermodynamic_conditions(report.thermodynamic_conditions)
 
-    print()
-    print("CANDIDATE GENERATION")
-    print(minor_rule())
-    print(f"Forward evaluated:          {report.forward_candidates_evaluated}")
-    print(f"Forward selected:           {report.forward_candidates_accepted}")
-    print(f"Reverse evaluated:          {report.reverse_candidates_evaluated}")
-    print(f"Reverse selected:           {report.reverse_candidates_accepted}")
+    style.section('CANDIDATE GENERATION')
+    style.field('Forward evaluated', f"{report.forward_candidates_evaluated}")
+    style.field('Forward selected', f"{report.forward_candidates_accepted}")
+    style.field('Reverse evaluated', f"{report.reverse_candidates_evaluated}")
+    style.field('Reverse selected', f"{report.reverse_candidates_accepted}")
 
-    print()
-    print("SCREENING POLICY")
-    print(minor_rule())
+    style.section('SCREENING POLICY')
     print("Tier 1: strict preferred criteria")
     print("Tier 2: relaxed Tm window (+/- 2 °C)")
     print("Tier 3: best measured fallback candidates")
     print("3' GC clamp and secondary structure are scored, not blindly discarded.")
 
-    print()
-    print("PAIR EVALUATION")
-    print(minor_rule())
-    print(f"Pairs evaluated:            {report.pairs_evaluated}")
-    print(f"Pairs accepted/ranked:      {report.pairs_accepted}")
+    style.section('PAIR EVALUATION')
+    style.field('Pairs evaluated', f"{report.pairs_evaluated}")
+    style.field('Pairs accepted/ranked', f"{report.pairs_accepted}")
 
     if report.ranked_pairs:
         print()
@@ -4111,18 +4006,16 @@ def print_professional_primer_report(
             print()
     else:
         print()
-        print("NO ACCEPTABLE PRIMER PAIR FOUND")
+        style.warning("No acceptable primer pair was found.")
         if report.failure_reasons:
-            print()
-            print("MAIN LIMITING FACTORS")
+            style.section("Main limiting factors")
             for reason in report.failure_reasons:
                 print(f"- {reason}")
 
     if report.warnings:
-        print()
-        print("WARNINGS / DIAGNOSTICS")
+        style.section("Warnings and diagnostics")
         for warning in report.warnings:
-            print(f"- {warning}")
+            style.warning(warning)
 
     print(major_rule())
 
@@ -4132,17 +4025,15 @@ def _primer_ui_design_menu_v4(dna, header, pipeline):
     sequence = normalize_dna_sequence(dna)
 
     while True:
-        _primer_ui_header("PRIMER DESIGN")
-        print(f"Input:  {header}")
-        print(f"Length: {len(sequence)} bp")
-        print()
-        print("[1] Design Primers")
-        print("[2] Single Primer Analysis")
-        print()
-        print("[0] Back")
-        print(minor_rule())
+        style.header("Primer design")
+        style.field('Input', f"{header}")
+        style.field('Length', f"{len(sequence)} bp")
+        style.menu([
+            ("Design", [('1', 'Design Primers')]),
+            ("Analysis", [('2', 'Single Primer Analysis')]),
+        ])
 
-        choice = input("Selection: ").strip()
+        choice = style.ask_choice()
 
         if choice == "0":
             return None
@@ -4167,7 +4058,7 @@ def _primer_ui_design_menu_v4(dna, header, pipeline):
                 return result
             continue
 
-        print("ERROR: Invalid selection.")
+        style.invalid_selection()
 
 
 def run_primer_analysis_ui(
@@ -4179,8 +4070,8 @@ def run_primer_analysis_ui(
     try:
         normalize_dna_sequence(dna)
     except (TypeError, ValueError) as exc:
-        _primer_ui_header("PRIMER DESIGN")
-        print(f"ERROR: {exc}")
+        style.header("Primer design")
+        style.error(f"{exc}")
         return None
 
     return _primer_ui_design_menu_v4(
@@ -4508,7 +4399,7 @@ def _v7_primer_ui_design(sequence, target_start, target_end, pipeline):
         return report
 
     except (TypeError, ValueError, ZeroDivisionError) as exc:
-        print(f"ERROR: {exc}")
+        style.error(f"{exc}")
         return None
 
 
