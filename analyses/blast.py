@@ -665,6 +665,11 @@ def _utc_now() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
 
 
+def _evalue_text(evalue: Optional[float]) -> str:
+    """An E-value with three significant figures, or n/a when absent."""
+    return "n/a" if evalue is None else f"{evalue:.3g}"
+
+
 def _local_tag(element: ET.Element) -> str:
     """Return XML tag without namespace."""
     return element.tag.rsplit("}", 1)[-1]
@@ -3292,7 +3297,7 @@ def calculate_evidence_score(
     ]
     if not significant:
         notes.append(
-            f"Best E-value {hsp.evalue:g} exceeds {significance_evalue:g}: a match of "
+            f"Best E-value {hsp.evalue:.3g} exceeds {significance_evalue:g}: a match of "
             "this quality is expected by chance in a database of this size."
         )
 
@@ -3723,7 +3728,7 @@ def build_text_report(run: BlastRun) -> str:
                 f"    Definition: {hit.definition}",
                 f"    Identity:   {hit.best_identity_percent:.2f}%",
                 f"    Coverage:   {hit.best_coverage_percent:.2f}%",
-                f"    E-value:    {hit.best_evalue}",
+                f"    E-value:    {_evalue_text(hit.best_evalue)}",
                 f"    Bit score:  {hit.best_bit_score:.2f}",
                 "",
             ]
@@ -3825,7 +3830,7 @@ def print_hit_summary(run: BlastRun, *, limit: int = 15) -> None:
     print(_line())
 
     for rank, hit in enumerate(rank_hits(run.hits)[:limit], start=1):
-        evalue = f"{hit.best_evalue:.3g}" if hit.best_evalue is not None else "n/a"
+        evalue = _evalue_text(hit.best_evalue)
         print(
             f"{rank:<6}"
             f"{(hit.accession or hit.hit_id)[:17]:<18}"

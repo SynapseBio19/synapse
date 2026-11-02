@@ -1112,6 +1112,20 @@ class OutputNotationTests(unittest.TestCase):
                       for name, rule in rules.items() if rule.search(text)]
         self.assertEqual(violations, [])
 
+    def test_blast_text_report_shows_e_values_with_three_significant_figures(self):
+        import re
+        from analyses import blast as B
+        query = B.build_query("ATGCGTACGTACGTACGTAC" + "A" * 80, name="notation")
+        run = B.parse_blast_xml(B.SAMPLE_XML, query=query, rid="NOTATION",
+                                parameters=B.BlastParameters(),
+                                submitted_at="2026-01-01T00:00:00+00:00")
+        report = B.build_text_report(run)
+        shown = re.findall(r"E-value:\s+(\S+)", report)
+        self.assertTrue(shown)
+        expected = [B._evalue_text(hit.best_evalue) for hit in B.rank_hits(run.hits)[:20]]
+        self.assertEqual(shown, expected)
+        self.assertEqual((B._evalue_text(1.234567e-50), B._evalue_text(None)), ("1.23e-50", "n/a"))
+
     def _pair(self):
         from analyses import primer as P
         from tests._support import deterministic_dna

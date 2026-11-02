@@ -1548,3 +1548,20 @@ Tests: 1 new (`SpellingStandardTests`) checks code and documentation for
 31 British forms; it found three sites the first pass had missed (a
 docstring in `core/orf_context.py` and a helper name in
 `tests/test_stage2_foundation.py`), which were corrected.
+
+### Stage G/H E-values in the BLAST text report (`analyses/blast.py`)
+
+Found while writing the style guide's notation table. The BLAST table and
+the HSP lines print E-values with three significant figures (`:.3g`), but
+the per-hit block of the text report printed the raw float
+(`1.2345678901e-50` for a value that the table shows as `1.23e-50`), and
+the evidence note used six (`:g`). All three now go through one helper,
+`_evalue_text`, which also prints `n/a` for a missing value instead of
+`None`. The configured significance threshold keeps `:g`, because it is a
+parameter and should be shown exactly as set.
+
+Tests: 1 new (`test_blast_text_report_shows_e_values_with_three_significant_figures`).
+The bundled sample XML has E-value `1e-25`, which both notations print
+the same way, so the report part of the test does not distinguish old
+from new output; the helper's own assertions (`1.234567e-50` ->
+`1.23e-50`, `None` -> `n/a`) do.
