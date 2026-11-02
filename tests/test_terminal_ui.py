@@ -265,7 +265,12 @@ def render_first_screen(module, answers=("0",)):
     logging.disable(logging.CRITICAL)
     try:
         with mock.patch.object(builtins, "input", scripted), contextlib.redirect_stdout(buffer):
-            calls[module]()
+            try:
+                calls[module]()
+            except EOFError:
+                # The script ran out before the screen was left; the
+                # caller's assertions then see where it stopped.
+                print("<<script exhausted>>")
     finally:
         logging.disable(logging.NOTSET)
     return buffer.getvalue()

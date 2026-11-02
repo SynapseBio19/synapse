@@ -58,6 +58,7 @@ from typing import (
     Tuple,
 )
 from ui.style import major_rule, minor_rule
+from ui import style
 
 
 # ============================================================================
@@ -3171,13 +3172,13 @@ def build_mutation_report(
         major_rule(),
         "MUTATION ANALYSIS REPORT",
         major_rule(),
-        f"Reference:        {result.reference_name}",
-        f"Variant:          {result.variant_name}",
-        f"Reference length: {result.reference_length} bp",
-        f"Variant length:   {result.variant_length} bp",
-        f"Alignment identity:   {result.identity_percent:.2f}%",
-        f"Sequence similarity:   {result.sequence_similarity_percent:.2f}%",
-        f"Mutations:             {len(result.mutations)}",
+        style.field_line('Reference', f"{result.reference_name}"),
+        style.field_line('Variant', f"{result.variant_name}"),
+        style.field_line('Reference length', f"{result.reference_length} bp"),
+        style.field_line('Variant length', f"{result.variant_length} bp"),
+        style.field_line('Alignment identity', f"{result.identity_percent:.2f}%"),
+        style.field_line('Sequence similarity', f"{result.sequence_similarity_percent:.2f}%"),
+        style.field_line('Mutations', f"{len(result.mutations)}"),
         "",
         "MUTATION SUMMARY",
         minor_rule(),
@@ -3201,28 +3202,28 @@ def build_mutation_report(
 
     lines.extend(
         [
-            f"SNPs:             {s.snps}",
-            f"Substitutions:    {s.substitutions}",
-            f"Insertions:       {s.insertions}",
-            f"Deletions:        {s.deletions}",
-            f"Complex changes:  {s.complex_changes}",
-            f"Transitions:      {s.transitions}",
-            f"Transversions:    {s.transversions}",
-            f"Ti/Tv ratio:      {ratio}",
-            f"Inserted bases:   {s.inserted_bases}",
-            f"Deleted bases:    {s.deleted_bases}",
-            f"Net length:       {s.net_length_change:+d} bp",
-            f"Mutation density: {s.mutation_density_per_kb:.2f}/kb",
+            style.field_line('SNPs', f"{s.snps}"),
+            style.field_line('Substitutions', f"{s.substitutions}"),
+            style.field_line('Insertions', f"{s.insertions}"),
+            style.field_line('Deletions', f"{s.deletions}"),
+            style.field_line('Complex changes', f"{s.complex_changes}"),
+            style.field_line('Transitions', f"{s.transitions}"),
+            style.field_line('Transversions', f"{s.transversions}"),
+            style.field_line('Ti/Tv ratio', f"{ratio}"),
+            style.field_line('Inserted bases', f"{s.inserted_bases}"),
+            style.field_line('Deleted bases', f"{s.deleted_bases}"),
+            style.field_line('Net length', f"{s.net_length_change:+d} bp"),
+            style.field_line('Mutation density', f"{s.mutation_density_per_kb:.2f}/kb"),
             "",
             "CODING CONSEQUENCES",
             minor_rule(),
-            f"Synonymous:       {s.synonymous}",
-            f"Missense:         {s.missense}",
-            f"Nonsense:         {s.nonsense}",
-            f"Start-loss:       {s.start_loss}",
-            f"Stop-loss:        {s.stop_loss}",
-            f"Frameshifts:      {s.frameshifts}",
-            f"In-frame indels:  {s.in_frame_indels}",
+            style.field_line('Synonymous', f"{s.synonymous}"),
+            style.field_line('Missense', f"{s.missense}"),
+            style.field_line('Nonsense', f"{s.nonsense}"),
+            style.field_line('Start-loss', f"{s.start_loss}"),
+            style.field_line('Stop-loss', f"{s.stop_loss}"),
+            style.field_line('Frameshifts', f"{s.frameshifts}"),
+            style.field_line('In-frame indels', f"{s.in_frame_indels}"),
             "",
             "MUTATIONS",
             minor_rule(),
@@ -3254,24 +3255,24 @@ def build_mutation_report(
                 "",
                 "CODING ANALYSIS",
                 minor_rule(),
-                f"Reference protein: {c.reference_protein}",
-                f"Variant protein:   {c.alternative_protein}",
-                f"Affected codons:  {len(c.affected_codons)}",
-                f"Frameshift:        {'YES' if c.frameshift else 'NO'}",
+                style.field_line('Reference protein', f"{c.reference_protein}"),
+                style.field_line('Variant protein', f"{c.alternative_protein}"),
+                style.field_line('Affected codons', f"{len(c.affected_codons)}"),
+                style.field_line('Frameshift', f"{'YES' if c.frameshift else 'NO'}"),
             ]
         )
 
         if c.frameshift_position is not None:
 
             lines.append(
-                f"Frameshift position: {c.frameshift_position}"
+                style.field_line('Frameshift position', f"{c.frameshift_position}")
             )
 
         if c.premature_stop_position is not None:
 
             lines.append(
-                f"Premature stop: codon "
-                f"{c.premature_stop_position}"
+                style.field_line('Premature stop', f"codon "
+                f"{c.premature_stop_position}")
             )
 
     if include_alignment:
@@ -3439,10 +3440,10 @@ def advanced_mutation_report(
 
         lines.extend(
             [
-                f"Reference GC:       {advanced.reference_quality.gc_percent:.2f}%",
-                f"Variant GC:         {advanced.variant_quality.gc_percent:.2f}%",
-                f"Reference complexity: {advanced.reference_quality.complexity_percent:.2f}%",
-                f"Variant complexity:   {advanced.variant_quality.complexity_percent:.2f}%",
+                style.field_line('Reference GC', f"{advanced.reference_quality.gc_percent:.2f}%"),
+                style.field_line('Variant GC', f"{advanced.variant_quality.gc_percent:.2f}%"),
+                style.field_line('Reference complexity', f"{advanced.reference_quality.complexity_percent:.2f}%"),
+                style.field_line('Variant complexity', f"{advanced.variant_quality.complexity_percent:.2f}%"),
             ]
         )
 
@@ -3682,41 +3683,17 @@ def _prompt_sequence(
 
     if available:
 
-        print()
-
-        print(
-            f"Available sequences for {prompt}:"
-        )
-
-        print(
-            minor_rule()
-        )
-
-        for i, (
-            header,
-            _,
-        ) in enumerate(
-            available,
-            1,
-        ):
-
-            print(
-                f"[{i}] {header}"
-            )
-
-        print(
-            "[M] Enter sequence manually"
-        )
-
-        print(
-            minor_rule()
-        )
+        # No [0] here: the four callers have no cancel path (recorded in
+        # docs/TERMINAL_UI_STANDARD.md, "Known deviation").
+        style.menu([
+            (f"Available sequences for {prompt}",
+             [(i, header) for i, (header, _) in enumerate(available, 1)]),
+            (None, [("M", "Enter sequence manually")]),
+        ], zero=None)
 
         while True:
 
-            choice = input(
-                f"{prompt} selection: "
-            ).strip()
+            choice = style.ask_choice(f"{prompt} selection")
 
             if choice.upper() == "M":
                 break
@@ -3740,20 +3717,14 @@ def _prompt_sequence(
                     ),
                 )
 
-            print(
-                "Invalid selection."
-            )
+            style.invalid_selection()
 
-    header = input(
-        f"{prompt} name: "
-    ).strip()
+    header = style.ask(f"{prompt} name")
 
     if not header:
         header = prompt
 
-    sequence = input(
-        f"{prompt} DNA sequence: "
-    ).strip()
+    sequence = style.ask(f"{prompt} DNA sequence")
 
     return (
         header,
@@ -3841,55 +3812,19 @@ def run_mutation_analysis_ui(
 
     while True:
 
-        print()
+        style.header('MUTATION ANALYSIS')
+        style.field("Reference", header if dna else "none loaded")
+        if dna:
+            style.field("Length", f"{len(dna)} bp")
 
-        print(
-            major_rule()
-        )
+        style.menu([
+            ("Comparison", [('1', 'Compare Sequences')]),
+            ("Analysis", [('2', 'Mutation Statistics'), ('3', 'Coding Consequence Analysis')]),
+            ("Output", [('4', 'Mutation Report')]),
+            ("System", [('5', 'Run Mutation Self-Test')]),
+        ])
 
-        print(
-            "MUTATION ANALYSIS"
-        )
-
-        print(
-            major_rule()
-        )
-
-        print()
-
-        print(
-            "[1] Compare Sequences"
-        )
-
-        print(
-            "[2] Mutation Statistics"
-        )
-
-        print(
-            "[3] Coding Consequence Analysis"
-        )
-
-        print(
-            "[4] Mutation Report"
-        )
-
-        print(
-            "[5] Run Mutation Self-Test"
-        )
-
-        print()
-
-        print(
-            "[0] Back"
-        )
-
-        print(
-            minor_rule()
-        )
-
-        choice = input(
-            "Selection: "
-        ).strip()
+        choice = style.ask_choice()
 
         # ------------------------------------------------------------------
         # BACK
@@ -3969,15 +3904,11 @@ def run_mutation_analysis_ui(
 
             except MutationAnalysisError as error:
 
-                print(
-                    f"Error: {error}"
-                )
+                style.field('Error', f"{error}")
 
             except Exception as error:
 
-                print(
-                    f"Mutation analysis failed: {error}"
-                )
+                style.field('Mutation analysis failed', f"{error}")
 
         # ------------------------------------------------------------------
         # STATISTICS
@@ -4015,84 +3946,39 @@ def run_mutation_analysis_ui(
                     f"{s.transition_transversion_ratio:.3f}"
                 )
 
-            print()
+            style.header('MUTATION STATISTICS')
 
-            print(
-                major_rule()
-            )
+            style.field('Total mutations', f"{s.total_mutations}")
 
-            print(
-                "MUTATION STATISTICS"
-            )
+            style.field('Alignment identity', f"{last_result.identity_percent:.2f}%")
 
-            print(
-                major_rule()
-            )
+            style.field('Sequence similarity', f"{last_result.sequence_similarity_percent:.2f}%")
 
-            print(
-                f"Total mutations:        {s.total_mutations}"
-            )
+            style.field('SNPs', f"{s.snps}")
 
-            print(
-                f"Alignment identity:     {last_result.identity_percent:.2f}%"
-            )
+            style.field('Insertions', f"{s.insertions}")
 
-            print(
-                f"Sequence similarity:    {last_result.sequence_similarity_percent:.2f}%"
-            )
+            style.field('Deletions', f"{s.deletions}")
 
-            print(
-                f"SNPs:                   {s.snps}"
-            )
+            style.field('Transitions', f"{s.transitions}")
 
-            print(
-                f"Insertions:             {s.insertions}"
-            )
+            style.field('Transversions', f"{s.transversions}")
 
-            print(
-                f"Deletions:              {s.deletions}"
-            )
+            style.field('Ti/Tv ratio', f"{ratio}")
 
-            print(
-                f"Transitions:            {s.transitions}"
-            )
+            style.field('Net length change', f"{s.net_length_change:+d} bp")
 
-            print(
-                f"Transversions:          {s.transversions}"
-            )
+            style.field('Mutation density', f"{s.mutation_density_per_kb:.2f}/kb")
 
-            print(
-                f"Ti/Tv ratio:            {ratio}"
-            )
+            style.field('Synonymous', f"{s.synonymous}")
 
-            print(
-                f"Net length change:      {s.net_length_change:+d} bp"
-            )
+            style.field('Missense', f"{s.missense}")
 
-            print(
-                f"Mutation density:       "
-                f"{s.mutation_density_per_kb:.2f}/kb"
-            )
+            style.field('Nonsense', f"{s.nonsense}")
 
-            print(
-                f"Synonymous:             {s.synonymous}"
-            )
+            style.field('Frameshifts', f"{s.frameshifts}")
 
-            print(
-                f"Missense:               {s.missense}"
-            )
-
-            print(
-                f"Nonsense:               {s.nonsense}"
-            )
-
-            print(
-                f"Frameshifts:            {s.frameshifts}"
-            )
-
-            print(
-                f"In-frame indels:        {s.in_frame_indels}"
-            )
+            style.field('In-frame indels', f"{s.in_frame_indels}")
 
         # ------------------------------------------------------------------
         # CODING CONSEQUENCE
@@ -4221,92 +4107,46 @@ def run_mutation_analysis_ui(
                     )
                 )
 
-                print()
+                style.header('CODING CONSEQUENCE ANALYSIS')
 
-                print(
-                    major_rule()
-                )
+                style.field('Reference protein', f"{coding.reference_protein}")
 
-                print(
-                    "CODING CONSEQUENCE ANALYSIS"
-                )
+                style.field('Variant protein', f"{coding.alternative_protein}")
 
-                print(
-                    major_rule()
-                )
+                style.field('Synonymous', f"{coding.synonymous_count}")
 
-                print(
-                    f"Reference protein: "
-                    f"{coding.reference_protein}"
-                )
+                style.field('Missense', f"{coding.missense_count}")
 
-                print(
-                    f"Variant protein:   "
-                    f"{coding.alternative_protein}"
-                )
+                style.field('Nonsense', f"{coding.nonsense_count}")
 
-                print(
-                    f"Synonymous:        "
-                    f"{coding.synonymous_count}"
-                )
+                style.field('Start-loss', f"{coding.start_loss_count}")
 
-                print(
-                    f"Missense:          "
-                    f"{coding.missense_count}"
-                )
+                style.field('Stop-loss', f"{coding.stop_loss_count}")
 
-                print(
-                    f"Nonsense:          "
-                    f"{coding.nonsense_count}"
-                )
-
-                print(
-                    f"Start-loss:        "
-                    f"{coding.start_loss_count}"
-                )
-
-                print(
-                    f"Stop-loss:         "
-                    f"{coding.stop_loss_count}"
-                )
-
-                print(
-                    "Frameshift:        "
-                    f"{'YES' if coding.frameshift else 'NO'}"
-                )
+                style.field('Frameshift', f"{'YES' if coding.frameshift else 'NO'}")
 
                 if (
                     coding.frameshift_position
                     is not None
                 ):
 
-                    print(
-                        f"Frameshift position: "
-                        f"{coding.frameshift_position}"
-                    )
+                    style.field('Frameshift position', f"{coding.frameshift_position}")
 
                 if (
                     coding.premature_stop_position
                     is not None
                 ):
 
-                    print(
-                        f"Premature stop: "
-                        f"codon "
-                        f"{coding.premature_stop_position}"
-                    )
+                    style.field('Premature stop', f"codon "
+                        f"{coding.premature_stop_position}")
 
             except MutationAnalysisError as error:
 
-                print(
-                    f"Error: {error}"
-                )
+                style.field('Error', f"{error}")
 
             except Exception as error:
 
-                print(
-                    f"Coding analysis failed: {error}"
-                )
+                style.field('Coding analysis failed', f"{error}")
 
         # ------------------------------------------------------------------
         # REPORT
@@ -4339,19 +4179,7 @@ def run_mutation_analysis_ui(
                 run_mutation_self_test()
             )
 
-            print()
-
-            print(
-                major_rule()
-            )
-
-            print(
-                "MUTATION SELF-TEST"
-            )
-
-            print(
-                major_rule()
-            )
+            style.header('MUTATION SELF-TEST')
 
             for name, passed in (
                 tests.items()
@@ -4373,9 +4201,7 @@ def run_mutation_analysis_ui(
 
         else:
 
-            print(
-                "Invalid selection."
-            )
+            style.invalid_selection()
 
 
 # ============================================================================
@@ -4391,43 +4217,16 @@ def run_mutation_variant_ui(
 
     while True:
 
-        print()
+        style.header('MUTATION & VARIANT ANALYSIS')
+        style.field("Sequence", header if dna else "none loaded")
+        if dna:
+            style.field("Length", f"{len(dna)} bp")
 
-        print(
-            major_rule()
-        )
+        style.menu([
+            ("Analysis", [('1', 'Mutation Analysis'), ('2', 'Variant Analysis')]),
+        ])
 
-        print(
-            "MUTATION & VARIANT ANALYSIS"
-        )
-
-        print(
-            major_rule()
-        )
-
-        print()
-
-        print(
-            "[1] Mutation Analysis"
-        )
-
-        print(
-            "[2] Variant Analysis"
-        )
-
-        print()
-
-        print(
-            "[0] Back"
-        )
-
-        print(
-            minor_rule()
-        )
-
-        choice = input(
-            "Selection: "
-        ).strip()
+        choice = style.ask_choice()
 
         if choice == "0":
             return None
@@ -4459,19 +4258,7 @@ def run_mutation_variant_ui(
 
             except ImportError as error:
 
-                print()
-
-                print(
-                    major_rule()
-                )
-
-                print(
-                    "VARIANT ANALYSIS IMPORT ERROR"
-                )
-
-                print(
-                    major_rule()
-                )
+                style.header('VARIANT ANALYSIS IMPORT ERROR')
 
                 print()
 
@@ -4488,25 +4275,11 @@ def run_mutation_variant_ui(
                     "exists and can be imported."
                 )
 
-                input(
-                    "\nPress Enter to continue..."
-                )
+                style.pause()
 
             except Exception as error:
 
-                print()
-
-                print(
-                    major_rule()
-                )
-
-                print(
-                    "VARIANT ANALYSIS ERROR"
-                )
-
-                print(
-                    major_rule()
-                )
+                style.header('VARIANT ANALYSIS ERROR')
 
                 print()
 
@@ -4515,15 +4288,11 @@ def run_mutation_variant_ui(
                     f"{error}"
                 )
 
-                input(
-                    "\nPress Enter to continue..."
-                )
+                style.pause()
 
         else:
 
-            print(
-                "Invalid selection."
-            )
+            style.invalid_selection()
 
 
 # ============================================================================
@@ -5369,17 +5138,7 @@ if __name__ == "__main__":
         results.values()
     )
 
-    print(
-        major_rule()
-    )
-
-    print(
-        "SYNAPSE MUTATION ANALYSIS SELF-TEST"
-    )
-
-    print(
-        major_rule()
-    )
+    style.header('SYNAPSE MUTATION ANALYSIS SELF-TEST')
 
     for name, success in (
         results.items()

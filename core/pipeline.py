@@ -433,70 +433,40 @@ class PipelineContext:
         # Terminal output living in core; it uses the shared presentation
         # module through a local import so core keeps no module-level
         # dependency on ui (Stage F).
+        from ui import style
         from ui.style import major_rule, minor_rule
 
         labels = STATUS_LABELS
 
-        print()
-        print(major_rule())
-        print("SYNAPSE PIPELINE STATUS")
-        print(major_rule())
+        style.header('Pipeline status')
 
-        print()
-        print("Current Sequence")
-        print(minor_rule())
+        style.section('Current Sequence')
 
-        print(
-            f"Header:       "
-            f"{self.header or '-'}"
-        )
+        style.field('Header', f"{self.header or '-'}")
 
-        print(
-            f"Length:       "
-            f"{self.length} bp"
-        )
+        style.field('Length', f"{self.length} bp")
 
-        print(
-            f"Topology:     "
-            f"{self.topology}"
-        )
+        style.field('Topology', f"{self.topology}")
 
         if self.sequence:
-            print(
-                f"SHA-256:      "
-                f"{self.sequence_sha256[:16]}..."
-            )
+            style.field('SHA-256', f"{self.sequence_sha256[:16]}...")
 
         if self.record is not None and self.record.source_path:
-            print(
-                f"Source file:  "
-                f"{self.record.source_path}"
-            )
+            style.field('Source file', f"{self.record.source_path}")
 
         if self.selected_orf is not None:
 
-            print(
-                f"Selected ORF: "
-                f"#{self.selected_orf.get('rank', '-')}"
-            )
+            style.field('Selected ORF', f"#{self.selected_orf.get('rank', '-')}")
 
         if self.rna_source:
 
-            print(
-                f"RNA Source:   "
-                f"{self.rna_source}"
-            )
+            style.field('RNA Source', f"{self.rna_source}")
 
         if self.protein_source:
 
-            print(
-                f"Protein Source:"
-                f" {self.protein_source}"
-            )
+            style.field('Protein Source', f"{self.protein_source}")
 
-        print()
-        print("Analysis Status")
-        print(minor_rule())
+        style.section('Analysis Status')
 
         for key, label in labels.items():
 
@@ -507,10 +477,7 @@ class PipelineContext:
                 else "NOT RUN"
             )
 
-            print(
-                f"{label:<28} "
-                f"{state}"
-            )
+            print(style.columns((label, state), (28,)))
 
         print()
         print(major_rule())
@@ -1344,6 +1311,7 @@ def create_pipeline(
 # ============================================================
 
 if __name__ == "__main__":
+    from ui import style
     from ui.style import major_rule
 
     test_sequence = (
@@ -1358,23 +1326,11 @@ if __name__ == "__main__":
         topology="linear",
     )
 
-    print()
-    print(major_rule())
-    print("SYNAPSE PIPELINE TEST")
-    print(major_rule())
+    style.header('Pipeline test')
+    style.field('Sequence', f"{pipeline.context.header}")
 
-    print(
-        f"\nSequence: "
-        f"{pipeline.context.header}"
-    )
+    style.field('Length', f"{pipeline.context.length} bp")
 
-    print(
-        f"Length:   "
-        f"{pipeline.context.length} bp"
-    )
-
-    print(
-        "\nPipeline initialized successfully."
-    )
+    style.success("Pipeline initialized.")
 
     pipeline.print_status()
