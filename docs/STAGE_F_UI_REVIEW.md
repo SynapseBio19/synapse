@@ -417,3 +417,46 @@ through `ui/style.py`:
 Still open: the other interface files (`TERMINAL_UI_STANDARD.md` section 9),
 the variant menu order, other result tables, dialog value prompts and the
 confirmation notation.
+
+## 11. Follow-up: the remaining ten files converted (2026-11-02)
+
+On the owner's instruction the other ten interface files were converted
+(`1ac77a4`, `bf6ae87`, `9b7f2ef`, `85c22ac`, `a4df3d4`, `3853d87`, `69e3f0f`, `7970e5a`, `7ecb88d`): `main.py`, `ui/menu.py`, `ui/report.py`, sequence overview,
+RNA, protein, restriction, cloning, mutation and `core/pipeline.py`.
+
+| Finding | State in all sixteen interface files |
+|---|---|
+| 1. Shared renderers unused | All files use them: 779 `field`, 172 `section`, 142 `field_line`, 102 `header`, 36 `menu`, 74 `ask`, 31 `ask_choice`, 58 `pause`, 7 `confirm`, 17 `columns`, and 168 message helpers. |
+| 2. Local helpers | Also removed: `_cloning_ui_print_header`/`_footer`, `_protein_ui_header`. |
+| 3. Titles | Each menu carries its main-menu name ("MAIN MENU", "RNA ANALYSIS", "PROTEIN ANALYSIS", "RESTRICTION & CLONING ANALYSIS", ...); no "SYNAPSE" prefix anywhere. |
+| 4./5. Headings, fields | Upper-case sections and values at column 24 in every screen, including the sequence overview, the pipeline status and the text reports of CRISPR, BLAST, primer, variant, literature and mutation. |
+| 6. Prompts | `Selection:` in every menu; 52 value prompts through `ask()`. |
+| 7. Menu frame | One footer everywhere; the sequence selector and the mutation sequence prompt, which cannot be left, offer no `[0]` through `menu(zero=None)`. |
+| 8. Messages | Categories throughout; the checkmark lines ("✓ ...") are `OK:` messages. |
+| 9. Invalid selection | One reply in every menu ("Please choose 0-5" and similar variants removed). |
+| 10. Confirmation | All six yes/no questions through `confirm()` (`[y/N]`/`[Y/n]`). |
+| 11./12. Tables | One `columns()` definition per table. Four tables were misaligned and are fixed: BLAST database status (Status 42 vs 24 columns), CRISPR guide list (position column), both protein composition tables (3L column); BLAST hits, restriction enzymes and taxonomy now fit the 70-column rule. |
+| 13. Tests | `RenderedScreenTests` render all eleven menus, the sequence overview and the pipeline status; the source rule covers all sixteen files; a numbering test checks the variant order. They give 11 failures on the code before this round. |
+
+Variant menu (requirement 4 of the owner's instruction): reordered to the
+5.3 sequence (normalization [3] and filtering [4] before statistics [5]
+and interpretation [6]); every dispatch branch was checked against its
+new label.
+
+Also corrected on the way:
+
+- **A defect from the first round.** Four BLAST and variant yes/no
+  questions had been turned into `ask(..., default='y/N')`. The answer
+  was still read correctly, but the code treated the notation as a value.
+- **A message.** The ORF hand-over said the RNA codon view uses the
+  standard code, which has been untrue since P1-9.
+
+**Verdict.** With this round, Stage F is implemented as a unified
+interface: every screen, menu, prompt, message, table and text report
+of the sixteen interface files goes through `ui/style.py`, and the
+rendered result is tested. What still prints itself is listed, with
+its reason, in `TERMINAL_UI_STANDARD.md` section 9: raw line input, two
+numeric helpers, closing rules, analysis result lines, the documented
+mutation deviation, the pipeline's printing from `core/`, and menus
+living inside the analysis modules (P2-2). Each is a stated exception,
+not an inconsistency.

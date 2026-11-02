@@ -81,12 +81,19 @@ Every part has one renderer in `ui.style`:
 `field_line()` returns the same line as text, for reports that are built
 as strings.
 
-**Adoption.** The six modules ORF, CRISPR, BLAST, literature, primer and
-variant analysis draw their screens through these renderers (Stage F
-completion, 2026-11-02). `main.py`, `ui/menu.py`, `ui/report.py`,
-sequence overview, RNA, protein, restriction, cloning, mutation and
-`core/pipeline.py` still print their own titles, sections and fields
-with the shared rules; converting them is open work (section 9).
+**Adoption.** Every interface file draws its screens through these
+renderers (Stage F completion, 2026-11-02): `main.py`, `ui/menu.py`,
+`ui/report.py`, `core/pipeline.py` (through function-local imports) and
+the modules ORF, CRISPR, BLAST, literature, primer, variant analysis,
+sequence overview, RNA, protein, restriction, cloning and mutation. What
+they still print themselves is listed in section 9.
+
+**Tables** take their header and rows from one `columns()` definition;
+values are left-aligned in their column and a table stays within the
+70-column rule. **Text reports** that are built as line lists write
+their key/value lines through `field_line()`, so a stored or exported
+report aligns like the screen. Result rows that are lists of their own
+(profile windows, restriction sites, CpG islands) keep their line form.
 
 ### Section order
 
@@ -133,7 +140,7 @@ rather than done quietly.
 |---|---|
 | `ask_choice()` | A menu selection. Renders `Selection: `. |
 | `ask(label, default=...)` | A value. A default is shown in brackets and used for empty input. |
-| `confirm(question)` | A yes/no question. Anything but an explicit yes means no. |
+| `confirm(question, default_yes=False)` | A yes/no question, written `[y/N]` (or `[Y/n]` when yes is the default). `y`, `yes`, `j`, `ja` mean yes; anything else no, an empty answer the default. Every yes/no question in Synapse uses it. |
 | `pause()` | `Press Enter to continue...` |
 
 Invalid input never ends a workflow: the screen says `Invalid selection.`
@@ -196,13 +203,19 @@ menus from the analysis modules is the remaining part of audit item P2-2.
    presentation layer stays free of scientific logic.
 6. Menu numbers are contiguous, and every entry has a dispatch branch
    and every branch an entry (BLAST menu and main menu).
-7. **Rendered screens** of the six converted modules, driven with scripted
-   input (`RenderedScreenTests`): the frame and title, the context fields
-   at the shared column, the footer (blank line, `[0] Back`, minor rule,
-   `Selection: `), and the reply to an unknown key.
-8. The converted modules print no message prefix, menu entry or
-   selection prompt of their own, define no rule or header helper, and
-   use no "SYNAPSE" title prefix.
+7. **Rendered screens** (`RenderedScreenTests`), driven with scripted
+   input: all eleven menus (ten modules and the main menu) for frame,
+   title (the main-menu name), context fields at the shared column,
+   footer (blank line, `[0] Back` or `[0] Exit`, minor rule,
+   `Selection: `) and the reply to an unknown key; the sequence overview
+   (run through `main.py`) and the pipeline status for aligned fields and
+   upper-case headings.
+8. No interface file (all sixteen) prints a message prefix, menu entry,
+   selection prompt or yes/no notation of its own, defines a rule or
+   header helper, or titles a screen "SYNAPSE ...".
+9. The variant menu follows the order of 5.3 (input, normalization,
+   filtering, statistics, interpretation, reporting), with every entry
+   dispatched.
 
 ## 8. Numbering
 
@@ -222,14 +235,22 @@ A change that breaks the standard fails the suite.
 
 ## 9. Open work
 
-- The ten remaining interface files listed under "Adoption" in section 2.
-  The same rewrite (titles, sections, fields, menus, prompts, messages)
-  applies; each conversion adds the module to `SHARED_UI_MODULES` in
-  `tests/test_terminal_ui.py`, which applies the checks of section 7.
-- Variant analysis lists normalization last in its ANALYSIS group;
-  Master Prompt 5.3 orders input, parsing, normalization, filtering,
-  statistics. Reordering means renumbering the menu and its dispatch.
-- Result tables other than the ORF candidate list keep module-specific
-  column widths; `columns()` is available for them.
-- Value prompts inside dialogs (for example "System: ", "FASTA path: ")
-  still call `input()` directly.
+What remains outside the shared renderers, each for a stated reason:
+
+- **Raw line input** (`input()` without a prompt) where a sequence or VCF
+  is pasted line by line (CRISPR, variant analysis): the raw line must
+  not be stripped or reformatted.
+- **Two CRISPR numeric helpers** take a complete prompt text from their
+  callers (`input(prompt)`); converting them means changing every
+  caller's prompt string.
+- **Closing rules**: 18 direct `print(major_rule())` calls close a report
+  or frame its closing summary line, which section 2 allows.
+- **Result lines** of the analyses (profile windows, sites, islands,
+  alignments, interpretation prose) remain module text: they are
+  scientific content, not interface furniture.
+- **The mutation sequence prompt** offers no `[0]` (section 3, "Known
+  deviation"); it is drawn through `style.menu(zero=None)`.
+- **`core/pipeline.py`** prints from `core/` through function-local
+  imports (section 6); moving `print_status` to `ui/` is structural work.
+- **Menus inside the analysis modules** (P2-2): every menu uses the
+  shared renderer, but the menu code still lives with the science.

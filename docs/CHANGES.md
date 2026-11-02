@@ -1849,3 +1849,59 @@ reply to an unknown key, plus a source rule against bypassing
 `ui.style`. On the code before the conversion they give 8 failures and
 5 errors. They found four more "SYNAPSE" title prefixes the first pass
 had missed. The BLAST numbering test now reads the `style.menu()` entries.
+
+## Stage F completion, round 2: the remaining ten interface files (2026-11-02)
+
+The first round (`2e47ff9` ... `623a0a8`) put the six modules named in the
+re-examination on the shared renderers. This round does the same for
+the other ten interface files (`1ac77a4`, `bf6ae87`, `9b7f2ef`, `85c22ac`, `a4df3d4`, `3853d87`, `69e3f0f`, `7970e5a`, `7ecb88d`). It uses the same rewriting
+passes, plus a third one for report line lists. Each commit lists its
+visible changes. In summary:
+
+- **Session (`main.py`, `ui/menu.py`).**
+  - "MAIN MENU" with labeled groups; "LOADED SEQUENCES" without `[0]`.
+  - Loader, type dialog, protein record and error screens without the
+    "SYNAPSE -" prefix.
+  - The ORF hand-over note no longer claims the RNA codon view uses the
+    standard code.
+- **Sequence overview, RNA, protein, restriction, cloning, mutation,
+  pipeline status.**
+  - Titled like their main-menu entries, grouped menus, upper-case
+    sections, values at column 24.
+  - Context fields on the restriction, cloning and mutation menus.
+  - Checkmark lines are `OK:` messages.
+- **Tables.** One `columns()` definition each. Four tables were
+  misaligned:
+  - BLAST database status: the Status header was 42 columns wide, its
+    rows 24.
+  - CRISPR guide list: the position column was misaligned.
+  - Protein composition, both tables: the "3L" column was misaligned.
+- **Text reports.** CRISPR, BLAST, primer, variant, literature and
+  mutation write their key/value lines through `field_line()`; the CRISPR
+  self-test checks the shared form.
+- **Prompts and yes/no.**
+  - 52 value prompts go through `ask()`.
+  - All six yes/no questions go through `confirm()`. This also corrects
+    four that the first round had turned into `ask(..., default='y/N')`.
+- **Variant menu** in the order of Master Prompt 5.3: normalization and
+  filtering before statistics and interpretation. Six entries changed
+  number (normalize 8 -> 3, statistics 6 -> 5, analyze 3 -> 6, compare
+  5 -> 7, cohort 7 -> 8; filter stays 4).
+
+Not changed, with reasons in `TERMINAL_UI_STANDARD.md` section 9:
+
+- raw line input;
+- two CRISPR numeric helpers;
+- closing rules;
+- analysis result lines;
+- the mutation `[0]` deviation;
+- the pipeline's printing from `core/`;
+- P2-2.
+
+Data, API, golden master and the scientific results are unchanged.
+Tests: 3 new and 5 extended in `tests/test_terminal_ui.py`. The rendered
+checks cover all eleven menus, the sequence overview and the pipeline
+status, and the source rule covers all sixteen files. On the code before
+this round they give 11 failures. The extended tests found what the
+passes had left: the protein module's own header helper and four
+"SYNAPSE ... SELF-TEST" titles, fixed in `7970e5a`. Suite 322/322.

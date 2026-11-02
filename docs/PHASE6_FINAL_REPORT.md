@@ -53,11 +53,10 @@ Python 3.10 blocker in Stage I.
 - Architecture: one input contract for menu and API; `core/api.py`
   covers every analysis without keyboard input; one shared presentation
   module (`ui/style.py`); the superseded primer generations are gone.
-- Interface and language: one rule width and one meaning for `[0]`
-  across all screens; since the Stage F completion the ORF, CRISPR, BLAST,
-  literature, primer and variant screens are drawn by the shared
-  renderers (the other modules still print their own titles and fields);
-  one message prefix per category, one
+- Interface and language: since the Stage F completion every screen,
+  menu, prompt, yes/no question, message, table and text report of the
+  sixteen interface files is drawn by the shared renderers in
+  `ui/style.py` and tested as rendered; one message prefix per category, one
   notation per unit, 1-based positions everywhere a user sees them, and a
   style guide whose mechanical rules the test suite enforces.
 - Evidence: 314 tests (109 at the end of the previous cycle), including
@@ -224,9 +223,11 @@ deliberate violations). The Stage F re-examination
 (`docs/STAGE_F_UI_REVIEW.md`) found that these checks covered rules,
 `[0]` and prefixes only and that no module used the shared renderers;
 the six modules named there were then converted and are checked as
-rendered screens (`RenderedScreenTests`). **Remaining inconsistencies**:
-ten interface files not yet converted (`TERMINAL_UI_STANDARD.md`
-section 9); the mutation
+rendered screens (`RenderedScreenTests`); a second round converted the
+remaining ten interface files, so all sixteen use them and all eleven
+menus are tested as rendered. **Remaining exceptions**, each with its
+reason in `TERMINAL_UI_STANDARD.md` section 9: raw line input, two
+CRISPR numeric helpers, closing rules, analysis result lines; the mutation
 module's sequence prompt offers no `[0]` (a cancel needs a control-flow
 change in four callers); `core/pipeline.py` prints status from inside
 `core/` through two function-local imports; the menus still live inside

@@ -97,6 +97,7 @@ IUPAC, gapped and invalid input (D14):
 | 46 | Documentation corrections from the review: figures, stale sections, IG evidence wording, unverified references marked, report J completed | this package | documents only | Done |
 | 47 | Stage F re-examination: shared basis, not a unified interface; renderers unused | `docs/STAGE_F_UI_REVIEW.md` | rendered menus, source inventory | Report |
 | 48 | Stage F completion for ORF, CRISPR, BLAST, literature, primer, variant: shared renderers; rendered-screen tests | `2e47ff9`, `e7eaf58`, `5cb4c9a`, `b181ae3`, `fb4070a`, `fdc968d`, `b80fd37` + this package | rendered-screen tests fail on the previous code | Done for six modules; ten interface files open |
+| 49 | Stage F completion round 2: the ten remaining interface files on the shared renderers; tables, report lines, prompts and yes/no unified; variant menu in 5.3 order | `1ac77a4`, `bf6ae87`, `9b7f2ef`, `85c22ac`, `a4df3d4`, `3853d87`, `69e3f0f`, `7970e5a`, `7ecb88d` + this package | rendered tests for all menus and two report screens; 11 failures on the previous code | Done: Stage F unified; exceptions listed in TERMINAL_UI_STANDARD.md section 9 |
 
 ## Paused (2026-10-31, historical)
 
