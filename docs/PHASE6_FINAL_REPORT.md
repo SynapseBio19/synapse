@@ -53,8 +53,11 @@ Python 3.10 blocker in Stage I.
 - Architecture: one input contract for menu and API; `core/api.py`
   covers every analysis without keyboard input; one shared presentation
   module (`ui/style.py`); the superseded primer generations are gone.
-- Interface and language: one visual language across all terminal
-  screens, one meaning for `[0]`, one message prefix per category, one
+- Interface and language: one rule width and one meaning for `[0]`
+  across all screens; since the Stage F completion the ORF, CRISPR, BLAST,
+  literature, primer and variant screens are drawn by the shared
+  renderers (the other modules still print their own titles and fields);
+  one message prefix per category, one
   notation per unit, 1-based positions everywhere a user sees them, and a
   style guide whose mechanical rules the test suite enforces.
 - Evidence: 314 tests (109 at the end of the previous cycle), including
@@ -217,7 +220,13 @@ selection.` for every unknown key.
 | Literature | 88-column frames | 70 columns |
 
 Enforced by `tests/test_terminal_ui.py` (12 checks, verified against
-deliberate violations). **Remaining inconsistencies**: the mutation
+deliberate violations). The Stage F re-examination
+(`docs/STAGE_F_UI_REVIEW.md`) found that these checks covered rules,
+`[0]` and prefixes only and that no module used the shared renderers;
+the six modules named there were then converted and are checked as
+rendered screens (`RenderedScreenTests`). **Remaining inconsistencies**:
+ten interface files not yet converted (`TERMINAL_UI_STANDARD.md`
+section 9); the mutation
 module's sequence prompt offers no `[0]` (a cancel needs a control-flow
 change in four callers); `core/pipeline.py` prints status from inside
 `core/` through two function-local imports; the menus still live inside

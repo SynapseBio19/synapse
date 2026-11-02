@@ -95,6 +95,8 @@ IUPAC, gapped and invalid input (D14):
 | 44 | Stage I: static Python 3.10 check; **CRISPR module unimportable on 3.10/3.11** (`f"{'#':>3}"`) fixed with identical output | this package | grammar check with `feature_version=(3, 10)`; tokenizer check for pre-PEP-701 rules, failing on the previous code | Corrected; suite 314/314 |
 | 45 | Closing review requested by the owner: cross-run of old and new suites, AST interface diff, golden key comparison, commit and document audit | `fc77ff4` | mechanical checks; reviewer is the author (stated) | Review written; no source change |
 | 46 | Documentation corrections from the review: figures, stale sections, IG evidence wording, unverified references marked, report J completed | this package | documents only | Done |
+| 47 | Stage F re-examination: shared basis, not a unified interface; renderers unused | `docs/STAGE_F_UI_REVIEW.md` | rendered menus, source inventory | Report |
+| 48 | Stage F completion for ORF, CRISPR, BLAST, literature, primer, variant: shared renderers; rendered-screen tests | `2e47ff9`, `e7eaf58`, `5cb4c9a`, `b181ae3`, `fb4070a`, `fdc968d`, `b80fd37` + this package | rendered-screen tests fail on the previous code | Done for six modules; ten interface files open |
 
 ## Paused (2026-10-31, historical)
 

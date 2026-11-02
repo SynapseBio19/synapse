@@ -2862,7 +2862,7 @@ __all__ = [
 if __name__ == "__main__":
     tests = run_variant_analysis_self_test()
     passed = sum(tests.values())
-    style.header('SYNAPSE VARIANT ANALYSIS SELF-TEST')
+    style.header('Variant analysis self-test')
     for name, success in tests.items():
         print(f"[{'PASS' if success else 'FAIL'}] {name}")
     print(minor_rule())

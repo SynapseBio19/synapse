@@ -176,5 +176,119 @@ class LayeringTests(unittest.TestCase):
                                      f"{path.name} imports ui at module level")
 
 
+# ----------------------------------------------------------------------
+# The rendered interface, not only source patterns (Stage F completion)
+# ----------------------------------------------------------------------
+# Modules whose screens are routed through ui.style. A module joins this
+# list when it is converted; the checks below then apply to it.
+SHARED_UI_MODULES = ("orf", "crispr", "blast", "literature", "primer", "variant_analysis")
+
+
+def render_first_screen(module, answers=("0",)):
+    """The text a module prints until its main menu has been left."""
+    import builtins
+    import contextlib
+    import io
+    import logging
+    from unittest import mock
+    from tests._support import deterministic_dna
+
+    dna = deterministic_dna(900)
+    pending = list(answers)
+
+    def scripted(prompt=""):
+        print(prompt, end="")
+        if not pending:
+            raise EOFError("script exhausted")
+        answer = pending.pop(0)
+        print(answer)
+        return answer
+
+    calls = {
+        "orf": lambda: __import__("analyses.orf", fromlist=["x"]).run_orf_analysis_ui(dna),
+        "crispr": lambda: __import__("analyses.crispr", fromlist=["x"]).crispr_menu(dna, "demo"),
+        "blast": lambda: __import__("analyses.blast", fromlist=["x"]).blast_menu(dna, "demo"),
+        "literature": lambda: __import__("analyses.literature", fromlist=["x"])._interactive_menu(),
+        "primer": lambda: __import__("analyses.primer", fromlist=["x"]).run_primer_analysis_ui(dna, "demo"),
+        "variant_analysis": lambda: __import__("analyses.variant_analysis", fromlist=["x"]).run_variant_analysis_ui(),
+    }
+    buffer = io.StringIO()
+    logging.disable(logging.CRITICAL)
+    try:
+        with mock.patch.object(builtins, "input", scripted), contextlib.redirect_stdout(buffer):
+            calls[module]()
+    finally:
+        logging.disable(logging.NOTSET)
+    return buffer.getvalue()
+
+
+class RenderedScreenTests(unittest.TestCase):
+    TITLES = {"orf": "ORF ANALYSIS", "crispr": "CRISPR GUIDE DESIGN", "blast": "BLAST SEARCH",
+              "literature": "LITERATURE SEARCH", "primer": "PRIMER DESIGN",
+              "variant_analysis": "VARIANT ANALYSIS"}
+
+    def _first_screen(self, module):
+        lines = render_first_screen(module).splitlines()
+        end = next(i for i, line in enumerate(lines) if line.startswith(style.SELECTION_PROMPT + ":"))
+        start = next(i for i, line in enumerate(lines) if line == style.major_rule())
+        return lines[start:end + 1]
+
+    def test_each_screen_has_the_shared_frame_title_and_footer(self):
+        for module in SHARED_UI_MODULES:
+            with self.subTest(module=module):
+                screen = self._first_screen(module)
+                self.assertEqual(screen[:3], [style.major_rule(), self.TITLES[module], style.major_rule()])
+                self.assertEqual(screen[-1], "Selection: 0")
+                self.assertEqual(screen[-2], style.minor_rule())
+                self.assertEqual(screen[-3], "[0] Back")
+                self.assertEqual(screen[-4], "")
+
+    def test_context_fields_line_up(self):
+        field = re.compile(r"^[A-Z][^:\[]*:\s")
+        for module in SHARED_UI_MODULES:
+            with self.subTest(module=module):
+                screen = self._first_screen(module)
+                first_option = next(i for i, line in enumerate(screen) if line.startswith("["))
+                context = [line for line in screen[3:first_option] if field.match(line)]
+                for line in context:
+                    label, _, _ = line.partition(":")
+                    if len(label) + 1 <= style.FIELD_WIDTH:
+                        self.assertRegex(line, rf"^.{{{style.FIELD_WIDTH}}} \S", line)
+
+    def test_an_unknown_key_gets_the_shared_reply(self):
+        for module in SHARED_UI_MODULES:
+            with self.subTest(module=module):
+                output = render_first_screen(module, ("x", "0"))
+                after = output.split("Selection: x\n", 1)[1]
+                self.assertEqual(after.lstrip("\n").splitlines()[0], style.INVALID_SELECTION)
+
+    def test_converted_modules_do_not_bypass_ui_style(self):
+        """No message prefix, menu entry, selection prompt or rule helper of their own."""
+        rules = {
+            "message prefix printed directly": re.compile(r'print\(f?"(\\n)*(ERROR|WARNING|NOTE|OK): '),
+            "menu entry printed directly": re.compile(r'print\(f?"(\\n)*\[[0-9A-Z]+\] '),
+            "selection prompt of its own": re.compile(r'input\(f?"(\\n)*(Selection|Select option)'),
+            "own rule or header helper": re.compile(r"def (_line|_print_\w*header|_\w+_ui_header)\("),
+            "SYNAPSE title prefix": re.compile(r'header\(f?["\']SYNAPSE'),
+        }
+        hits = []
+        for module in SHARED_UI_MODULES:
+            path = PROJECT_ROOT / "analyses" / f"{module}.py"
+            for number, line in enumerate(read(path).splitlines(), 1):
+                hits.extend(f"{module}.py:{number}: {name}" for name, rule in rules.items()
+                            if rule.search(line))
+        self.assertEqual(hits, [])
+
+    def test_menu_renderer_layout(self):
+        import contextlib
+        import io
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            style.menu([("Search", [(1, "Run")]), (None, [(2, "Other")])], zero="Cancel")
+        self.assertEqual(buffer.getvalue().splitlines(),
+                         ["", "SEARCH", "[1] Run", "", "[2] Other", "", "[0] Cancel", style.minor_rule()])
+        self.assertEqual(style.columns(["ORF-001", "+3", "87 bp"], [8, 6]), "ORF-001  +3     87 bp")
+
+
 if __name__ == "__main__":
     unittest.main()

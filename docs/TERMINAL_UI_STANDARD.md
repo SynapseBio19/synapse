@@ -57,14 +57,36 @@ SECTION TITLE
 Label:                 value
 Label:                 value
 
+GROUP
 [1] First action
 [2] Second action
+
 [0] Back
+----------------------------------------------------------------------
+Selection:
 ```
 
-`ui.style` provides `header()`, `section()` and `field()` for these.
-Labels in a key/value block are padded to `FIELD_WIDTH` (22) so aligned
-blocks line up across modules.
+Every part has one renderer in `ui.style`:
+
+| Part | Renderer | Rule |
+|---|---|---|
+| Screen title | `header(title)` | Upper case, framed by two major rules, a blank line before. No "SYNAPSE" prefix: the title names the screen, and a module's main screen carries the name of its main-menu entry. |
+| Context block | `field(label, value)` | Directly under the title. Labels padded to `FIELD_WIDTH` (22), so values start at column 24 in every module. A label is a short name; a sentence is a message, not a field. |
+| Section | `section(title)` | Upper case over a minor rule, a blank line before. |
+| Menu | `menu(groups, zero=...)` | The module's own groups and entries (5.3); each group after a blank line under an upper-case label; then a blank line, the `[0]` entry and a minor rule. |
+| Prompt | `ask_choice()` / `ask(label, default=...)` | `Selection: ` for menus; a default in brackets. |
+| Table row | `columns(values, widths)` | Values are converted to text before padding, so a column stays aligned whatever the number of digits. |
+| End of a report | `print(major_rule())` | A report may close with a major rule. |
+
+`field_line()` returns the same line as text, for reports that are built
+as strings.
+
+**Adoption.** The six modules ORF, CRISPR, BLAST, literature, primer and
+variant analysis draw their screens through these renderers (Stage F
+completion, 2026-11-02). `main.py`, `ui/menu.py`, `ui/report.py`,
+sequence overview, RNA, protein, restriction, cloning, mutation and
+`core/pipeline.py` still print their own titles, sections and fields
+with the shared rules; converting them is open work (section 9).
 
 ### Section order
 
@@ -129,6 +151,13 @@ statement it is.
 | `NOTE:` | Context worth knowing; nothing is wrong. | `style.note()` |
 | `OK:` | Confirmation of a completed action. | `style.success()` |
 
+| Situation | Category |
+|---|---|
+| An export or a save succeeded | `OK:` |
+| An export, a file read or an input check failed | `ERROR:` |
+| A view needs something first ("Run [1] BLAST Search first.", "No variants loaded.") | `NOTE:`, then `pause()` so it is read before the menu returns |
+| An unknown menu key | `invalid_selection()`, then the same menu again; a dialog asks again rather than ending |
+
 Scientific wording stays module-specific. A CRISPR off-target warning, a
 primer thermodynamics warning and a variant normalization warning carry
 the same prefix and entirely different text, because they say different
@@ -167,6 +196,13 @@ menus from the analysis modules is the remaining part of audit item P2-2.
    presentation layer stays free of scientific logic.
 6. Menu numbers are contiguous, and every entry has a dispatch branch
    and every branch an entry (BLAST menu and main menu).
+7. **Rendered screens** of the six converted modules, driven with scripted
+   input (`RenderedScreenTests`): the frame and title, the context fields
+   at the shared column, the footer (blank line, `[0] Back`, minor rule,
+   `Selection: `), and the reply to an unknown key.
+8. The converted modules print no message prefix, menu entry or
+   selection prompt of their own, define no rule or header helper, and
+   use no "SYNAPSE" title prefix.
 
 ## 8. Numbering
 
@@ -183,3 +219,17 @@ label. In `analyses/blast.py` the rewrite must be scoped to
 numbered sub-dialogs that must not shift.
 
 A change that breaks the standard fails the suite.
+
+## 9. Open work
+
+- The ten remaining interface files listed under "Adoption" in section 2.
+  The same rewrite (titles, sections, fields, menus, prompts, messages)
+  applies; each conversion adds the module to `SHARED_UI_MODULES` in
+  `tests/test_terminal_ui.py`, which applies the checks of section 7.
+- Variant analysis lists normalization last in its ANALYSIS group;
+  Master Prompt 5.3 orders input, parsing, normalization, filtering,
+  statistics. Reordering means renumbering the menu and its dispatch.
+- Result tables other than the ORF candidate list keep module-specific
+  column widths; `columns()` is available for them.
+- Value prompts inside dialogs (for example "System: ", "FASTA path: ")
+  still call `input()` directly.

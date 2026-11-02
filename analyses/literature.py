@@ -1761,7 +1761,7 @@ def export_results(run: LiteratureSearchRun, path: str | Path) -> Path:
 
 def print_results(run: LiteratureSearchRun, limit: int = 10) -> None:
 
-    style.header('SYNAPSE LITERATURE SEARCH RESULTS')
+    style.header('Literature search results')
 
     style.field('Query', f"{run.query.query}")
 

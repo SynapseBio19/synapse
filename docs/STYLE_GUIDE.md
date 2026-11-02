@@ -232,6 +232,7 @@ that breaks one fails the suite.
 | Rule | Test |
 |---|---|
 | Separators, `[0]` meanings, message prefixes, contiguous menus, presentation layer free of science (section 6) | `tests/test_terminal_ui.py` |
+| Rendered screens of the converted modules: frame, title, fields, footer, invalid-key reply; no bypass of `ui.style` (section 6) | `RenderedScreenTests` |
 | "Confidence" is not used as a data key anywhere in the source (2.1) | `HeuristicScoreVocabularyTests` in `tests/test_phase6_tier2.py` |
 | Unit notation in printed text: `%`, `°C`, `cal/(mol·K)`, `Da` (3.1) | `OutputNotationTests.test_printed_units_use_one_notation` |
 | E-values with three significant figures (3.2) | `OutputNotationTests.test_blast_text_report_shows_e_values_with_three_significant_figures` |

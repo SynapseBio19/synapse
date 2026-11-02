@@ -1789,3 +1789,63 @@ only: the docstring of
 still says "(ExPASy's)", and the module docstring of
 `tests/test_external_reference.py` repeats the ExPASy comparison for
 ubiquitin from the audit.
+
+## Stage F completion: six modules on the shared renderers (2026-11-02)
+
+The Stage F re-examination (`docs/STAGE_F_UI_REVIEW.md`) found that
+Stage F had shared the rules, the `[0]` meanings and the prefix spelling,
+but that no module called the renderers in `ui/style.py`. On the owner's
+instruction the six modules it compared were converted (`2e47ff9`, `e7eaf58`, `5cb4c9a`, `b181ae3`, `fb4070a`, `fdc968d`, `b80fd37`).
+
+**Method.** Two AST-guided rewriting passes (kept outside the
+repository) replaced recurring print patterns at their source positions,
+so untouched code, line endings and the two bare-LF lines of `orf.py`
+stay byte-identical:
+
+- rule-title-rule triples became `style.header`;
+- a heading over a minor rule became `style.section`;
+- "Label:   value" prints became `style.field` (a long label or a
+  sentence was left alone);
+- `print("[n] ...")` runs with their `[0]` entry became `style.menu`;
+- `input("Selection: ")` became `ask_choice()`, `input("Label [d]: ")`
+  became `ask()`, and the pause prompt became `pause()`;
+- prefixed and recognizable messages went through `error`, `warning`,
+  `note`, `success` and `invalid_selection`.
+
+What the patterns could not decide was done by hand and is listed in each
+commit:
+
+- menu groups for ORF, literature and primer;
+- the ORF settings order;
+- the ORF candidate table;
+- the literature frame;
+- the primer Tm dialog;
+- the CRISPR title;
+- pauses after precondition messages.
+
+**`ui/style.py`** gains `menu()`, `group()`, `field_line()` and
+`columns()`, and its docstring now spells "recognizable".
+
+| Before (rendered) | After |
+|---|---|
+| Literature: unframed banner "Synapse Literature Intelligence v2.1.1" | framed "LITERATURE SEARCH" with module and sources as fields |
+| ORF prompt "Select option:", flat menu, no footer rule | "Selection:", groups Discovery / Evaluation / Selection / Settings, shared footer |
+| ORF candidate table misaligned, column "Conf." | aligned columns, "Heuristic" |
+| ORF settings numbered 1-5, 8, 6, 7 | 1-8 in order (genetic code [6], defaults [7], legacy [8]) |
+| CRISPR titled "CRISPR ANALYSIS ENGINE" | "CRISPR GUIDE DESIGN", its main-menu name |
+| Context values at columns 9-28 depending on the module | column 24 in all six |
+| "SYNAPSE —", "SYNAPSE" title prefixes | none |
+| Primer: "ERROR: Invalid selection." ending the Tm dialog | "Invalid selection." and the question again |
+| "Run [1] BLAST Search first.", "No variants loaded." scrolled away at once | `NOTE:` and a pause |
+| "Export failed: ...", "Exported: ..." without a category | `ERROR:` / `OK:` |
+
+Data, API and golden master are unchanged; no test outside the interface
+tests needed a change. Value prompts inside dialogs and the other ten
+interface files are listed as open in `TERMINAL_UI_STANDARD.md` section 9.
+
+Tests: 5 new (`RenderedScreenTests`). They render the six first screens
+with scripted input and check the frame, title, fields, footer and the
+reply to an unknown key, plus a source rule against bypassing
+`ui.style`. On the code before the conversion they give 8 failures and
+5 errors. They found four more "SYNAPSE" title prefixes the first pass
+had missed. The BLAST numbering test now reads the `style.menu()` entries.

@@ -1300,7 +1300,8 @@ class StyleGuideConsistencyTests(unittest.TestCase):
         missing = []
         for name in sorted(named):
             class_name, _, method = name.partition(".")
-            cls = globals().get(class_name)
+            from tests import test_terminal_ui
+            cls = globals().get(class_name) or getattr(test_terminal_ui, class_name, None)
             if cls is None or (method and not hasattr(cls, method)):
                 missing.append(name)
         self.assertEqual(missing, [])

@@ -3039,7 +3039,7 @@ def run_self_test(verbose: bool = True) -> bool:
         except Exception as exc:
             results.append(SelfTestResult(name, False, str(exc)))
     if verbose:
-        style.header('SYNAPSE CRISPR SELF-TEST')
+        style.header('CRISPR self-test')
         for result in results:
             marker = "PASS" if result.passed else "FAIL"
             suffix = f" - {result.detail}" if result.detail else ""

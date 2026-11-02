@@ -5565,7 +5565,7 @@ def run_self_test(verbose: bool = True) -> bool:
             results.append(SelfTestResult(name, False, str(exc)))
 
     if verbose:
-        style.header('SYNAPSE BLAST SELF-TEST')
+        style.header('BLAST self-test')
         for result in results:
             marker = "PASS" if result.passed else "FAIL"
             suffix = f" - {result.detail}" if result.detail else ""
