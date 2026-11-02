@@ -49,6 +49,7 @@ from pathlib import Path
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 from core.seqtools import IUPAC_COMPLEMENT as _CORE_IUPAC_COMPLEMENT
 from ui.style import RULE_WIDTH, major_rule, minor_rule
+from ui import style
 
 
 # ============================================================================
@@ -615,7 +616,7 @@ def format_system_details(system_name: str) -> str:
     system = get_crispr_system(system_name)
     lines = [
         "SELECTED CRISPR SYSTEM",
-        _line(),
+        minor_rule(),
         f"System:          {system.name}",
         f"Enzyme family:   {system.enzyme_family}",
         f"PAM:             {system.pam}",
@@ -1926,11 +1927,6 @@ def export_batch_summary(results: Mapping[str, DesignResult], path: str | Path) 
 # REPORTING / VISUAL TEXT
 # ============================================================================
 
-def _line(char: str = "-", width: int = RULE_WIDTH) -> str:
-    # Kept as a local shorthand; the width is the shared one (Stage F).
-    return char * width
-
-
 def target_map(candidate: GuideCandidate, sequence_length: int, width: int = 60) -> str:
     """ASCII target map for quick positional grounding."""
     if sequence_length <= 0:
@@ -1997,7 +1993,7 @@ def format_candidate(candidate: GuideCandidate, rank: int) -> str:
 
 
 def format_base_editing_report(results: Sequence[BaseEditingCandidate]) -> str:
-    lines = ["BASE EDITING ANALYSIS", _line()]
+    lines = ["BASE EDITING ANALYSIS", minor_rule()]
     if not results:
         lines.append("No base-editing candidates available.")
         return "\n".join(lines)
@@ -2016,12 +2012,12 @@ def format_base_editing_report(results: Sequence[BaseEditingCandidate]) -> str:
             lines.append(f"  - position {b['position_in_guide']}: {b['base']} -> {b['conversion'].split('>')[1]}")
         for note in item.sequence_level_notes:
             lines.append(f"  NOTE: {note}")
-        lines.append(_line())
+        lines.append(minor_rule())
     return "\n".join(lines)
 
 
 def format_prime_editing_report(results: Sequence[PrimeEditingCandidate], top_n: int = 20) -> str:
-    lines = ["PRIME EDITING CANDIDATES", _line()]
+    lines = ["PRIME EDITING CANDIDATES", minor_rule()]
     if not results:
         lines.append("No sequence-level prime-editing candidates available.")
         return "\n".join(lines)
@@ -2035,7 +2031,7 @@ def format_prime_editing_report(results: Sequence[PrimeEditingCandidate], top_n:
             f"RTT ({item.rtt_length} nt): {item.rtt_sequence}",
             f"RTT spans edit site: {'YES' if item.edit_in_rtt else 'NO'}",
             "Notes: " + " | ".join(item.sequence_level_notes),
-            _line(),
+            minor_rule(),
         ])
     if len(results) > top_n:
         lines.append(f"Showing top {top_n} of {len(results)} sequence-level candidates.")
@@ -2062,9 +2058,9 @@ def format_report(result: DesignResult, *, top_n: int = 10) -> str:
         f"Candidates found:      {len(result.candidates)}",
         f"Heuristic quality-pass: {result.high_quality_count}/{len(result.candidates)}",
         f"Ranking mode:            {ranking_mode_label(result.candidates)}",
-        _line(),
+        minor_rule(),
         "SCIENTIFIC SCOPE",
-        _line(),
+        minor_rule(),
         "Ranking is a transparent computational heuristic, not measured editing efficacy.",
         "If local specificity data are available, the ranking is explicitly specificity-aware.",
         "Local specificity uses only explicitly supplied reference sequences.",
@@ -2072,18 +2068,18 @@ def format_report(result: DesignResult, *, top_n: int = 10) -> str:
         "Base/prime editing outputs are sequence-level candidate architectures.",
     ]
     if result.warnings:
-        lines.extend([_line(), "WARNINGS", _line()])
+        lines.extend([minor_rule(), "WARNINGS", minor_rule()])
         lines.extend(f"- {warning}" for warning in result.warnings)
     lines.extend([
-        _line(),
+        minor_rule(),
         f"RANKED GUIDE CANDIDATES ({ranking_mode_label(result.candidates).upper()})",
-        _line(),
+        minor_rule(),
     ])
     if not result.candidates:
         lines.append("No candidates.")
     for rank, candidate in enumerate(result.candidates[:top_n], 1):
         lines.append(format_candidate(candidate, rank))
-        lines.append(_line())
+        lines.append(minor_rule())
     if len(result.candidates) > top_n:
         lines.append(f"Showing top {top_n} of {len(result.candidates)} candidates.")
     return "\n".join(lines)
@@ -2125,14 +2121,13 @@ def _input_float(prompt: str, default: float) -> float:
 
 def _choose_system() -> str:
     systems = list_crispr_systems()
-    print("\nAvailable CRISPR systems")
-    print(_line())
+    style.section('Available CRISPR systems')
     for i, system in enumerate(systems, 1):
         print(
             f"[{i}] {system.name:<12} PAM={system.pam:<6} Guide={system.guide_length:<2} nt | "
             f"{system.description}"
         )
-    print("[0] Cancel")
+    style.cancel()
     while True:
         choice = input("System: ").strip()
         if choice == "0":
@@ -2143,17 +2138,16 @@ def _choose_system() -> str:
                 return systems[index - 1].name
         except ValueError:
             pass
-        print("Invalid selection.")
+        style.invalid_selection()
 
 
 def _choose_editor() -> str:
     editors = list_base_editors()
-    print("\nAvailable computational base-editor models")
-    print(_line())
+    style.section('Available computational base-editor models')
     for i, name in enumerate(editors, 1):
         data = get_base_editor(name)
         print(f"[{i}] {name:<5} {data['conversion'][0]}>{data['conversion'][1]} window={data['window'][0]}-{data['window'][1]}")
-    print("[0] Cancel")
+    style.cancel()
     while True:
         choice = input("Editor: ").strip()
         if choice == "0":
@@ -2164,7 +2158,7 @@ def _choose_editor() -> str:
                 return editors[index - 1]
         except ValueError:
             pass
-        print("Invalid selection.")
+        style.invalid_selection()
 
 
 def _manual_sequence() -> Tuple[str, str]:
@@ -2180,15 +2174,15 @@ def _manual_sequence() -> Tuple[str, str]:
 
 
 def _print_candidate_table(candidates: Sequence[GuideCandidate], limit: int = 20) -> None:
-    print("\n" + _line())
+    print("\n" + minor_rule())
     mode = ranking_mode_label(candidates)
     print(f"RANKED GUIDES ({mode.upper()})")
     print("Score = transparent computational prioritization heuristic.")
     if has_specificity_analysis(candidates):
         print("Specificity component uses only explicitly supplied local reference sequences.")
-    print(_line())
+    print(minor_rule())
     print(f"  # {'ID':<7} {'Guide':<22} {'PAM':<7} {'Str':<4} {'Pos':<12} {'GC':>6} {'Score':>7}")
-    print(_line())
+    print(minor_rule())
     for i, c in enumerate(candidates[:limit], 1):
         print(
             f"{i:>3} {c.candidate_id:<7} {c.guide:<22} {c.pam:<7} {c.strand:<4} "
@@ -2200,7 +2194,7 @@ def _print_candidate_table(candidates: Sequence[GuideCandidate], limit: int = 20
 
 def _choose_candidate(candidates: Sequence[GuideCandidate]) -> Optional[GuideCandidate]:
     if not candidates:
-        print("No guide candidates available.")
+        style.note("No guide candidates available.")
         return None
     _print_candidate_table(candidates)
     raw = input("Candidate number (0 cancel): ").strip()
@@ -2232,13 +2226,11 @@ def _read_local_references() -> Dict[str, str]:
         try:
             normalized = normalize_sequence(seq)
             if len(normalized) < 23:
-                print(
-                    "WARNING: Reference is shorter than a 20-nt SpCas9 guide plus a 3-nt PAM. "
-                    "A PAM-aware hit may not be detectable."
-                )
+                style.warning("Reference is shorter than a 20-nt SpCas9 guide plus a 3-nt PAM. "
+                    "A PAM-aware hit may not be detectable.")
             refs[name.strip()] = normalized
         except CRISPRAnalysisError as exc:
-            print(f"ERROR: {exc}")
+            style.error(f"{exc}")
     return refs
 
 
@@ -2253,9 +2245,7 @@ def _load_orf_or_region(current_sequence: str) -> Tuple[str, int, int, str, str]
 
 
 def _cli_design() -> None:
-    print("\n" + major_rule())
-    print("CRISPR GUIDE DESIGN")
-    print(major_rule())
+    style.header('CRISPR GUIDE DESIGN')
     name, sequence = _manual_sequence()
     if not sequence:
         print("No sequence entered.")
@@ -2270,7 +2260,7 @@ def _cli_design() -> None:
     try:
         result = design_guides(sequence, sequence_name=name, system=system, config=config)
     except CRISPRAnalysisError as exc:
-        print(f"ERROR: {exc}")
+        style.error(f"{exc}")
         return
     print_report(result)
 
@@ -2321,14 +2311,11 @@ def crispr_menu(
         nonlocal region_name, feature_type, last_result
 
         while True:
-            print("\n" + major_rule())
-            print("SEQUENCE & REGION")
-            print(major_rule())
-            print("[1] Select DNA Sequence")
-            print("[2] Select ORF / Region")
-            print("[0] Back")
-            print(_line())
-            choice = input("Selection: ").strip()
+            style.header('SEQUENCE & REGION')
+            style.menu([
+                (None, [('1', 'Select DNA Sequence'), ('2', 'Select ORF / Region')]),
+            ])
+            choice = style.ask_choice()
 
             if choice == "0":
                 return
@@ -2337,7 +2324,7 @@ def crispr_menu(
                 try:
                     base_sequence = normalize_sequence(seq)
                 except CRISPRAnalysisError as exc:
-                    print(f"ERROR: {exc}")
+                    style.error(f"{exc}")
                     continue
                 current_name = name
                 region_start = 1
@@ -2345,10 +2332,10 @@ def crispr_menu(
                 region_name = "Selected Region"
                 feature_type = "sequence"
                 last_result = None
-                print(f"Selected sequence: {current_name} ({len(base_sequence)} bp)")
+                style.field('Selected sequence', f"{current_name} ({len(base_sequence)} bp)")
             elif choice == "2":
                 if not base_sequence:
-                    print("No DNA sequence selected.")
+                    style.note("No DNA sequence selected.")
                     continue
                 try:
                     selected_seq, start, end, name, _source = _load_orf_or_region(base_sequence)
@@ -2363,23 +2350,23 @@ def crispr_menu(
                     last_result = None
                     print(f"Selected {region_name} ({len(base_sequence)} bp).")
                 except CRISPRAnalysisError as exc:
-                    print(f"ERROR: {exc}")
+                    style.error(f"{exc}")
             else:
-                print("Invalid selection.")
+                style.invalid_selection()
 
     def batch_analysis_menu() -> None:
         nonlocal batch_results, batch_sequences, current_name, base_sequence, region_start
         nonlocal region_end, region_name, feature_type, last_result
 
         while True:
-            print("\n" + major_rule())
-            print("BATCH ANALYSIS")
-            print(major_rule())
-            print("[1] Load FASTA / Batch Analysis")
-            print("[2] Use First Record as Current Sequence")
-            print("[0] Back")
-            print(_line())
-            choice = input("Selection: ").strip()
+            style.header('BATCH ANALYSIS')
+            style.menu([
+                (None, [
+                    ('1', 'Load FASTA / Batch Analysis'),
+                    ('2', 'Use First Record as Current Sequence'),
+                ]),
+            ])
+            choice = style.ask_choice()
 
             if choice == "0":
                 return
@@ -2401,10 +2388,10 @@ def crispr_menu(
                             f"high-quality={row['high_quality']}"
                         )
                 except CRISPRAnalysisError as exc:
-                    print(f"ERROR: {exc}")
+                    style.error(f"{exc}")
             elif choice == "2":
                 if not batch_results:
-                    print("No batch analysis available. Use [1] first.")
+                    style.note("No batch analysis available. Use [1] first.")
                     continue
                 records = list(batch_results.keys())
                 print("\nAVAILABLE RECORDS")
@@ -2414,7 +2401,7 @@ def crispr_menu(
                 try:
                     index = int(raw)
                 except ValueError:
-                    print("Invalid selection.")
+                    style.invalid_selection()
                     continue
                 if index == 0:
                     continue
@@ -2428,25 +2415,21 @@ def crispr_menu(
                     region_name = result.region_name
                     feature_type = result.feature_type
                     last_result = result
-                    print(f"Current sequence: {current_name}")
+                    style.field('Current sequence', f"{current_name}")
                 else:
-                    print("Invalid selection.")
+                    style.invalid_selection()
             else:
-                print("Invalid selection.")
+                style.invalid_selection()
 
     def system_menu() -> None:
         nonlocal config
         while True:
-            print("\n" + major_rule())
-            print("CRISPR SYSTEM")
-            print(major_rule())
-            print(f"Current system: {config.system}")
-            print()
-            print("[1] Select CRISPR System")
-            print("[2] Show System Details")
-            print("[0] Back")
-            print(_line())
-            choice = input("Selection: ").strip()
+            style.header('CRISPR SYSTEM')
+            style.field('Current system', f"{config.system}")
+            style.menu([
+                (None, [('1', 'Select CRISPR System'), ('2', 'Show System Details')]),
+            ])
+            choice = style.ask_choice()
 
             if choice == "0":
                 return
@@ -2454,27 +2437,24 @@ def crispr_menu(
                 system = _choose_system()
                 if system:
                     config.system = system
-                    print(f"Selected system: {system}")
+                    style.field('Selected system', f"{system}")
             elif choice == "2":
                 print()
                 print(format_system_details(config.system))
             else:
-                print("Invalid selection.")
+                style.invalid_selection()
 
     def guide_analysis_menu() -> None:
         nonlocal last_result
         if not last_result:
-            print("Run [4] Target Discovery first.")
+            style.note("Run [4] Target Discovery first.")
             return
         while True:
-            print("\n" + major_rule())
-            print("GUIDE ANALYSIS & RANKING")
-            print(major_rule())
-            print("[1] Analyze Individual Guide")
-            print("[2] Rank Guides")
-            print("[0] Back")
-            print(_line())
-            choice = input("Selection: ").strip()
+            style.header('GUIDE ANALYSIS & RANKING')
+            style.menu([
+                (None, [('1', 'Analyze Individual Guide'), ('2', 'Rank Guides')]),
+            ])
+            choice = style.ask_choice()
             if choice == "0":
                 return
             if choice == "1":
@@ -2485,28 +2465,28 @@ def crispr_menu(
                 last_result.candidates = rank_guides(last_result.candidates, config=config)
                 _print_candidate_table(last_result.candidates)
             else:
-                print("Invalid selection.")
+                style.invalid_selection()
 
     def report_export_menu() -> None:
         if not last_result and not batch_results:
-            print("No analysis results available.")
+            style.note("No analysis results available.")
             return
         while True:
-            print("\n" + major_rule())
-            print("REPORTS & EXPORT")
-            print(major_rule())
-            print("[1] Full Guide Report")
-            print("[2] Export Guides")
-            print("[3] Export Batch Summary")
-            print("[0] Back")
-            print(_line())
-            choice = input("Selection: ").strip()
+            style.header('REPORTS & EXPORT')
+            style.menu([
+                (None, [
+                    ('1', 'Full Guide Report'),
+                    ('2', 'Export Guides'),
+                    ('3', 'Export Batch Summary'),
+                ]),
+            ])
+            choice = style.ask_choice()
 
             if choice == "0":
                 return
             if choice == "1":
                 if not last_result:
-                    print("Run [4] Target Discovery first.")
+                    style.note("Run [4] Target Discovery first.")
                     continue
                 print_report(last_result, top_n=10)
                 if last_base_results:
@@ -2515,7 +2495,7 @@ def crispr_menu(
                     print(format_prime_editing_report(last_prime_results, top_n=10))
             elif choice == "2":
                 if not last_result:
-                    print("Run [4] Target Discovery first.")
+                    style.note("Run [4] Target Discovery first.")
                     continue
                 default_dir = _default_export_directory()
                 print(f"Relative paths are saved to: {default_dir}")
@@ -2533,15 +2513,15 @@ def crispr_menu(
                     else:
                         print("Use .json, .csv or .fasta/.fa extension.")
                         continue
-                    print(f"Exported: {exported}")
+                    style.success(f"Exported: {exported}")
                 except PermissionError:
-                    print("Export failed: permission denied.")
+                    style.error("Export failed: permission denied.")
                     print("Choose a writable Desktop/Documents location or use a relative filename.")
                 except OSError as exc:
-                    print(f"Export failed: {exc}")
+                    style.error(f"Export failed: {exc}")
             elif choice == "3":
                 if not batch_results:
-                    print("No batch analysis available. Use [2] -> [1] Load FASTA / Batch Analysis first.")
+                    style.note("No batch analysis available. Use [2] -> [1] Load FASTA / Batch Analysis first.")
                     continue
                 default_dir = _default_export_directory()
                 print(f"Relative paths are saved to: {default_dir}")
@@ -2550,54 +2530,38 @@ def crispr_menu(
                     continue
                 try:
                     exported = export_batch_summary(batch_results, path)
-                    print(f"Exported: {exported}")
+                    style.success(f"Exported: {exported}")
                 except PermissionError:
-                    print("Export failed: permission denied.")
+                    style.error("Export failed: permission denied.")
                     print("Choose a writable Desktop/Documents location or use a relative filename.")
                 except OSError as exc:
-                    print(f"Export failed: {exc}")
+                    style.error(f"Export failed: {exc}")
             else:
-                print("Invalid selection.")
+                style.invalid_selection()
 
     while True:
-        print("\n" + major_rule())
-        print("CRISPR ANALYSIS ENGINE")
-        print(major_rule())
-        print(f"Sequence: {current_name}")
-        print(f"Length:   {len(base_sequence) if base_sequence else 0} bp")
-        print(
-            f"Region:   {region_name} ({region_start}-{region_end})"
-            if base_sequence else "Region:   none"
-        )
-        print(f"System:   {config.system}")
-        print()
-        print("INPUT / CONTEXT")
-        print("[1] Sequence & Region")
-        print("[2] Batch Analysis")
-        print("[3] CRISPR System")
-        print()
-        print("GUIDE DESIGN")
-        print("[4] Target Discovery")
-        print("[5] Guide Analysis & Ranking")
-        print()
-        print("EDITING")
-        print("[6] Mutation / Variant Targeting")
-        print("[7] Base Editing")
-        print("[8] Prime Editing")
-        print()
-        print("SPECIFICITY")
-        print("[9] Off-Target Analysis")
-        print("[10] Specificity Profile")
-        print()
-        print("OUTPUT")
-        print("[11] Reports & Export")
-        print()
-        print("SYSTEM")
-        print("[12] CRISPR Self-Test")
-        print("[13] Supported Systems")
-        print("[0] Back")
-        print(_line())
-        choice = input("Selection: ").strip()
+        style.header('CRISPR GUIDE DESIGN')
+        style.field('Sequence', f"{current_name}")
+        style.field('Length', f"{len(base_sequence) if base_sequence else 0} bp")
+        style.field('Region', f"{region_name} ({region_start}-{region_end})" if base_sequence else "none")
+        style.field('System', f"{config.system}")
+        style.menu([
+            ('Input / Context', [
+                ('1', 'Sequence & Region'),
+                ('2', 'Batch Analysis'),
+                ('3', 'CRISPR System'),
+            ]),
+            ('Guide Design', [('4', 'Target Discovery'), ('5', 'Guide Analysis & Ranking')]),
+            ('Editing', [
+                ('6', 'Mutation / Variant Targeting'),
+                ('7', 'Base Editing'),
+                ('8', 'Prime Editing'),
+            ]),
+            ('Specificity', [('9', 'Off-Target Analysis'), ('10', 'Specificity Profile')]),
+            ('Output', [('11', 'Reports & Export')]),
+            ('System', [('12', 'CRISPR Self-Test'), ('13', 'Supported Systems')]),
+        ])
+        choice = style.ask_choice()
 
         if choice == "0":
             # Returned to main.py so the result can be stored in the pipeline.
@@ -2614,7 +2578,7 @@ def crispr_menu(
 
         elif choice == "4":
             if not base_sequence:
-                print("No DNA sequence selected.")
+                style.note("No DNA sequence selected.")
                 continue
             config.min_gc = _input_float(f"Minimum GC [{config.min_gc}]: ", config.min_gc)
             config.max_gc = _input_float(f"Maximum GC [{config.max_gc}]: ", config.max_gc)
@@ -2635,7 +2599,7 @@ def crispr_menu(
                 print(f"Found {last_result.candidate_count} candidate(s).")
                 _print_candidate_table(last_result.candidates)
             except CRISPRAnalysisError as exc:
-                print(f"ERROR: {exc}")
+                style.error(f"{exc}")
 
         elif choice == "5":
             guide_analysis_menu()
@@ -2647,10 +2611,8 @@ def crispr_menu(
             try:
                 mutation = parse_mutation_target(raw)
                 selected_mutations.append(mutation)
-                print(
-                    f"Added variant: {mutation.chromosome}:{mutation.position} "
-                    f"{mutation.reference}>{mutation.alternative}"
-                )
+                style.field('Added variant', f"{mutation.chromosome}:{mutation.position} "
+                    f"{mutation.reference}>{mutation.alternative}")
                 if last_result:
                     annotate_mutation_targets(
                         last_result.candidates,
@@ -2660,14 +2622,14 @@ def crispr_menu(
                     last_result.candidates = rank_guides(last_result.candidates, config=config)
                     _print_candidate_table(last_result.candidates)
             except CRISPRAnalysisError as exc:
-                print(f"ERROR: {exc}")
+                style.error(f"{exc}")
 
         elif choice == "7":
             if not last_result:
-                print("Run [4] Target Discovery first.")
+                style.note("Run [4] Target Discovery first.")
                 continue
             if not selected_mutations:
-                print("No mutation/variant selected. Use [6] first.")
+                style.note("No mutation/variant selected. Use [6] first.")
                 continue
             editor = _choose_editor()
             if not editor:
@@ -2682,10 +2644,10 @@ def crispr_menu(
 
         elif choice == "8":
             if not last_result or not base_sequence:
-                print("Run [4] Target Discovery first.")
+                style.note("Run [4] Target Discovery first.")
                 continue
             if not selected_mutations:
-                print("No mutation/variant selected. Use [6] first.")
+                style.note("No mutation/variant selected. Use [6] first.")
                 continue
             last_prime_results = []
             for mutation in selected_mutations:
@@ -2703,7 +2665,7 @@ def crispr_menu(
 
         elif choice == "9":
             if not last_result:
-                print("Run [4] Target Discovery first.")
+                style.note("Run [4] Target Discovery first.")
                 continue
             local_references = _read_local_references()
             if local_references:
@@ -2748,10 +2710,9 @@ def crispr_menu(
 
         elif choice == "10":
             if not last_result:
-                print("Run [4] Target Discovery first.")
+                style.note("Run [4] Target Discovery first.")
                 continue
-            print("SPECIFICITY PROFILE")
-            print(_line())
+            style.section('SPECIFICITY PROFILE')
             if has_specificity_analysis(last_result.candidates):
                 print("Candidates with explicit local specificity analysis are marked in the ranking.")
                 print("Select the candidate to inspect its local specificity profile.")
@@ -2777,8 +2738,7 @@ def crispr_menu(
             run_self_test(verbose=True)
 
         elif choice == "13":
-            print("\nSUPPORTED CRISPR SYSTEMS")
-            print(_line())
+            style.section('SUPPORTED CRISPR SYSTEMS')
             for system in list_crispr_systems():
                 print(
                     f"{system.name}: family={system.enzyme_family}, "
@@ -2787,7 +2747,7 @@ def crispr_menu(
                 )
 
         else:
-            print("Invalid selection.")
+            style.invalid_selection()
 
 
 # ============================================================================
@@ -3066,15 +3026,13 @@ def run_self_test(verbose: bool = True) -> bool:
         except Exception as exc:
             results.append(SelfTestResult(name, False, str(exc)))
     if verbose:
-        print("\n" + major_rule())
-        print("SYNAPSE CRISPR SELF-TEST")
-        print(major_rule())
+        style.header('SYNAPSE CRISPR SELF-TEST')
         for result in results:
             marker = "PASS" if result.passed else "FAIL"
             suffix = f" - {result.detail}" if result.detail else ""
             print(f"[{marker}] {result.name}{suffix}")
         passed = sum(r.passed for r in results)
-        print(_line())
+        print(minor_rule())
         print(f"{passed}/{len(results)} tests passed.")
     return all(result.passed for result in results)
 
