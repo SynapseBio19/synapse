@@ -124,5 +124,37 @@ class ParameterSetTests(unittest.TestCase):
             P.calculate_tm_nearest_neighbor("ACGTACGTACGT", salt_model="x")
 
 
+class Primer3ReferenceComparison(unittest.TestCase):
+    """External reference comparison with primer3-py (the ``reference`` extra).
+
+    primer3-py wraps the Primer3 C library, an implementation that shares no
+    code with Synapse. Both use SantaLucia (1998) parameters and the
+    SantaLucia salt correction with the von Ahsen (2001) divalent
+    conversion. Measured on 2026-11-02 with primer3-py 2.4.0: 81 primers x
+    36 conditions, max |dTm| 0.0032 C; the systematic part comes from the gas
+    constant (Synapse R = 1.98720 cal/(mol K), Primer3 1.987).
+    """
+
+    @unittest.skipUnless(__import__("importlib").util.find_spec("primer3"),
+                         "primer3-py (reference extra) not installed")
+    def test_tm_agrees_with_primer3_across_salt_conditions(self):
+        import primer3
+        from analyses import primer as P
+        from tests._support import deterministic_dna
+        template = deterministic_dna(1200)
+        primers = ["CGTGACGTGACGGACT"] + [template[i:i + n] for i in range(0, 1100, 110)
+                                          for n in (18, 22, 25)]
+        worst = 0.0
+        for seq in primers:
+            for na, mg, dntp, oligo in ((50, 0, 0, 50), (50, 1.5, 0.2, 250), (100, 3.0, 0.8, 250),
+                                        (50, 0.5, 0.8, 250)):
+                ours = P.calculate_duplex_thermodynamics(
+                    seq, sodium_mM=na, magnesium_mM=mg, dntp_mM=dntp, primer_nM=oligo).tm_C
+                ref = primer3.calc_tm(seq, mv_conc=na, dv_conc=mg, dntp_conc=dntp, dna_conc=oligo,
+                                      tm_method="santalucia", salt_corrections_method="santalucia")
+                worst = max(worst, abs(ours - ref))
+        self.assertLess(worst, 0.01)
+
+
 if __name__ == "__main__":
     unittest.main()

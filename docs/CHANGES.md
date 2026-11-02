@@ -1627,3 +1627,32 @@ the meaning is now stated where readers meet it:
 
 Category: scientific accuracy. The numbers are unchanged; the
 interpretation text is not part of any golden snapshot.
+
+## Phase 6 - Stage I: final verification (2026-11-02)
+
+### External reference comparison: primer Tm against primer3-py (P1-3)
+
+`docs/METHODS.md` recorded that Primer3 could not be installed in the
+development environment, so the audit criterion for P1-3 ("±1 °C against
+Biopython/Primer3 at three Mg²⁺ levels") had never been run. primer3-py
+2.4.0 is now installed as a test-only reference (the `reference` extra),
+and the comparison was run locally, with no network access:
+
+- 81 primers: the Primer3 manual example and 18-, 20-, 22- and 25-nt
+  windows of a fixed test sequence.
+- 36 conditions: Na⁺ 50 and 100 mM; Mg²⁺ 0, 1.5 and 3 mM; dNTP 0, 0.2 and
+  0.8 mM; oligo 50 and 250 nM.
+- primer3-py with `tm_method="santalucia"`,
+  `salt_corrections_method="santalucia"`.
+- Result: 2,916 comparisons, max |ΔTm| 0.0032 °C, mean 0.0024 °C. The
+  offset is systematic and comes from the gas constant (Synapse 1.98720,
+  Primer3 1.987).
+
+The criterion is met with a margin of more than two orders of magnitude.
+This shows that Synapse implements the published equations as Primer3
+does; it does not show that the nearest-neighbor model predicts
+experimental melting temperatures, which no software comparison can.
+
+Test: 1 new (`Primer3ReferenceComparison`, a reduced grid of 31 primers
+x 4 conditions, tolerance 0.01 °C), skipped with a reason when primer3-py
+is not installed.

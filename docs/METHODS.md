@@ -249,9 +249,19 @@ Validation:
   50.554 °C (the manual uses R = 1.987).
 - Implementation cross-check against an independent implementation of the
   published equations (6 primers × 4 buffer conditions, agreement < 1e‑6 °C).
-- Not run: Primer3 or Biopython executables (not installable in the
-  development environment). Hairpin/dimer screens are heuristic and not
-  independently validated. Predicted Tm is not an annealing temperature.
+- External reference comparison (2026-11-02): primer3-py 2.4.0, which
+  wraps the Primer3 C library and shares no code with Synapse, with
+  `tm_method="santalucia"` and `salt_corrections_method="santalucia"`.
+  81 primers (the manual example and 18-25-nt windows of a fixed test
+  sequence) x 36 conditions (Na⁺ 50 and 100 mM; Mg²⁺ 0, 1.5 and 3 mM;
+  dNTP 0, 0.2 and 0.8 mM; oligo 50 and 250 nM): 2,916 comparisons,
+  max |ΔTm| 0.0032 °C, mean 0.0024 °C. The systematic offset comes from
+  the gas constant (1.98720 vs 1.987). A reduced grid runs in the suite
+  (`Primer3ReferenceComparison`, skipped without the `reference` extra).
+- Not compared: hairpin and dimer screens are heuristic and not
+  independently validated. Predicted Tm is not an annealing temperature,
+  and agreement with Primer3 shows that the equations are implemented as
+  published, not that the model predicts experiments.
 
 ## Mutation analysis (`analyses/mutation.py`)
 

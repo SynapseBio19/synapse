@@ -36,7 +36,7 @@ named.
 |---|---|---|---|
 | P1-1 | Test suite and golden master | IMPLEMENTED+TESTED | 109 tests (`unittest`, standard library); 12 golden scenarios; network and `input()` blocked in tests. |
 | P1-2 | `SequenceRecord`, `Interval`, `Feature`, `AnalysisResult`, `store_result()`, no silent `except` | IMPLEMENTED+TESTED | Every module stores visibly; coordinate tests; failures are logged. |
-| P1-3 | Mg²⁺ model, symmetry parameter, honest category labels | IMPLEMENTED (not independently validated) | von Ahsen 2001 implemented; known-answer test against the Primer3 manual example (ΔH, ΔS exact; Tm 50.550 vs 50.554 °C) and an independent re-implementation of the equations. The criterion "±1 °C against Biopython/Primer3 at three Mg levels" was not run: neither package could be installed or executed here. |
+| P1-3 | Mg²⁺ model, symmetry parameter, honest category labels | IMPLEMENTED+TESTED (external reference comparison) | von Ahsen 2001 implemented; known-answer test against the Primer3 manual example (ΔH, ΔS exact; Tm 50.550 vs 50.554 °C) and an independent re-implementation of the equations. The criterion "±1 °C against Biopython/Primer3 at three Mg levels" is met (Phase 6, 2026-11-02): against primer3-py 2.4.0 at Mg²⁺ 0, 1.5 and 3 mM, 2,916 comparisons agree within 0.0032 °C. This confirms the implementation against an independent one; it is not experimental validation of the model. |
 | P1-4 | Restriction sites across the origin (circular) | IMPLEMENTED+TESTED | Implemented and unit tested (`wraps_origin`). Phase 6: the digest was compared with Biopython `Bio.Restriction` on pUC19 (132/132 agree); the map and the other site-based results did not honor topology (audit D3) and now do, also 132/132 against Biopython (2026-10-31). The NEBcutter comparison itself was not run; Biopython's REBASE-based engine served as the independent reference. |
 | P1-5 | VCF: FILTER semantics, header cardinality A/R/G, PL/AD remapping, contig mapping, `.vcf.gz` | IMPLEMENTED+TESTED | FILTER semantics, header cardinality, PL/AD remapping and gzip implemented and tested. Contig-name matching added in Phase 6 (audit D12, 2026-10-31): exact by default, opt-in `chr_prefix` pairing of `1`/`chr1`, mitochondrial names never paired, and an unmatched contig is now flagged (`REFERENCE_CONTIG_NOT_FOUND`) instead of being skipped silently (`tests/test_phase6_tier1.py`). Not covered: contig-length checks and RefSeq accession names. |
 | P1-6 | File selection (FASTA/GenBank), topology, SHA-256 | IMPLEMENTED+TESTED | Own files load; hashes recorded in every result. |
@@ -73,7 +73,9 @@ These were not possible in the development environment and are the
 recommended next steps:
 
 1. `bcftools norm` comparison for variant normalization (P0-7).
-2. Primer3 / Biopython Tm comparison at several Mg²⁺ levels (P1-3).
+2. ~~Primer3 / Biopython Tm comparison at several Mg²⁺ levels (P1-3).~~
+   Done 2026-11-02 with primer3-py 2.4.0: 2,916 comparisons over Mg²⁺
+   0-3 mM, max |ΔTm| 0.0032 °C (`docs/METHODS.md`).
 3. NEBcutter comparison for a circular plasmid digest (P1-4).
 4. ORFfinder comparison on reference sequences (P1-9).
 5. A systematic REBASE re-check of all enzyme entries (P0-4).
