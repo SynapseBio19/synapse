@@ -79,7 +79,7 @@ simulated keystrokes (see audit §11.5).
 | GC / AT content, content ranges | `calculate_gc_content`, `calculate_at_content`, `calculate_dna_content_ranges` | Implemented | Execution-tested | Not applicable | |
 | GC / AT skew | `calculate_gc_skew`, `calculate_at_skew` | Implemented | Execution-tested | Not applicable | |
 | GC and complexity profiles | `calculate_gc_content_profile`, `calculate_complexity_profile`, `calculate_profile_statistics` | Implemented | Execution-tested | Not applicable | Window/step parameterized via `core.api`. |
-| Sequence complexity | `calculate_sequence_complexity` | Implemented | Execution-tested | Not applicable | P2-5 "rename complexity" still open. |
+| Sequence complexity | `calculate_sequence_complexity` | Implemented | Execution-tested | Not applicable | Normalized Shannon entropy of A/C/G/T composition; defined in `METHODS.md` with its limit (it does not detect repeats). P2-5: the name is kept, the meaning is now stated (2026-11-02). |
 | Homopolymer detection | `find_homopolymers` | Implemented | Execution-tested | Not applicable | |
 | CpG analysis and islands | `analyze_cpg`, `find_cpg_islands` | Implemented | Execution-tested | Not applicable | P2-6 sliding-count optimization deferred. |
 | Molecular weight (DNA) | `calculate_dna_molecular_weight`, `calculate_average_dna_molecular_weight` | Implemented | Execution-tested | Not applicable | |

@@ -331,8 +331,10 @@ def create_sequence_interpretation(
 
     statements.append(
         f"Sequence complexity is {complexity_class} "
-        f"({sequence_complexity:.3f}) based on normalized "
-        "Shannon entropy of A/T/C/G composition."
+        f"({sequence_complexity:.3f}): the normalized Shannon "
+        "entropy of A/C/G/T composition. It measures base "
+        "composition only and does not detect repeats; a tandem "
+        "repeat of all four bases scores 1.000."
     )
 
     if cpg["count"] > 0:

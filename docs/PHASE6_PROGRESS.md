@@ -93,6 +93,7 @@ IUPAC, gapped and invalid input (D14):
 | 36 | BLAST E-values with three significant figures everywhere; `n/a` when absent | `4e5dbdc` | helper assertions (the sample XML cannot distinguish) | Corrected |
 | 37 | `docs/STYLE_GUIDE.md` (9.1-9.6) with an enforcement table checked by the suite | this package | guide-consistency test verified with a deliberate violation | Done |
 | 38 | README rewritten to 15.1 (purpose, modules, installation, dependencies, usage, configuration, architecture, testing, limitations) | this package | each statement checked against the code | Done |
+| 39 | P2-5 complexity: one measure in four modules, now defined with its limit in METHODS and the interpretation; new METHODS section for the sequence overview | this package | `ACGT`x100 = 1.000 and `AT`x100 = 0.500 checked by execution | Done; field names kept |
 
 ## Paused (2026-10-31)
 

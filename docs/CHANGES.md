@@ -1607,3 +1607,23 @@ documentation set. `LEGACY/` and `Synapse_Website/` are named as not part
 of the software. Every statement was checked against the code (the four
 CRISPR systems, the default log and export directories, the variables
 read through `os.environ`).
+
+### Stage H "Sequence complexity" defined, with its limit (`analyses/sequence.py`, `docs/METHODS.md`)
+
+Audit item P2-5 asked for the "complexity" measure to be renamed. A check
+of the four modules that report it (sequence, RNA, CRISPR, mutation)
+showed that they compute one and the same quantity: the Shannon entropy
+of the A/C/G/T composition divided by 2 bits. That is a composition
+measure, and the word "complexity" suggests more: `ACGT` repeated 100
+times, a pure tandem repeat, scores the maximum of 1.000.
+
+Rather than rename field names in four modules and the golden master,
+the meaning is now stated where readers meet it:
+
+| Where | Original | Revised |
+|---|---|---|
+| sequence-overview interpretation | "Sequence complexity is high (1.000) based on normalized Shannon entropy of A/T/C/G composition." | "Sequence complexity is high (1.000): the normalized Shannon entropy of A/C/G/T composition. It measures base composition only and does not detect repeats; a tandem repeat of all four bases scores 1.000." |
+| `docs/METHODS.md` | no section for the sequence overview | new section: GC/AT content and ranges, skew formulas, the entropy definition and its limit, the Synapse class thresholds, homopolymers, CpG-island criteria (Gardiner-Garden and Frommer 1987), mass conventions, and what is and is not validated |
+
+Category: scientific accuracy. The numbers are unchanged; the
+interpretation text is not part of any golden snapshot.

@@ -86,6 +86,36 @@ use 0-based inclusive `start <= stop` on the forward strand.
   write RNA molecules in the DNA alphabet, so the letters then decide
   between DNA and RNA.
 
+## Sequence overview (`analyses/sequence.py`)
+
+- GC and AT content are percentages of the unambiguous bases. With IUPAC
+  ambiguity codes present, a minimum and maximum over every resolution of
+  the codes are reported as well.
+- GC skew = (G − C)/(G + C); AT skew = (A − T)/(A + T); 0 when the
+  denominator is 0.
+- Sequence complexity is the Shannon entropy of the A/C/G/T composition
+  divided by its maximum of 2 bits, so it runs from 0 (one base) to 1
+  (all four equally frequent). It measures composition only and does not
+  detect repeats: `ACGT` repeated 100 times scores 1.000 and `AT`
+  repeated 100 times 0.500. The classes high (≥ 0.75), moderate (≥ 0.50)
+  and low are Synapse conventions. The RNA, CRISPR and mutation modules
+  use the same measure (the mutation module as a percentage); the field
+  names keep the word "complexity" for compatibility.
+- Homopolymers: runs of at least 4 identical bases.
+- CpG islands: 200-bp windows with GC ≥ 50% and an observed/expected CpG
+  ratio ≥ 0.60, where expected = C·G/window length (the criteria of
+  Gardiner-Garden and Frommer 1987).
+- Molecular mass: composition-based sums of nucleotide residue masses
+  for single- and double-stranded DNA, with a range for ambiguous bases;
+  the average estimate uses 660 Da per bp. Calculators differ in their
+  residue-mass and terminal-group conventions, so the value is an
+  estimate.
+- Validation: the module self-test (`run_sequence_self_test`, run by the
+  suite) checks counts, content, skew, entropy, CpG count, IUPAC ranges
+  and the average mass on small constructed sequences, and the golden
+  master guards the outputs. CpG-island windows and the residue masses
+  are not compared with an external tool (not independently validated).
+
 ## ORF search (`analyses/orf.py`)
 
 | Parameter | Default | Alternatives |
