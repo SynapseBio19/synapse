@@ -841,10 +841,10 @@ def calculate_cds_quality(
 
 
 # ============================================================
-# ORF CONFIDENCE
+# ORF HEURISTIC SCORE
 # ============================================================
 
-def calculate_orf_confidence(
+def calculate_orf_heuristic_score(
     orf
 ):
 
@@ -937,6 +937,11 @@ def calculate_orf_confidence(
     }
 
 
+# Former name, kept so existing callers keep working (D18). The value is a
+# heuristic ranking score, not a confidence or a probability.
+calculate_orf_confidence = calculate_orf_heuristic_score
+
+
 # ============================================================
 # ORF FINDER
 # ============================================================
@@ -957,7 +962,7 @@ def resolve_start_codons(start_codons=None, start_codon_policy=None):
 def _orf_sort_key(orf, ranking):
     if ranking == "heuristic":
         return (
-            orf["confidence"]["score"],
+            orf["heuristic_score"]["score"],
             orf["cds_quality"]["score"],
             orf["length"],
             orf["status"] == "Complete",
@@ -969,7 +974,7 @@ def _orf_sort_key(orf, ranking):
         orf["length"],
         orf["status"] == "Complete",
         orf["start_type"] == "Canonical",
-        orf["confidence"]["score"],
+        orf["heuristic_score"]["score"],
     )
 
 
@@ -1010,7 +1015,7 @@ def find_orfs(
         True: report every in-frame start as its own (nested) ORF.
     ranking:
         "length" (default, longest first) or "heuristic" (legacy
-        confidence score).
+        heuristic score).
 
     Coordinates in the result are 0-based and inclusive on the forward
     strand ("start" <= "stop"), for both strands.
@@ -1330,8 +1335,8 @@ def find_orfs(
                                 )
                             )
 
-                            orf["confidence"] = (
-                                calculate_orf_confidence(
+                            orf["heuristic_score"] = (
+                                calculate_orf_heuristic_score(
                                     orf
                                 )
                             )
@@ -1528,8 +1533,8 @@ def find_orfs(
                                     )
                                 )
 
-                                orf["confidence"] = (
-                                    calculate_orf_confidence(
+                                orf["heuristic_score"] = (
+                                    calculate_orf_heuristic_score(
                                         orf
                                     )
                                 )
@@ -2183,8 +2188,8 @@ def print_orf_report(
 
         print(
             f"Heuristic score:     "
-            f"{orf['confidence']['score']}/100 "
-            f"({orf['confidence']['classification']})"
+            f"{orf['heuristic_score']['score']}/100 "
+            f"({orf['heuristic_score']['classification']})"
         )
 
         print(
@@ -2525,7 +2530,7 @@ def print_orf_report(
     )
 
     print(
-        "Confidence and CDS quality scores are heuristic "
+        "Heuristic and CDS quality scores are "
         "ranking systems, not experimental evidence."
     )
 
@@ -2669,8 +2674,8 @@ def compare_orf_candidates(orfs, top_n=5, ranking=None):
             "protein_length": orf["protein_length"],
             "start_codon": orf["start_codon"],
             "status": orf["status"],
-            "confidence_score": orf["confidence"]["score"],
-            "confidence_classification": orf["confidence"]["classification"],
+            "heuristic_score": orf["heuristic_score"]["score"],
+            "heuristic_classification": orf["heuristic_score"]["classification"],
             "cds_quality_score": orf["cds_quality"]["score"],
             "cds_quality_classification": orf["cds_quality"]["classification"],
             "translation_safe": orf["translation_safe"],
@@ -2767,7 +2772,7 @@ def analyze_selected_orf(orf):
         "sequence": orf["sequence"],
         "protein_sequence": protein,
         "protein_length": len(protein),
-        "confidence": orf["confidence"],
+        "heuristic_score": orf["heuristic_score"],
         "cds_quality": orf["cds_quality"],
         "start_context": orf["start_context"],
         "codon_usage": orf["codon_usage"],
@@ -2783,20 +2788,20 @@ def calculate_orf_feature_summary(orfs):
     """Summarize high-value candidate features without claiming function."""
     if not orfs:
         return {
-            "high_confidence": 0,
-            "moderate_confidence": 0,
-            "low_confidence": 0,
+            "high_heuristic_score": 0,
+            "moderate_heuristic_score": 0,
+            "low_heuristic_score": 0,
             "canonical_complete": 0,
             "alternative_complete": 0,
             "translation_safe_fraction": 0.0,
         }
 
     high = sum(
-        orf["confidence"]["classification"] == "High"
+        orf["heuristic_score"]["classification"] == "High"
         for orf in orfs
     )
     moderate = sum(
-        orf["confidence"]["classification"] == "Moderate"
+        orf["heuristic_score"]["classification"] == "Moderate"
         for orf in orfs
     )
     low = len(orfs) - high - moderate
@@ -2817,9 +2822,9 @@ def calculate_orf_feature_summary(orfs):
     )
 
     return {
-        "high_confidence": high,
-        "moderate_confidence": moderate,
-        "low_confidence": low,
+        "high_heuristic_score": high,
+        "moderate_heuristic_score": moderate,
+        "low_heuristic_score": low,
         "canonical_complete": canonical_complete,
         "alternative_complete": alternative_complete,
         "translation_safe_fraction": translation_safe_fraction,
@@ -2896,7 +2901,7 @@ def print_orf_candidate_comparison(orfs, top_n=5):
             f"{candidate['protein_length']} aa | "
             f"{candidate['start_codon']} | "
             f"{candidate['status']} | "
-            f"Heuristic {candidate['confidence_score']}/100 | "
+            f"Heuristic {candidate['heuristic_score']}/100 | "
             f"CDS {candidate['cds_quality_score']}/100"
         )
 
@@ -2952,8 +2957,8 @@ def print_orf_summary_card(analysis):
     if top:
         print(f"Best candidate:        ORF #{top['rank']}")
         print(
-            f"Heuristic score:       {top['confidence']['score']}/100 "
-            f"({top['confidence']['classification']})"
+            f"Heuristic score:       {top['heuristic_score']['score']}/100 "
+            f"({top['heuristic_score']['classification']})"
         )
         print(
             f"CDS quality:           {top['cds_quality']['score']}/100 "
@@ -3001,7 +3006,7 @@ def print_orf_candidates(orfs, top_n=None):
             f"{orf['protein_length']} aa{'':<5}"
             f"{orf['start_codon']:<8}"
             f"{_orf_status_label(orf):<24}"
-            f"{orf['confidence']['score']}/100"
+            f"{orf['heuristic_score']['score']}/100"
         )
 
 
@@ -3024,8 +3029,8 @@ def print_orf_candidate_details(orf):
     print("\nQuality")
     print(minor_rule())
     print(
-        f"Heuristic score:       {orf['confidence']['score']}/100 "
-        f"({orf['confidence']['classification']})"
+        f"Heuristic score:       {orf['heuristic_score']['score']}/100 "
+        f"({orf['heuristic_score']['classification']})"
     )
     print(
         f"CDS quality:           {orf['cds_quality']['score']}/100 "
@@ -3084,7 +3089,7 @@ def print_orf_comparison_table(orfs, top_n=5):
         ("Protein", lambda c: f"{c['protein_length']} aa"),
         ("Start codon", lambda c: c["start_codon"]),
         ("Status", lambda c: c["status"]),
-        ("Heuristic score", lambda c: f"{c['confidence_score']}/100"),
+        ("Heuristic score", lambda c: f"{c['heuristic_score']}/100"),
         ("CDS quality", lambda c: f"{c['cds_quality_score']}/100"),
         (
             "Translation safe",
@@ -3166,7 +3171,7 @@ def select_orf(orfs):
             f"{orf['protein_length']} aa | "
             f"{orf['start_codon']} | "
             f"{orf['status']} | "
-            f"Heuristic {orf['confidence']['score']}/100"
+            f"Heuristic {orf['heuristic_score']['score']}/100"
         )
 
     print("\n[0] Back")
@@ -3198,7 +3203,7 @@ def select_orf(orfs):
                 print(f"Status:                {selected['status']}")
                 print(
                     f"Heuristic score:       "
-                    f"{selected['confidence']['score']}/100"
+                    f"{selected['heuristic_score']['score']}/100"
                 )
                 print(
                     f"CDS quality:           "

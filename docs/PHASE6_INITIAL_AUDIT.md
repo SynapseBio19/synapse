@@ -552,7 +552,7 @@ use `[0] Cancel` in sub-dialogs and `[0] Back` in menus; letter keys
 selector.
 
 ### D18 – Exported results still carry the "confidence" vocabulary
-**`analyses/orf.py:810`, exports** · CONFIRMED · editorial / scientific
+**`analyses/orf.py:810`, exports** · CONFIRMED · editorial / scientific · **corrected 2026-11-02 (Opus 5.5)**: the value is `heuristic_score` in data and exports; see `docs/CHANGES.md` Stage G
 
 P2-5 renamed the displayed ORF label from "Confidence" to "Heuristic
 score", but the data model and every export still use the old vocabulary:

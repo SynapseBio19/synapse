@@ -1863,7 +1863,7 @@ def get_cloning_compatible_sites(
     vector_topology="linear",
     insert_topology="linear",
 ):
-    """Restriction-to-Cloning handoff with explicit site confidence."""
+    """Restriction-to-Cloning handoff with explicit confirmed-site counts."""
     vector = analyze_enzyme(
         vector_sequence,
         enzyme_name,

@@ -1386,7 +1386,7 @@ def _score_strategy(
         else 0
     )
 
-    components["metadata_confidence"] = (
+    components["compatibility_metadata"] = (
         10
         if validity[
             "compatibility_known"

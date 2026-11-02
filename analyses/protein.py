@@ -1992,7 +1992,7 @@ def predict_signal_peptide(
 
         return {
             "predicted": False,
-            "confidence": "low",
+            "evidence": "low",
             "reason": "Sequence too short for a meaningful signal-peptide screen.",
             "hydrophobic_core": None,
             "cleavage_site": None,
@@ -2069,7 +2069,7 @@ def predict_signal_peptide(
 
         return {
             "predicted": False,
-            "confidence": "low",
+            "evidence": "low",
             "reason": (
                 "No convincing N-terminal hydrophobic core "
                 "was detected."
@@ -2126,7 +2126,7 @@ def predict_signal_peptide(
 
         return {
             "predicted": False,
-            "confidence": "low",
+            "evidence": "low",
             "reason": (
                 "N-terminal hydrophobic core detected, "
                 "but no plausible cleavage-site pattern "
@@ -2149,7 +2149,7 @@ def predict_signal_peptide(
             )
     )
 
-    confidence = (
+    evidence = (
         "moderate"
         if hydrophobic_core["score"] >= 1.8
         else "low"
@@ -2157,7 +2157,7 @@ def predict_signal_peptide(
 
     return {
         "predicted": True,
-        "confidence": confidence,
+        "evidence": evidence,
         "reason": (
             "N-terminal hydrophobic core and a plausible "
             "-3/-1 cleavage-site pattern were detected."
@@ -3165,8 +3165,8 @@ def print_protein_report(
         )
 
         print(
-            f"Confidence:          "
-            f"{signal['confidence']}"
+            f"Heuristic evidence:  "
+            f"{signal['evidence']}"
         )
 
         core = signal.get(
@@ -4291,8 +4291,8 @@ def _print_physicochemical_structural(analysis):
         )
 
         print(
-            f"Confidence label:    "
-            f"{signal['confidence']}"
+            f"Heuristic evidence:  "
+            f"{signal['evidence']}"
         )
     else:
         print(

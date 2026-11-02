@@ -1336,3 +1336,56 @@ without the guard, setting the limits explicitly through `xml.parsers.expat`
 is the dependency-free hardening.
 
 Tests: 4 new (`XmlParsingExposureTests`).
+
+## Phase 6 - Stage G: scientific output standardization (2026-11-02)
+
+### D18 Heuristic scores are no longer called "confidence" (`analyses/orf.py`, `analyses/protein.py`, `analyses/cloning.py`, `analyses/primer.py`)
+
+The ORF display was relabelled "Heuristic score" in Stage 1, but the data
+model and every export still called the value `confidence`, a word that
+implies a probability. The value is a sum of fixed points (complete ORF
++25, ATG +20, length bands, translation safety, ambiguous codons, Kozak,
+Shine-Dalgarno), clipped to 0-100. It ranks candidates; it does not
+estimate how likely a candidate is to be coding.
+
+| Where | Before | After |
+|---|---|---|
+| ORF record | `orf["confidence"] = {"score", "classification"}` | `orf["heuristic_score"] = {"score", "classification"}` |
+| Scoring function | `calculate_orf_confidence` | `calculate_orf_heuristic_score`; the former name stays as an alias |
+| `compare_orf_candidates` rows | `confidence_score`, `confidence_classification` | `heuristic_score`, `heuristic_classification` |
+| `calculate_orf_feature_summary` | `high_confidence`, `moderate_confidence`, `low_confidence` | `high_heuristic_score`, `moderate_heuristic_score`, `low_heuristic_score` |
+| ORF interpretation note | "Confidence and CDS quality scores are heuristic ranking systems" | "Heuristic and CDS quality scores are ranking systems" |
+| Signal-peptide screen | `"confidence": "low"/"moderate"`, printed as "Confidence:" / "Confidence label:" | `"evidence": "low"/"moderate"`, printed as "Heuristic evidence:" |
+| Cloning plan score component | `metadata_confidence` | `compatibility_metadata` (it awards 10 points when the end compatibility is known) |
+| Primer warning when every pair is MARGINAL or POOR | "No high-confidence primer pair was found ..." | "Every reported primer pair is rated MARGINAL or POOR ..." |
+
+Values, bands, thresholds and ranking are unchanged. Only names changed.
+
+**Golden master (§11.7).** `tests/golden/orf.json` and
+`tests/golden/orf_legacy_baseline.json` stored the score under the key
+`confidence` (6 and 23 occurrences). The key is now `heuristic_score`.
+The snapshots were rewritten by renaming that key and nothing else; with
+the key mapped back, both files are identical to the previous version,
+and the unmodified test then confirmed that the code produces exactly the
+renamed files. The large line count of the diff comes from the snapshot
+writer's sorted keys: the renamed key moves from between `cds_quality` and
+`frame` to between `frame` and `length`.
+
+| Snapshot | SHA-256 before | Keys renamed |
+|---|---|---|
+| `orf.json` | `e5fe5dd9...5037a672` | 6 |
+| `orf_legacy_baseline.json` | `67fef456...56d77627` | 23 |
+
+**Compatibility.** Code that reads `orf["confidence"]` or the old
+comparison and summary keys must use the new names; no alias is kept in
+the data, because an alias would put the misleading word back into every
+export. The function name is aliased because an alias there does not
+reach any output.
+
+Unchanged on purpose: docstrings that say a value is *not* a statistical
+confidence (BLAST evidence profile, literature relevance score, protein
+sequence-applicability label) use the word correctly.
+
+Tests: 5 new (`HeuristicScoreVocabularyTests`), each confirmed to fail on
+the previous code. One of them checks every string literal used as a
+dictionary key or subscript in `analyses/` for the word.

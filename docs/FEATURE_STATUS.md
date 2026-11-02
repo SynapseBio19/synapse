@@ -100,7 +100,7 @@ relative to its use (every session runs it).
 |---|---|---|---|---|---|---|
 | 1 | ORF Discovery | `find_orfs`, `analyze_orfs`, `analyze_orfs_enhanced` | Implemented | Execution-tested | Independently validated (codes, coordinates) | Both strands, 3 frames each. |
 | 2 | ORF Candidates | `print_orf_candidates`, `print_orf_candidate_details` | Implemented | Reachable | Not applicable | |
-| 3 | Compare ORFs | `compare_orf_candidates`, `print_orf_comparison_table` | Implemented | Execution-tested | Not applicable | **D18** exposes `confidence_*` keys. |
+| 3 | Compare ORFs | `compare_orf_candidates`, `print_orf_comparison_table` | Implemented | Execution-tested | Not applicable | Rows carry `heuristic_score` and `heuristic_classification` (**D18 corrected 2026-11-02**). |
 | 4 | ORF Relationships | `analyze_orf_relationships` | Implemented | Execution-tested | Not applicable | Overlap/nesting by coordinates only, correctly disclaimed. |
 | 5 | Select ORF | `select_orf`, `analyze_selected_orf` | Implemented | Integration-tested | Not applicable | Hands over to RNA, protein, CRISPR, BLAST. |
 | 6.1 | Minimum ORF length | `_orf_settings_menu` | Implemented | Execution-tested | Not applicable | Default 75 nt incl. stop; any value ≥ 3. |
@@ -115,10 +115,10 @@ relative to its use (every session runs it).
 | — | Codon usage, diversity, GC3 | `analyze_codon_usage`, `calculate_codon_diversity` | Implemented | Execution-tested | Not applicable | |
 | — | Kozak context | `analyze_kozak_context` | Implemented | Execution-tested | Not applicable | **S1** strand-local coordinate frame. Simplified 3-position heuristic. |
 | — | Shine–Dalgarno screen | `analyze_shine_dalgarno` | Implemented | Execution-tested | Not applicable | Fixed motif list, no energy model. |
-| — | CDS quality, heuristic score | `calculate_cds_quality`, `calculate_orf_confidence` | Implemented | Execution-tested | Not applicable | **D18**. |
+| — | CDS quality, heuristic score | `calculate_cds_quality`, `calculate_orf_heuristic_score` | Implemented | Execution-tested | Not applicable | **D18 corrected 2026-11-02**: stored as `orf["heuristic_score"]`; `calculate_orf_confidence` remains as an alias of the former name. A ranking aid, not a probability. |
 | — | ORF density, frame statistics | `calculate_orf_density`, `calculate_frame_statistics` | Implemented | Execution-tested | Not applicable | |
 | — | ORF translation | `translate_orf_sequence`, `initiation_codons`, `is_initiation_codon` | Implemented | Execution-tested | **Independently validated** (Biopython, tables 1/2/4/11) | **D1 corrected 2026-10-31**: initiator Met only for initiation codons of the genetic code (table 1: ATG/CTG/GTG/TTG); internal codons use the elongation code. **D2 corrected 2026-10-31**: accepts the ORF dict and uses its `genetic_code`; a conflicting table raises; a bare string defaults to table 1. Agrees with `core.api` for every ORF found in tables 1/2/4/11. |
-| — | Start-codon classification and scores | `classify_start_codon`, `calculate_cds_quality`, `calculate_orf_confidence` | Partially implemented | Execution-tested | Not applicable | **S19**: still use the fixed ATG/GTG/TTG set — a CTG ORF is classified "None" and scores 10 points lower than an equivalent GTG ORF. |
+| — | Start-codon classification and scores | `classify_start_codon`, `calculate_cds_quality`, `calculate_orf_heuristic_score` | Implemented | Execution-tested | Not applicable | **S19 corrected 2026-10-31**: all three use the initiation codons of the ORF's genetic code, so a CTG ORF found with `table_starts` is classified and scored like an equivalent GTG ORF. |
 | — | Circular / origin-spanning ORFs | — | **Not implemented** | Not applicable | Not applicable | `core.api.find_orfs` adds a limitation note for circular records. |
 
 Test coverage: 19 test references — the best-covered module.

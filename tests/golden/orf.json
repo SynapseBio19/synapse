@@ -2,8 +2,8 @@
  "TEST_8_REFERENCE": [
   {
    "cds_quality": 60,
-   "confidence": 60,
    "frame": 1,
+   "heuristic_score": 60,
    "length": 99,
    "protein_length": 33,
    "rank": 1,
@@ -19,8 +19,8 @@
  "TEST_8_REVERSE": [
   {
    "cds_quality": 60,
-   "confidence": 60,
    "frame": -1,
+   "heuristic_score": 60,
    "length": 99,
    "protein_length": 33,
    "rank": 1,
@@ -38,8 +38,8 @@
  "random600_top5": [
   {
    "cds_quality": 80,
-   "confidence": 75,
    "frame": 1,
+   "heuristic_score": 75,
    "length": 114,
    "protein_length": 37,
    "rank": 1,
@@ -53,8 +53,8 @@
   },
   {
    "cds_quality": 80,
-   "confidence": 75,
    "frame": -1,
+   "heuristic_score": 75,
    "length": 108,
    "protein_length": 35,
    "rank": 2,
@@ -68,8 +68,8 @@
   },
   {
    "cds_quality": 80,
-   "confidence": 78,
    "frame": 1,
+   "heuristic_score": 78,
    "length": 87,
    "protein_length": 28,
    "rank": 3,
@@ -83,8 +83,8 @@
   },
   {
    "cds_quality": 80,
-   "confidence": 75,
    "frame": 2,
+   "heuristic_score": 75,
    "length": 87,
    "protein_length": 28,
    "rank": 4,

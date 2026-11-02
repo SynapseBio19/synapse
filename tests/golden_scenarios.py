@@ -32,7 +32,7 @@ def _orf_view(orf):
     keys = ("rank", "strand", "frame", "start", "stop", "length", "protein_length",
             "start_codon", "stop_codon", "status", "sequence")
     view = {k: orf.get(k) for k in keys}
-    view["confidence"] = orf["confidence"]["score"]
+    view["heuristic_score"] = orf["heuristic_score"]["score"]
     view["cds_quality"] = orf["cds_quality"]["score"]
     return view
 

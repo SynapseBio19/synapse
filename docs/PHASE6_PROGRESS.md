@@ -84,6 +84,7 @@ IUPAC, gapped and invalid input (D14):
 
 | 28 | Stage F: one separator width through `ui/style.py` (11 -> 1); `[0]` means Back/Cancel/Exit only (7 -> 3); uniform message prefixes; `TERMINAL_UI_STANDARD.md`; enforcement tests | `5db21ab` + this package | interface inventory before and after; enforcement tests verified against deliberate violations | D17 corrected; suite 277/277 |
 | 29 | Stage F: BLAST menu renumbered so SEARCH reads 1-4 instead of 1, 2, 3, 14; numbering rule documented and enforced | this package | each branch checked against its new label; contiguity test for the BLAST and main menus | Corrected; suite 279/279 |
+| 30 | D18 heuristic scores renamed from "confidence" in data, exports and messages (ORF, signal-peptide screen, cloning score component, primer warning); golden key renamed with values proven identical | this package | golden before/after hashes; key-mapped-back equality; unmodified golden test; new tests fail on the previous code | Corrected; suite 288/288 |
 
 ## Paused (2026-10-31)
 

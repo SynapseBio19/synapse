@@ -993,5 +993,79 @@ class XmlParsingExposureTests(unittest.TestCase):
         self.assertIsNotNone(query)
 
 
+# ----------------------------------------------------------------------
+# D18: heuristic scores are not called "confidence" in data or exports
+# ----------------------------------------------------------------------
+def _confidence_keys(value, path="$"):
+    """Every dictionary key below ``value`` that contains "confidence"."""
+    found = []
+    if isinstance(value, dict):
+        for key, item in value.items():
+            if "confidence" in str(key).lower():
+                found.append(f"{path}.{key}")
+            found.extend(_confidence_keys(item, f"{path}.{key}"))
+    elif isinstance(value, (list, tuple)):
+        for index, item in enumerate(value):
+            found.extend(_confidence_keys(item, f"{path}[{index}]"))
+    return found
+
+
+def _literal_keys_containing(word, directories):
+    """String literals used as dict keys or subscripts that contain ``word``."""
+    import ast
+    hits = []
+    for directory in directories:
+        for path in sorted((PROJECT_ROOT / directory).glob("*.py")):
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            for node in ast.walk(tree):
+                keys = []
+                if isinstance(node, ast.Dict):
+                    keys = [k for k in node.keys if k is not None]
+                elif isinstance(node, ast.Subscript):
+                    keys = [node.slice]
+                for key in keys:
+                    if (isinstance(key, ast.Constant) and isinstance(key.value, str)
+                            and word in key.value.lower()):
+                        hits.append(f"{directory}/{path.name}:{key.lineno} {key.value!r}")
+    return hits
+
+
+class HeuristicScoreVocabularyTests(unittest.TestCase):
+    def test_orf_results_carry_no_confidence_key(self):
+        from analyses import orf as O
+        from tests.golden_scenarios import RANDOM_600
+        result = O.analyze_orfs_enhanced(RANDOM_600)
+        self.assertGreater(result["candidate_count"], 0)
+        self.assertEqual(_confidence_keys(result), [])
+        orf = result["orfs"][0]
+        self.assertEqual(set(orf["heuristic_score"]), {"score", "classification"})
+        self.assertEqual(_confidence_keys(O.analyze_selected_orf(orf)), [])
+
+    def test_comparison_rows_and_summary_use_heuristic_names(self):
+        from analyses import orf as O
+        from tests.golden_scenarios import RANDOM_600
+        orfs = O.analyze_orfs_enhanced(RANDOM_600)["orfs"]
+        row = O.compare_orf_candidates(orfs, top_n=1)[0]
+        self.assertEqual((row["heuristic_score"], row["heuristic_classification"]),
+                         (orfs[0]["heuristic_score"]["score"],
+                          orfs[0]["heuristic_score"]["classification"]))
+        summary = O.calculate_orf_feature_summary(orfs)
+        self.assertEqual(summary["high_heuristic_score"] + summary["moderate_heuristic_score"]
+                         + summary["low_heuristic_score"], len(orfs))
+
+    def test_former_function_name_still_works(self):
+        from analyses import orf as O
+        self.assertIs(O.calculate_orf_confidence, O.calculate_orf_heuristic_score)
+
+    def test_signal_peptide_screen_reports_evidence(self):
+        from analyses import protein as P
+        signal = P.predict_signal_peptide("MKLLLLAAALLLLACSSA" + "K" * 20)
+        self.assertIn(signal["evidence"], ("low", "moderate"))
+        self.assertNotIn("confidence", signal)
+
+    def test_no_confidence_literal_keys_in_analyses(self):
+        self.assertEqual(_literal_keys_containing("confidence", ("analyses",)), [])
+
+
 if __name__ == "__main__":
     unittest.main()

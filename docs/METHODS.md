@@ -108,7 +108,11 @@ use 0-based inclusive `start <= stop` on the forward strand.
   and `core.api.analyze_protein_from_cds` accept the ORF dict and read its
   `genetic_code` (a conflicting explicit table is an error). A bare DNA
   string defaults to table 1.
-- The "heuristic score" is a ranking aid, not a probability of coding.
+- The "heuristic score" (`orf["heuristic_score"]`, 0-100 with a
+  High/Moderate/Low/Very Low band) is a ranking aid, not a probability of
+  coding. It adds fixed points for completeness, start codon, length,
+  translation safety, ambiguous codons, Kozak context and a
+  Shine-Dalgarno match; the weights are Synapse conventions.
 - Not implemented: 5′-partial ORFs without a start codon, ORFs across the
   origin of circular sequences.
 - Validation: known-answer tests for frames, strands, coordinates and the

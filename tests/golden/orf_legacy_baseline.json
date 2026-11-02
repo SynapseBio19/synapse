@@ -2,8 +2,8 @@
  "TEST_8_REFERENCE": [
   {
    "cds_quality": 70,
-   "confidence": 71,
    "frame": 2,
+   "heuristic_score": 71,
    "length": 36,
    "protein_length": 11,
    "rank": 1,
@@ -17,8 +17,8 @@
   },
   {
    "cds_quality": 70,
-   "confidence": 68,
    "frame": 2,
+   "heuristic_score": 68,
    "length": 45,
    "protein_length": 14,
    "rank": 2,
@@ -32,8 +32,8 @@
   },
   {
    "cds_quality": 70,
-   "confidence": 65,
    "frame": 2,
+   "heuristic_score": 65,
    "length": 33,
    "protein_length": 10,
    "rank": 3,
@@ -47,8 +47,8 @@
   },
   {
    "cds_quality": 70,
-   "confidence": 65,
    "frame": 2,
+   "heuristic_score": 65,
    "length": 18,
    "protein_length": 5,
    "rank": 4,
@@ -62,8 +62,8 @@
   },
   {
    "cds_quality": 70,
-   "confidence": 65,
    "frame": 2,
+   "heuristic_score": 65,
    "length": 12,
    "protein_length": 3,
    "rank": 5,
@@ -77,8 +77,8 @@
   },
   {
    "cds_quality": 60,
-   "confidence": 60,
    "frame": 1,
+   "heuristic_score": 60,
    "length": 99,
    "protein_length": 33,
    "rank": 6,
@@ -94,8 +94,8 @@
  "TEST_8_REVERSE": [
   {
    "cds_quality": 70,
-   "confidence": 71,
    "frame": -2,
+   "heuristic_score": 71,
    "length": 36,
    "protein_length": 11,
    "rank": 1,
@@ -109,8 +109,8 @@
   },
   {
    "cds_quality": 70,
-   "confidence": 68,
    "frame": -2,
+   "heuristic_score": 68,
    "length": 45,
    "protein_length": 14,
    "rank": 2,
@@ -124,8 +124,8 @@
   },
   {
    "cds_quality": 70,
-   "confidence": 65,
    "frame": -2,
+   "heuristic_score": 65,
    "length": 33,
    "protein_length": 10,
    "rank": 3,
@@ -139,8 +139,8 @@
   },
   {
    "cds_quality": 70,
-   "confidence": 65,
    "frame": -2,
+   "heuristic_score": 65,
    "length": 18,
    "protein_length": 5,
    "rank": 4,
@@ -154,8 +154,8 @@
   },
   {
    "cds_quality": 70,
-   "confidence": 65,
    "frame": -2,
+   "heuristic_score": 65,
    "length": 12,
    "protein_length": 3,
    "rank": 5,
@@ -169,8 +169,8 @@
   },
   {
    "cds_quality": 60,
-   "confidence": 60,
    "frame": -1,
+   "heuristic_score": 60,
    "length": 99,
    "protein_length": 33,
    "rank": 6,
@@ -186,8 +186,8 @@
  "TEST_8_SNP_NONSENSE": [
   {
    "cds_quality": 80,
-   "confidence": 75,
    "frame": 1,
+   "heuristic_score": 75,
    "length": 45,
    "protein_length": 14,
    "rank": 1,
@@ -201,8 +201,8 @@
   },
   {
    "cds_quality": 70,
-   "confidence": 71,
    "frame": 2,
+   "heuristic_score": 71,
    "length": 36,
    "protein_length": 11,
    "rank": 2,
@@ -216,8 +216,8 @@
   },
   {
    "cds_quality": 70,
-   "confidence": 68,
    "frame": 2,
+   "heuristic_score": 68,
    "length": 45,
    "protein_length": 14,
    "rank": 3,
@@ -231,8 +231,8 @@
   },
   {
    "cds_quality": 70,
-   "confidence": 65,
    "frame": 2,
+   "heuristic_score": 65,
    "length": 33,
    "protein_length": 10,
    "rank": 4,
@@ -246,8 +246,8 @@
   },
   {
    "cds_quality": 70,
-   "confidence": 65,
    "frame": 2,
+   "heuristic_score": 65,
    "length": 18,
    "protein_length": 5,
    "rank": 5,
@@ -261,8 +261,8 @@
   },
   {
    "cds_quality": 70,
-   "confidence": 65,
    "frame": 2,
+   "heuristic_score": 65,
    "length": 12,
    "protein_length": 3,
    "rank": 6,
@@ -279,8 +279,8 @@
  "random600_top5": [
   {
    "cds_quality": 80,
-   "confidence": 81,
    "frame": -2,
+   "heuristic_score": 81,
    "length": 45,
    "protein_length": 14,
    "rank": 1,
@@ -294,8 +294,8 @@
   },
   {
    "cds_quality": 80,
-   "confidence": 81,
    "frame": 1,
+   "heuristic_score": 81,
    "length": 36,
    "protein_length": 11,
    "rank": 2,
@@ -309,8 +309,8 @@
   },
   {
    "cds_quality": 80,
-   "confidence": 81,
    "frame": -2,
+   "heuristic_score": 81,
    "length": 33,
    "protein_length": 10,
    "rank": 3,
@@ -324,8 +324,8 @@
   },
   {
    "cds_quality": 80,
-   "confidence": 78,
    "frame": 1,
+   "heuristic_score": 78,
    "length": 87,
    "protein_length": 28,
    "rank": 4,
@@ -339,8 +339,8 @@
   },
   {
    "cds_quality": 80,
-   "confidence": 78,
    "frame": -1,
+   "heuristic_score": 78,
    "length": 87,
    "protein_length": 28,
    "rank": 5,

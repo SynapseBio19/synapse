@@ -5108,7 +5108,7 @@ def design_primers_professional(
         warnings.append("Salt-adjusted Tm is an empirical screening estimate; Mg2+, dNTP and sequence-specific thermodynamics are not fully represented by this model.")
 
     if ranked_pairs and all(x.pair.category in {"MARGINAL", "POOR"} for x in ranked_pairs):
-        warnings.append("No high-confidence primer pair was found under the current structural and thermodynamic criteria; the reported pairs are best-effort alternatives and should not be treated as validated designs.")
+        warnings.append("Every reported primer pair is rated MARGINAL or POOR under the current structural and thermodynamic criteria; these pairs are best-effort alternatives and should not be treated as validated designs.")
 
     return ProfessionalPrimerDesignReport(
         sequence_length=len(sequence),
