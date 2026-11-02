@@ -1235,6 +1235,21 @@ class SpellingStandardTests(unittest.TestCase):
                             for m in pattern.finditer(line))
         self.assertEqual(hits, [])
 
+    def test_style_guide_names_only_tests_that_exist(self):
+        import re
+        guide = (PROJECT_ROOT / "docs" / "STYLE_GUIDE.md").read_text(encoding="utf-8")
+        enforcement = guide.split("## 8. Enforcement", 1)[1]
+        named = set(re.findall(r"`((?:[A-Z]\w+Tests)(?:\.test_\w+)?)`", enforcement))
+        self.assertTrue(named)
+        missing = []
+        for name in sorted(named):
+            class_name, _, method = name.partition(".")
+            cls = globals().get(class_name)
+            if cls is None or (method and not hasattr(cls, method)):
+                missing.append(name)
+        self.assertEqual(missing, [])
+        self.assertTrue((PROJECT_ROOT / "tests" / "test_terminal_ui.py").exists())
+
 
 if __name__ == "__main__":
     unittest.main()

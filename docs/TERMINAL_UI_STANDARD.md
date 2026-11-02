@@ -7,6 +7,9 @@ interface. It is implemented in `ui/style.py` and enforced by
 Scope: the terminal interface only. Synapse has no graphical or web
 interface, and Phase 6 does not add one.
 
+The wider communication standard (terminology, units, scientific
+writing, code documentation) is [`STYLE_GUIDE.md`](STYLE_GUIDE.md).
+
 ## 1. Why this exists
 
 Before Stage F each component drew its own frame. A mechanical inventory

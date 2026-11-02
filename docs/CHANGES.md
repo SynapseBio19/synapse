@@ -1565,3 +1565,25 @@ The bundled sample XML has E-value `1e-25`, which both notations print
 the same way, so the report part of the test does not distinguish old
 from new output; the helper's own assertions (`1.234567e-50` ->
 `1.23e-50`, `None` -> `n/a`) do.
+
+### Stage H `docs/STYLE_GUIDE.md`
+
+New permanent reference (Master Prompt section 9): language and spelling,
+preferred scientific terms (with "confidence" reserved for statistical
+confidence), abbreviations, sequence and variant notation, units,
+precision, coordinate conventions, the measured / calculated / predicted /
+inferred distinction with Synapse examples, the structure of an
+interpretation, message categories and wording patterns for recurring
+situations, a summary of the terminal standard, and code documentation
+rules.
+
+Every rule in it was taken from the implementation as it now stands, and
+writing it surfaced two deviations: the BLAST E-value notation (corrected
+above) and the HGVS convention of parentheses for predicted protein
+consequences, which Synapse does not follow; the guide records that as
+open rather than claiming it.
+
+Its enforcement table names the test for each mechanical rule, and a new
+test (`test_style_guide_names_only_tests_that_exist`) fails if the guide
+names a test that does not exist, so the table cannot go stale; checked
+with a deliberately misspelled test name.
