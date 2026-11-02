@@ -1692,3 +1692,38 @@ without the reference libraries).
   table, and a known-answer test for IG that needs no Biopython
   (`AIGA` = 10/4 × (1.0 + 1.0 − 7.49)). On the previous code 20 protein
   subtests, the table test and the known-answer test fail.
+
+### Integration workflows (Master Prompt 10.1-10.4, 10.7, 10.8)
+
+`tests/test_integration_workflows.py` (new, 7 tests) runs complete
+workflows through `core.pipeline` and `core.api` instead of single
+functions:
+
+- **10.1** A minus-strand ORF flows from detection to selection, RNA and
+  protein: its forward-strand coordinates point at the CDS, the RNA is
+  the CDS with U, the protein is `MAAAAAAAAAAWKKKKKKKKKK`, and exactly one
+  result per module is stored. With NCBI table 2 the internal TGA is read
+  as Trp all the way to the protein. Selecting another ORF removes the
+  RNA and protein results, the cached sequences and their report entries.
+- **10.2** A restriction analysis and a primer design on the same
+  sequence share one coordinate frame (EcoRI cut after base 241; every
+  primer, reverse primer and amplicon equals its slice of the template),
+  and the report carries both with their parameters and the primer
+  warnings.
+- **10.3** CRISPR guides for a selected ORF lie inside it, match the DNA
+  at their 1-based coordinates on either strand, and have their modeled
+  cut inside the protospacer; the result records the restriction to the
+  ORF and the genome limitation.
+- **10.4** A VCF with one matching and one mismatching REF allele: the
+  mismatch is reported, both records are kept, and the file's SHA-256 is
+  in the parameters.
+- **10.7** An exported JSON and Markdown report: the input hash equals the
+  SHA-256 of the sequence, every `data_sha256` recomputes from the
+  exported data, every entry has parameters, and the Markdown names each
+  analysis and the Synapse version.
+
+All seven passed on their first run: they found no new defect, and
+the restriction-parameter check passes only since `81ccc55`. The BLAST
+(10.5) and literature (10.6) workflows remain covered by the stubbed
+client, the offline fixtures and the BLAST+ tests, because a live run
+needs external services.
