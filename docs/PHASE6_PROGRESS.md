@@ -87,6 +87,7 @@ IUPAC, gapped and invalid input (D14):
 | 30 | D18 heuristic scores renamed from "confidence" in data, exports and messages (ORF, signal-peptide screen, cloning score component, primer warning); golden key renamed with values proven identical | this package | golden before/after hashes; key-mapped-back equality; unmodified golden test; new tests fail on the previous code | Corrected; suite 288/288 |
 | 31 | D18 part 2: the sequence-type classifier reports an `evidence` level (CONFIRMED/PROBABLE/AMBIGUOUS/INVALID), not a "confidence"; source check extended to `core/`, `fileio/`, `ui/`, `main.py` | this package | the extended checks fail on the previous code; values and rules unchanged; no golden snapshot affected | Corrected; suite 289/289 |
 | 32 | Stage G: one notation per unit in printed output (%, °C, cal/(mol·K), Da); primer positions and target input 1-based inclusive like the other menus | this package | inventory of every f-string literal; source check fails on the previous code; primer coordinates verified by slicing | Corrected; suite 292/292 |
+| 33 | Stage G (6.4): payload warnings (primer, CRISPR) reach the exported summary and the Markdown report on every path | this package | measurement over every offline `core.api` analysis; new tests fail on the previous code | Corrected; suite 294/294; menu-path parameters for sequence/restriction/cloning recorded as open |
 
 ## Paused (2026-10-31)
 

@@ -1456,3 +1456,30 @@ Tests: 3 new (`OutputNotationTests`): a source check of every f-string
 literal for the four unit rules, the 1-based primer display, and the
 1-based target input with six cases including out-of-range values. Each
 fails on the previous code.
+
+### Stage G (6.4) Warnings a result carries reach the exported summary (`core/models.py`)
+
+Each stored analysis is exported with its parameters, warnings and
+limitations. The JSON report holds the full payload as well; the Markdown
+report prints only those three lists. A measurement over every offline
+`core.api` analysis showed that two payloads carry warnings of their own
+that never reached the list: a primer design on a 600-nt test sequence
+had three (for example "Specificity was not genome-wide screened; no
+reference database was supplied."), and CRISPR designs carry theirs the
+same way. Through `core.api` the Markdown report therefore showed none of
+them. The interactive primer path copied them by hand, so the two paths
+disagreed.
+
+`AnalysisResult` now adds a payload's top-level `warnings` to its own
+list when it is created, without duplicates. Every path that stores a
+result uses it, so the API and the menus agree, and the payload and its
+`data_sha256` are unchanged.
+
+Measured and left as recorded follow-up: results stored from the menus
+for sequence overview, restriction and cloning record no parameters (the
+API path records topology, enzymes and the other inputs). Supplying them
+needs each module's parameters named explicitly rather than guessed from
+the payload.
+
+Tests: 2 new (`ExportedWarningsTests`), both failing on the previous
+code.

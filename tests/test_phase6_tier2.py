@@ -1140,5 +1140,36 @@ class OutputNotationTests(unittest.TestCase):
                 self.assertEqual(P._primer_ui_read_target(sequence), expected, answers)
 
 
+# ----------------------------------------------------------------------
+# Stage G (6.4): warnings a result carries reach the exported summary
+# ----------------------------------------------------------------------
+class ExportedWarningsTests(unittest.TestCase):
+    def test_payload_warnings_reach_the_markdown_report(self):
+        import logging
+        import types
+        from core import api
+        from core.report import build_analysis_report, report_to_markdown
+        from tests._support import deterministic_dna
+        logging.disable(logging.CRITICAL)
+        try:
+            result = api.design_primers(deterministic_dna(600))
+        finally:
+            logging.disable(logging.NOTSET)
+        payload_warnings = list(result.data.warnings)
+        self.assertTrue(payload_warnings)
+        self.assertTrue(set(payload_warnings) <= set(result.warnings))
+        context = types.SimpleNamespace(results={"primer": [result]}, sequence="", header="")
+        markdown = report_to_markdown(build_analysis_report(context))
+        for warning in payload_warnings:
+            self.assertIn(f"  - {warning}", markdown)
+
+    def test_warnings_passed_and_carried_are_not_duplicated(self):
+        from core.models import AnalysisResult
+        payload = {"warnings": ["W1", "W2"]}
+        result = AnalysisResult(module="x", data=payload, warnings=["W0", "W1"])
+        self.assertEqual(result.warnings, ["W0", "W1", "W2"])
+        self.assertEqual(AnalysisResult(module="x", data={"value": 1}).warnings, [])
+
+
 if __name__ == "__main__":
     unittest.main()

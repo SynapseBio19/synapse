@@ -36,6 +36,14 @@ def sha256_file(path) -> str:
     return digest.hexdigest()
 
 
+def embedded_warnings(data: Any) -> List[str]:
+    """The top-level ``warnings`` list a result payload carries, as text."""
+    value = data.get("warnings") if isinstance(data, dict) else getattr(data, "warnings", None)
+    if not isinstance(value, (list, tuple)):
+        return []
+    return [str(item) for item in value]
+
+
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
@@ -208,6 +216,15 @@ class AnalysisResult:
     created_at: str = field(default_factory=utc_now)
     synapse_version: str = SYNAPSE_VERSION
     python_version: str = field(default_factory=platform.python_version)
+
+    def __post_init__(self) -> None:
+        # A payload that carries its own warnings (primer reports, CRISPR
+        # designs) shows them in the summary too: the Markdown export
+        # prints the summary, not the payload.
+        self.warnings = list(self.warnings)
+        for warning in embedded_warnings(self.data):
+            if warning not in self.warnings:
+                self.warnings.append(warning)
 
     def summary(self) -> Dict[str, Any]:
         """Metadata without the (possibly large) data payload."""
