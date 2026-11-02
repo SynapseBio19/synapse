@@ -2928,26 +2928,20 @@ def select_orf(orfs):
 
     style.header("SELECT ORF")
 
-    style.section('Available candidates')
-
-    for index, orf in enumerate(orfs, start=1):
-        print(
-            f"[{index}] "
-            f"ORF-{orf['rank']:03d} | "
-            f"Frame {orf['frame']:+d} | "
-            f"{orf['length']} bp | "
-            f"{orf['protein_length']} aa | "
-            f"{orf['start_codon']} | "
-            f"{orf['status']} | "
-            f"Heuristic {orf['heuristic_score']['score']}/100"
-        )
-
-    print()
-    style.back()
+    style.menu([("Available candidates", [
+        (index,
+         f"ORF-{orf['rank']:03d} | "
+         f"Frame {orf['frame']:+d} | "
+         f"{orf['length']} bp | "
+         f"{orf['protein_length']} aa | "
+         f"{orf['start_codon']} | "
+         f"{orf['status']} | "
+         f"Heuristic {orf['heuristic_score']['score']}/100")
+        for index, orf in enumerate(orfs, start=1)
+    ])])
 
     while True:
-        print()
-        choice = style.ask("Select ORF")
+        choice = style.ask_choice()
 
         if choice == "0":
             return None

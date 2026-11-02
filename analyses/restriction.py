@@ -2361,22 +2361,21 @@ def _synapse_ui_select_enzymes(
             continue
 
         if maximum is not None and len(selected) > maximum:
-            print(f"Please select no more than {maximum} enzyme(s).")
+            style.error(f"Please select no more than {maximum} enzyme(s).")
             continue
 
         return selected
 
 
 def _synapse_ui_select_topology(default="linear"):
-    style.section('DNA Topology')
-    style.option('1', 'Linear')
-    style.option('2', 'Circular')
-    print(f"[Enter] Keep current ({str(default).capitalize()})")
-    style.back()
+    style.menu([("DNA topology", [
+        (1, "Linear"),
+        (2, "Circular"),
+        ("Enter", f"Keep current ({str(default).capitalize()})"),
+    ])])
 
     while True:
-        print()
-        choice = style.ask("Select topology")
+        choice = style.ask_choice()
 
         if choice == "0":
             return None

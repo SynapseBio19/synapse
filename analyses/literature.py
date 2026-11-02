@@ -2225,7 +2225,7 @@ def _interactive_menu(context: Optional[dict[str, Any]] = None) -> None:
 
             print("Search options are set when starting each run. Maximum results per source: 200.")
 
-            print("Optional environment variables: SYNAPSE_NCBI_EMAIL, SYNAPSE_OPENALEX_EMAIL, SYNAPSE_CROSSREF_EMAIL.")
+            style.note("Optional environment variables: SYNAPSE_NCBI_EMAIL, SYNAPSE_OPENALEX_EMAIL, SYNAPSE_CROSSREF_EMAIL.")
 
             continue
 
