@@ -302,7 +302,7 @@ def print_results(
         "G"
     ):
 
-        style.field(base, f"{nucleotide_counts[base]:>6}  "
+        style.field(base, f"{nucleotide_counts[base]:<6}  "
                     f"{nucleotide_percentages[base]:>6.2f}%")
 
     # ========================================================

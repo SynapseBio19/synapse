@@ -5129,7 +5129,7 @@ if __name__ == "__main__":
         results.values()
     )
 
-    style.header('SYNAPSE MUTATION ANALYSIS SELF-TEST')
+    style.header('Mutation analysis self-test')
 
     for name, success in (
         results.items()

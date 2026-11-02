@@ -2267,7 +2267,7 @@ def print_restriction_report(analysis):
 if __name__ == "__main__":
     self_test = run_restriction_self_test()
 
-    style.header('SYNAPSE RESTRICTION ENGINE SELF-TEST')
+    style.header('Restriction engine self-test')
 
     for name, passed in self_test.items():
         if name == "all_passed":

@@ -3119,13 +3119,6 @@ def print_protein_report(
 # ============================================================
 
 
-def _protein_ui_header(title):
-    print()
-    print(major_rule())
-    print(title)
-    print(major_rule())
-
-
 def _protein_ui_pause():
     style.pause()
 
@@ -3428,7 +3421,7 @@ def _print_protein_overview(
     reading_frame=None,
     orf_status=None,
 ):
-    _protein_ui_header(
+    style.header(
         "PROTEIN OVERVIEW"
     )
 
@@ -3498,7 +3491,7 @@ def _print_protein_overview(
 
 
 def _print_translation_and_sequence(analysis):
-    _protein_ui_header(
+    style.header(
         "TRANSLATION & SEQUENCE"
     )
 
@@ -3601,7 +3594,7 @@ def _print_translation_and_sequence(analysis):
 
 
 def _print_amino_acid_composition(analysis):
-    _protein_ui_header(
+    style.header(
         "AMINO ACID COMPOSITION"
     )
 
@@ -3689,7 +3682,7 @@ def _print_amino_acid_composition(analysis):
 
 
 def _print_physicochemical_structural(analysis):
-    _protein_ui_header(
+    style.header(
         "PHYSICOCHEMICAL & STRUCTURAL PROPERTIES"
     )
 
@@ -3870,7 +3863,7 @@ def _print_complete_protein_report(
     reading_frame=None,
     orf_status=None,
 ):
-    _protein_ui_header(
+    style.header(
         "COMPLETE PROTEIN REPORT"
     )
 
@@ -4114,7 +4107,7 @@ def protein_analysis_menu(
 
     if not active_protein:
 
-        _protein_ui_header(
+        style.header(
             "PROTEIN ANALYSIS ERROR"
         )
 

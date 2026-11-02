@@ -234,9 +234,24 @@ class LayeringTests(unittest.TestCase):
 # ----------------------------------------------------------------------
 # The rendered interface, not only source patterns (Stage F completion)
 # ----------------------------------------------------------------------
-# Modules whose screens are routed through ui.style. A module joins this
-# list when it is converted; the checks below then apply to it.
-SHARED_UI_MODULES = ("orf", "crispr", "blast", "literature", "primer", "variant_analysis")
+# Menu screens rendered by the checks below: every module menu and the
+# main menu. Each entry is converted to ui.style, not only listed here.
+SHARED_UI_MODULES = ("orf", "crispr", "blast", "literature", "primer", "variant_analysis",
+                     "rna", "protein", "restriction", "mutation", "menu")
+
+# Every file that draws terminal screens; all of them are routed through
+# ui.style, so the source rule applies to all.
+INTERFACE_SOURCES = tuple(
+    [PROJECT_ROOT / "main.py", PROJECT_ROOT / "core" / "pipeline.py"]
+    + [PROJECT_ROOT / "ui" / name for name in ("menu.py", "report.py")]
+    + [PROJECT_ROOT / "analyses" / f"{name}.py" for name in (
+        "orf", "crispr", "blast", "literature", "primer", "variant_analysis", "sequence",
+        "rna", "protein", "restriction", "cloning", "mutation")]
+)
+
+# Answers that reach the menu: RNA first shows its pipeline input and
+# waits for Enter.
+LEAD_IN = {"rna": ("",)}
 
 
 def render_first_screen(module, answers=("0",)):
@@ -292,14 +307,21 @@ def render_first_screen(module, answers=("0",)):
 
 
 class RenderedScreenTests(unittest.TestCase):
+    # A module's menu carries the name of its main-menu entry.
     TITLES = {"orf": "ORF ANALYSIS", "crispr": "CRISPR GUIDE DESIGN", "blast": "BLAST SEARCH",
               "literature": "LITERATURE SEARCH", "primer": "PRIMER DESIGN",
-              "variant_analysis": "VARIANT ANALYSIS"}
+              "variant_analysis": "VARIANT ANALYSIS", "rna": "RNA ANALYSIS",
+              "protein": "PROTEIN ANALYSIS", "restriction": "RESTRICTION & CLONING ANALYSIS",
+              "mutation": "MUTATION & VARIANT ANALYSIS", "menu": "MAIN MENU"}
+    ZERO = {"menu": "[0] Exit"}
 
-    def _first_screen(self, module):
-        lines = render_first_screen(module).splitlines()
-        end = next(i for i, line in enumerate(lines) if line.startswith(style.SELECTION_PROMPT + ":"))
-        start = next(i for i, line in enumerate(lines) if line == style.major_rule())
+    def _first_screen(self, module, answer="0"):
+        lines = render_first_screen(module, LEAD_IN.get(module, ()) + (answer,)).splitlines()
+        end = next(i for i, line in enumerate(lines) if line.startswith(style.SELECTION_PROMPT + ":")
+                   and line.endswith(answer))
+        # The menu screen starts at the last title frame before its prompt.
+        start = max(i for i in range(end - 2) if lines[i] == style.major_rule()
+                    and lines[i + 2] == style.major_rule())
         return lines[start:end + 1]
 
     def test_each_screen_has_the_shared_frame_title_and_footer(self):
@@ -309,7 +331,7 @@ class RenderedScreenTests(unittest.TestCase):
                 self.assertEqual(screen[:3], [style.major_rule(), self.TITLES[module], style.major_rule()])
                 self.assertEqual(screen[-1], "Selection: 0")
                 self.assertEqual(screen[-2], style.minor_rule())
-                self.assertEqual(screen[-3], "[0] Back")
+                self.assertEqual(screen[-3], self.ZERO.get(module, "[0] Back"))
                 self.assertEqual(screen[-4], "")
 
     def test_context_fields_line_up(self):
@@ -325,9 +347,10 @@ class RenderedScreenTests(unittest.TestCase):
                         self.assertRegex(line, rf"^.{{{style.FIELD_WIDTH}}} \S", line)
 
     def test_an_unknown_key_gets_the_shared_reply(self):
-        for module in SHARED_UI_MODULES:
+        # The main menu returns its answer to main.py, which replies.
+        for module in [m for m in SHARED_UI_MODULES if m != "menu"]:
             with self.subTest(module=module):
-                output = render_first_screen(module, ("x", "0"))
+                output = render_first_screen(module, LEAD_IN.get(module, ()) + ("x", "0"))
                 after = output.split("Selection: x\n", 1)[1]
                 self.assertEqual(after.lstrip("\n").splitlines()[0], style.INVALID_SELECTION)
 
@@ -340,13 +363,61 @@ class RenderedScreenTests(unittest.TestCase):
             "own rule or header helper": re.compile(r"def (_line|_print_\w*header|_\w+_ui_header)\("),
             "SYNAPSE title prefix": re.compile(r'header\(f?["\']SYNAPSE'),
         }
+        rules["yes/no question of its own"] = re.compile(r'\[[yY]/[nN]\]|\([yY]/[nN]\)')
         hits = []
-        for module in SHARED_UI_MODULES:
-            path = PROJECT_ROOT / "analyses" / f"{module}.py"
+        for path in INTERFACE_SOURCES:
             for number, line in enumerate(read(path).splitlines(), 1):
-                hits.extend(f"{module}.py:{number}: {name}" for name, rule in rules.items()
+                hits.extend(f"{path.name}:{number}: {name}" for name, rule in rules.items()
                             if rule.search(line))
         self.assertEqual(hits, [])
+
+    def test_report_screens_align_their_fields(self):
+        """The sequence overview and the pipeline status, as rendered."""
+        import contextlib
+        import io
+        import os
+        import subprocess
+        import sys
+        import tempfile
+        from core.pipeline import SynapsePipeline
+        with tempfile.TemporaryDirectory() as logs:
+            env = dict(os.environ, SYNAPSE_LOG_DIR=logs, PYTHONIOENCODING="utf-8")
+            overview = subprocess.run([sys.executable, "main.py"], cwd=PROJECT_ROOT, input="\n1\n0\n",
+                                      capture_output=True, text=True, encoding="utf-8",
+                                      timeout=120, env=env).stdout
+        buffer = io.StringIO()
+        pipeline = SynapsePipeline("ACGT" * 30, "demo")
+        with contextlib.redirect_stdout(buffer):
+            pipeline.print_status()
+        field = re.compile(r"^([A-Za-z][^:\[]{0,20}):( +)\S")
+        for name, text in (("sequence overview", overview), ("pipeline status", buffer.getvalue())):
+            with self.subTest(screen=name):
+                lines = text.splitlines()
+                self.assertIn(style.major_rule(), lines)
+                fields = [line for line in lines if field.match(line)
+                          and not line.startswith(("ERROR:", "WARNING:", "NOTE:", "OK:"))]
+                self.assertGreater(len(fields), 3)
+                for line in fields:
+                    self.assertRegex(line, rf"^.{{{style.FIELD_WIDTH}}} \S", line)
+                headings = [lines[i - 1] for i, line in enumerate(lines)
+                            if line == style.minor_rule() and i and lines[i - 1].strip()
+                            and not lines[i - 1].startswith(("[", "Selection"))]
+                for heading in headings:
+                    self.assertEqual(heading, heading.upper(), heading)
+
+    def test_yes_no_questions_use_one_notation(self):
+        import builtins
+        import contextlib
+        import io
+        from unittest import mock
+        for answer, default_yes, expected in (("", False, False), ("y", False, True), ("yes", False, True),
+                                              ("", True, True), ("n", True, False)):
+            buffer = io.StringIO()
+            with mock.patch.object(builtins, "input", lambda prompt: (print(prompt, end=""), answer)[1]), \
+                    contextlib.redirect_stdout(buffer):
+                result = style.confirm("Proceed?", default_yes=default_yes)
+            self.assertEqual(result, expected, (answer, default_yes))
+            self.assertEqual(buffer.getvalue(), "Proceed? [Y/n]: " if default_yes else "Proceed? [y/N]: ")
 
     def test_menu_renderer_layout(self):
         import contextlib
@@ -357,6 +428,10 @@ class RenderedScreenTests(unittest.TestCase):
         self.assertEqual(buffer.getvalue().splitlines(),
                          ["", "SEARCH", "[1] Run", "", "[2] Other", "", "[0] Cancel", style.minor_rule()])
         self.assertEqual(style.columns(["ORF-001", "+3", "87 bp"], [8, 6]), "ORF-001  +3     87 bp")
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            style.menu([(None, [("F", "Load another file")])], zero=None)
+        self.assertEqual(buffer.getvalue().splitlines(), ["", "[F] Load another file", "", style.minor_rule()])
 
 
 if __name__ == "__main__":

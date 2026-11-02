@@ -2468,7 +2468,7 @@ if __name__ == "__main__":
 
     self_test = run_sequence_self_test()
 
-    style.header('SYNAPSE SEQUENCE ENGINE SELF-TEST')
+    style.header('Sequence engine self-test')
 
     for name, passed in self_test.items():
 

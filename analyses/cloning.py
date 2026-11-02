@@ -4280,7 +4280,7 @@ def run_cloning_self_test():
 if __name__ == "__main__":
     tests = run_cloning_self_test()
 
-    style.header('SYNAPSE CLONING ENGINE SELF-TEST')
+    style.header('Cloning engine self-test')
 
     for name, passed in tests.items():
         print(
