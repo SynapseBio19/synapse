@@ -44,6 +44,7 @@ from pathlib import Path
 
 from typing import Any, Optional
 from ui.style import major_rule, minor_rule
+from ui import style
 
 MODULE_NAME = "Synapse Literature Intelligence"
 
@@ -1760,19 +1761,15 @@ def export_results(run: LiteratureSearchRun, path: str | Path) -> Path:
 
 def print_results(run: LiteratureSearchRun, limit: int = 10) -> None:
 
-    print("\n" + major_rule())
+    style.header('SYNAPSE LITERATURE SEARCH RESULTS')
 
-    print("SYNAPSE LITERATURE SEARCH RESULTS")
+    style.field('Query', f"{run.query.query}")
 
-    print(major_rule())
-
-    print(f"Query: {run.query.query}")
-
-    print(f"Sources: {', '.join(run.query.sources)}")
+    style.field('Sources', f"{', '.join(run.query.sources)}")
 
     print(f"Retrieved before deduplication: {run.total_results_before_deduplication}")
 
-    print(f"Unique articles: {len(run.articles)}")
+    style.field('Unique articles', f"{len(run.articles)}")
 
     print(minor_rule())
 
@@ -1839,22 +1836,18 @@ def print_article_detail(run: LiteratureSearchRun, article_index: int) -> None:
 
     article = run.articles[article_index - 1]
 
-    print("\n" + major_rule())
+    style.header('LITERATURE ARTICLE DETAIL')
 
-    print("LITERATURE ARTICLE DETAIL")
+    style.field('Title', f"{article.title}")
 
-    print(major_rule())
+    style.field('Authors', f"{', '.join(article.authors) or 'Not available'}")
 
-    print(f"Title: {article.title}")
-
-    print(f"Authors: {', '.join(article.authors) or 'Not available'}")
-
-    print(f"Journal: {article.journal or 'Not available'}")
+    style.field('Journal', f"{article.journal or 'Not available'}")
 
     date_display = article.publication_date or "Not available"
     if article.metadata.get("date_validation") == "FUTURE_DATE_REVIEW":
         date_display += " [REVIEW: FUTURE DATE]"
-    print(f"Publication date: {date_display}")
+    style.field('Publication date', f"{date_display}")
     if article.metadata.get("date_validation_note"):
         print(f"DATE VALIDATION WARNING: {article.metadata['date_validation_note']}")
 
@@ -1862,15 +1855,15 @@ def print_article_detail(run: LiteratureSearchRun, article_index: int) -> None:
 
     print(f"PMID: {article.pmid or 'Not available'} | PMCID: {article.pmcid or 'Not available'}")
 
-    print(f"Open access: {'Yes' if article.is_open_access is True else 'No' if article.is_open_access is False else 'Unknown'}")
+    style.field('Open access', f"{'Yes' if article.is_open_access is True else 'No' if article.is_open_access is False else 'Unknown'}")
 
-    print(f"Citation count: {article.citation_count if article.citation_count is not None else 'Not available'}")
+    style.field('Citation count', f"{article.citation_count if article.citation_count is not None else 'Not available'}")
 
-    print(f"Relevance: {article.relevance_score if article.relevance_score is not None else 'Not scored'} / 100 (text match; not study quality)")
+    style.field('Relevance', f"{article.relevance_score if article.relevance_score is not None else 'Not scored'} / 100 (text match; not study quality)")
     if article.metadata.get("metadata_completeness") is not None:
-        print(f"Metadata completeness: {article.metadata['metadata_completeness']:.0%} (bibliographic fields only)")
+        style.field('Metadata completeness', f"{article.metadata['metadata_completeness']:.0%} (bibliographic fields only)")
     if article.metadata.get("missing_core_metadata"):
-        print(f"Missing core metadata: {', '.join(article.metadata['missing_core_metadata'])}")
+        style.field('Missing core metadata', f"{', '.join(article.metadata['missing_core_metadata'])}")
 
     print("Matched terms/components:")
 
@@ -1878,8 +1871,8 @@ def print_article_detail(run: LiteratureSearchRun, article_index: int) -> None:
 
         print(f"  {key}: {value}")
 
-    print(f"Publication type(s): {', '.join(article.publication_types) or 'Not available from retrieved metadata'}")
-    print(f"Sources: {', '.join(article.source_ids) or 'Not available'}")
+    style.field('Publication type(s)', f"{', '.join(article.publication_types) or 'Not available from retrieved metadata'}")
+    style.field('Sources', f"{', '.join(article.source_ids) or 'Not available'}")
 
     print("Links:")
 
@@ -2162,7 +2155,7 @@ def self_test() -> bool:
 
         print(f"[{'PASS' if passed else 'FAIL'}] {name}")
 
-    print(f"Self-test: {sum(ok for _, ok in tests)}/{len(tests)} passed")
+    style.field('Self-test', f"{sum(ok for _, ok in tests)}/{len(tests)} passed")
 
     return all(ok for _, ok in tests)
 
@@ -2188,25 +2181,22 @@ def _interactive_menu(context: Optional[dict[str, Any]] = None) -> None:
     context = dict(context or {})
     suggested = str(context.get("suggested_query") or "").strip()
 
-    print(f"\n{MODULE_NAME} v{MODULE_VERSION}")
-
-    print("Scientific literature retrieval and analysis")
-
     while True:
 
-        print("\nLITERATURE SEARCH")
+        style.header("Literature search")
+        style.field("Module", f"{MODULE_NAME} v{MODULE_VERSION}")
+        style.field("Sources", "PubMed, Europe PMC, OpenAlex, Crossref")
+        if suggested:
+            style.field("Suggested query", suggested)
+        style.menu([
+            ("Search", [("1", "New Literature Search")]),
+            ("Configuration", [
+                ("2", "Search Configuration (current run parameters are entered per search)"),
+            ]),
+            ("System", [("3", "Run Self-Test"), ("4", "Data Sources & Scientific Limitations")]),
+        ])
 
-        print("[1] New Literature Search")
-
-        print("[2] Search Configuration (current run parameters are entered per search)")
-
-        print("[3] Run Self-Test")
-
-        print("[4] Data Sources & Scientific Limitations")
-
-        print("[0] Back")
-
-        choice = input("Selection: ").strip()
+        choice = style.ask_choice()
 
         if choice == "0":
 
@@ -2220,13 +2210,14 @@ def _interactive_menu(context: Optional[dict[str, Any]] = None) -> None:
 
         if choice == "4":
 
-            print("Sources: PubMed, Europe PMC, OpenAlex, Crossref.")
-
-            print("Relevance scores measure query-text matching only; they are not evidence quality.")
-
-            print("Source coverage, indexing delay, API availability, and metadata completeness vary.")
-
-            print("Abstracts and full text may be unavailable or restricted by copyright/licensing.")
+            style.section("Data sources and scientific limitations")
+            style.field("Sources", "PubMed, Europe PMC, OpenAlex, Crossref")
+            style.notes([
+                "Relevance scores measure query-text matching only; they are not evidence quality.",
+                "Source coverage, indexing delay, API availability, and metadata completeness vary.",
+                "Abstracts and full text may be unavailable or restricted by copyright/licensing.",
+            ])
+            style.pause()
 
             continue
 
@@ -2240,7 +2231,7 @@ def _interactive_menu(context: Optional[dict[str, Any]] = None) -> None:
 
         if choice != "1":
 
-            print("Invalid selection.")
+            style.invalid_selection()
 
             continue
 
@@ -2260,7 +2251,7 @@ def _interactive_menu(context: Optional[dict[str, Any]] = None) -> None:
 
             continue
 
-        max_raw = input("Maximum results per source [30]: ").strip()
+        max_raw = style.ask('Maximum results per source', default='30')
 
         try:
 
@@ -2284,9 +2275,9 @@ def _interactive_menu(context: Optional[dict[str, Any]] = None) -> None:
 
                 continue
 
-            date_from = input("From date YYYY or YYYY-MM-DD [none]: ").strip() or None
+            date_from = style.ask('From date YYYY or YYYY-MM-DD', default='none') or None
 
-            date_to = input("To date YYYY or YYYY-MM-DD [none]: ").strip() or None
+            date_to = style.ask('To date YYYY or YYYY-MM-DD', default='none') or None
 
             oa = input("Open-access only? (y/N): ").strip().lower() == "y"
 
@@ -2299,7 +2290,7 @@ def _interactive_menu(context: Optional[dict[str, Any]] = None) -> None:
 
         except (ValueError, KeyError) as exc:
 
-            print(f"Invalid configuration: {exc}")
+            style.field('Invalid configuration', f"{exc}")
 
             continue
 
@@ -2349,11 +2340,11 @@ def _interactive_menu(context: Optional[dict[str, Any]] = None) -> None:
 
                 saved = export_results(run, export)
 
-                print(f"Exported: {saved.resolve()}")
+                style.success(f"Exported: {saved.resolve()}")
 
             except (OSError, ValueError) as exc:
 
-                print(f"Export failed: {exc}")
+                style.error(f"Export failed: {exc}")
 
 def main(context: Optional[dict[str, Any]] = None) -> int:
     if context is not None:
@@ -2388,7 +2379,7 @@ def main(context: Optional[dict[str, Any]] = None) -> int:
 
         except (ValueError, LiteratureError) as exc:
 
-            print(f"Search failed: {exc}")
+            style.field('Search failed', f"{exc}")
 
             return 1
 
