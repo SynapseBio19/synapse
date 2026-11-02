@@ -32,6 +32,16 @@ def read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def first_menu_keys(source: str) -> list:
+    """The entry keys of the first style.menu([...]) call in ``source``."""
+    for node in ast.walk(ast.parse(source)):
+        if (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                and node.func.attr == "menu" and node.args):
+            groups = ast.literal_eval(node.args[0])
+            return [str(key) for _title, entries in groups for key, _label in entries]
+    return []
+
+
 class SeparatorTests(unittest.TestCase):
     def test_no_module_draws_its_own_separator(self):
         offenders = []
@@ -100,15 +110,8 @@ class MenuNumberingTests(unittest.TestCase):
 
     def test_blast_menu_is_contiguous_and_fully_dispatched(self):
         body = self._menu_source("analyses/blast.py", "blast_menu")
-        # Entries of the top-level menu, up to and including [0].
-        labels, seen_back = [], False
-        for key, _label in re.findall(r'print\("\[(\d+)\] ([^"]+)"\)', body):
-            if seen_back:
-                break            # anything after [0] belongs to a sub-dialog
-            if key == "0":
-                seen_back = True
-            else:
-                labels.append(int(key))
+        # Entries of the top-level menu: the first style.menu() call.
+        labels = [int(key) for key in first_menu_keys(body)]
         self.assertEqual(labels, list(range(1, len(labels) + 1)),
                          f"BLAST menu numbers must be contiguous: {labels}")
         dispatched = {

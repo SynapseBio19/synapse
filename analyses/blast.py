@@ -83,6 +83,7 @@ from core.alphabets import (
     declared_type_from_molecule,
 )
 from ui.style import RULE_WIDTH, major_rule, minor_rule
+from ui import style
 
 
 # ============================================================================
@@ -3804,30 +3805,23 @@ def compare_blast_runs(run_a: BlastRun, run_b: BlastRun) -> BlastComparison:
 # DISPLAY
 # ============================================================================
 
-def _line(char: str = "-", width: int = RULE_WIDTH) -> str:
-    # Kept as a local shorthand; the width is the shared one (Stage F).
-    return char * width
-
-
 def print_hit_summary(run: BlastRun, *, limit: int = 15) -> None:
-    print("\r\n" + _line("="))
-    print("BLAST RESULT SUMMARY")
-    print(_line("="))
-    print(f"Query:              {run.query.name}")
-    print(f"Type:               {run.query.sequence_type}")
-    print(f"Length:             {run.query.length}")
-    print(f"Program:            {run.metadata.program}")
-    print(f"Database:            {run.metadata.database}")
+    style.header('BLAST RESULT SUMMARY')
+    style.field('Query', f"{run.query.name}")
+    style.field('Type', f"{run.query.sequence_type}")
+    style.field('Length', f"{run.query.length}")
+    style.field('Program', f"{run.metadata.program}")
+    style.field('Database', f"{run.metadata.database}")
     print(f"RID:                {run.metadata.rid}")
-    print(f"Hits:               {run.hit_count}")
-    print(f"Significant hits:   {run.significant_hit_count}")
-    print(_line())
+    style.field('Hits', f"{run.hit_count}")
+    style.field('Significant hits', f"{run.significant_hit_count}")
+    print(minor_rule())
 
     print(
         f"{'Rank':<6}{'Accession':<18}{'Identity':>12}"
         f"{'Coverage':>12}{'E-value':>16}{'Bit score':>14}"
     )
-    print(_line())
+    print(minor_rule())
 
     for rank, hit in enumerate(rank_hits(run.hits)[:limit], start=1):
         evalue = _evalue_text(hit.best_evalue)
@@ -3842,14 +3836,12 @@ def print_hit_summary(run: BlastRun, *, limit: int = 15) -> None:
 
 
 def print_hit_detail(hit: BlastHit) -> None:
-    print("\r\n" + _line("="))
-    print("BLAST HIT DETAIL")
-    print(_line("="))
-    print(f"Accession:      {hit.accession}")
-    print(f"Hit ID:         {hit.hit_id}")
-    print(f"Definition:     {hit.definition}")
-    print(f"Subject length: {hit.length}")
-    print(f"HSPs:           {len(hit.hsps)}")
+    style.header('BLAST HIT DETAIL')
+    style.field('Accession', f"{hit.accession}")
+    style.field('Hit ID', f"{hit.hit_id}")
+    style.field('Definition', f"{hit.definition}")
+    style.field('Subject length', f"{hit.length}")
+    style.field('HSPs', f"{len(hit.hsps)}")
     print()
 
     for hsp in hit.hsps:
@@ -3866,15 +3858,14 @@ def print_hit_detail(hit: BlastHit) -> None:
 # ============================================================================
 
 def _print_local_database_status(manager: LocalBlastDatabaseManager) -> None:
-    print("\r\nLOCAL BLAST DATABASE STATUS")
-    print(_line("="))
-    print(f"Root: {manager.root}")
-    print(_line())
+    style.header("Local BLAST database status")
+    style.field('Root', f"{manager.root}")
+    print(minor_rule())
     print(
         f"{'Database':<24}{'Type':<12}{'Status':<42}"
         f"{'Volumes':>12}{'Size':>12}"
     )
-    print(_line())
+    print(minor_rule())
 
     for database in manager.list_databases():
         if database.exists:
@@ -3976,7 +3967,7 @@ def _select_local_database(
         )
     )
 
-    print("\r\nLOCAL DATABASE")
+    print("\nLOCAL DATABASE")
     for index, database in enumerate(available, start=1):
         if database.verification_status == "VERIFIED":
             status_label = "VERIFIED"
@@ -3991,7 +3982,7 @@ def _select_local_database(
             f"[{index}] {database.name} | "
             f"{database.size_gb:.2f} GB | {status_label}{sequence_info}"
         )
-    print("[0] Cancel")
+    style.cancel()
 
     choice = input("Database: ").strip()
     if choice == "0":
@@ -4011,26 +4002,21 @@ def blast_database_manager_menu(
     manager = manager or LocalBlastDatabaseManager()
 
     while True:
-        print("\r\n" + _line("="))
-        print("BLAST DATABASE MANAGER")
-        print(_line("="))
-        print(f"Database root: {manager.root}")
-        print()
-        print("DATABASE")
-        print("[1] Database Status")
-        print("[2] Download / Update NCBI Database")
-        print("[3] Verify Database")
-        print("[4] Create Custom Database from FASTA")
-        print("[5] Remove Database")
-        print("[6] Database Information")
-        print()
-        print("TOOLS")
-        print("[7] BLAST+ Tool Status")
-        print("[8] Change Database Root")
-        print("[0] Back")
-        print(_line())
+        style.header('BLAST DATABASE MANAGER')
+        style.field('Database root', f"{manager.root}")
+        style.menu([
+            ('Database', [
+                ('1', 'Database Status'),
+                ('2', 'Download / Update NCBI Database'),
+                ('3', 'Verify Database'),
+                ('4', 'Create Custom Database from FASTA'),
+                ('5', 'Remove Database'),
+                ('6', 'Database Information'),
+            ]),
+            ('Tools', [('7', 'BLAST+ Tool Status'), ('8', 'Change Database Root')]),
+        ])
 
-        choice = input("Selection: ").strip()
+        choice = style.ask_choice()
 
         if choice == "0":
             return
@@ -4040,8 +4026,7 @@ def blast_database_manager_menu(
             continue
 
         if choice == "2":
-            print("\r\nNCBI DATABASES AVAILABLE THROUGH update_blastdb.pl")
-            print(_line())
+            style.section('NCBI DATABASES AVAILABLE THROUGH update_blastdb.pl')
             for index, (name, info) in enumerate(
                 LOCAL_DATABASE_CATALOG.items(), start=1
             ):
@@ -4052,7 +4037,7 @@ def blast_database_manager_menu(
                     f"{recommendation:<16} "
                     f"{info['description']}"
                 )
-            print("[0] Cancel")
+            style.cancel()
 
             raw = input("Database: ").strip()
             if raw == "0":
@@ -4066,7 +4051,7 @@ def blast_database_manager_menu(
                 continue
 
             print()
-            print(f"Selected database: {name}")
+            style.field('Selected database', f"{name}")
             print(
                 "IMPORTANT: The database will be downloaded from NCBI into the "
                 f"following directory:\r\n{manager.root}"
@@ -4083,11 +4068,11 @@ def blast_database_manager_menu(
             try:
                 database = manager.update_ncbi_database(name)
                 print(f"\r\nUpdate completed: {database.name}")
-                print(f"Status: {database.verification_status}")
-                print(f"Files:  {database.file_count}")
-                print(f"Size:   {database.size_gb:.3f} GB")
+                style.field('Status', f"{database.verification_status}")
+                style.field('Files', f"{database.file_count}")
+                style.field('Size', f"{database.size_gb:.3f} GB")
             except BlastAnalysisError as exc:
-                print(f"ERROR: {exc}")
+                style.error(f"{exc}")
             continue
 
         if choice == "3":
@@ -4097,13 +4082,12 @@ def blast_database_manager_menu(
                 continue
             try:
                 database = manager.verify_database(name, run_blastdbcmd=True)
-                print("\r\nVERIFICATION RESULT")
-                print(_line())
-                print(f"Database: {database.name}")
-                print(f"Status:   {database.verification_status}")
-                print(f"Message:  {database.verification_message}")
+                style.section('VERIFICATION RESULT')
+                style.field('Database', f"{database.name}")
+                style.field('Status', f"{database.verification_status}")
+                style.field('Message', f"{database.verification_message}")
             except BlastAnalysisError as exc:
-                print(f"ERROR: {exc}")
+                style.error(f"{exc}")
             continue
 
         if choice == "4":
@@ -4117,10 +4101,9 @@ def blast_database_manager_menu(
                 print("No database name supplied.")
                 continue
 
-            print("\r\nDATABASE TYPE")
-            print("[1] Nucleotide")
-            print("[2] Protein")
-            print("[0] Cancel")
+            style.menu([
+                ('\r\nDatabase Type', [('1', 'Nucleotide'), ('2', 'Protein')]),
+            ], zero="Cancel")
             db_choice = input("Type: ").strip()
             if db_choice == "0":
                 continue
@@ -4135,15 +4118,14 @@ def blast_database_manager_menu(
                     name,
                     database_type,
                 )
-                print("\r\nCUSTOM DATABASE CREATED")
-                print(_line())
-                print(f"Name:   {database.name}")
-                print(f"Type:   {database.database_type}")
-                print(f"Path:   {database.path}")
-                print(f"Files:  {database.file_count}")
-                print(f"Size:   {database.size_mb:.2f} MB")
+                style.section('CUSTOM DATABASE CREATED')
+                style.field('Name', f"{database.name}")
+                style.field('Type', f"{database.database_type}")
+                style.field('Path', f"{database.path}")
+                style.field('Files', f"{database.file_count}")
+                style.field('Size', f"{database.size_mb:.2f} MB")
             except BlastAnalysisError as exc:
-                print(f"ERROR: {exc}")
+                style.error(f"{exc}")
             continue
 
         if choice == "5":
@@ -4168,7 +4150,7 @@ def blast_database_manager_menu(
                 removed = manager.remove_database(name)
                 print(f"Removed {len(removed)} files.")
             except BlastAnalysisError as exc:
-                print(f"ERROR: {exc}")
+                style.error(f"{exc}")
             continue
 
         if choice == "6":
@@ -4178,23 +4160,18 @@ def blast_database_manager_menu(
                 continue
             try:
                 info = manager.database_info(name)
-                print("\r\nDATABASE INFORMATION")
-                print(_line())
+                style.section('DATABASE INFORMATION')
                 print(json.dumps(info, indent=2, ensure_ascii=False))
             except BlastAnalysisError as exc:
-                print(f"ERROR: {exc}")
+                style.error(f"{exc}")
             continue
 
         if choice == "7":
-            print("\r\nBLAST+ TOOL STATUS")
-            print(_line())
+            style.section('BLAST+ TOOL STATUS')
             tools = manager.executable_manager.available()
             for name, path in tools.items():
-                print(f"{name:<14}: {path or 'NOT FOUND'}")
-            print(
-                f"perl           : "
-                f"{manager.executable_manager.resolve_perl() or 'NOT FOUND'}"
-            )
+                style.field(name, path or "NOT FOUND")
+            style.field("perl", manager.executable_manager.resolve_perl() or "NOT FOUND")
             print(
                 f"{BLAST_UPDATE_SCRIPT:<14}: "
                 f"{manager.executable_manager.resolve_update_script() or 'NOT FOUND'}"
@@ -4210,16 +4187,16 @@ def blast_database_manager_menu(
             try:
                 manager = LocalBlastDatabaseManager(root=raw_root or DEFAULT_LOCAL_DB_ROOT)
                 manager.ensure_root()
-                print(f"Database root changed to: {manager.root}")
+                style.field('Database root changed to', f"{manager.root}")
                 print(
                     f"To make this persistent across sessions, set the "
                     f"{LOCAL_DB_ROOT_ENV} environment variable."
                 )
             except OSError as exc:
-                print(f"ERROR: {exc}")
+                style.error(f"{exc}")
             continue
 
-        print("Invalid selection.")
+        style.invalid_selection()
 
 
 def _query_type_for_menu(sequence: str, declared: Optional[str]) -> Optional[str]:
@@ -4233,9 +4210,9 @@ def _query_type_for_menu(sequence: str, declared: Optional[str]) -> Optional[str
         if classify_sequence(sequence, declared).evidence != AMBIGUOUS:
             raise
         print(f"\r\n{exc}")
-    print("[1] DNA")
-    print("[2] Protein")
-    print("[0] Cancel")
+    style.menu([
+        (None, [('1', 'DNA'), ('2', 'Protein')]),
+    ], zero="Cancel")
     choice = input("Query type: ").strip()
     return {"1": "DNA", "2": "PROTEIN"}.get(choice)
 
@@ -4270,68 +4247,65 @@ def blast_menu(
     manager = LocalBlastDatabaseManager()
 
     while True:
-        print("\r\n" + _line("="))
-        print("BLAST SEARCH")
-        print(_line("="))
+        style.header('BLAST SEARCH')
 
         if active_query is not None:
-            print(f"Query context:    {active_query.name}")
-            print(f"Query source:     {active_query.source}")
-            print(f"Query length:     {active_query.length} {active_query.sequence_type.lower()}")
+            style.field('Query context', f"{active_query.name}")
+            style.field('Query source', f"{active_query.source}")
+            style.field('Query length', f"{active_query.length} {active_query.sequence_type.lower()}")
         elif current_orf is not None:
             try:
                 orf_query = build_orf_query(current_orf, sequence_name=current_name, parent_sequence=base_sequence)
-                print(f"Query context:    Selected ORF ({orf_query.name})")
-                print(f"Query length:     {orf_query.length} bp")
+                style.field('Query context', f"Selected ORF ({orf_query.name})")
+                style.field('Query length', f"{orf_query.length} bp")
             except BlastAnalysisError:
-                print("Query context:    Selected ORF (unavailable)")
+                style.field('Query context', "Selected ORF (unavailable)")
         elif base_sequence:
-            print(f"Query context:    {current_name}")
-            print("Query source:     Selected Synapse Sequence")
-            print(f"Query length:     {len(''.join(base_sequence.split()))} nt")
+            style.field('Query context', f"{current_name}")
+            style.field('Query source', "Selected Synapse Sequence")
+            style.field('Query length', f"{len(''.join(base_sequence.split()))} nt")
         else:
-            print("Query context:    No sequence loaded")
+            style.field('Query context', "No sequence loaded")
 
         if last_run:
-            print(f"Last engine:      {last_run.metadata.engine}")
-            print(f"Last database:    {last_run.metadata.database}")
+            style.field('Last engine', f"{last_run.metadata.engine}")
+            style.field('Last database', f"{last_run.metadata.database}")
 
-        print()
-        print("SEARCH")
-        print("[1] Run BLAST Search")
-        print("[2] Resume Search by Request ID (RID)")
-        print("[3] Search Configuration")
-        print("[4] BLAST Database Manager")
-        print()
-        print("RESULT ANALYSIS")
-        print("[5] Result Summary")
-        print("[6] Hit Detail & Alignment")
-        print("[7] Evidence Profile")
-        print("[8] Taxonomic Overview")
-        print("[9] Compare BLAST Runs")
-        print()
-        print("OUTPUT")
-        print("[10] Export Results")
-        print("[11] Full BLAST Report")
-        print()
-        print("SYSTEM")
-        print("[12] BLAST Self-Test")
-        print("[13] Supported Programs & Databases")
-        print("[14] Database Status")
-        print("[0] Back")
-        print(_line())
+        style.menu([
+            ('Search', [
+                ('1', 'Run BLAST Search'),
+                ('2', 'Resume Search by Request ID (RID)'),
+                ('3', 'Search Configuration'),
+                ('4', 'BLAST Database Manager'),
+            ]),
+            ('Result Analysis', [
+                ('5', 'Result Summary'),
+                ('6', 'Hit Detail & Alignment'),
+                ('7', 'Evidence Profile'),
+                ('8', 'Taxonomic Overview'),
+                ('9', 'Compare BLAST Runs'),
+            ]),
+            ('Output', [('10', 'Export Results'), ('11', 'Full BLAST Report')]),
+            ('System', [
+                ('12', 'BLAST Self-Test'),
+                ('13', 'Supported Programs & Databases'),
+                ('14', 'Database Status'),
+            ]),
+        ])
 
-        choice = input("Selection: ").strip()
+        choice = style.ask_choice()
 
         if choice == "0":
             # Returned to main.py so the run can be stored in the pipeline.
             return last_run
 
         if choice == "1":
-            print("\r\nQUERY SOURCE")
-            print("[1] Selected Synapse Sequence")
-            print("[2] Load FASTA File")
-            print("[0] Cancel")
+            style.menu([
+                ('\r\nQuery Source', [
+                    ('1', 'Selected Synapse Sequence'),
+                    ('2', 'Load FASTA File'),
+                ]),
+            ], zero="Cancel")
             query_source_choice = input("Source: ").strip()
 
             if query_source_choice == "0":
@@ -4342,7 +4316,8 @@ def blast_menu(
             if query_source_choice == "1":
                 active_query = None
                 if not base_sequence and current_orf is None:
-                    print("ERROR: No DNA/protein sequence or ORF is available.")
+                    style.error("No DNA/protein sequence or ORF is available.")
+                    style.pause()
                     continue
 
                 try:
@@ -4363,7 +4338,8 @@ def blast_menu(
                             source="Selected Synapse Sequence",
                         )
                 except BlastAnalysisError as exc:
-                    print(f"ERROR: {exc}")
+                    style.error(f"{exc}")
+                    style.pause()
                     continue
 
             elif query_source_choice == "2":
@@ -4375,19 +4351,20 @@ def blast_menu(
                 try:
                     fasta_queries = load_fasta_queries(raw_path)
                 except BlastAnalysisError as exc:
-                    print(f"ERROR: {exc}")
+                    style.error(f"{exc}")
+                    style.pause()
                     continue
 
                 if len(fasta_queries) == 1:
                     search_query = fasta_queries[0]
                 else:
-                    print("\r\nFASTA RECORDS")
+                    print("\nFASTA RECORDS")
                     for index, fasta_query in enumerate(fasta_queries, start=1):
                         print(
                             f"[{index}] {fasta_query.name} | "
                             f"{fasta_query.length} {fasta_query.sequence_type.lower()}"
                         )
-                    print("[0] Cancel")
+                    style.cancel()
                     record_choice = input("Record: ").strip()
                     if record_choice == "0":
                         continue
@@ -4398,27 +4375,25 @@ def blast_menu(
                         continue
 
                 active_query = search_query
-                print(
-                    f"Loaded FASTA query: {search_query.name} "
-                    f"({search_query.length} {search_query.sequence_type.lower()})"
-                )
+                style.field('Loaded FASTA query', f"{search_query.name} "
+                    f"({search_query.length} {search_query.sequence_type.lower()})")
 
             else:
                 print("Invalid query source.")
                 continue
 
             if search_query is None:
-                print("ERROR: No BLAST query was selected.")
+                style.error("No BLAST query was selected.")
+                style.pause()
                 continue
 
             available_query_type = search_query.sequence_type
 
             compatible_programs = programs_for_query_type(available_query_type)
 
-            print("\r\nSEARCH ENGINE")
-            print("[1] Local BLAST+")
-            print("[2] NCBI BLAST")
-            print("[0] Cancel")
+            style.menu([
+                ('\r\nSearch Engine', [('1', 'Local BLAST+'), ('2', 'NCBI BLAST')]),
+            ], zero="Cancel")
             engine_choice = input("Engine: ").strip()
             if engine_choice == "0":
                 continue
@@ -4428,13 +4403,13 @@ def blast_menu(
                 print("Invalid engine.")
                 continue
 
-            print("\r\nBLAST PROGRAM")
+            print("\nBLAST PROGRAM")
             for index, name in enumerate(compatible_programs, start=1):
                 print(
                     f"[{index}] {name.upper()} - "
                     f"{PROGRAMS[name]['description']}"
                 )
-            print("[0] Cancel")
+            style.cancel()
 
             program_choice = input("Program: ").strip()
             if program_choice == "0":
@@ -4460,7 +4435,8 @@ def blast_menu(
                         manager, local_database
                     )
                 except BlastAnalysisError as exc:
-                    print(f"ERROR: {exc}")
+                    style.error(f"{exc}")
+                    style.pause()
                     continue
                 database = local_database.name
                 print(
@@ -4476,13 +4452,13 @@ def blast_menu(
                     if info["type"] == PROGRAMS[program]["database_type"]
                 ]
 
-                print("\r\nNCBI REMOTE DATABASE")
+                print("\nNCBI REMOTE DATABASE")
                 for index, name in enumerate(compatible_databases, start=1):
                     print(
                         f"[{index}] {name} - "
                         f"{DATABASES[name]['description']}"
                     )
-                print("[0] Cancel")
+                style.cancel()
 
                 db_choice = input("Database: ").strip()
                 if db_choice == "0":
@@ -4495,18 +4471,16 @@ def blast_menu(
                     print("Invalid database.")
                     continue
 
-            raw_evalue = input("E-value [10]: ").strip()
+            raw_evalue = style.ask('E-value', default='10')
             raw_max = input(f"Maximum target sequences [{DEFAULT_MAX_HITS}]: ").strip()
 
             raw_threads = ""
             raw_word_size = ""
             raw_filter = ""
             if engine == "local":
-                raw_threads = input("CPU threads [4]: ").strip()
-                raw_word_size = input("Word size [default]: ").strip()
-                raw_filter = input(
-                    "Filtering [default/none]: "
-                ).strip().lower()
+                raw_threads = style.ask('CPU threads', default='4')
+                raw_word_size = style.ask('Word size', default='default')
+                raw_filter = style.ask('Filtering', default='default/none').lower()
 
             try:
                 evalue = float(raw_evalue) if raw_evalue else 10.0
@@ -4543,7 +4517,7 @@ def blast_menu(
 
                 if engine == "local":
                     assert local_database is not None
-                    print("\r\nRunning local BLAST+ search...")
+                    print("\nRunning local BLAST+ search...")
                     new_run = LocalBlastEngine().run(
                         query,
                         parameters,
@@ -4551,17 +4525,17 @@ def blast_menu(
                     )
                 else:
                     normalized = parameters.normalized()
-                    print("\r\nPRIVACY NOTICE")
+                    print("\nPRIVACY NOTICE")
                     print(
                         "The query sequence will be sent to NCBI (blast.ncbi.nlm.nih.gov) "
                         "and processed on NCBI servers. Do not submit confidential or "
                         "unpublished sequences unless this is acceptable."
                     )
-                    confirm = input("Send this query to NCBI? [y/N]: ").strip().lower()
+                    confirm = style.ask('Send this query to NCBI?', default='y/N').lower()
                     if confirm not in {"y", "yes", "j", "ja"}:
                         print("Remote search cancelled.")
                         continue
-                    print("\r\nSubmitting BLAST search to NCBI...")
+                    print("\nSubmitting BLAST search to NCBI...")
                     print("The search may take several seconds or longer.")
                     client = NCBIBlastClient(
                         tool=normalized.tool,
@@ -4571,7 +4545,7 @@ def blast_menu(
 
                 comparison_run = last_run
                 last_run = new_run
-                print("\r\nBLAST SEARCH COMPLETED")
+                print("\nBLAST SEARCH COMPLETED")
                 print_hit_summary(last_run)
                 if not last_run.hits:
                     print(
@@ -4580,11 +4554,10 @@ def blast_menu(
                     )
 
             except (BlastAnalysisError, AssertionError) as exc:
-                print(f"ERROR: {exc}")
+                style.error(f"{exc}")
 
         elif choice == "3":
-            print("\r\nSEARCH CONFIGURATION")
-            print(_line())
+            style.section('SEARCH CONFIGURATION')
             print("Supported programs:")
             for name, info in PROGRAMS.items():
                 print(
@@ -4593,11 +4566,11 @@ def blast_menu(
                     f"database={info['database_type']:<11}"
                 )
             print()
-            print(f"Default E-value:           {10.0}")
-            print(f"Default max target seqs:   {DEFAULT_MAX_HITS}")
+            style.field('Default E-value', f"{10.0}")
+            style.field('Default max target seqs', f"{DEFAULT_MAX_HITS}")
             print("Default local CPU threads: 4")
-            print("Local filtering:           BLAST+ default")
-            print(f"Local database root:        {manager.root}")
+            style.field('Local filtering', "BLAST+ default")
+            style.field('Local database root', f"{manager.root}")
             print(
                 "NCBI remote searches use the NCBI URL API. "
                 "Local searches use installed BLAST+ executables."
@@ -4609,13 +4582,15 @@ def blast_menu(
 
         elif choice == "5":
             if not last_run:
-                print("Run [1] BLAST Search first.")
+                style.note("Run [1] BLAST Search first.")
+                style.pause()
                 continue
             print_hit_summary(last_run)
 
         elif choice == "6":
             if not last_run or not last_run.hits:
-                print("No BLAST hits available.")
+                style.note("No BLAST hits available.")
+                style.pause()
                 continue
 
             ranked = rank_hits(last_run.hits)
@@ -4637,15 +4612,15 @@ def blast_menu(
                 print()
                 print(alignment_text(hit))
             except (ValueError, IndexError, BlastAnalysisError) as exc:
-                print(f"ERROR: {exc}")
+                style.error(f"{exc}")
 
         elif choice == "7":
             if not last_run:
-                print("Run [1] BLAST Search first.")
+                style.note("Run [1] BLAST Search first.")
+                style.pause()
                 continue
 
-            print("\r\nEVIDENCE PROFILE")
-            print(_line())
+            style.section('EVIDENCE PROFILE')
             for index, profile in enumerate(build_evidence_profile(last_run), start=1):
                 print(
                     f"[{index}] {profile.accession or profile.hit_id}: "
@@ -4657,12 +4632,12 @@ def blast_menu(
 
         elif choice == "8":
             if not last_run:
-                print("Run [1] BLAST Search first.")
+                style.note("Run [1] BLAST Search first.")
+                style.pause()
                 continue
 
             groups = group_hits_by_taxonomy(last_run.hits)
-            print("\r\nTAXONOMIC OVERVIEW")
-            print(_line())
+            style.section('TAXONOMIC OVERVIEW')
 
             identified = sum(1 for hit in last_run.hits if hit.scientific_names)
             unknown = len(last_run.hits) - identified
@@ -4674,35 +4649,32 @@ def blast_menu(
                 and _taxonomy_source(hit) == "inferred from BLAST hit definition"
             )
 
-            print(f"Hits analyzed:       {len(last_run.hits)}")
-            print(f"Taxa identified:     {identified}")
-            print(f"Unknown:             {unknown}")
+            style.field('Hits analyzed', f"{len(last_run.hits)}")
+            style.field('Taxa identified', f"{identified}")
+            style.field('Unknown', f"{unknown}")
             if inferred:
-                print(
-                    f"Definition-inferred: {inferred} "
-                    "(not an authoritative taxonomy assignment)"
-                )
+                style.field('Definition-inferred', f"{inferred} "
+                    "(not an authoritative taxonomy assignment)")
             print()
 
             if not groups:
-                print("No taxonomy labels were available from this result set.")
+                style.note("No taxonomy labels were available from this result set.")
             else:
                 print("Taxon / organism                         Hits")
-                print("-----------------------------------------------")
+                print(minor_rule())
                 for name, count in groups.items():
                     print(f"{name:<40} {count:>4}")
 
             if inferred:
                 print()
-                print(
-                    "NOTE: Some organism names were inferred conservatively "
+                style.note("Some organism names were inferred conservatively "
                     "from BLAST hit definitions because explicit taxonomy "
-                    "fields were not present in the returned result."
-                )
+                    "fields were not present in the returned result.")
 
         elif choice == "9":
             if not last_run:
-                print("Run [1] BLAST Search first.")
+                style.note("Run [1] BLAST Search first.")
+                style.pause()
                 continue
 
             if comparison_run is None:
@@ -4713,17 +4685,17 @@ def blast_menu(
                 continue
 
             comparison = compare_blast_runs(comparison_run, last_run)
-            print("\r\nBLAST RUN COMPARISON")
-            print(_line())
-            print(f"Query A:       {comparison.query_a}")
-            print(f"Query B:       {comparison.query_b}")
-            print(f"Common hits:   {len(comparison.common_accessions)}")
-            print(f"Unique to A:   {len(comparison.unique_to_a)}")
-            print(f"Unique to B:   {len(comparison.unique_to_b)}")
+            style.section('BLAST RUN COMPARISON')
+            style.field('Query A', f"{comparison.query_a}")
+            style.field('Query B', f"{comparison.query_b}")
+            style.field('Common hits', f"{len(comparison.common_accessions)}")
+            style.field('Unique to A', f"{len(comparison.unique_to_a)}")
+            style.field('Unique to B', f"{len(comparison.unique_to_b)}")
 
         elif choice == "10":
             if not last_run:
-                print("Run [1] BLAST Search first.")
+                style.note("Run [1] BLAST Search first.")
+                style.pause()
                 continue
 
             path = input("Export path (.json/.csv/.txt): ").strip()
@@ -4742,13 +4714,13 @@ def blast_menu(
                 else:
                     print("Use .json, .csv or .txt.")
                     continue
-                print(f"Exported: {path}")
+                style.success(f"Exported: {path}")
             except OSError as exc:
-                print(f"Export failed: {exc}")
+                style.error(f"Export failed: {exc}")
 
         elif choice == "11":
             if not last_run:
-                print("Run [1] BLAST Search first.")
+                style.note("Run [1] BLAST Search first.")
             else:
                 print(build_text_report(last_run))
 
@@ -4756,8 +4728,7 @@ def blast_menu(
             run_self_test(verbose=True)
 
         elif choice == "13":
-            print("\r\nBLAST PROGRAMS")
-            print(_line())
+            style.section('BLAST PROGRAMS')
             for name, info in PROGRAMS.items():
                 print(
                     f"{name.upper():<9} "
@@ -4766,13 +4737,11 @@ def blast_menu(
                     f"{info['description']}"
                 )
 
-            print("\r\nREMOTE DATABASES")
-            print(_line())
+            style.section('REMOTE DATABASES')
             for name, info in DATABASES.items():
                 print(f"{name:<18} {info['type']:<12} {info['description']}")
 
-            print("\r\nLOCAL NCBI DATABASE CATALOG")
-            print(_line())
+            style.section('LOCAL NCBI DATABASE CATALOG')
             for name, info in LOCAL_DATABASE_CATALOG.items():
                 print(
                     f"{name:<18} {info['type']:<12} "
@@ -4784,7 +4753,7 @@ def blast_menu(
 
         elif choice == "2":
             # P1-7: collect a search submitted earlier instead of repeating it.
-            print("\r\nRESUME A PREVIOUS SEARCH")
+            print("\nRESUME A PREVIOUS SEARCH")
             print(
                 "Enter the request ID (RID) of a search submitted earlier. Only "
                 "the RID is sent to NCBI; the query sequence is not transmitted "
@@ -4804,7 +4773,8 @@ def blast_menu(
             try:
                 resumed = NCBIBlastClient().resume(rid)
             except BlastAnalysisError as exc:
-                print(f"ERROR: {exc}")
+                style.error(f"{exc}")
+                style.pause()
                 continue
 
             last_run = resumed
@@ -4815,10 +4785,10 @@ def blast_menu(
                 f"{resumed.query.sequence_type.lower()})."
             )
             for note in resumed.metadata.warnings:
-                print(f"NOTE: {note}")
+                style.note(f"{note}")
 
         else:
-            print("Invalid selection.")
+            style.invalid_selection()
 
 
 # ============================================================================
@@ -5595,15 +5565,13 @@ def run_self_test(verbose: bool = True) -> bool:
             results.append(SelfTestResult(name, False, str(exc)))
 
     if verbose:
-        print("\r\n" + _line("="))
-        print("SYNAPSE BLAST SELF-TEST")
-        print(_line("="))
+        style.header('SYNAPSE BLAST SELF-TEST')
         for result in results:
             marker = "PASS" if result.passed else "FAIL"
             suffix = f" - {result.detail}" if result.detail else ""
             print(f"[{marker}] {result.name}{suffix}")
         passed = sum(result.passed for result in results)
-        print(_line())
+        print(minor_rule())
         print(f"{passed}/{len(results)} tests passed.")
 
     return all(result.passed for result in results)
