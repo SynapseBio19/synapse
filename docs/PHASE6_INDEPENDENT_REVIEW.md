@@ -326,3 +326,15 @@ need the owner's decision.
    rely on the old convention.
 10. **Ask an independent reviewer** to repeat Q1 and Q3 without this
     session's context.
+
+---
+
+## 3. Follow-up (2026-11-02)
+
+Next step 1 (correct the documents) and the documentation half of next
+step 2 (mark the unverified references) were carried out in the commit
+after this review, documents only. The corrections are tabulated in
+`docs/CHANGES.md` ("Documentation corrections after the closing
+review"). Two test docstrings that repeat the ExPASy wording were left
+unchanged, because that round changed no code. Next steps 3-10 are open;
+3, 4 and 5 need the owner's approval.

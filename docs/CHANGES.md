@@ -1507,7 +1507,10 @@ which is the intended, evidence-limited statement.
 `analyze_orfs`, "behavior" in 10 code sites), while the documentation
 mixed both systems ("behaviour" 18 times next to "behavior" 11 times,
 "labelled", "modelled", "-ise" forms). American English is now used
-throughout: 92 words in 10 documents and 6 code text sites, grouped:
+throughout: 86 words in 8 documents, 9 text sites in 4 source files and
+6 in tests, grouped (figures corrected after the closing review; the
+first version of this entry said 92 words in 10 documents and 6 code
+sites):
 
 | Category | Original | Revised | Where |
 |---|---|---|---|
@@ -1673,14 +1676,15 @@ without the reference libraries).
   random test proteins of 41-400 aa, 20 contained IG and differed from
   ProtParam by up to 1.29 index units.
 - **Corrected behavior.** The weight is 1.0, the value in Biopython 1.88
-  `Bio.SeqUtils.ProtParamData.DIWV`, which reproduces the ExPASy
-  ProtParam table. The rest of Synapse's table equals Biopython's except
+  `Bio.SeqUtils.ProtParamData.DIWV`, which cites Guruprasad et al.
+  (1990). (The first version of this entry said the table reproduces
+  ExPASy ProtParam; that was not verified.) The rest of Synapse's table equals Biopython's except
   FY (33.6 vs 33.601, a 0.001 difference that is left as is).
 - **Reasoning.** The I row read `1.0, 1.0, 44.94, 1.0, -7.49, ...` against
   Biopython's `1.0, 1.0, 44.94, 1.0, 1.0, ...`; -7.49 occurs twice more in
   the same row (IK, IV), which makes a transcription error plausible.
-- **Reference.** Guruprasad et al. (1990) through its established
-  implementation (ExPASy ProtParam, as carried by Biopython). The paper's
+- **Reference.** Guruprasad et al. (1990) through one established
+  implementation (Biopython), a single secondary source. The paper's
   table itself was not consulted in this session, because no external
   access was used; checking it is the recommended confirmation.
 - **Why the audit missed it.** The two proteins compared with ExPASy in
@@ -1757,3 +1761,31 @@ decision.
 Tests: 2 new (`Python310CompatibilityTests`); the f-string test fails on
 the previous code and is skipped on interpreters older than 3.12, whose
 tokenizer cannot see inside f-strings.
+
+### Documentation corrections after the closing review
+
+`docs/PHASE6_INDEPENDENT_REVIEW.md` (`fc77ff4`) found statements in the
+Phase 6 documents that did not match the repository. Corrected, without
+any source change:
+
+| Where | Was | Now |
+|---|---|---|
+| this file (Stage H spelling), `PHASE6_PROGRESS.md` row 35, final report G | 92 words in 10 documents, 6 code sites | 86 words in 8 documents, 9 text sites in 4 source files, 6 in tests (word-level diff of `1a8f2bc`) |
+| final report A | Stage I found three defects | items 25-27 come from Stage G (primer coordinates) and Stage I (IG weight, Python 3.10) |
+| final report A | 109 tests "at the start" of the previous cycle | at the end |
+| final report A | confirmed S items "are corrected" | S9 quantified only, S14 resolved for the API only, S5 addressed |
+| `AUDIT_STATUS.md` P1-1 | 312 tests | 314 |
+| final report header | attribution "as recorded per commit" | five early commits carry no attribution |
+| IG weight (METHODS, FEATURE_STATUS, AUDIT_STATUS, final report, this file) | Biopython's table "reproduces ExPASy ProtParam" | Biopython's table, which cites Guruprasad et al. (1990); one secondary source |
+| final report row 26 | "unimportable on 3.10/3.11" | the same, marked as inferred from the grammar, not observed |
+| `METHODS.md` references | four entries written without verification | marked as not verified at the source |
+| `PHASE6_HANDOVER.md` opening, section 1 | "Phase 6 is not complete" | current status first; the pause text kept as history |
+| `PHASE6_PROGRESS.md` "Paused", "Open after the current package", P2-5 row | Stages F-I not started; D17/D18 open; complexity open | marked historical; points to final report J; complexity resolved by documentation |
+| final report J | about ten open items missing | added (G·U/RNAfold, primer generations, NEBcutter, real BLAST database, HGVS validator, pipeline printing, complexity names, pyright errors, tool ledger, coverage, two edge-case tests, unverified references, ResourceWarning) |
+
+Not changed, because it is test code and this round changed documents
+only: the docstring of
+`ProteinReferenceTests.test_instability_weights_match_the_reference_table`
+still says "(ExPASy's)", and the module docstring of
+`tests/test_external_reference.py` repeats the ExPASy comparison for
+ubiquitin from the audit.

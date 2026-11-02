@@ -171,11 +171,11 @@ use 0-based inclusive `start <= stop` on the forward strand.
   repeats it, skipped without Biopython.
 - Instability index (Guruprasad et al. 1990): 10/L times the sum of the
   dipeptide weights. The weight for the dipeptide IG was −7.49 in Synapse
-  and 1.0 in Biopython's table, which reproduces ExPASy ProtParam; it is
-  now 1.0 (2026-11-02). The only remaining difference is FY, 33.6 here and
-  33.601 there. The primary table was not consulted for this correction
-  (no external access in this session), so the reference is the
-  established implementation, not the paper.
+  and 1.0 in Biopython's table (`ProtParamData.DIWV`, which cites
+  Guruprasad et al. 1990); it is now 1.0 (2026-11-02). The only remaining
+  difference is FY, 33.6 here and 33.601 there. The primary table was not consulted for this correction
+  (no external access in this session), so the reference is one
+  secondary source, not the paper; confirming it is open work.
 - Unresolved residues ("?", from ambiguous codons) keep their position.
   Sliding windows (hydropathy, flexibility, transmembrane screen, signal
   peptide) and the instability index skip the windows or dipeptides that
@@ -451,13 +451,17 @@ Validation:
 - NCBI: The Genetic Codes; ORFfinder documentation; Primer3 manual
   (`PRIMER_TM_FORMULA`, `PRIMER_SALT_CORRECTIONS`).
 - Gardiner-Garden M, Frommer M (1987) CpG islands in vertebrate genomes.
-  J Mol Biol 196:261–282.
+  J Mol Biol 196:261–282. (Bibliographic details not verified at the
+  source in Phase 6.)
 - Guruprasad K, Reddy BVB, Pandit MW (1990) Correlation between stability
   of a protein and its dipeptide composition: a novel approach for
   predicting in vivo stability of a protein from its primary sequence.
-  Protein Eng 4:155–161.
+  Protein Eng 4:155–161. (Journal, volume and pages as cited in
+  Biopython's `ProtParamData`; not verified at the source in Phase 6.)
 - Cock PJA et al. (2009) Biopython: freely available Python tools for
   computational molecular biology and bioinformatics. Bioinformatics
-  25:1422–1423. (Reference implementation in the tests, version 1.88.)
+  25:1422–1423. (Reference implementation in the tests, version 1.88.
+  Bibliographic details not verified at the source in Phase 6.)
 - Untergasser A et al. (2012) Primer3 - new capabilities and interfaces.
-  Nucleic Acids Res 40:e115. (primer3-py 2.4.0 wraps Primer3 in the tests.)
+  Nucleic Acids Res 40:e115. (primer3-py 2.4.0 wraps Primer3 in the tests.
+  Bibliographic details not verified at the source in Phase 6.)

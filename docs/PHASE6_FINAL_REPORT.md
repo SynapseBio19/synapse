@@ -3,7 +3,14 @@
 Project Synapse, Phase 6 (2026-10-30 to 2026-11-02). Working copy
 `Project Snyapse - Kopie`; the original project was not modified.
 Governing specification: the integrated Phase 6 Master Prompt. Work by
-Claude Opus 5 and Claude Opus 5.5, as recorded per commit.
+Claude Opus 5 and Claude Opus 5.5. 58 of the 63 Phase 6 commits carry a
+model attribution; the first five (`824ca5f`, `d4544ad`, `5c098e3`,
+`47146b0`, `7334296`) carry none.
+
+Corrected on 2026-11-02 after the closing review
+(`docs/PHASE6_INDEPENDENT_REVIEW.md`): figures in sections A and G, the
+evidence wording for the IG weight and the Python 3.10 finding, and
+the open items in section J.
 
 The detailed records behind this report are `docs/PHASE6_INITIAL_AUDIT.md`
 (the findings), `docs/PHASE6_PROGRESS.md` (one row per work package, with
@@ -18,13 +25,18 @@ execution history, including pauses and a restricted assignment).
 
 **Outcome.** The Phase 6 audit recorded 19 confirmed defects (D1-D19)
 and, as the work went on, 24 suspected or unverified concerns (S1-S24).
-All 19 defects are corrected, and every S item is assessed: confirmed
-ones are corrected, two were shown not to be defects, one (S24) is
+All 19 defects are corrected, and every S item is assessed. Most
+confirmed ones are corrected; S9 (alignment memory) is quantified and
+documented but not corrected, S14 is resolved for the API while the
+menus remain in the modules (P2-2), and S5 is addressed by naming and
+sourcing the rule. Two were shown not to be defects, one (S24) is
 measured with its residual risk documented, and one (S11) is blocked on
 the owner's approval for external requests. Stages F (terminal
 interface), G (scientific output), H (language and documentation) and
-I (final verification) are complete. Stage I found and corrected three
-further defects that no earlier test had caught (section B, items 25-27).
+I (final verification) are complete. Three further defects that no
+earlier test had caught were found and corrected (section B, items
+25-27): the primer coordinates in Stage G, the IG weight and the
+Python 3.10 blocker in Stage I.
 
 **Main improvements.**
 
@@ -45,7 +57,7 @@ further defects that no earlier test had caught (section B, items 25-27).
   screens, one meaning for `[0]`, one message prefix per category, one
   notation per unit, 1-based positions everywhere a user sees them, and a
   style guide whose mechanical rules the test suite enforces.
-- Evidence: 314 tests (109 at the start of the previous cycle), including
+- Evidence: 314 tests (109 at the end of the previous cycle), including
   external reference comparisons with Biopython 1.88 and primer3-py
   2.4.0, BLAST+ 2.17.0 executions, and cross-module workflow tests.
 
@@ -101,8 +113,8 @@ references and test names are in `docs/CHANGES.md` under the ID. Levels:
 | 22 | S23 | CRISPR | Seed always taken at the guide's 3' end, which is PAM-distal for Cas12a (5' PAM) | PAM-proximal seed for 3'- and 5'-PAM systems | K |
 | 23 | S9 | Mutation | Memory cost of the alignment unstated | Measured (~45 bytes per cell) and stated in the note | measurement |
 | 24 | P2-5 | Sequence overview | "Complexity" not defined | Defined as normalized composition entropy with its limit (repeats score 1.0) | K |
-| 25 | IG weight | Protein | Instability weight for IG was -7.49 | 1.0, the ExPASy/Biopython value | R (Biopython ProtParam, 31 proteins) |
-| 26 | Py 3.10 | CRISPR | `f"{'#':>3}"` made the module unimportable on 3.10/3.11 | Literal header, same output | static 3.10 check |
+| 25 | IG weight | Protein | Instability weight for IG was -7.49 | 1.0, the value in Biopython's table (`ProtParamData.DIWV`, which cites Guruprasad et al. 1990); the paper's table was not consulted | R (Biopython ProtParam, 31 proteins; one secondary source) |
+| 26 | Py 3.10 | CRISPR | `f"{'#':>3}"` made the module unimportable on 3.10/3.11 | Literal header, same output | static 3.10 check; the import failure follows from the pre-3.12 grammar and was not observed on a 3.10 interpreter |
 | 27 | Primer coordinates | Primer menu | Positions printed 0-based half-open unlabeled; target read half-open | 1-based inclusive in display and input; API unchanged | K |
 
 Independent scientific validation (experiments, curated benchmarks)
@@ -247,8 +259,9 @@ D18). In summary:
   "evidence level" for the type classifier; "heuristic evidence" for the
   signal-peptide screen; the primer warning names what was observed
   ("Every reported primer pair is rated MARGINAL or POOR ...").
-- **Spelling**: American English throughout (92 words in documents,
-  6 interface sites), matching the identifiers; enforced by a test.
+- **Spelling**: American English throughout (86 words in 8 documents,
+  9 text sites in 4 source files and 6 in tests), matching the
+  identifiers; enforced by a test.
 - **Recurring messages**: one wording per situation (`Invalid
   selection.`, `No DNA sequence selected.`).
 - **Precision**: the mutation frame warning names the reading frame and
@@ -360,6 +373,19 @@ at the start. Not committed by design: `exports/`, `logs/`,
 | Restriction-site-driven primer design | primer, restriction | no wiring | none | pass a chosen site as the target | technical |
 | `blast_results/TEST_8_REFERENCE_blast.json` | BLAST | deletion is the owner's decision | owner | delete or keep as labeled | environmental |
 | License (`pyproject.toml`: "decision pending") | project | owner's decision | owner | choose a license | environmental |
+| G·U pairing, optional RNAfold (P2-5) | RNA | not implemented; RNAfold is an external tool | dependency decision (1.3.1) | implement G·U; decide on RNAfold | scientific |
+| Merging the surviving primer generations (P2-1) | primer | behavior-preserving refactoring of its own | none | merge with bytecode and golden checks | technical |
+| NEBcutter comparison of a circular digest (P1-4) | restriction | web service; largely covered by the Biopython pUC19 comparison | approval | decide whether still needed | environmental |
+| Local BLAST on a real database | BLAST | `nt` is too large; only test databases used | approval for a ~0.5 GB download | swissprot as a proportionate step | environmental |
+| HGVS conformance against a validator | mutation | no validator installed | `hgvs` package or Mutalyzer (approval) | compare a variant set | scientific |
+| `core/pipeline.py` prints from `core/` | pipeline | layering follow-up of Stage F | none | move `print_status` to `ui/` | technical |
+| "complexity" field names | sequence, RNA, CRISPR, mutation | kept for compatibility; meaning documented | none | rename with a documented snapshot change, if wanted | technical |
+| 112 pyright errors (standard mode, Python 3.10) | primer, CRISPR, mutation, tests | reduced from 134, not cleared | none | triage for reachable `None` paths | technical |
+| Tool and data ledger (1.3.1, 11.8) | project | versions recorded; source, access date, license and checksum are not | none | write the ledger | environmental |
+| Line coverage | tests | no coverage tool installed | approval to install `coverage` | measure and report | technical |
+| Missing-file and runtime invalid-selection tests (11.4) | input, menus | not written | none | add both | technical |
+| Four references in `METHODS.md` not verified at the source | documentation | written in Stage H/I without access | approval (PubMed) | verify or keep the mark | scientific |
+| `ResourceWarning` in a literature retry test | tests | a simulated `HTTPError` is not closed | none | close it in the test | technical |
 
 ---
 

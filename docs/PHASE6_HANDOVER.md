@@ -1,13 +1,19 @@
-# Phase 6 handover – planned pause (2026-10-31)
+# Phase 6 handover
 
-This is the state at a planned pause requested by the owner. Phase 6 is
-**not complete**. Stages F–H (terminal UI standard, output
+**Current status (2026-11-02): Phase 6 is complete** as far as the
+environment and the owner's restrictions allow; see section 12 and
+`docs/PHASE6_FINAL_REPORT.md`. Sections 1-6 below record the state at
+the planned pause of 2026-10-31 and are kept unchanged as history;
+sections 7-12 are the later addenda in order.
+
+*As of the pause (2026-10-31):* this is the state at a planned pause
+requested by the owner. Phase 6 is **not complete**. Stages F–H (terminal UI standard, output
 standardization, style guide/editorial pass) and Stage I (final
 verification and report) have not been started. The running record is
 `docs/PHASE6_PROGRESS.md`; the findings are in
 `docs/PHASE6_INITIAL_AUDIT.md`.
 
-## 1. Repository state
+## 1. Repository state (at the pause; current state in section 12)
 
 | Item | State |
 |---|---|

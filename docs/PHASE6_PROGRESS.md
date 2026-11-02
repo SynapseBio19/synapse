@@ -83,7 +83,7 @@ IUPAC, gapped and invalid input (D14):
 | 32 | Stage G: one notation per unit in printed output (%, °C, cal/(mol·K), Da); primer positions and target input 1-based inclusive like the other menus | this package | inventory of every f-string literal; source check fails on the previous code; primer coordinates verified by slicing | Corrected; suite 292/292 |
 | 33 | Stage G (6.4): payload warnings (primer, CRISPR) reach the exported summary and the Markdown report on every path | this package | measurement over every offline `core.api` analysis; new tests fail on the previous code | Corrected; suite 294/294; menu-path parameters for sequence/restriction/cloning recorded as open |
 | 34 | Stage G (6.4): menu-path restriction results record enzymes and topology; restriction and cloning results record the enzyme data version on both paths | this package | new test fails on the previous code | Corrected; suite 295/295; menu-path sequence-overview and cloning input parameters still open |
-| 35 | Stage H editorial review part 1: American spelling throughout (92 words in docs, 6 code text sites); one wording for recurring messages; tone and precision fixes; enforcement test | this package | inventory of every string literal and document; spelling test fails on the previous text | Done; suite 296/296 |
+| 35 | Stage H editorial review part 1: American spelling throughout (86 words in 8 documents, 9 text sites in 4 source files and 6 in tests; corrected after the closing review); one wording for recurring messages; tone and precision fixes; enforcement test | this package | inventory of every string literal and document; spelling test fails on the previous text | Done; suite 296/296 |
 | 36 | BLAST E-values with three significant figures everywhere; `n/a` when absent | `4e5dbdc` | helper assertions (the sample XML cannot distinguish) | Corrected |
 | 37 | `docs/STYLE_GUIDE.md` (9.1-9.6) with an enforcement table checked by the suite | this package | guide-consistency test verified with a deliberate violation | Done |
 | 38 | README rewritten to 15.1 (purpose, modules, installation, dependencies, usage, configuration, architecture, testing, limitations) | this package | each statement checked against the code | Done |
@@ -93,18 +93,22 @@ IUPAC, gapped and invalid input (D14):
 | 42 | Stage I: integration workflow tests for 10.1-10.4 and 10.7 (selection transfer, coordinates, genetic code, invalidation, report traceability) | this package | 7 tests, all passing on the first run (no new defect found) | Done; suite 312/312 |
 | 43 | Stage I: feature matrix and AUDIT_STATUS brought to the end-of-phase state; table rendering fixed | `82ae2e9`, `70cf362` | every table checked for its cell count | Done |
 | 44 | Stage I: static Python 3.10 check; **CRISPR module unimportable on 3.10/3.11** (`f"{'#':>3}"`) fixed with identical output | this package | grammar check with `feature_version=(3, 10)`; tokenizer check for pre-PEP-701 rules, failing on the previous code | Corrected; suite 314/314 |
+| 45 | Closing review requested by the owner: cross-run of old and new suites, AST interface diff, golden key comparison, commit and document audit | `fc77ff4` | mechanical checks; reviewer is the author (stated) | Review written; no source change |
+| 46 | Documentation corrections from the review: figures, stale sections, IG evidence wording, unverified references marked, report J completed | this package | documents only | Done |
 
-## Paused (2026-10-31)
+## Paused (2026-10-31, historical)
 
 Planned pause at the owner's request; see `docs/PHASE6_HANDOVER.md` for the
-exact state, the open findings and the continuation steps. Stages F–I have
-not started.
+exact state, the open findings and the continuation steps. Stages F–I had
+not started then. Work resumed on 2026-10-31 and Phase 6 was completed on
+2026-11-02 (rows 28-44).
 
-## Open after the current package
+## Open at the end of Phase 6
 
-D17 and D18 (stages F and G), plus S6/P1-7, S13, S14/P2-2, S18 and P1-9.
-Corrected or assessed: D1–D16, D19, S1–S5, S7–S12, S15–S17 and S19–S23.
-S11 stays open pending the owner's approval for live external requests.
+D1-D19 are corrected and S1-S24 assessed. The open items, with reason,
+required resource and next action, are in section J of
+`docs/PHASE6_FINAL_REPORT.md`; S11 stays open pending the owner's approval
+for live external requests.
 
 ## Classification of the outstanding audit items (2026-11-01)
 
@@ -116,7 +120,7 @@ reason it stands where it does. None is silently closed.
 | **P0-4** enzyme definitions vs REBASE | 3.6 "Verify enzyme definitions against authoritative sources" | **Partially done; blocked for the rest** | ClaI was corrected and NdeI confirmed in the previous cycle, and `ENZYME_DATABASE_VERSION` records the review date. A systematic re-check of all 22 entries needs REBASE itself. That is an external data source, so it needs the owner's approval under the resource policy; it has not been requested. Not a defect, an unfinished validation. |
 | **P2-3** CRISPR improvements | 3.9 | **Mostly done; CFD still rejected** | Cut position (D8) and on-target exclusion (D9) are implemented and tested; the U6/Pol III poly-T consideration is named and sourced (S5). CFD scoring stays rejected: it needs the published mismatch weight matrix, and 14.3 forbids inventing it. Implementing it requires the matrix supplied as a cited data file. |
 | **P2-4** cross-checks | 3.13, 10.8 | **Partially done** | REF against the reference sequence is implemented (P0-7) and the reference alphabet is now validated (S22). Primer and guide consistency against called variants is not implemented. It is feasible without external data and is the natural next functional item. |
-| **P2-5** honest labels, G·U, RNAfold | 3.3, 3.4, 8.2 | **Partially done** | Unresolved residues keep their positions (Stage 5, extended by D14-F6), and the ORF label is "Heuristic score". G·U pairing and an optional RNAfold integration are not implemented; RNAfold would be an external tool and needs the dependency justification of 1.3.1. The "complexity" renaming belongs with Stage G terminology. |
+| **P2-5** honest labels, G·U, RNAfold | 3.3, 3.4, 8.2 | **Partially done** | Unresolved residues keep their positions (Stage 5, extended by D14-F6), and the ORF label is "Heuristic score". G·U pairing and an optional RNAfold integration are not implemented; RNAfold would be an external tool and needs the dependency justification of 1.3.1. "Complexity" was resolved by documentation on 2026-11-02 (`1269335`): the measure is defined with its limit and the field names are kept. |
 | **P2-6** performance | 3.13, 11.4 | **Partially done** | The cloning planner no longer rescans (S18): 10 enzymes went from 100-110 s to 0.57 s. The mutation alignment is still quadratic in time and memory; S9 measured it at ~45 bytes per matrix cell, so 10 kb needs about 4.5 GB. A banded or linear-space alignment is a real algorithmic change and is the remaining part. |
 | **P2-7** Type IIS enzymes | 3.6 "Pay particular attention to Type IIS enzymes" | **Not implemented, currently harmless** | The database holds no Type IIS enzyme, so the forward-strand search cannot produce a wrong result today. Adding one without Type IIS support would. The guard is that both arrive together. |
 | **S11** live literature providers | 3.11, 1.3 | **Blocked, awaiting the owner** | Testing against live providers means sending queries to external services, which needs explicit approval. Offline fixtures cover parsing, deduplication and retries. |
