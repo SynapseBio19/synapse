@@ -1,4 +1,4 @@
-# Status of every audit recommendation (as of 2026-10-30)
+# Status of every audit recommendation (as of 2026-11-02)
 
 Assessment categories:
 
@@ -34,7 +34,7 @@ named.
 
 | ID | Subject | Status | Evidence / open points |
 |---|---|---|---|
-| P1-1 | Test suite and golden master | IMPLEMENTED+TESTED | 109 tests (`unittest`, standard library); 12 golden scenarios; network and `input()` blocked in tests. |
+| P1-1 | Test suite and golden master | IMPLEMENTED+TESTED | 109 tests at the end of the 2026-10 cycle; 312 at the end of Phase 6 (2026-11-02), including external reference tests against Biopython and primer3-py that skip without them, integration workflow tests, and interface and style enforcement tests; 13 golden snapshots; network and `input()` blocked in tests. |
 | P1-2 | `SequenceRecord`, `Interval`, `Feature`, `AnalysisResult`, `store_result()`, no silent `except` | IMPLEMENTED+TESTED | Every module stores visibly; coordinate tests; failures are logged. |
 | P1-3 | Mg²⁺ model, symmetry parameter, honest category labels | IMPLEMENTED+TESTED (external reference comparison) | von Ahsen 2001 implemented; known-answer test against the Primer3 manual example (ΔH, ΔS exact; Tm 50.550 vs 50.554 °C) and an independent re-implementation of the equations. The criterion "±1 °C against Biopython/Primer3 at three Mg levels" is met (Phase 6, 2026-11-02): against primer3-py 2.4.0 at Mg²⁺ 0, 1.5 and 3 mM, 2,916 comparisons agree within 0.0032 °C. This confirms the implementation against an independent one; it is not experimental validation of the model. |
 | P1-4 | Restriction sites across the origin (circular) | IMPLEMENTED+TESTED | Implemented and unit tested (`wraps_origin`). Phase 6: the digest was compared with Biopython `Bio.Restriction` on pUC19 (132/132 agree); the map and the other site-based results did not honor topology (audit D3) and now do, also 132/132 against Biopython (2026-10-31). The NEBcutter comparison itself was not run; Biopython's REBASE-based engine served as the independent reference. |
@@ -56,14 +56,14 @@ named.
 | P2-3 | CRISPR: cut position, U6 rules, local CFD scoring, exclude the on-target site | DEFERRED / partly REJECTED | Phase 6: the modeled cut site is reported with its source (audit D8) and the on-target site is excluded from the local specificity screen (audit D9, 2026-10-31). The rest was not implemented in this session. **CFD scoring is rejected** for now: it requires the published mismatch weight matrix, and reconstructing those numbers from memory would mean inventing scientific data. It can be added once the matrix is supplied as a data file with a citation. |
 | P2-4 | Cross-checks (primer/guide against variants, REF vs. sequence) | PARTIAL | REF vs. reference sequence is implemented (`check_reference_alleles`, P0-7). Primer/guide-versus-variant consistency checks are deferred. |
 | P2-5 | Honest labels; preserve "?" positions; G·U / RNAfold; rename complexity | PARTIAL | Unresolved residues keep their position in all position-dependent protein analyses (Stage 5, tested); labels and validation status are documented in `docs/METHODS.md`; the ORF "Confidence" label is now "Heuristic score", and since 2026-11-02 (D18) the data model and exports say `heuristic_score` as well. G·U pairing and optional RNAfold are deferred. Complexity (2026-11-02): the four modules that report it compute one measure, the normalized Shannon entropy of A/C/G/T composition; `METHODS.md` now defines it and states that it does not detect repeats (`ACGT` x 100 scores 1.000), and the sequence-overview interpretation says so. The field names keep "complexity" for compatibility, so the rename itself is not done. |
-| P2-6 | Performance (banded alignment, sliding CpG count, primer pre-filter) | DEFERRED | Only a length warning above 2 kb was added (P1-10). The criterion "10 kb in < 10 s per module" is not met for the mutation module. |
+| P2-6 | Performance (banded alignment, sliding CpG count, primer pre-filter) | PARTIAL | Phase 6 (S18): the cloning planner no longer rescans identical sites, 10 enzymes 100-110 s -> 0.57 s. The mutation alignment is still quadratic in time and memory; S9 measured ~45 bytes per matrix cell (about 4.5 GB for 10 kb x 10 kb), and the note now states the figures. The criterion "10 kb in < 10 s per module" is not met for the mutation module; a banded or linear-space alignment is the remaining work. |
 | P2-7 | Type IIS enzymes on both strands, methylation flags | PARTIAL | Methylation notes are implemented (ClaI, XbaI, DpnI, HpaII). **Type IIS support is deferred**; the forward-strand-only search remains correct for the palindromic enzymes in the database, and no Type IIS enzyme was added, so no wrong result can arise from this today. |
 
 ## P3 – long-term
 
 | ID | Subject | Status |
 |---|---|---|
-| P3-1 | Evidence-bound experiment planner | DEFERRED (depends on P1-2, P1-12, both now in place) |
+| P3-1 | Evidence-bound experiment planner | DEFERRED (depends on P1-2, P1-12, both now in place). The menu entry says "not implemented" (Phase 6, D15). |
 | P3-2 | Primer/guide specificity against genomes (BLAST, Cas-OFFinder) | DEFERRED (needs local databases) |
 | P3-3 | Web or desktop front end | DEFERRED (depends on P2-2; `core/api.py` is the entry layer for it) |
 
@@ -79,6 +79,35 @@ recommended next steps:
 3. NEBcutter comparison for a circular plasmid digest (P1-4).
 4. ORFfinder comparison on reference sequences (P1-9).
 5. A systematic REBASE re-check of all enzyme entries (P0-4).
-6. Local BLAST+ runs against `data/blast_db/` and one live remote run (P1-7).
-7. An independent review of the primer ranking chain before it is flattened
-   (P2-1).
+6. ~~Local BLAST+ runs~~ done in Phase 6 (BLAST+ 2.17.0 on the bundled
+   database and on `makeblastdb` databases, blastn and blastp). One live
+   remote NCBI run is still open and needs the owner's approval (P1-7).
+7. ~~An independent review of the primer ranking chain~~ done in Phase 6
+   (D16 part 2, reachability review; P2-1). Merging the surviving
+   generations is still not done.
+8. A Python 3.10 suite run: only Python 3.14 is installed; installing a
+   3.10 interpreter needs the owner's approval. `pyright` runs at
+   `pythonVersion = 3.10` on every change.
+9. The instability-index weights against the Guruprasad et al. (1990)
+   table itself; Phase 6 corrected the IG weight against Biopython's
+   ExPASy-derived table.
+
+## Phase 6 audit findings
+
+The Phase 6 initial audit (`docs/PHASE6_INITIAL_AUDIT.md`) recorded 19
+confirmed defects (D1-D19) and 14 suspected or unverified concerns, a
+list that grew to 24 (S1-S24) as the work found more. Their status at the
+end of Phase 6:
+
+- **D1-D19**: all corrected; D18 (the "confidence" vocabulary) in Stage G
+  with a documented golden-master change.
+- **S1-S24**: all assessed. Confirmed ones are corrected; S1, S2 are not
+  defects (verified by execution); S24 is measured with its residual risk
+  recorded; **S11** (live literature providers) is blocked on the owner's
+  approval for external requests.
+- One further defect was found in Stage I by the new reference tests: the
+  instability weight for IG (corrected; `docs/CHANGES.md`).
+
+Each item's evidence, commit and validation level is in
+`docs/PHASE6_PROGRESS.md`; the per-feature status is in
+`docs/FEATURE_STATUS.md`.
