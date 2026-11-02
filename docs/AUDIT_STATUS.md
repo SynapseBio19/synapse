@@ -87,7 +87,9 @@ recommended next steps:
    generations is still not done.
 8. A Python 3.10 suite run: only Python 3.14 is installed; installing a
    3.10 interpreter needs the owner's approval. `pyright` runs at
-   `pythonVersion = 3.10` on every change.
+   `pythonVersion = 3.10` on every change, and a static 3.10 check in the
+   suite found one f-string that made the CRISPR module unimportable on
+   3.10 and 3.11 (fixed).
 9. The instability-index weights against the Guruprasad et al. (1990)
    table itself; Phase 6 corrected the IG weight against Biopython's
    ExPASy-derived table.

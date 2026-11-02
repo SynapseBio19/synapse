@@ -2187,7 +2187,7 @@ def _print_candidate_table(candidates: Sequence[GuideCandidate], limit: int = 20
     if has_specificity_analysis(candidates):
         print("Specificity component uses only explicitly supplied local reference sequences.")
     print(_line())
-    print(f"{'#':>3} {'ID':<7} {'Guide':<22} {'PAM':<7} {'Str':<4} {'Pos':<12} {'GC':>6} {'Score':>7}")
+    print(f"  # {'ID':<7} {'Guide':<22} {'PAM':<7} {'Str':<4} {'Pos':<12} {'GC':>6} {'Score':>7}")
     print(_line())
     for i, c in enumerate(candidates[:limit], 1):
         print(

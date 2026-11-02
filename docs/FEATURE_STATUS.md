@@ -487,7 +487,7 @@ explicitly not implemented.
 | NEBcutter comparison | Web service | Substantively superseded by validation 2 |
 | Live remote NCBI BLAST | Not run by choice | One confirmed run recording RID and provenance |
 | Local BLAST on a real database | `nt` is ~100 GB+ | `swissprot` (~0.5 GB) as a proportionate step |
-| Python 3.10 suite | 3.10 not installed (only 3.14.6); installing an interpreter needs the owner's approval | Install 3.10 and run the suite. `pyright --pythonversion 3.10` runs on every package (112 diagnostics, baseline 134) |
+| Python 3.10 suite | 3.10 not installed (only 3.14.6); installing an interpreter needs the owner's approval | Install 3.10 and run the suite. Meanwhile `pyright --pythonversion 3.10` (112 diagnostics, baseline 134) and `Python310CompatibilityTests` (3.10 grammar, pre-3.12 f-string rules) run; the latter found and fixed one CRISPR import failure on 3.10/3.11 |
 | HGVS conformance | No validator | `hgvs` package or Mutalyzer; currently labeled "HGVS-like" |
 | Primer hairpin/dimer screens | Heuristic by design | `primer3.calc_hairpin` / `calc_heterodimer` are available and would be a direct comparison |
 

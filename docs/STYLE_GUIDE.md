@@ -237,6 +237,7 @@ that breaks one fails the suite.
 | E-values with three significant figures (3.2) | `OutputNotationTests.test_blast_text_report_shows_e_values_with_three_significant_figures` |
 | Primer positions shown and read 1-based (3.3) | `OutputNotationTests` (two tests) |
 | American spelling in code and documentation (1) | `SpellingStandardTests` |
+| Python 3.10 compatibility: 3.10 grammar, no f-string that needs 3.12 (7) | `Python310CompatibilityTests` |
 | A result's own warnings reach the exported summary (4.3, 5) | `ExportedWarningsTests` |
 
 Rules that need judgment (sections 2.3, 4 and 5.2) are applied in review.

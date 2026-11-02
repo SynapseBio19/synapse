@@ -1207,6 +1207,13 @@ class ExportedWarningsTests(unittest.TestCase):
 # ----------------------------------------------------------------------
 # Stage H (8.6, 9.6): one spelling, American English as in the identifiers
 # ----------------------------------------------------------------------
+def _python_sources():
+    paths = [PROJECT_ROOT / "main.py"]
+    for directory in ("analyses", "core", "data", "fileio", "ui", "tests"):
+        paths.extend(sorted((PROJECT_ROOT / directory).glob("*.py")))
+    return paths
+
+
 class SpellingStandardTests(unittest.TestCase):
     BRITISH = ("behaviour", "analyse", "analysed", "labelled", "labelling", "modelled",
                "modelling", "normalise", "normalised", "normalisation", "organise",
@@ -1235,6 +1242,55 @@ class SpellingStandardTests(unittest.TestCase):
                             for m in pattern.finditer(line))
         self.assertEqual(hits, [])
 
+
+# ----------------------------------------------------------------------
+# Stage I (11.8): Python 3.10 compatibility without a 3.10 interpreter
+# ----------------------------------------------------------------------
+class Python310CompatibilityTests(unittest.TestCase):
+    def test_source_parses_with_the_python_3_10_grammar(self):
+        import ast
+        failures = []
+        for path in _python_sources():
+            try:
+                ast.parse(path.read_text(encoding="utf-8"), feature_version=(3, 10))
+            except SyntaxError as exc:
+                failures.append(f"{path.relative_to(PROJECT_ROOT).as_posix()}:{exc.lineno} {exc.msg}")
+        self.assertEqual(failures, [])
+
+    @unittest.skipUnless(hasattr(__import__("tokenize"), "FSTRING_START"),
+                         "needs the Python 3.12+ tokenizer to see inside f-strings")
+    def test_no_f_string_needs_python_3_12(self):
+        """Before PEP 701 (3.12) an f-string field may not contain '#', a
+        backslash, or the f-string's own quote. ``ast.parse`` with
+        ``feature_version`` does not check this, and neither does pyright,
+        which missed ``f"{'#':>3}"`` in the CRISPR module."""
+        import io
+        import tokenize
+        # Looked up by name: the constants exist only from Python 3.12 on.
+        fstring_start = getattr(tokenize, "FSTRING_START")
+        fstring_end = getattr(tokenize, "FSTRING_END")
+        hits = []
+        for path in _python_sources():
+            quotes = []
+            source = path.read_text(encoding="utf-8")
+            for token in tokenize.generate_tokens(io.StringIO(source).readline):
+                if token.type == fstring_start:
+                    if quotes and token.string.lstrip("rRfFbBuU")[0] == quotes[-1]:
+                        hits.append((path, token.start[0], "nested f-string reuses the quote"))
+                    quotes.append(token.string.lstrip("rRfFbBuU")[0])
+                elif token.type == fstring_end:
+                    quotes.pop()
+                elif quotes and token.type == tokenize.COMMENT:
+                    hits.append((path, token.start[0], "comment in an f-string field"))
+                elif quotes and token.type == tokenize.STRING:
+                    body = token.string.lstrip("rRbBuU")
+                    if "#" in body or "\\" in body or body[0] == quotes[-1]:
+                        hits.append((path, token.start[0], f"string {token.string!r} in an f-string field"))
+        self.assertEqual([f"{p.relative_to(PROJECT_ROOT).as_posix()}:{line} {why}"
+                          for p, line, why in hits], [])
+
+
+class StyleGuideConsistencyTests(unittest.TestCase):
     def test_style_guide_names_only_tests_that_exist(self):
         import re
         guide = (PROJECT_ROOT / "docs" / "STYLE_GUIDE.md").read_text(encoding="utf-8")

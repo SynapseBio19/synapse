@@ -1727,3 +1727,33 @@ the restriction-parameter check passes only since `81ccc55`. The BLAST
 (10.5) and literature (10.6) workflows remain covered by the stubbed
 client, the offline fixtures and the BLAST+ tests, because a live run
 needs external services.
+
+### The CRISPR module could not be imported on Python 3.10 (`analyses/crispr.py`)
+
+`pyproject.toml` requires Python 3.10 or newer, but only Python 3.14 is
+installed here, so no test had ever run on 3.10. A static check now
+stands in for that run: every source file is parsed with the 3.10
+grammar (`ast.parse(feature_version=(3, 10))`), and every f-string is
+tokenized to find what PEP 701 first allowed in Python 3.12 (a `#`, a
+backslash or the f-string's own quote inside a replacement field).
+
+The check found one site, present since the baseline commit:
+
+| File | Original | Revised |
+|---|---|---|
+| `analyses/crispr.py:2190` (guide table header) | `print(f"{'#':>3} {'ID':<7} ...")` | `print(f"  # {'ID':<7} ...")` |
+
+Before 3.12, `'#'` inside a replacement field is a syntax error
+("f-string expression part cannot include '#'"), so on Python 3.10 and
+3.11 the whole CRISPR module, and with it the menu entry, failed to
+import. pyright at `pythonVersion = 3.10` does not report this. The
+printed header is identical (`'#'` right-aligned in three columns is
+`"  #"`).
+
+This is a static check, not a 3.10 run. Running the suite on a real 3.10
+interpreter still needs one to be installed, which is the owner's
+decision.
+
+Tests: 2 new (`Python310CompatibilityTests`); the f-string test fails on
+the previous code and is skipped on interpreters older than 3.12, whose
+tokenizer cannot see inside f-strings.
