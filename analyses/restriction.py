@@ -6,6 +6,7 @@ from data.restriction_enzymes import (
     get_restriction_enzyme,
 )
 from ui.style import major_rule, minor_rule
+from ui import style
 
 
 # ============================================================
@@ -2123,31 +2124,24 @@ def get_physical_cut_boundaries(digest_result):
 def print_restriction_report(analysis):
     """Print a human-readable report without changing analysis data."""
     if not analysis:
-        print("No restriction analysis available.")
+        style.note("No restriction analysis available.")
         return
 
-    print()
-    print(major_rule())
-    print("SYNAPSE — RESTRICTION ANALYSIS")
-    print(major_rule())
+    style.header('RESTRICTION ANALYSIS')
 
-    print("\nSequence")
-    print(minor_rule())
-    print(f"Length:              {analysis['sequence_length']} bp")
-    print(f"Topology:            {analysis['topology'].capitalize()}")
-    print(f"Enzymes analyzed:    {len(analysis['enzymes'])}")
+    style.section('Sequence')
+    style.field('Length', f"{analysis['sequence_length']} bp")
+    style.field('Topology', f"{analysis['topology'].capitalize()}")
+    style.field('Enzymes analyzed', f"{len(analysis['enzymes'])}")
 
     status = analysis.get("sequence_status", {})
     ambiguous = status.get("ambiguous_positions", [])
     if ambiguous:
-        print(
-            f"IUPAC ambiguous bases: {len(ambiguous)} "
+        style.field('IUPAC ambiguous bases', f"{len(ambiguous)} "
             f"(positions: {', '.join(map(str, ambiguous[:20]))}"
-            f"{'…' if len(ambiguous) > 20 else ''})"
-        )
+            f"{'…' if len(ambiguous) > 20 else ''})")
 
-    print("\nRestriction Enzymes")
-    print(minor_rule())
+    style.section('Restriction Enzymes')
     print(
         f"{'Enzyme':<12} {'Recognition':<14} "
         f"{'Sites':>6} {'Confirmed':>10} {'Possible':>9} {'Type':>8}"
@@ -2164,8 +2158,7 @@ def print_restriction_report(analysis):
             f"{result['cut_type']:>8}"
         )
 
-    print("\nRestriction Map")
-    print(minor_rule())
+    style.section('Restriction Map')
     sites = analysis.get("restriction_map", [])
 
     if not sites:
@@ -2186,11 +2179,10 @@ def print_restriction_report(analysis):
 
     digest = analysis["digest"]
 
-    print("\nDigest")
-    print(minor_rule())
-    print(f"Enzyme cut events:       {digest['cut_count']}")
-    print(f"Physical cut boundaries: {digest['unique_cut_count']}")
-    print(f"Expected fragments:      {digest['fragment_count']}")
+    style.section('Digest')
+    style.field('Enzyme cut events', f"{digest['cut_count']}")
+    style.field('Physical cut boundaries', f"{digest['unique_cut_count']}")
+    style.field('Expected fragments', f"{digest['fragment_count']}")
 
     if digest["fragments"]:
         for fragment in digest["fragments"]:
@@ -2201,11 +2193,10 @@ def print_restriction_report(analysis):
                 f" | Cut by: {enzymes}"
             )
 
-    print("\nPredicted Gel Bands")
-    print(minor_rule())
+    style.section('Predicted Gel Bands')
     bands = analysis.get("gel_bands", [])
     if not bands:
-        print("No bands available.")
+        style.note("No bands available.")
     else:
         for band in bands:
             print(
@@ -2214,29 +2205,23 @@ def print_restriction_report(analysis):
                 f"{'s' if band['copies'] != 1 else ''}"
             )
 
-    print("\nUnique Cutters")
-    print(minor_rule())
+    style.section('Unique Cutters')
     print(", ".join(analysis["unique_cutters"]) or "None detected.")
 
-    print("\nNon-Cutting Enzymes")
-    print(minor_rule())
+    style.section('Non-Cutting Enzymes')
     print(", ".join(analysis["non_cutters"]) or "None detected.")
 
-    print("\nMultiple-Site Warnings")
-    print(minor_rule())
+    style.section('Multiple-Site Warnings')
     warnings = analysis.get("internal_sites", [])
     if not warnings:
         print("No multiple-site warnings detected.")
     else:
         for warning in warnings:
             positions = ", ".join(map(str, warning["positions"]))
-            print(
-                f"WARNING: {warning['enzyme']} has "
-                f"{warning['site_count']} sites at {positions}"
-            )
+            style.warning(f"{warning['enzyme']} has "
+                f"{warning['site_count']} sites at {positions}")
 
-    print("\nRecommended Enzyme Pairs")
-    print(minor_rule())
+    style.section('Recommended Enzyme Pairs')
     recommendations = analysis.get("recommended_pairs", [])
     if not recommendations:
         print("No suitable enzyme pairs detected.")
@@ -2252,8 +2237,7 @@ def print_restriction_report(analysis):
             for warning in recommendation["warnings"]:
                 print(f"   ! {warning}")
 
-    print("\nInterpretation")
-    print(minor_rule())
+    style.section('Interpretation')
     if digest["cut_count"] == 0:
         print("No selected restriction enzyme cuts the sequence.")
     elif analysis["topology"] == "circular":
@@ -2269,11 +2253,9 @@ def print_restriction_report(analysis):
 
     if analysis.get("site_statistics"):
         stats = analysis["site_statistics"]
-        print(
-            f"Site events: {stats['total_site_events']} | "
+        style.field('Site events', f"{stats['total_site_events']} | "
             f"confirmed: {stats['confirmed_site_events']} | "
-            f"possible: {stats['possible_site_events']}"
-        )
+            f"possible: {stats['possible_site_events']}")
 
     print(
         "\nNote: This is sequence-level in-silico analysis. "
@@ -2286,9 +2268,7 @@ def print_restriction_report(analysis):
 if __name__ == "__main__":
     self_test = run_restriction_self_test()
 
-    print(major_rule())
-    print("SYNAPSE RESTRICTION ENGINE SELF-TEST")
-    print(major_rule())
+    style.header('SYNAPSE RESTRICTION ENGINE SELF-TEST')
 
     for name, passed in self_test.items():
         if name == "all_passed":
@@ -2326,7 +2306,7 @@ if __name__ == "__main__":
 
 
 def _synapse_ui_pause():
-    input("\nPress Enter to continue...")
+    style.pause()
 
 
 def _synapse_ui_select_enzymes(
@@ -2388,12 +2368,11 @@ def _synapse_ui_select_enzymes(
 
 
 def _synapse_ui_select_topology(default="linear"):
-    print("\nDNA Topology")
-    print(minor_rule())
-    print("[1] Linear")
-    print("[2] Circular")
+    style.section('DNA Topology')
+    style.option('1', 'Linear')
+    style.option('2', 'Circular')
     print(f"[Enter] Keep current ({str(default).capitalize()})")
-    print("[0] Back")
+    style.back()
 
     while True:
         choice = input("\nSelect topology: ").strip()
@@ -2411,10 +2390,7 @@ def _synapse_ui_select_topology(default="linear"):
 
 
 def _restriction_overview_ui(dna, pipeline=None, topology="linear"):
-    print()
-    print(major_rule())
-    print("RESTRICTION OVERVIEW")
-    print(major_rule())
+    style.header('RESTRICTION OVERVIEW')
 
     enzymes = _synapse_ui_select_enzymes()
     if enzymes is None:
@@ -2442,16 +2418,14 @@ def _restriction_overview_ui(dna, pipeline=None, topology="linear"):
         return analysis
 
     except (ValueError, TypeError, KeyError) as error:
-        print(f"\nRestriction analysis error: {error}")
+        print()
+        style.field('Restriction analysis error', f"{error}")
         _synapse_ui_pause()
         return None
 
 
 def _restriction_map_ui(dna, topology="linear"):
-    print()
-    print(major_rule())
-    print("RESTRICTION MAP")
-    print(major_rule())
+    style.header('RESTRICTION MAP')
 
     enzymes = _synapse_ui_select_enzymes()
     if enzymes is None:
@@ -2492,16 +2466,14 @@ def _restriction_map_ui(dna, topology="linear"):
         return sites
 
     except (ValueError, TypeError, KeyError) as error:
-        print(f"\nRestriction map error: {error}")
+        print()
+        style.field('Restriction map error', f"{error}")
         _synapse_ui_pause()
         return None
 
 
 def _restriction_digest_gel_ui(dna, topology="linear"):
-    print()
-    print(major_rule())
-    print("DIGEST & GEL ANALYSIS")
-    print(major_rule())
+    style.header('DIGEST & GEL ANALYSIS')
 
     enzymes = _synapse_ui_select_enzymes(
         allow_all=False,
@@ -2523,19 +2495,18 @@ def _restriction_digest_gel_ui(dna, topology="linear"):
         bands = get_gel_band_prediction(digest)
 
         print()
-        print(f"Topology:       {selected_topology.capitalize()}")
-        print(f"Enzymes:        {', '.join(enzymes)}")
-        print(f"Cut events:     {digest['cut_count']}")
-        print(f"Cut boundaries: {digest['unique_cut_count']}")
-        print(f"Fragments:      {digest['fragment_count']}")
+        style.field('Topology', f"{selected_topology.capitalize()}")
+        style.field('Enzymes', f"{', '.join(enzymes)}")
+        style.field('Cut events', f"{digest['cut_count']}")
+        style.field('Cut boundaries', f"{digest['unique_cut_count']}")
+        style.field('Fragments', f"{digest['fragment_count']}")
 
         possible = digest.get("possible_cuts", [])
         if possible:
-            print(
-                f"\nNote: {len(possible)} ambiguity-dependent site(s) "
+            print()
+            style.field('Note', f"{len(possible)} ambiguity-dependent site(s) "
                 "(IUPAC symbols such as N inside the recognition "
-                "sequence) were NOT counted as cuts."
-            )
+                "sequence) were NOT counted as cuts.")
 
         for enzyme_name in enzymes:
             enzyme = get_restriction_enzyme(enzyme_name) or {}
@@ -2543,18 +2514,16 @@ def _restriction_digest_gel_ui(dna, topology="linear"):
             if note:
                 print(f"Methylation note ({enzyme_name}): {note}")
 
-        print("\nFragments")
-        print(minor_rule())
+        style.section('Fragments')
         for fragment in digest.get("fragments", []):
             print(
                 f"Fragment {fragment['fragment']:>2}: "
                 f"{fragment['length']:>8} bp"
             )
 
-        print("\nPredicted Gel Bands")
-        print(minor_rule())
+        style.section('Predicted Gel Bands')
         if not bands:
-            print("No bands available.")
+            style.note("No bands available.")
         else:
             for band in bands:
                 copies = band["copies"]
@@ -2568,7 +2537,8 @@ def _restriction_digest_gel_ui(dna, topology="linear"):
         return {"digest": digest, "gel_bands": bands}
 
     except (ValueError, TypeError, KeyError) as error:
-        print(f"\nDigest analysis error: {error}")
+        print()
+        style.field('Digest analysis error', f"{error}")
         _synapse_ui_pause()
         return None
 
@@ -2578,10 +2548,7 @@ def _restriction_complete_report_ui(
     pipeline=None,
     topology="linear",
 ):
-    print()
-    print(major_rule())
-    print("COMPLETE RESTRICTION REPORT")
-    print(major_rule())
+    style.header('COMPLETE RESTRICTION REPORT')
 
     enzymes = _synapse_ui_select_enzymes()
     if enzymes is None:
@@ -2609,7 +2576,8 @@ def _restriction_complete_report_ui(
         return analysis
 
     except (ValueError, TypeError, KeyError) as error:
-        print(f"\nRestriction analysis error: {error}")
+        print()
+        style.field('Restriction analysis error', f"{error}")
         _synapse_ui_pause()
         return None
 
@@ -2623,21 +2591,21 @@ def run_restriction_analysis_ui(
     """Small user-facing Restriction menu."""
 
     while True:
-        print()
-        print(major_rule())
-        print("RESTRICTION ANALYSIS")
-        print(major_rule())
+        style.header('RESTRICTION ANALYSIS')
+        style.field("Sequence", header)
+        style.field("Length", f"{len(dna)} bp")
+        style.field("Topology", topology)
 
-        print()
-        print("[1] Restriction Overview")
-        print("[2] Restriction Map")
-        print("[3] Digest & Gel Analysis")
-        print("[4] Complete Restriction Report")
-        print()
-        print("[0] Back")
-        print(minor_rule())
+        style.menu([
+            ("Analysis", [
+                ('1', 'Restriction Overview'),
+                ('2', 'Restriction Map'),
+                ('3', 'Digest & Gel Analysis'),
+            ]),
+            ("Report", [('4', 'Complete Restriction Report')]),
+        ])
 
-        choice = input("\nSelection: ").strip()
+        choice = style.ask_choice()
 
         if choice == "0":
             return None
@@ -2662,7 +2630,8 @@ def run_restriction_analysis_ui(
                 topology=topology,
             )
         else:
-            print("\nInvalid selection.")
+            print()
+            style.invalid_selection()
 
 
 def run_restriction_cloning_ui(
@@ -2685,19 +2654,16 @@ def run_restriction_cloning_ui(
         run_cloning_analysis_ui = None
 
     while True:
-        print()
-        print(major_rule())
-        print("RESTRICTION & CLONING")
-        print(major_rule())
+        style.header('RESTRICTION & CLONING ANALYSIS')
+        style.field("Sequence", header)
+        style.field("Length", f"{len(dna)} bp")
+        style.field("Topology", topology)
 
-        print()
-        print("[1] Restriction Analysis")
-        print("[2] Cloning Analysis")
-        print()
-        print("[0] Back")
-        print(minor_rule())
+        style.menu([
+            ("Analysis", [('1', 'Restriction Analysis'), ('2', 'Cloning Analysis')]),
+        ])
 
-        choice = input("\nSelection: ").strip()
+        choice = style.ask_choice()
 
         if choice == "0":
             return None
@@ -2726,4 +2692,5 @@ def run_restriction_cloning_ui(
             )
             continue
 
-        print("\nInvalid selection.")
+        print()
+        style.invalid_selection()

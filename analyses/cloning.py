@@ -31,6 +31,7 @@ from data.restriction_enzymes import RESTRICTION_ENZYMES
 # (audit D4). bases_match is re-exported for existing callers.
 from analyses.restriction import bases_match, find_recognition_site_matches
 from ui.style import major_rule, minor_rule
+from ui import style
 
 
 # ============================================================
@@ -3597,12 +3598,7 @@ def print_design_reasons(
         analysis
     )
 
-    print(
-        "\nDESIGN EVALUATION"
-    )
-    print(
-        minor_rule()
-    )
+    style.section('DESIGN EVALUATION')
 
     for reason in evaluation[
         "positive"
@@ -3635,12 +3631,7 @@ def ascii_orientation_visualization(
         "strategy"
     ]
 
-    print(
-        "\nCLONING ARCHITECTURE"
-    )
-    print(
-        minor_rule()
-    )
+    style.section('CLONING ARCHITECTURE')
     print(
         "VECTOR:"
     )
@@ -3660,30 +3651,18 @@ def ascii_orientation_visualization(
         f" >>>>>>>>>>>>>>>>>>>>>>>>>>> "
         f"{insert['right']['enzyme']}"
     )
-    print(
-        f"\nOrientation: "
-        f"{strategy['orientation']}"
-    )
+    print()
+    style.field('Orientation', f"{strategy['orientation']}")
 
 
 def print_cloning_report(
     analysis,
 ):
-    print()
-    print(
-        major_rule()
-    )
-    print(
-        "CLONING ANALYSIS"
-    )
-    print(
-        major_rule()
-    )
+    style.header('CLONING ANALYSIS')
 
     if not analysis:
-        print(
-            "\nNo analysis available."
-        )
+        print()
+        style.note("No analysis available.")
         print(
             major_rule()
         )
@@ -3711,10 +3690,8 @@ def print_cloning_report(
         return
 
     if "vector" not in analysis:
-        print(
-            f"\nStatus: "
-            f"{analysis.get('status', 'UNKNOWN')}"
-        )
+        print()
+        style.field('Status', f"{analysis.get('status', 'UNKNOWN')}")
         print(
             major_rule()
         )
@@ -3744,90 +3721,27 @@ def _print_single_strategy_report(
         "validity"
     ]
 
-    print(
-        "\nVECTOR"
-    )
-    print(
-        minor_rule()
-    )
-    print(
-        f"Left enzyme:       "
-        f"{vector['left']['enzyme']}"
-    )
-    print(
-        f"Left position:     "
-        f"{vector['left']['position']}"
-    )
-    print(
-        f"Left recognition:  "
-        f"{vector['left']['recognition_sequence']}"
-    )
-    print(
-        f"Left overhang:     "
-        f"{vector['left']['overhang'] or '-'}"
-    )
-    print(
-        f"Right enzyme:      "
-        f"{vector['right']['enzyme']}"
-    )
-    print(
-        f"Right position:    "
-        f"{vector['right']['position']}"
-    )
-    print(
-        f"Right recognition: "
-        f"{vector['right']['recognition_sequence']}"
-    )
-    print(
-        f"Right overhang:    "
-        f"{vector['right']['overhang'] or '-'}"
-    )
+    style.section('VECTOR')
+    style.field('Left enzyme', f"{vector['left']['enzyme']}")
+    style.field('Left position', f"{vector['left']['position']}")
+    style.field('Left recognition', f"{vector['left']['recognition_sequence']}")
+    style.field('Left overhang', f"{vector['left']['overhang'] or '-'}")
+    style.field('Right enzyme', f"{vector['right']['enzyme']}")
+    style.field('Right position', f"{vector['right']['position']}")
+    style.field('Right recognition', f"{vector['right']['recognition_sequence']}")
+    style.field('Right overhang', f"{vector['right']['overhang'] or '-'}")
 
-    print(
-        "\nINSERT"
-    )
-    print(
-        minor_rule()
-    )
-    print(
-        f"Left enzyme:       "
-        f"{insert['left']['enzyme']}"
-    )
-    print(
-        f"Left position:     "
-        f"{insert['left']['position']}"
-    )
-    print(
-        f"Left recognition:  "
-        f"{insert['left']['recognition_sequence']}"
-    )
-    print(
-        f"Left overhang:     "
-        f"{insert['left']['overhang'] or '-'}"
-    )
-    print(
-        f"Right enzyme:      "
-        f"{insert['right']['enzyme']}"
-    )
-    print(
-        f"Right position:    "
-        f"{insert['right']['position']}"
-    )
-    print(
-        f"Right recognition: "
-        f"{insert['right']['recognition_sequence']}"
-    )
-    print(
-        f"Right overhang:    "
-        f"{insert['right']['overhang'] or '-'}"
-    )
+    style.section('INSERT')
+    style.field('Left enzyme', f"{insert['left']['enzyme']}")
+    style.field('Left position', f"{insert['left']['position']}")
+    style.field('Left recognition', f"{insert['left']['recognition_sequence']}")
+    style.field('Left overhang', f"{insert['left']['overhang'] or '-'}")
+    style.field('Right enzyme', f"{insert['right']['enzyme']}")
+    style.field('Right position', f"{insert['right']['position']}")
+    style.field('Right recognition', f"{insert['right']['recognition_sequence']}")
+    style.field('Right overhang', f"{insert['right']['overhang'] or '-'}")
 
-    print(
-        "\nCLONING JUNCTIONS"
-    )
-    print(
-        minor_rule()
-    )
+    style.section('CLONING JUNCTIONS')
 
     for side in (
         "left",
@@ -3849,43 +3763,15 @@ def _print_single_strategy_report(
             f"        {junction['mechanism']}"
         )
 
-    print(
-        "\nORIENTATION"
-    )
-    print(
-        minor_rule()
-    )
-    print(
-        f"Intended orientation: "
-        f"{'COMPATIBLE' if validity['junctions_compatible'] else 'NOT VALID'}"
-    )
-    print(
-        f"Reverse orientation:  "
-        f"{'COMPATIBLE' if validity['reverse_orientation_compatible'] else 'BLOCKED'}"
-    )
-    print(
-        f"Directional:          "
-        f"{_yes_no(strategy['directional'])}"
-    )
-    print(
-        f"Self-ligation risk:   "
-        f"{'POSSIBLE' if strategy['self_ligation_risk'] else 'REDUCED'}"
-    )
+    style.section('ORIENTATION')
+    style.field('Intended orientation', f"{'COMPATIBLE' if validity['junctions_compatible'] else 'NOT VALID'}")
+    style.field('Reverse orientation', f"{'COMPATIBLE' if validity['reverse_orientation_compatible'] else 'BLOCKED'}")
+    style.field('Directional', f"{_yes_no(strategy['directional'])}")
+    style.field('Self-ligation risk', f"{'POSSIBLE' if strategy['self_ligation_risk'] else 'REDUCED'}")
 
-    print(
-        "\nDESIGN SCORE"
-    )
-    print(
-        minor_rule()
-    )
-    print(
-        f"Score:               "
-        f"{score['score']}/{score['maximum']}"
-    )
-    print(
-        f"Category:            "
-        f"{score['category']}"
-    )
+    style.section('DESIGN SCORE')
+    style.field('Score', f"{score['score']}/{score['maximum']}")
+    style.field('Category', f"{score['category']}")
 
     for component, value in score[
         "components"
@@ -3895,36 +3781,13 @@ def _print_single_strategy_report(
             f"{value:>3} pts"
         )
 
-    print(
-        "\nVALIDATION"
-    )
-    print(
-        minor_rule()
-    )
-    print(
-        f"Required sites:       "
-        f"{'PASS' if validity['required_sites'] else 'FAIL'}"
-    )
-    print(
-        f"Vector architecture:  "
-        f"{'PASS' if validity['vector_unique'] else 'FAIL'}"
-    )
-    print(
-        f"Insert architecture:  "
-        f"{'PASS' if validity['insert_unique'] else 'FAIL'}"
-    )
-    print(
-        f"Junctions:            "
-        f"{'PASS' if validity['junctions_compatible'] else 'FAIL'}"
-    )
-    print(
-        f"No internal sites:    "
-        f"{'PASS' if validity['no_internal_sites'] else 'FAIL'}"
-    )
-    print(
-        f"Overall valid:        "
-        f"{'YES' if validity['valid'] else 'NO'}"
-    )
+    style.section('VALIDATION')
+    style.field('Required sites', f"{'PASS' if validity['required_sites'] else 'FAIL'}")
+    style.field('Vector architecture', f"{'PASS' if validity['vector_unique'] else 'FAIL'}")
+    style.field('Insert architecture', f"{'PASS' if validity['insert_unique'] else 'FAIL'}")
+    style.field('Junctions', f"{'PASS' if validity['junctions_compatible'] else 'FAIL'}")
+    style.field('No internal sites', f"{'PASS' if validity['no_internal_sites'] else 'FAIL'}")
+    style.field('Overall valid', f"{'YES' if validity['valid'] else 'NO'}")
 
     print_design_reasons(
         analysis
@@ -3934,12 +3797,7 @@ def _print_single_strategy_report(
         analysis
     )
 
-    print(
-        "\nINTERPRETATION"
-    )
-    print(
-        minor_rule()
-    )
+    style.section('INTERPRETATION')
 
     if validity[
         "valid"
@@ -3969,42 +3827,21 @@ def _print_single_strategy_report(
 def print_planner_report(
     planner,
 ):
-    print()
-    print(
-        major_rule()
-    )
-    print(
-        "AUTOMATIC CLONING PLANNER"
-    )
-    print(
-        major_rule()
-    )
+    style.header('AUTOMATIC CLONING PLANNER')
 
     if not planner:
-        print(
-            "\nNo planner result available."
-        )
+        print()
+        style.note("No planner result available.")
         print(
             major_rule()
         )
         return
 
-    print(
-        f"\nStatus:               "
-        f"{planner.get('status', 'UNKNOWN')}"
-    )
-    print(
-        f"Strategies evaluated: "
-        f"{planner.get('evaluated_count', 0)}"
-    )
-    print(
-        f"Valid strategies:     "
-        f"{planner.get('valid_count', 0)}"
-    )
-    print(
-        f"Rejected strategies:  "
-        f"{planner.get('rejected_count', 0)}"
-    )
+    print()
+    style.field('Status', f"{planner.get('status', 'UNKNOWN')}")
+    style.field('Strategies evaluated', f"{planner.get('evaluated_count', 0)}")
+    style.field('Valid strategies', f"{planner.get('valid_count', 0)}")
+    style.field('Rejected strategies', f"{planner.get('rejected_count', 0)}")
 
     best = planner.get(
         "best"
@@ -4016,12 +3853,7 @@ def print_planner_report(
             {},
         )
 
-        print(
-            "\nNO STRATEGY AVAILABLE"
-        )
-        print(
-            minor_rule()
-        )
+        style.section('NO STRATEGY AVAILABLE')
         print(
             diagnostics.get(
                 "primary_reason",
@@ -4079,51 +3911,20 @@ def print_planner_report(
         )
         return
 
-    print(
-        "\nBEST STRATEGY"
-    )
-    print(
-        minor_rule()
-    )
+    style.section('BEST STRATEGY')
 
-    print(
-        f"Vector:              "
-        f"{best['vector']['left']['enzyme']} + "
-        f"{best['vector']['right']['enzyme']}"
-    )
-    print(
-        f"Insert:              "
-        f"{best['insert']['left']['enzyme']} + "
-        f"{best['insert']['right']['enzyme']}"
-    )
-    print(
-        f"Score:               "
-        f"{best['score']['score']}/"
-        f"{best['score']['maximum']}"
-    )
-    print(
-        f"Category:            "
-        f"{best['score']['category']}"
-    )
-    print(
-        f"Orientation:         "
-        f"{best['strategy']['orientation']}"
-    )
-    print(
-        f"Directional:         "
-        f"{_yes_no(best['strategy']['directional'])}"
-    )
-    print(
-        f"Valid:               "
-        f"{_yes_no(best['validity']['valid'])}"
-    )
+    style.field('Vector', f"{best['vector']['left']['enzyme']} + "
+        f"{best['vector']['right']['enzyme']}")
+    style.field('Insert', f"{best['insert']['left']['enzyme']} + "
+        f"{best['insert']['right']['enzyme']}")
+    style.field('Score', f"{best['score']['score']}/"
+        f"{best['score']['maximum']}")
+    style.field('Category', f"{best['score']['category']}")
+    style.field('Orientation', f"{best['strategy']['orientation']}")
+    style.field('Directional', f"{_yes_no(best['strategy']['directional'])}")
+    style.field('Valid', f"{_yes_no(best['validity']['valid'])}")
 
-    print(
-        "\nJUNCTIONS"
-    )
-    print(
-        minor_rule()
-    )
+    style.section('JUNCTIONS')
 
     for side in (
         "left",
@@ -4142,68 +3943,29 @@ def print_planner_report(
             f"{junction['status']}"
         )
 
-    print(
-        "\nORIENTATION CHECK"
-    )
-    print(
-        minor_rule()
-    )
+    style.section('ORIENTATION CHECK')
 
-    print(
-        f"Intended orientation:  "
-        f"{'COMPATIBLE' if best['validity']['junctions_compatible'] else 'NOT VALID'}"
-    )
-    print(
-        f"Reverse orientation:   "
-        f"{'COMPATIBLE' if best['validity']['reverse_orientation_compatible'] else 'BLOCKED'}"
-    )
+    style.field('Intended orientation', f"{'COMPATIBLE' if best['validity']['junctions_compatible'] else 'NOT VALID'}")
+    style.field('Reverse orientation', f"{'COMPATIBLE' if best['validity']['reverse_orientation_compatible'] else 'BLOCKED'}")
 
-    print(
-        "\nVALIDATION"
-    )
-    print(
-        minor_rule()
-    )
+    style.section('VALIDATION')
 
     validity = best[
         "validity"
     ]
 
-    print(
-        f"Required sites:        "
-        f"{'PASS' if validity['required_sites'] else 'FAIL'}"
-    )
-    print(
-        f"Vector architecture:   "
-        f"{'PASS' if validity['vector_unique'] else 'FAIL'}"
-    )
-    print(
-        f"Insert architecture:   "
-        f"{'PASS' if validity['insert_unique'] else 'FAIL'}"
-    )
-    print(
-        f"Junctions:             "
-        f"{'PASS' if validity['junctions_compatible'] else 'FAIL'}"
-    )
-    print(
-        f"No internal sites:     "
-        f"{'PASS' if validity['no_internal_sites'] else 'FAIL'}"
-    )
-    print(
-        f"Overall valid:         "
-        f"{'YES' if validity['valid'] else 'NO'}"
-    )
+    style.field('Required sites', f"{'PASS' if validity['required_sites'] else 'FAIL'}")
+    style.field('Vector architecture', f"{'PASS' if validity['vector_unique'] else 'FAIL'}")
+    style.field('Insert architecture', f"{'PASS' if validity['insert_unique'] else 'FAIL'}")
+    style.field('Junctions', f"{'PASS' if validity['junctions_compatible'] else 'FAIL'}")
+    style.field('No internal sites', f"{'PASS' if validity['no_internal_sites'] else 'FAIL'}")
+    style.field('Overall valid', f"{'YES' if validity['valid'] else 'NO'}")
 
     print_design_reasons(
         best
     )
 
-    print(
-        "\nRANKED STRATEGIES"
-    )
-    print(
-        minor_rule()
-    )
+    style.section('RANKED STRATEGIES')
 
     for index, candidate in enumerate(
         planner.get(
@@ -4518,16 +4280,7 @@ def run_cloning_self_test():
 if __name__ == "__main__":
     tests = run_cloning_self_test()
 
-    print()
-    print(
-        major_rule()
-    )
-    print(
-        "SYNAPSE CLONING ENGINE SELF-TEST"
-    )
-    print(
-        major_rule()
-    )
+    style.header('SYNAPSE CLONING ENGINE SELF-TEST')
 
     for name, passed in tests.items():
         print(
@@ -4568,15 +4321,6 @@ def _cloning_ui_normalize_choice(value):
     return str(value).strip()
 
 
-def _cloning_ui_print_header(title):
-    print()
-    print(major_rule())
-    print(title)
-    print(major_rule())
-
-
-def _cloning_ui_print_footer():
-    print(minor_rule())
 
 
 def _cloning_ui_select_insert(
@@ -4584,7 +4328,8 @@ def _cloning_ui_select_insert(
     vector_index=None,
 ):
     if not sequences:
-        print("\nNo additional sequences are available.")
+        print()
+        style.note("No additional sequences are available.")
         return None, None, None
 
     records = []
@@ -4598,7 +4343,7 @@ def _cloning_ui_select_insert(
 
     available = []
 
-    _cloning_ui_print_header("SELECT INSERT")
+    style.header("SELECT INSERT")
 
     for key, record in records:
         sequence = record.get("sequence", "")
@@ -4610,21 +4355,17 @@ def _cloning_ui_select_insert(
         if vector_index is not None and key == vector_index:
             continue
 
-        display_index = len(available) + 1
         available.append((key, header, sequence))
-        print(f"[{display_index}] {header}")
 
     if not available:
-        print("\nNo suitable insert sequence is available.")
-        _cloning_ui_print_footer()
+        style.note("No suitable insert sequence is available.")
         return None, None, None
 
-    print()
-    print("[0] Back")
-    _cloning_ui_print_footer()
+    style.menu([("Insert", [(index, header) for index, (_, header, _) in
+                            enumerate(available, start=1)])])
 
     while True:
-        choice = input("Selection: ").strip()
+        choice = style.ask_choice()
 
         if choice == "0":
             return None, None, None
@@ -4636,7 +4377,7 @@ def _cloning_ui_select_insert(
             if choice == str(display_index):
                 return key, header, sequence
 
-        print("Invalid selection.")
+        style.invalid_selection()
 
 
 def _cloning_ui_record_topology(
@@ -4661,22 +4402,13 @@ def _cloning_ui_select_enzyme(
 ):
     enzyme_names = list(RESTRICTION_ENZYMES.keys())
 
-    _cloning_ui_print_header("SELECT RESTRICTION ENZYME")
+    style.header("SELECT RESTRICTION ENZYME")
 
-    for index, enzyme_name in enumerate(
-        enzyme_names,
-        start=1,
-    ):
-        print(f"[{index:>2}] {enzyme_name}")
-
-    if allow_back:
-        print()
-        print("[0] Back")
-
-    _cloning_ui_print_footer()
+    style.menu([("Enzymes", list(enumerate(enzyme_names, start=1)))],
+               zero=style.BACK_LABEL if allow_back else None)
 
     while True:
-        choice = input(f"{prompt}: ").strip()
+        choice = style.ask_choice(prompt)
 
         if allow_back and choice == "0":
             return None
@@ -4684,13 +4416,13 @@ def _cloning_ui_select_enzyme(
         try:
             index = int(choice) - 1
         except ValueError:
-            print("Invalid selection.")
+            style.invalid_selection()
             continue
 
         if 0 <= index < len(enzyme_names):
             return enzyme_names[index]
 
-        print("Invalid selection.")
+        style.invalid_selection()
 
 
 def _cloning_ui_select_two_distinct_enzymes():
@@ -4741,11 +4473,10 @@ def _cloning_ui_print_sequence_context(
     vector_topology="linear",
     insert_topology="linear",
 ):
-    print()
-    print(f"Vector: {vector_header}")
-    print(f"Length: {len(normalize_sequence(vector_sequence))} bp ({vector_topology})")
-    print(f"Insert: {insert_header}")
-    print(f"Length: {len(normalize_sequence(insert_sequence))} bp ({insert_topology})")
+    style.field('Vector', f"{vector_header}")
+    style.field('Vector length', f"{len(normalize_sequence(vector_sequence))} bp ({vector_topology})")
+    style.field('Insert', f"{insert_header}")
+    style.field('Insert length', f"{len(normalize_sequence(insert_sequence))} bp ({insert_topology})")
 
 
 def _cloning_ui_automatic_planner(
@@ -4755,7 +4486,7 @@ def _cloning_ui_automatic_planner(
     vector_topology="linear",
     insert_topology="linear",
 ):
-    _cloning_ui_print_header(
+    style.header(
         "AUTOMATIC CLONING PLANNER"
     )
 
@@ -4764,15 +4495,12 @@ def _cloning_ui_automatic_planner(
         "and ranks the resulting sequence-level strategies."
     )
 
-    print()
-    print("[1] Find best strategy")
-    print("[2] Show top strategies")
-    print()
-    print("[0] Back")
-    _cloning_ui_print_footer()
+    style.menu([
+        (None, [('1', 'Find best strategy'), ('2', 'Show top strategies')]),
+    ])
 
     while True:
-        choice = input("Selection: ").strip()
+        choice = style.ask_choice()
 
         if choice == "0":
             return None
@@ -4780,15 +4508,13 @@ def _cloning_ui_automatic_planner(
         if choice in {"1", "2"}:
             break
 
-        print("Invalid selection.")
+        style.invalid_selection()
 
     if choice == "1":
         top_n = 1
     else:
         while True:
-            raw = input(
-                "Number of strategies to display [default 5]: "
-            ).strip()
+            raw = style.ask('Number of strategies to display', default='default 5')
 
             if not raw:
                 top_n = 5
@@ -4816,7 +4542,7 @@ def _cloning_ui_automatic_planner(
     )
 
     print_planner_report(result)
-    input("\nPress Enter to continue...")
+    style.pause()
     return result
 
 
@@ -4827,7 +4553,7 @@ def _cloning_ui_single_enzyme(
     vector_topology="linear",
     insert_topology="linear",
 ):
-    _cloning_ui_print_header(
+    style.header(
         "SINGLE-ENZYME ANALYSIS"
     )
 
@@ -4836,14 +4562,12 @@ def _cloning_ui_single_enzyme(
         "for vector and insert."
     )
 
-    print()
-    print("[1] Select enzyme")
-    print()
-    print("[0] Back")
-    _cloning_ui_print_footer()
+    style.menu([
+        (None, [('1', 'Select enzyme')]),
+    ])
 
     while True:
-        choice = input("Selection: ").strip()
+        choice = style.ask_choice()
 
         if choice == "0":
             return None
@@ -4851,7 +4575,7 @@ def _cloning_ui_single_enzyme(
         if choice == "1":
             break
 
-        print("Invalid selection.")
+        style.invalid_selection()
 
     enzyme = _cloning_ui_select_enzyme(
         "Selection"
@@ -4875,14 +4599,14 @@ def _cloning_ui_single_enzyme(
     )
 
     print_cloning_report(result)
-    input("\nPress Enter to continue...")
+    style.pause()
     return result
 
 
 def _cloning_ui_select_two_enzyme_architecture(
     molecule_name,
 ):
-    _cloning_ui_print_header(
+    style.header(
         f"SELECT {molecule_name.upper()} ENZYMES"
     )
 
@@ -4913,7 +4637,7 @@ def _cloning_ui_select_two_enzyme_architecture(
         print(
             "\nThe two enzymes must be different."
         )
-        input("Press Enter to continue...")
+        style.pause()
         return _cloning_ui_select_two_enzyme_architecture(
             molecule_name
         )
@@ -4928,7 +4652,7 @@ def _cloning_ui_two_enzyme_strategy(
     vector_topology="linear",
     insert_topology="linear",
 ):
-    _cloning_ui_print_header(
+    style.header(
         "TWO-ENZYME STRATEGY ANALYSIS"
     )
 
@@ -4942,14 +4666,12 @@ def _cloning_ui_two_enzyme_strategy(
         "  Vector left / Vector right / Insert left / Insert right"
     )
 
-    print()
-    print("[1] Configure enzyme architecture")
-    print()
-    print("[0] Back")
-    _cloning_ui_print_footer()
+    style.menu([
+        (None, [('1', 'Configure enzyme architecture')]),
+    ])
 
     while True:
-        choice = input("Selection: ").strip()
+        choice = style.ask_choice()
 
         if choice == "0":
             return None
@@ -4957,7 +4679,7 @@ def _cloning_ui_two_enzyme_strategy(
         if choice == "1":
             break
 
-        print("Invalid selection.")
+        style.invalid_selection()
 
     vector_left, vector_right = (
         _cloning_ui_select_two_enzyme_architecture(
@@ -4977,26 +4699,20 @@ def _cloning_ui_two_enzyme_strategy(
     if insert_left is None:
         return None
 
-    _cloning_ui_print_header(
+    style.header(
         "TWO-ENZYME STRATEGY"
     )
 
     print()
-    print(
-        f"Vector: {vector_left} + {vector_right}"
-    )
-    print(
-        f"Insert: {insert_left} + {insert_right}"
-    )
+    style.field('Vector', f"{vector_left} + {vector_right}")
+    style.field('Insert', f"{insert_left} + {insert_right}")
 
-    print()
-    print("[1] Run analysis")
-    print()
-    print("[0] Back")
-    _cloning_ui_print_footer()
+    style.menu([
+        (None, [('1', 'Run analysis')]),
+    ])
 
     while True:
-        choice = input("Selection: ").strip()
+        choice = style.ask_choice()
 
         if choice == "0":
             return None
@@ -5004,7 +4720,7 @@ def _cloning_ui_two_enzyme_strategy(
         if choice == "1":
             break
 
-        print("Invalid selection.")
+        style.invalid_selection()
 
     result = evaluate_cloning_strategy(
         vector_sequence,
@@ -5023,7 +4739,7 @@ def _cloning_ui_two_enzyme_strategy(
     )
 
     print_cloning_report(result)
-    input("\nPress Enter to continue...")
+    style.pause()
     return result
 
 
@@ -5061,18 +4777,15 @@ def run_cloning_analysis_ui(
     )
 
     if not vector_validation["valid"]:
-        _cloning_ui_print_header(
+        style.header(
             "CLONING ANALYSIS"
         )
         print("\nInvalid vector sequence.")
 
         if vector_validation["invalid_positions"]:
-            print(
-                "Invalid positions: "
-                f"{vector_validation['invalid_positions']}"
-            )
+            style.field('Invalid positions', f"{vector_validation['invalid_positions']}")
 
-        _cloning_ui_print_footer()
+        print(minor_rule())
         return None
 
     if insert_sequence is None:
@@ -5105,22 +4818,19 @@ def run_cloning_analysis_ui(
     )
 
     if not insert_validation["valid"]:
-        _cloning_ui_print_header(
+        style.header(
             "CLONING ANALYSIS"
         )
         print("\nInvalid insert sequence.")
 
         if insert_validation["invalid_positions"]:
-            print(
-                "Invalid positions: "
-                f"{insert_validation['invalid_positions']}"
-            )
+            style.field('Invalid positions', f"{insert_validation['invalid_positions']}")
 
-        _cloning_ui_print_footer()
+        print(minor_rule())
         return None
 
     while True:
-        _cloning_ui_print_header(
+        style.header(
             "CLONING ANALYSIS"
         )
 
@@ -5133,15 +4843,12 @@ def run_cloning_analysis_ui(
             insert_topology=insert_topology,
         )
 
-        print()
-        print("[1] Automatic Cloning Planner")
-        print("[2] Single-Enzyme Analysis")
-        print("[3] Two-Enzyme Strategy Analysis")
-        print()
-        print("[0] Back")
-        _cloning_ui_print_footer()
+        style.menu([
+            ("Planning", [('1', 'Automatic Cloning Planner')]),
+            ("Analysis", [('2', 'Single-Enzyme Analysis'), ('3', 'Two-Enzyme Strategy Analysis')]),
+        ])
 
-        choice = input("Selection: ").strip()
+        choice = style.ask_choice()
 
         if choice == "0":
             return None
@@ -5182,7 +4889,7 @@ def run_cloning_analysis_ui(
                 continue
             return None
 
-        print("Invalid selection.")
+        style.invalid_selection()
 
 
 # ============================================================

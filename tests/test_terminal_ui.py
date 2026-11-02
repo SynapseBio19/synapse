@@ -55,9 +55,12 @@ def zero_labels(source: str) -> list:
         if name == "menu":
             zero = next((k.value for k in node.keywords if k.arg == "zero"), None)
             has_zero = any(k.arg == "zero" for k in node.keywords)
-            label = text(zero, style.BACK_LABEL) if has_zero else style.BACK_LABEL
-            if label is not None:
-                labels.append(label)
+            # A conditional [0] (present or absent) is checked on both branches.
+            branches = [zero.body, zero.orelse] if isinstance(zero, ast.IfExp) else [zero]
+            for branch in branches:
+                label = text(branch, style.BACK_LABEL) if has_zero else style.BACK_LABEL
+                if label is not None:
+                    labels.append(label)
         elif name == "back":
             labels.append(text(node.args[0] if node.args else None, style.BACK_LABEL))
         elif name == "cancel":
