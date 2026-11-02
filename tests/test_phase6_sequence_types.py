@@ -23,8 +23,8 @@ class SequenceClassifierTests(unittest.TestCase):
         from core import alphabets as A
         return A.classify_sequence(sequence, declared)
 
-    def assertType(self, result, sequence_type, confidence):
-        self.assertEqual((result.sequence_type, result.confidence), (sequence_type, confidence),
+    def assertType(self, result, sequence_type, evidence):
+        self.assertEqual((result.sequence_type, result.evidence), (sequence_type, evidence),
                          result.describe())
 
     def test_plain_nucleotides_are_probable_not_confirmed(self):
@@ -93,7 +93,7 @@ class SequenceClassifierTests(unittest.TestCase):
         from core import alphabets as A
         self.assertEqual(A.require_sequence_type(DNA_SEQ, ("DNA",)).sequence_type, "DNA")
         self.assertEqual(
-            A.require_sequence_type(IUPAC_LETTER_PEPTIDE, ("PROTEIN",), declared="PROTEIN").confidence,
+            A.require_sequence_type(IUPAC_LETTER_PEPTIDE, ("PROTEIN",), declared="PROTEIN").evidence,
             "CONFIRMED")
         for sequence, accepted, fragment in (
             (IUPAC_LETTER_PEPTIDE, ("DNA",), "cannot be determined"),
@@ -151,14 +151,14 @@ class DeclaredMoleculeTypeTests(unittest.TestCase):
     def test_genbank_protein_record_is_confirmed_protein(self):
         [record] = self.load("p.gp", _genbank("PEP1", len(IUPAC_LETTER_PEPTIDE), "aa", "", IUPAC_LETTER_PEPTIDE))
         self.assertEqual(record["molecule_type"], "protein")
-        self.assertEqual((record["alphabet"], record["sequence_classification"]["confidence"]),
+        self.assertEqual((record["alphabet"], record["sequence_classification"]["evidence"]),
                          ("PROTEIN", "CONFIRMED"))
 
     def test_genbank_mrna_written_with_t_is_a_confirmed_nucleotide(self):
         [record] = self.load("m.gb", _genbank("MRNA1", len(DNA_SEQ), "bp", "mRNA", DNA_SEQ))
         self.assertEqual(record["molecule_type"], "mRNA")
         self.assertEqual(record["declared_type"], "NUCLEOTIDE")
-        self.assertEqual((record["alphabet"], record["sequence_classification"]["confidence"]),
+        self.assertEqual((record["alphabet"], record["sequence_classification"]["evidence"]),
                          ("DNA", "CONFIRMED"))
 
     def test_fasta_moltype_modifier(self):
@@ -169,7 +169,7 @@ class DeclaredMoleculeTypeTests(unittest.TestCase):
             f">plain\n{DNA_SEQ}\n"
             f">wrong [moltype=mRNA]\n{PROTEIN}\n"
         ))
-        summary = [(r["molecule_type"], r["alphabet"], r["sequence_classification"]["confidence"])
+        summary = [(r["molecule_type"], r["alphabet"], r["sequence_classification"]["evidence"])
                    for r in records]
         self.assertEqual(summary, [
             ("protein", "PROTEIN", "CONFIRMED"),
@@ -184,7 +184,7 @@ class DeclaredMoleculeTypeTests(unittest.TestCase):
         from core.models import SequenceRecord
         [record] = self.load("x.fasta", f">pep [moltype=protein]\n{IUPAC_LETTER_PEPTIDE}\n")
         sequence_record = SequenceRecord.from_legacy_dict(record, 1)
-        self.assertEqual((sequence_record.alphabet, sequence_record.type_confidence), ("PROTEIN", "CONFIRMED"))
+        self.assertEqual((sequence_record.alphabet, sequence_record.type_evidence), ("PROTEIN", "CONFIRMED"))
         provenance = sequence_record.provenance()
         self.assertEqual((provenance["sequence_type"], provenance["molecule_type"]), ("PROTEIN", "protein"))
 
@@ -192,11 +192,11 @@ class DeclaredMoleculeTypeTests(unittest.TestCase):
         from core.models import SequenceRecord
         self.assertEqual(SequenceRecord("x", "acgt").alphabet, "DNA")
         undecided = SequenceRecord("p", IUPAC_LETTER_PEPTIDE)
-        self.assertEqual((undecided.alphabet, undecided.type_confidence), (None, "AMBIGUOUS"))
+        self.assertEqual((undecided.alphabet, undecided.type_evidence), (None, "AMBIGUOUS"))
         declared = undecided.with_declared_type("PROTEIN")
-        self.assertEqual((declared.alphabet, declared.type_confidence, declared.declared_type),
+        self.assertEqual((declared.alphabet, declared.type_evidence, declared.declared_type),
                          ("PROTEIN", "CONFIRMED", "PROTEIN"))
-        self.assertEqual(SequenceRecord("x", "ACGT", alphabet="DNA").type_confidence, "CONFIRMED")
+        self.assertEqual(SequenceRecord("x", "ACGT", alphabet="DNA").type_evidence, "CONFIRMED")
 
     def test_report_input_section_names_the_sequence_type(self):
         from core.models import SequenceRecord
@@ -205,7 +205,7 @@ class DeclaredMoleculeTypeTests(unittest.TestCase):
         pipeline = SynapsePipeline(sequence=DNA_SEQ, header="plain")
         pipeline.attach_record(SequenceRecord("plain", DNA_SEQ))
         report = build_analysis_report(pipeline)
-        self.assertEqual((report["input"]["sequence_type"], report["input"]["sequence_type_confidence"]),
+        self.assertEqual((report["input"]["sequence_type"], report["input"]["sequence_type_evidence"]),
                          ("DNA", "PROBABLE"))
         self.assertEqual(report["input"]["record"]["sequence_type"], "DNA")
         self.assertIn("- sequence_type: `DNA`", report_to_markdown(report))

@@ -233,7 +233,7 @@ def resolve_sequence_type(record):
     A sequence whose type cannot be told from its letters is not guessed:
     the user declares DNA, RNA or protein.
     """
-    while record.type_confidence == AMBIGUOUS:
+    while record.type_evidence == AMBIGUOUS:
         print()
         print(major_rule())
         print("SEQUENCE TYPE")
@@ -252,12 +252,12 @@ def resolve_sequence_type(record):
             print("\nInvalid selection.")
             continue
         candidate = record.with_declared_type(declared)
-        if candidate.type_confidence == INVALID:
+        if candidate.type_evidence == INVALID:
             print(f"\nNot possible: {candidate.type_reasons[0]}.")
             continue
         logger.info("Sequence type declared by the user: %s", declared)
         record = candidate
-    if record.type_confidence == INVALID:
+    if record.type_evidence == INVALID:
         print_sequence_type_error(record)
         return None
     return record
@@ -281,7 +281,7 @@ def run_protein_record(record, selected_index):
         print(f"\n{record.description}")
         print(
             f"Length: {record.length} aa | "
-            f"Type: protein ({record.type_confidence.lower()})"
+            f"Type: protein ({record.type_evidence.lower()})"
         )
         print("\n[1] Protein Analysis")
         print("[2] BLAST Search")

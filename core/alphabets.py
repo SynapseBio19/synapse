@@ -52,7 +52,7 @@ CONFIRMED = "CONFIRMED"
 PROBABLE = "PROBABLE"
 AMBIGUOUS = "AMBIGUOUS"
 INVALID = "INVALID"
-CONFIDENCE_LEVELS: Tuple[str, ...] = (CONFIRMED, PROBABLE, AMBIGUOUS, INVALID)
+EVIDENCE_LEVELS: Tuple[str, ...] = (CONFIRMED, PROBABLE, AMBIGUOUS, INVALID)
 
 NUCLEOTIDE_AMBIGUITY: FrozenSet[str] = frozenset("RYSWKMBDHVN")
 DNA_UNAMBIGUOUS: FrozenSet[str] = frozenset("ACGT")
@@ -107,7 +107,7 @@ class SequenceClassification:
     """
 
     sequence_type: Optional[str]
-    confidence: str
+    evidence: str
     candidates: Tuple[str, ...] = ()
     reasons: Tuple[str, ...] = ()
     declared: Optional[str] = None
@@ -116,17 +116,17 @@ class SequenceClassification:
     @property
     def usable(self) -> bool:
         """True when a type was determined (CONFIRMED or PROBABLE)."""
-        return self.confidence in (CONFIRMED, PROBABLE)
+        return self.evidence in (CONFIRMED, PROBABLE)
 
     def describe(self) -> str:
         label = self.sequence_type or "undetermined"
-        text = f"{label} ({self.confidence.lower()})"
+        text = f"{label} ({self.evidence.lower()})"
         return f"{text}: {'; '.join(self.reasons)}" if self.reasons else text
 
     def as_dict(self) -> Dict[str, object]:
         return {
             "sequence_type": self.sequence_type,
-            "confidence": self.confidence,
+            "evidence": self.evidence,
             "candidates": list(self.candidates),
             "declared": self.declared,
             "reasons": list(self.reasons),
@@ -281,9 +281,9 @@ def require_sequence_type(sequence: str, accepted: Iterable[str], *,
     accepted_types = tuple(accepted)
     result = classify_sequence(sequence, declared)
     wanted = " or ".join(accepted_types)
-    if result.confidence == INVALID:
+    if result.evidence == INVALID:
         raise SequenceTypeError(f"{context} needs a {wanted} sequence: {result.reasons[0]}.", result)
-    if result.confidence == AMBIGUOUS:
+    if result.evidence == AMBIGUOUS:
         options = ", ".join(result.candidates) or "none"
         raise SequenceTypeError(
             f"{context} needs a {wanted} sequence, and this sequence's type cannot be "

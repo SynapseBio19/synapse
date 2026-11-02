@@ -740,9 +740,9 @@ def infer_sequence_type(sequence: str, declared: Optional[str] = None) -> str:
     *declared* may be a type or "NUCLEOTIDE" (e.g. from file metadata).
     """
     result = classify_sequence(sequence, declared)
-    if result.confidence == INVALID:
+    if result.evidence == INVALID:
         raise BlastAnalysisError(f"Cannot infer the query type: {result.reasons[0]}.")
-    if result.confidence == AMBIGUOUS:
+    if result.evidence == AMBIGUOUS:
         raise BlastAnalysisError(
             "The query type cannot be determined from the sequence "
             f"({result.reasons[0]}); specify DNA or PROTEIN."
@@ -4225,7 +4225,7 @@ def _query_type_for_menu(sequence: str, declared: Optional[str]) -> Optional[str
     try:
         return infer_sequence_type(sequence, declared)
     except BlastAnalysisError as exc:
-        if classify_sequence(sequence, declared).confidence != AMBIGUOUS:
+        if classify_sequence(sequence, declared).evidence != AMBIGUOUS:
             raise
         print(f"\r\n{exc}")
     print("[1] DNA")

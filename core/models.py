@@ -109,7 +109,7 @@ class SequenceRecord:
     """A loaded sequence with its provenance and sequence type.
 
     ``alphabet`` (DNA, RNA, PROTEIN, or None when undetermined) and
-    ``type_confidence`` come from ``core.alphabets.classify_sequence``.
+    ``type_evidence`` come from ``core.alphabets.classify_sequence``.
     ``declared_type`` is a type stated by the user or by file metadata;
     an ``alphabet`` passed to the constructor counts as a declaration.
     ``molecule_type`` is the file's own label (e.g. GenBank "mRNA").
@@ -127,7 +127,7 @@ class SequenceRecord:
     features: List[Feature] = field(default_factory=list)
     declared_type: Optional[str] = None
     molecule_type: Optional[str] = None
-    type_confidence: str = field(default="", init=False)
+    type_evidence: str = field(default="", init=False)
     type_reasons: Tuple[str, ...] = field(default=(), init=False)
 
     def __post_init__(self) -> None:
@@ -139,7 +139,7 @@ class SequenceRecord:
         result = classify_sequence(self.sequence, self.declared_type)
         self.declared_type = result.declared
         self.alphabet = result.sequence_type
-        self.type_confidence = result.confidence
+        self.type_evidence = result.evidence
         self.type_reasons = result.reasons
 
     def with_declared_type(self, declared_type: str) -> "SequenceRecord":
@@ -161,7 +161,7 @@ class SequenceRecord:
             "length": self.length,
             "topology": self.topology,
             "sequence_type": self.alphabet,
-            "sequence_type_confidence": self.type_confidence,
+            "sequence_type_evidence": self.type_evidence,
             "declared_type": self.declared_type,
             "molecule_type": self.molecule_type,
             "sequence_sha256": self.sequence_sha256,

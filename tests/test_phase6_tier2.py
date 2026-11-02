@@ -1063,8 +1063,18 @@ class HeuristicScoreVocabularyTests(unittest.TestCase):
         self.assertIn(signal["evidence"], ("low", "moderate"))
         self.assertNotIn("confidence", signal)
 
-    def test_no_confidence_literal_keys_in_analyses(self):
-        self.assertEqual(_literal_keys_containing("confidence", ("analyses",)), [])
+    def test_no_confidence_literal_keys_in_source(self):
+        directories = ("analyses", "core", "fileio", "ui", ".")
+        self.assertEqual(_literal_keys_containing("confidence", directories), [])
+
+    def test_sequence_classification_reports_an_evidence_level(self):
+        from core.alphabets import EVIDENCE_LEVELS, classify_sequence
+        from core.models import SequenceRecord
+        result = classify_sequence("MKTAYIAKQR")
+        self.assertIn(result.evidence, EVIDENCE_LEVELS)
+        self.assertEqual(_confidence_keys(result.as_dict()), [])
+        record = SequenceRecord("p", "MKTAYIAKQR")
+        self.assertEqual(record.type_evidence, result.evidence)
 
 
 if __name__ == "__main__":

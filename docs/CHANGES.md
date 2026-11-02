@@ -1389,3 +1389,29 @@ sequence-applicability label) use the word correctly.
 Tests: 5 new (`HeuristicScoreVocabularyTests`), each confirmed to fail on
 the previous code. One of them checks every string literal used as a
 dictionary key or subscript in `analyses/` for the word.
+
+### D18 (part 2) The sequence-type classifier reports an evidence level (`core/alphabets.py`, `core/models.py`, `core/report.py`, `fileio/loader.py`, `main.py`, `analyses/blast.py`)
+
+The Phase 6 classifier (D13/D14) called its CONFIRMED / PROBABLE /
+AMBIGUOUS / INVALID outcome a "confidence". Those four values are
+categories of evidence about which letters occur; none of them is a
+probability. The word is now reserved for statistical confidence, which
+Synapse does not compute.
+
+| Where | Before | After |
+|---|---|---|
+| `SequenceClassification` field | `confidence` | `evidence` |
+| `SequenceClassification.as_dict()` | `"confidence"` | `"evidence"` |
+| Level constant | `CONFIDENCE_LEVELS` | `EVIDENCE_LEVELS` |
+| `SequenceRecord` attribute | `type_confidence` | `type_evidence` |
+| Provenance and report input section | `sequence_type_confidence` | `sequence_type_evidence` |
+
+The values and the classification rules are unchanged; no golden snapshot
+contained these names. The earlier entries "Central sequence alphabets and type
+classifier" and "D14-F3, F11 Declared molecule type is read, kept and
+reported" describe the names as they were introduced and are left as the
+record of that change.
+
+Tests: the existing sequence-type tests now read the new names, and the
+source check from part 1 covers `core/`, `fileio/`, `ui/` and `main.py`
+as well as `analyses/`.

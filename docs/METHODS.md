@@ -32,7 +32,7 @@ use 0-based inclusive `start <= stop` on the forward strand.
   = nucleotide) and the NCBI FASTA modifier `[moltype=...]`
   (`[moltype=protein]` is a Synapse extension) are read as a declared
   type. Each record is classified with `core.alphabets` and carries its
-  type and confidence into provenance and the report. Without a declared
+  type and its evidence level into provenance and the report. Without a declared
   type the letters decide (see "Sequence types").
 - Main menu: a record whose type cannot be determined is not guessed; the
   user declares DNA, RNA or protein. RNA records are analyzed in the DNA
@@ -66,7 +66,10 @@ use 0-based inclusive `start <= stop` on the forward strand.
   are checked against `Bio.Data.IUPACData` in the tests.
 - Normalization removes whitespace and uppercases; it never converts U to
   T and never drops a symbol.
-- Classification without a declared type (`classify_sequence`):
+- Classification without a declared type (`classify_sequence`) gives a
+  sequence type and an evidence level (`evidence`: CONFIRMED, PROBABLE,
+  AMBIGUOUS or INVALID). The level is categorical; it is not a
+  probability:
   - symbols that exist only in the protein alphabet (E F I J L O P Q X Z
     `*`) → protein, CONFIRMED;
   - only A, C, G, T/U and N → DNA or RNA, PROBABLE (never confirmed:

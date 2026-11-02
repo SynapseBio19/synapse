@@ -76,7 +76,7 @@ def classify_record(record: Dict[str, Any]) -> None:
     record["declared_type"] = declared
     record["alphabet"] = result.sequence_type
     record["sequence_classification"] = result.as_dict()
-    if declared is not None and result.confidence == INVALID:
+    if declared is not None and result.evidence == INVALID:
         record.setdefault("notes", []).append(
             f"Declared molecule type {molecule!r} does not fit the sequence: {result.reasons[0]}."
         )
