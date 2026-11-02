@@ -1587,3 +1587,23 @@ Its enforcement table names the test for each mechanical rule, and a new
 test (`test_style_guide_names_only_tests_that_exist`) fails if the guide
 names a test that does not exist, so the table cannot go stale; checked
 with a deliberately misspelled test name.
+
+### Stage H README rewritten to section 15.1
+
+The README described running, the API and testing, but not the project's
+purpose, its modules, its dependencies, its configuration or its
+limitations, and one statement was inaccurate: "BLAST tests that need
+BLAST+ or local databases are not part of the default run". They are part
+of the default run and are skipped, with the reason shown, when BLAST+ is
+absent; the same holds for the Biopython reference tests.
+
+It now covers purpose and status, the eleven menu modules (the planner
+marked "not implemented"), installation, a dependency table (runtime:
+standard library only; optional BLAST+ and network services; test-only
+Biopython and primer3-py; development pyright), terminal and API usage,
+the environment variables the code actually reads, the architecture,
+testing, the main limitations with figures from `METHODS.md`, and the
+documentation set. `LEGACY/` and `Synapse_Website/` are named as not part
+of the software. Every statement was checked against the code (the four
+CRISPR systems, the default log and export directories, the variables
+read through `os.environ`).

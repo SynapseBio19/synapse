@@ -92,6 +92,7 @@ IUPAC, gapped and invalid input (D14):
 | 35 | Stage H editorial review part 1: American spelling throughout (92 words in docs, 6 code text sites); one wording for recurring messages; tone and precision fixes; enforcement test | this package | inventory of every string literal and document; spelling test fails on the previous text | Done; suite 296/296 |
 | 36 | BLAST E-values with three significant figures everywhere; `n/a` when absent | `4e5dbdc` | helper assertions (the sample XML cannot distinguish) | Corrected |
 | 37 | `docs/STYLE_GUIDE.md` (9.1-9.6) with an enforcement table checked by the suite | this package | guide-consistency test verified with a deliberate violation | Done |
+| 38 | README rewritten to 15.1 (purpose, modules, installation, dependencies, usage, configuration, architecture, testing, limitations) | this package | each statement checked against the code | Done |
 
 ## Paused (2026-10-31)
 
