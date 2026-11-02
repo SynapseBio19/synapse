@@ -1678,7 +1678,7 @@ def export_results(run: LiteratureSearchRun, path: str | Path) -> Path:
 
     elif suffix == ".txt":
 
-        lines = [MODULE_NAME, f"Run ID: {run.run_id}", f"Query: {run.query.query}", f"Sources: {', '.join(run.query.sources)}", f"Unique articles: {len(run.articles)}", "", "SCIENTIFIC NOTE: Relevance scores are not evidence-quality scores.", ""]
+        lines = [MODULE_NAME, style.field_line('Run ID', f"{run.run_id}"), style.field_line('Query', f"{run.query.query}"), style.field_line('Sources', f"{', '.join(run.query.sources)}"), style.field_line('Unique articles', f"{len(run.articles)}"), "", "SCIENTIFIC NOTE: Relevance scores are not evidence-quality scores.", ""]
 
         for i, a in enumerate(run.articles, 1):
 
@@ -1851,9 +1851,9 @@ def print_article_detail(run: LiteratureSearchRun, article_index: int) -> None:
     if article.metadata.get("date_validation_note"):
         print(f"DATE VALIDATION WARNING: {article.metadata['date_validation_note']}")
 
-    print(f"DOI: {article.doi or 'Not available'}")
+    style.field('DOI', f"{article.doi or 'Not available'}")
 
-    print(f"PMID: {article.pmid or 'Not available'} | PMCID: {article.pmcid or 'Not available'}")
+    style.field('PMID', f"{article.pmid or 'Not available'} | PMCID: {article.pmcid or 'Not available'}")
 
     style.field('Open access', f"{'Yes' if article.is_open_access is True else 'No' if article.is_open_access is False else 'Unknown'}")
 
@@ -2241,9 +2241,9 @@ def _interactive_menu(context: Optional[dict[str, Any]] = None) -> None:
 
         if suggested:
             print(f"Suggestion from the active sequence header: {suggested}")
-            search_text = input("Search query [Enter = use suggestion]: ").strip() or suggested
+            search_text = style.ask('Search query [Enter = use suggestion]') or suggested
         else:
-            search_text = input("Search query (Boolean terms supported by each source): ").strip()
+            search_text = style.ask('Search query (Boolean terms supported by each source)')
 
         if not search_text:
 
@@ -2257,7 +2257,7 @@ def _interactive_menu(context: Optional[dict[str, Any]] = None) -> None:
 
             max_results = int(max_raw) if max_raw else 30
 
-            source_raw = input("Sources [1=PubMed, 2=Europe PMC, 3=OpenAlex, 4=Crossref, Enter=1,2,3]: ").strip()
+            source_raw = style.ask('Sources [1=PubMed, 2=Europe PMC, 3=OpenAlex, 4=Crossref, Enter=1,2,3]')
 
             source_map = {"1": "pubmed", "2": "europe_pmc", "3": "openalex", "4": "crossref"}
 
@@ -2279,9 +2279,9 @@ def _interactive_menu(context: Optional[dict[str, Any]] = None) -> None:
 
             date_to = style.ask('To date YYYY or YYYY-MM-DD', default='none') or None
 
-            oa = input("Open-access only? (y/N): ").strip().lower() == "y"
+            oa = style.confirm("Open-access only?")
 
-            sort = input("Sort [relevance/date/citations] (relevance): ").strip().lower() or "relevance"
+            sort = style.ask('Sort [relevance/date/citations] (relevance)').lower() or "relevance"
 
             query = LiteratureQuery(search_text, selected, max_results, date_from, date_to, oa, sort,
                                     biological_context={k: v for k, v in context.items() if k == "sequence_header"})
@@ -2318,7 +2318,7 @@ def _interactive_menu(context: Optional[dict[str, Any]] = None) -> None:
 
         while run.articles:
 
-            detail_choice = input("View full article detail? Enter result number, or press Enter to continue: ").strip()
+            detail_choice = style.ask('View full article detail? Enter result number, or press Enter to continue')
 
             if not detail_choice:
 
@@ -2332,7 +2332,7 @@ def _interactive_menu(context: Optional[dict[str, Any]] = None) -> None:
 
                 print("Enter a valid result number.")
 
-        export = input("Export results? Enter path with .json/.csv/.txt/.ris/.bib, or press Enter to skip: ").strip()
+        export = style.ask('Export results? Enter path with .json/.csv/.txt/.ris/.bib, or press Enter to skip')
 
         if export:
 

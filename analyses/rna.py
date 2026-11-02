@@ -2027,9 +2027,7 @@ def print_rna_report(
         except (TypeError, ValueError):
             orf_name = str(rank)
 
-        print(
-            f"ORF:                 {orf_name}"
-        )
+        style.field('ORF', f"{orf_name}")
         style.field('ORF length', f"{pipeline_info.get('dna_length', len(dna))} bp")
         style.field('Strand', f"{_orf_value(orf, 'strand', '-')}")
         style.field('Reading frame', f"{_orf_value(orf, 'frame', '-')}")
@@ -2765,10 +2763,7 @@ def print_rna_pipeline_input(analysis):
         else:
             orf_name = "Selected ORF"
 
-        print(
-            f"ORF:                 "
-            f"{orf_name}"
-        )
+        style.field('ORF', f"{orf_name}")
 
         style.field('Strand', f"{_orf_value(orf, 'strand', '-')}")
 
@@ -2842,10 +2837,7 @@ def print_rna_overview(analysis):
         except (TypeError, ValueError):
             orf_name = str(rank)
 
-        print(
-            f"ORF:                 "
-            f"{orf_name}"
-        )
+        style.field('ORF', f"{orf_name}")
 
         style.field('ORF length', f"{info.get('dna_length', summary['length'])} bp")
 

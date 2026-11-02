@@ -2142,21 +2142,20 @@ def print_restriction_report(analysis):
             f"{'…' if len(ambiguous) > 20 else ''})")
 
     style.section('Restriction Enzymes')
-    print(
-        f"{'Enzyme':<12} {'Recognition':<14} "
-        f"{'Sites':>6} {'Confirmed':>10} {'Possible':>9} {'Type':>8}"
-    )
+    widths = (10, 13, 6, 10, 9)
+    print(style.columns(("Enzyme", "Recognition", "Sites", "Confirmed", "Possible", "Type"), widths))
+    print(minor_rule())
 
     for enzyme_name in analysis["enzymes"]:
         result = analysis["enzyme_results"][enzyme_name]
-        print(
-            f"{enzyme_name:<12} "
-            f"{result['recognition_sequence']:<14} "
-            f"{result['site_count']:>6} "
-            f"{result['confirmed_site_count']:>10} "
-            f"{result['possible_site_count']:>9} "
-            f"{result['cut_type']:>8}"
-        )
+        print(style.columns((
+            enzyme_name,
+            result["recognition_sequence"],
+            result["site_count"],
+            result["confirmed_site_count"],
+            result["possible_site_count"],
+            result["cut_type"],
+        ), widths))
 
     style.section('Restriction Map')
     sites = analysis.get("restriction_map", [])
@@ -2333,7 +2332,8 @@ def _synapse_ui_select_enzymes(
     print("Enter 0 to go back.")
 
     while True:
-        raw = input("\nEnzymes: ").strip()
+        print()
+        raw = style.ask("Enzymes")
 
         if raw == "0":
             return None
@@ -2375,7 +2375,8 @@ def _synapse_ui_select_topology(default="linear"):
     style.back()
 
     while True:
-        choice = input("\nSelect topology: ").strip()
+        print()
+        choice = style.ask("Select topology")
 
         if choice == "0":
             return None

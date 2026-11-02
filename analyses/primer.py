@@ -3778,7 +3778,7 @@ def _primer_ui_read_target(sequence):
     print()
 
     start_input = style.ask('Target start', default='1')
-    end_input = input(f"Target end [{len(sequence)}]: ").strip()
+    end_input = style.ask(f"Target end [{len(sequence)}]")
 
     try:
         first = 1 if not start_input else int(start_input)
@@ -3805,7 +3805,7 @@ def _primer_ui_read_conditions():
     try:
         sodium_input = style.ask('Na+ / salt', default='50.0 mM')
         mg_input = style.ask('Mg2+', default='1.5 mM')
-        dntp_input = input("dNTPs [0.2 mM]: ").strip()
+        dntp_input = style.ask('dNTPs [0.2 mM]')
         primer_input = style.ask('Primer concentration', default='250 nM')
 
         sodium_mM = 50.0 if not sodium_input else float(sodium_input)
@@ -3853,7 +3853,7 @@ def _primer_ui_single_analysis(pipeline=None):
     """Analyze one existing primer sequence."""
     style.header("Single primer analysis")
 
-    primer_input = input("Primer sequence: ").strip()
+    primer_input = style.ask('Primer sequence')
 
     if not primer_input:
         style.error("Primer sequence is empty.")
@@ -4905,44 +4905,44 @@ def summarize_professional_primer_pair(advanced_pair: AdvancedPrimerPair, rank: 
 
     lines = [
         f"PRIMER PAIR #{rank}",
-        f"Score:                 {pair.score:.2f}/100",
-        f"Category:              {pair.category}",
+        style.field_line('Score', f"{pair.score:.2f}/100"),
+        style.field_line('Category', f"{pair.category}"),
         "",
         "FORWARD",
-        f"Sequence:              {forward.sequence}",
-        f"Position:              {forward.start + 1}-{forward.end} (1-based)",
-        f"Length:                {forward.length} bp",
-        f"GC:                    {forward.gc_percent:.2f}%",
-        f"Tm:                    {f_thermo.tm_C:.2f} °C",
+        style.field_line('Sequence', f"{forward.sequence}"),
+        style.field_line('Position', f"{forward.start + 1}-{forward.end} (1-based)"),
+        style.field_line('Length', f"{forward.length} bp"),
+        style.field_line('GC', f"{forward.gc_percent:.2f}%"),
+        style.field_line('Tm', f"{f_thermo.tm_C:.2f} °C"),
         f"ΔH:                    {f_thermo.delta_h_kcal_mol:.2f} kcal/mol",
         f"ΔS:                    {f_thermo.delta_s_cal_mol_k:.2f} cal/(mol·K)",
         f"ΔG at 25 °C:           {f_thermo.delta_g_kcal_mol:.2f} kcal/mol",
-        f"Effective salt:        {f_thermo.effective_salt_mM:.2f} mM",
+        style.field_line('Effective salt', f"{f_thermo.effective_salt_mM:.2f} mM"),
         f"3' GC clamp:           {forward.gc_clamp} bp",
-        f"Hairpin stem:          {forward.hairpin.max_stem} bp ({forward.hairpin.severity})",
-        f"Self-dimer stem:       {forward.self_dimer.max_stem} bp ({forward.self_dimer.severity})",
+        style.field_line('Hairpin stem', f"{forward.hairpin.max_stem} bp ({forward.hairpin.severity})"),
+        style.field_line('Self-dimer stem', f"{forward.self_dimer.max_stem} bp ({forward.self_dimer.severity})"),
         "",
         "REVERSE",
-        f"Sequence:              {reverse.sequence}",
-        f"Position:              {reverse.start + 1}-{reverse.end} (1-based)",
-        f"Length:                {reverse.length} bp",
-        f"GC:                    {reverse.gc_percent:.2f}%",
-        f"Tm:                    {r_thermo.tm_C:.2f} °C",
+        style.field_line('Sequence', f"{reverse.sequence}"),
+        style.field_line('Position', f"{reverse.start + 1}-{reverse.end} (1-based)"),
+        style.field_line('Length', f"{reverse.length} bp"),
+        style.field_line('GC', f"{reverse.gc_percent:.2f}%"),
+        style.field_line('Tm', f"{r_thermo.tm_C:.2f} °C"),
         f"ΔH:                    {r_thermo.delta_h_kcal_mol:.2f} kcal/mol",
         f"ΔS:                    {r_thermo.delta_s_cal_mol_k:.2f} cal/(mol·K)",
         f"ΔG at 25 °C:           {r_thermo.delta_g_kcal_mol:.2f} kcal/mol",
-        f"Effective salt:        {r_thermo.effective_salt_mM:.2f} mM",
+        style.field_line('Effective salt', f"{r_thermo.effective_salt_mM:.2f} mM"),
         f"3' GC clamp:           {reverse.gc_clamp} bp",
-        f"Hairpin stem:          {reverse.hairpin.max_stem} bp ({reverse.hairpin.severity})",
-        f"Self-dimer stem:       {reverse.self_dimer.max_stem} bp ({reverse.self_dimer.severity})",
+        style.field_line('Hairpin stem', f"{reverse.hairpin.max_stem} bp ({reverse.hairpin.severity})"),
+        style.field_line('Self-dimer stem', f"{reverse.self_dimer.max_stem} bp ({reverse.self_dimer.severity})"),
         "",
         "PAIR",
-        f"Amplicon:              {pair.amplicon_start}-{pair.amplicon_end}",
-        f"Amplicon length:       {pair.amplicon_length} bp",
+        style.field_line('Amplicon', f"{pair.amplicon_start}-{pair.amplicon_end}"),
+        style.field_line('Amplicon length', f"{pair.amplicon_length} bp"),
         f"ΔTm:                   {advanced_pair.thermodynamic_tm_delta:.2f} °C",
-        f"Thermodynamic score:   {advanced_pair.thermodynamic_pair_score:.2f}/15",
-        f"Heterodimer stem:      {pair.heterodimer.max_stem} bp ({pair.heterodimer.severity})",
-        f"Specificity screening: {specificity}",
+        style.field_line('Thermodynamic score', f"{advanced_pair.thermodynamic_pair_score:.2f}/15"),
+        style.field_line('Heterodimer stem', f"{pair.heterodimer.max_stem} bp ({pair.heterodimer.severity})"),
+        style.field_line('Specificity screening', f"{specificity}"),
     ]
     return "\n".join(lines)
 

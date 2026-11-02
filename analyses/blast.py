@@ -3707,16 +3707,16 @@ def build_text_report(run: BlastRun) -> str:
         major_rule(),
         "SYNAPSE BLAST REPORT",
         major_rule(),
-        f"Query:            {run.query.name}",
-        f"Query type:       {run.query.sequence_type}",
-        f"Query length:     {run.query.length}",
-        f"Query source:     {run.query.source}",
-        f"Feature type:     {run.query.feature_type}",
-        f"Program:          {run.metadata.program}",
-        f"Database:          {run.metadata.database}",
-        f"RID:              {run.metadata.rid}",
-        f"Hits:             {run.hit_count}",
-        f"Significant hits: {run.significant_hit_count}",
+        style.field_line('Query', f"{run.query.name}"),
+        style.field_line('Query type', f"{run.query.sequence_type}"),
+        style.field_line('Query length', f"{run.query.length}"),
+        style.field_line('Query source', f"{run.query.source}"),
+        style.field_line('Feature type', f"{run.query.feature_type}"),
+        style.field_line('Program', f"{run.metadata.program}"),
+        style.field_line('Database', f"{run.metadata.database}"),
+        style.field_line('RID', f"{run.metadata.rid}"),
+        style.field_line('Hits', f"{run.hit_count}"),
+        style.field_line('Significant hits', f"{run.significant_hit_count}"),
         "",
         "TOP HITS",
         minor_rule(),
@@ -3812,27 +3812,24 @@ def print_hit_summary(run: BlastRun, *, limit: int = 15) -> None:
     style.field('Length', f"{run.query.length}")
     style.field('Program', f"{run.metadata.program}")
     style.field('Database', f"{run.metadata.database}")
-    print(f"RID:                {run.metadata.rid}")
+    style.field("RID", run.metadata.rid)
     style.field('Hits', f"{run.hit_count}")
     style.field('Significant hits', f"{run.significant_hit_count}")
     print(minor_rule())
 
-    print(
-        f"{'Rank':<6}{'Accession':<18}{'Identity':>12}"
-        f"{'Coverage':>12}{'E-value':>16}{'Bit score':>14}"
-    )
+    widths = (5, 17, 9, 9, 10)
+    print(style.columns(("Rank", "Accession", "Identity", "Coverage", "E-value", "Bit score"), widths))
     print(minor_rule())
 
     for rank, hit in enumerate(rank_hits(run.hits)[:limit], start=1):
-        evalue = _evalue_text(hit.best_evalue)
-        print(
-            f"{rank:<6}"
-            f"{(hit.accession or hit.hit_id)[:17]:<18}"
-            f"{hit.best_identity_percent:>11.2f}%"
-            f"{hit.best_coverage_percent:>11.2f}%"
-            f"{evalue:>16}"
-            f"{hit.best_bit_score:>14.2f}"
-        )
+        print(style.columns((
+            rank,
+            (hit.accession or hit.hit_id)[:17],
+            f"{hit.best_identity_percent:.2f}%",
+            f"{hit.best_coverage_percent:.2f}%",
+            _evalue_text(hit.best_evalue),
+            f"{hit.best_bit_score:.2f}",
+        ), widths))
 
 
 def print_hit_detail(hit: BlastHit) -> None:
@@ -3861,10 +3858,8 @@ def _print_local_database_status(manager: LocalBlastDatabaseManager) -> None:
     style.header("Local BLAST database status")
     style.field('Root', f"{manager.root}")
     print(minor_rule())
-    print(
-        f"{'Database':<24}{'Type':<12}{'Status':<42}"
-        f"{'Volumes':>12}{'Size':>12}"
-    )
+    widths = (16, 11, 22, 8)
+    print(style.columns(("Database", "Type", "Status", "Volumes", "Size"), widths))
     print(minor_rule())
 
     for database in manager.list_databases():
@@ -3901,13 +3896,8 @@ def _print_local_database_status(manager: LocalBlastDatabaseManager) -> None:
         else:
             volume_text = "1" if database.installed else "-"
 
-        print(
-            f"{database.name:<24}"
-            f"{database.database_type:<12}"
-            f"{status:<24}"
-            f"{volume_text:>12}"
-            f"{size:>12}"
-        )
+        print(style.columns(
+            (database.name, database.database_type, status, volume_text, size), widths))
 
 
 def _ensure_local_database_verified(
@@ -3984,7 +3974,7 @@ def _select_local_database(
         )
     style.cancel()
 
-    choice = input("Database: ").strip()
+    choice = style.ask('Database')
     if choice == "0":
         return None
 
@@ -4039,7 +4029,7 @@ def blast_database_manager_menu(
                 )
             style.cancel()
 
-            raw = input("Database: ").strip()
+            raw = style.ask('Database')
             if raw == "0":
                 continue
 
@@ -4060,7 +4050,7 @@ def blast_database_manager_menu(
                 "Large databases can require substantial disk space and network "
                 "bandwidth. Synapse does not start this automatically."
             )
-            confirm = input("Type DOWNLOAD to continue: ").strip()
+            confirm = style.ask('Type DOWNLOAD to continue')
             if confirm != "DOWNLOAD":
                 print("Download cancelled.")
                 continue
@@ -4077,7 +4067,7 @@ def blast_database_manager_menu(
 
         if choice == "3":
             _print_local_database_status(manager)
-            name = input("\r\nDatabase name to verify (0 cancel): ").strip()
+            name = style.ask('\r\nDatabase name to verify (0 cancel)')
             if name == "0":
                 continue
             try:
@@ -4091,12 +4081,12 @@ def blast_database_manager_menu(
             continue
 
         if choice == "4":
-            fasta = input("FASTA file path: ").strip()
+            fasta = style.ask('FASTA file path')
             if not fasta:
                 print("No FASTA path supplied.")
                 continue
 
-            name = input("New database name: ").strip()
+            name = style.ask('New database name')
             if not name:
                 print("No database name supplied.")
                 continue
@@ -4104,7 +4094,7 @@ def blast_database_manager_menu(
             style.menu([
                 ('\r\nDatabase Type', [('1', 'Nucleotide'), ('2', 'Protein')]),
             ], zero="Cancel")
-            db_choice = input("Type: ").strip()
+            db_choice = style.ask('Type')
             if db_choice == "0":
                 continue
             database_type = {"1": "nucleotide", "2": "protein"}.get(db_choice)
@@ -4130,7 +4120,7 @@ def blast_database_manager_menu(
 
         if choice == "5":
             _print_local_database_status(manager)
-            name = input("\r\nDatabase name to remove (0 cancel): ").strip()
+            name = style.ask('\r\nDatabase name to remove (0 cancel)')
             if name == "0":
                 continue
 
@@ -4139,9 +4129,7 @@ def blast_database_manager_menu(
                 print("Database is not installed.")
                 continue
 
-            confirm = input(
-                f"Type REMOVE {database.name} to permanently remove its local files: "
-            ).strip()
+            confirm = style.ask(f"Type REMOVE {database.name} to permanently remove its local files")
             if confirm != f"REMOVE {database.name}":
                 print("Removal cancelled.")
                 continue
@@ -4155,7 +4143,7 @@ def blast_database_manager_menu(
 
         if choice == "6":
             _print_local_database_status(manager)
-            name = input("\r\nDatabase name (0 cancel): ").strip()
+            name = style.ask('\r\nDatabase name (0 cancel)')
             if name == "0":
                 continue
             try:
@@ -4179,9 +4167,7 @@ def blast_database_manager_menu(
             continue
 
         if choice == "8":
-            raw_root = input(
-                "New database root (blank = default project data/blast_db, 0 cancel): "
-            ).strip()
+            raw_root = style.ask('New database root (blank = default project data/blast_db, 0 cancel)')
             if raw_root == "0":
                 continue
             try:
@@ -4213,7 +4199,7 @@ def _query_type_for_menu(sequence: str, declared: Optional[str]) -> Optional[str
     style.menu([
         (None, [('1', 'DNA'), ('2', 'Protein')]),
     ], zero="Cancel")
-    choice = input("Query type: ").strip()
+    choice = style.ask('Query type')
     return {"1": "DNA", "2": "PROTEIN"}.get(choice)
 
 
@@ -4306,7 +4292,7 @@ def blast_menu(
                     ('2', 'Load FASTA File'),
                 ]),
             ], zero="Cancel")
-            query_source_choice = input("Source: ").strip()
+            query_source_choice = style.ask('Source')
 
             if query_source_choice == "0":
                 continue
@@ -4343,7 +4329,7 @@ def blast_menu(
                     continue
 
             elif query_source_choice == "2":
-                raw_path = input("FASTA file path: ").strip().strip('\"')
+                raw_path = style.ask('FASTA file path').strip('\"')
                 if not raw_path:
                     print("No FASTA path supplied.")
                     continue
@@ -4365,7 +4351,7 @@ def blast_menu(
                             f"{fasta_query.length} {fasta_query.sequence_type.lower()}"
                         )
                     style.cancel()
-                    record_choice = input("Record: ").strip()
+                    record_choice = style.ask('Record')
                     if record_choice == "0":
                         continue
                     try:
@@ -4394,7 +4380,7 @@ def blast_menu(
             style.menu([
                 ('\r\nSearch Engine', [('1', 'Local BLAST+'), ('2', 'NCBI BLAST')]),
             ], zero="Cancel")
-            engine_choice = input("Engine: ").strip()
+            engine_choice = style.ask('Engine')
             if engine_choice == "0":
                 continue
 
@@ -4411,7 +4397,7 @@ def blast_menu(
                 )
             style.cancel()
 
-            program_choice = input("Program: ").strip()
+            program_choice = style.ask('Program')
             if program_choice == "0":
                 continue
 
@@ -4460,7 +4446,7 @@ def blast_menu(
                     )
                 style.cancel()
 
-                db_choice = input("Database: ").strip()
+                db_choice = style.ask('Database')
                 if db_choice == "0":
                     continue
 
@@ -4472,7 +4458,7 @@ def blast_menu(
                     continue
 
             raw_evalue = style.ask('E-value', default='10')
-            raw_max = input(f"Maximum target sequences [{DEFAULT_MAX_HITS}]: ").strip()
+            raw_max = style.ask(f"Maximum target sequences [{DEFAULT_MAX_HITS}]")
 
             raw_threads = ""
             raw_word_size = ""
@@ -4531,9 +4517,8 @@ def blast_menu(
                         "and processed on NCBI servers. Do not submit confidential or "
                         "unpublished sequences unless this is acceptable."
                     )
-                    confirm = style.ask('Send this query to NCBI?', default='y/N').lower()
-                    if confirm not in {"y", "yes", "j", "ja"}:
-                        print("Remote search cancelled.")
+                    if not style.confirm("Send this query to NCBI?"):
+                        style.note("Remote search cancelled.")
                         continue
                     print("\nSubmitting BLAST search to NCBI...")
                     print("The search may take several seconds or longer.")
@@ -4601,7 +4586,7 @@ def blast_menu(
                     f"{hit.best_coverage_percent:.2f}% coverage"
                 )
 
-            raw = input("Hit number (0 cancel): ").strip()
+            raw = style.ask('Hit number (0 cancel)')
             if raw == "0":
                 continue
 
@@ -4660,10 +4645,10 @@ def blast_menu(
             if not groups:
                 style.note("No taxonomy labels were available from this result set.")
             else:
-                print("Taxon / organism                         Hits")
+                print(style.columns(("Taxon / organism", "Hits"), (40,)))
                 print(minor_rule())
                 for name, count in groups.items():
-                    print(f"{name:<40} {count:>4}")
+                    print(style.columns((name, count), (40,)))
 
             if inferred:
                 print()
@@ -4698,7 +4683,7 @@ def blast_menu(
                 style.pause()
                 continue
 
-            path = input("Export path (.json/.csv/.txt): ").strip()
+            path = style.ask('Export path (.json/.csv/.txt)')
             if not path:
                 print("No path supplied.")
                 continue
@@ -4760,14 +4745,13 @@ def blast_menu(
                 "again. NCBI keeps a request ID for a limited time, so an older "
                 "one may have expired."
             )
-            rid = input("Request ID (RID): ").strip()
+            rid = style.ask('Request ID (RID)')
             if not rid:
                 print("No request ID supplied.")
                 continue
 
-            confirm = input(f"Contact NCBI for request {rid}? [y/N]: ").strip().lower()
-            if confirm not in {"y", "yes", "j", "ja"}:
-                print("Resume cancelled.")
+            if not style.confirm(f"Contact NCBI for request {rid}?"):
+                style.note("Resume cancelled.")
                 continue
 
             try:

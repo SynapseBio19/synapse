@@ -617,16 +617,16 @@ def format_system_details(system_name: str) -> str:
     lines = [
         "SELECTED CRISPR SYSTEM",
         minor_rule(),
-        f"System:          {system.name}",
-        f"Enzyme family:   {system.enzyme_family}",
-        f"PAM:             {system.pam}",
-        f"PAM length:      {system.pam_length} nt",
-        f"Guide length:    {system.guide_length} nt",
-        f"PAM orientation: {system.pam_side}",
-        f"Cut model:       {system.cut_model}",
-        f"Cut position:    {_cut_description(system)}",
-        f"Cut source:      {system.cut_reference}",
-        f"Description:     {system.description}",
+        style.field_line('System', f"{system.name}"),
+        style.field_line('Enzyme family', f"{system.enzyme_family}"),
+        style.field_line('PAM', f"{system.pam}"),
+        style.field_line('PAM length', f"{system.pam_length} nt"),
+        style.field_line('Guide length', f"{system.guide_length} nt"),
+        style.field_line('PAM orientation', f"{system.pam_side}"),
+        style.field_line('Cut model', f"{system.cut_model}"),
+        style.field_line('Cut position', f"{_cut_description(system)}"),
+        style.field_line('Cut source', f"{system.cut_reference}"),
+        style.field_line('Description', f"{system.description}"),
         "",
         "Scientific scope: sequence-level computational model; not an",
         "experimental cleavage or editing-efficiency prediction.",
@@ -2000,13 +2000,13 @@ def format_base_editing_report(results: Sequence[BaseEditingCandidate]) -> str:
     for item in results:
         lines.extend([
             f"{item.candidate_id} | editor={item.editor} | conversion={item.conversion}",
-            f"Guide: {item.guide}",
-            f"PAM: {item.pam} | strand={item.strand}",
-            f"Variant: {item.variant}",
-            f"Variant position in guide: {item.variant_position_in_guide}",
-            f"Editing window: {item.editing_window[0]}-{item.editing_window[1]}",
-            f"Desired edit in window: {'YES' if item.desired_edit_in_window else 'NO'}",
-            f"Bystanders: {item.bystander_count}",
+            style.field_line('Guide', f"{item.guide}"),
+            style.field_line('PAM', f"{item.pam} | strand={item.strand}"),
+            style.field_line('Variant', f"{item.variant}"),
+            style.field_line('Variant position in guide', f"{item.variant_position_in_guide}"),
+            style.field_line('Editing window', f"{item.editing_window[0]}-{item.editing_window[1]}"),
+            style.field_line('Desired edit in window', f"{'YES' if item.desired_edit_in_window else 'NO'}"),
+            style.field_line('Bystanders', f"{item.bystander_count}"),
         ])
         for b in item.bystanders:
             lines.append(f"  - position {b['position_in_guide']}: {b['base']} -> {b['conversion'].split('>')[1]}")
@@ -2024,12 +2024,12 @@ def format_prime_editing_report(results: Sequence[PrimeEditingCandidate], top_n:
     for item in results[:top_n]:
         lines.extend([
             f"{item.candidate_id} | guide={item.guide_id} | strand={item.strand}",
-            f"Guide: {item.guide}",
-            f"PAM: {item.pam}",
-            f"Variant: {item.variant}",
+            style.field_line('Guide', f"{item.guide}"),
+            style.field_line('PAM', f"{item.pam}"),
+            style.field_line('Variant', f"{item.variant}"),
             f"PBS ({item.pbs_length} nt): {item.pbs_sequence}",
             f"RTT ({item.rtt_length} nt): {item.rtt_sequence}",
-            f"RTT spans edit site: {'YES' if item.edit_in_rtt else 'NO'}",
+            style.field_line('RTT spans edit site', f"{'YES' if item.edit_in_rtt else 'NO'}"),
             "Notes: " + " | ".join(item.sequence_level_notes),
             minor_rule(),
         ])
@@ -2043,21 +2043,21 @@ def format_report(result: DesignResult, *, top_n: int = 10) -> str:
         major_rule(),
         "SYNAPSE CRISPR GUIDE ANALYSIS REPORT",
         major_rule(),
-        f"Sequence:              {result.sequence_name}",
-        f"Sequence length:       {result.sequence_length} bp",
-        f"Target region:         {result.region.name}",
-        f"Region coordinates:    {result.region.start}-{result.region.end}",
-        f"Feature type:          {result.region.feature_type}",
-        f"Feature name:          {result.region.feature_name or 'N/A'}",
-        f"Feature strand:        {result.region.feature_strand}",
-        f"CRISPR system:         {result.system.name}",
-        f"Enzyme family:         {result.system.enzyme_family}",
-        f"PAM:                   {result.system.pam}",
-        f"Guide length:          {result.system.guide_length} nt",
-        f"PAM orientation:       {result.system.pam_side}",
-        f"Candidates found:      {len(result.candidates)}",
-        f"Heuristic quality-pass: {result.high_quality_count}/{len(result.candidates)}",
-        f"Ranking mode:            {ranking_mode_label(result.candidates)}",
+        style.field_line('Sequence', f"{result.sequence_name}"),
+        style.field_line('Sequence length', f"{result.sequence_length} bp"),
+        style.field_line('Target region', f"{result.region.name}"),
+        style.field_line('Region coordinates', f"{result.region.start}-{result.region.end}"),
+        style.field_line('Feature type', f"{result.region.feature_type}"),
+        style.field_line('Feature name', f"{result.region.feature_name or 'N/A'}"),
+        style.field_line('Feature strand', f"{result.region.feature_strand}"),
+        style.field_line('CRISPR system', f"{result.system.name}"),
+        style.field_line('Enzyme family', f"{result.system.enzyme_family}"),
+        style.field_line('PAM', f"{result.system.pam}"),
+        style.field_line('Guide length', f"{result.system.guide_length} nt"),
+        style.field_line('PAM orientation', f"{result.system.pam_side}"),
+        style.field_line('Candidates found', f"{len(result.candidates)}"),
+        style.field_line('Heuristic quality-pass', f"{result.high_quality_count}/{len(result.candidates)}"),
+        style.field_line('Ranking mode', f"{ranking_mode_label(result.candidates)}"),
         minor_rule(),
         "SCIENTIFIC SCOPE",
         minor_rule(),
@@ -2129,7 +2129,7 @@ def _choose_system() -> str:
         )
     style.cancel()
     while True:
-        choice = input("System: ").strip()
+        choice = style.ask('System')
         if choice == "0":
             return ""
         try:
@@ -2149,7 +2149,7 @@ def _choose_editor() -> str:
         print(f"[{i}] {name:<5} {data['conversion'][0]}>{data['conversion'][1]} window={data['window'][0]}-{data['window'][1]}")
     style.cancel()
     while True:
-        choice = input("Editor: ").strip()
+        choice = style.ask('Editor')
         if choice == "0":
             return ""
         try:
@@ -2162,7 +2162,7 @@ def _choose_editor() -> str:
 
 
 def _manual_sequence() -> Tuple[str, str]:
-    name = input("Sequence name: ").strip() or "Manual Sequence"
+    name = style.ask('Sequence name') or "Manual Sequence"
     print("Paste DNA sequence. Enter an empty line to finish.")
     lines: List[str] = []
     while True:
@@ -2181,13 +2181,15 @@ def _print_candidate_table(candidates: Sequence[GuideCandidate], limit: int = 20
     if has_specificity_analysis(candidates):
         print("Specificity component uses only explicitly supplied local reference sequences.")
     print(minor_rule())
-    print(f"  # {'ID':<7} {'Guide':<22} {'PAM':<7} {'Str':<4} {'Pos':<12} {'GC':>6} {'Score':>7}")
+    widths = (3, 6, 22, 5, 3, 9, 6)
+    print(style.columns(("#", "ID", "Guide", "PAM", "Str", "Pos", "GC", "Score"), widths))
     print(minor_rule())
     for i, c in enumerate(candidates[:limit], 1):
-        print(
-            f"{i:>3} {c.candidate_id:<7} {c.guide:<22} {c.pam:<7} {c.strand:<4} "
-            f"{c.guide_start}-{c.guide_end:<7} {c.metrics.gc_content:>5.1f}% {c.rank_score:>7.2f}"
-        )
+        print(style.columns((
+            i, c.candidate_id, c.guide, c.pam, c.strand,
+            f"{c.guide_start}-{c.guide_end}", f"{c.metrics.gc_content:.1f}%",
+            f"{c.rank_score:.2f}",
+        ), widths))
     if len(candidates) > limit:
         print(f"Showing {limit} of {len(candidates)} candidates.")
 
@@ -2197,7 +2199,7 @@ def _choose_candidate(candidates: Sequence[GuideCandidate]) -> Optional[GuideCan
         style.note("No guide candidates available.")
         return None
     _print_candidate_table(candidates)
-    raw = input("Candidate number (0 cancel): ").strip()
+    raw = style.ask('Candidate number (0 cancel)')
     try:
         index = int(raw)
         if index == 0:
@@ -2373,7 +2375,7 @@ def crispr_menu(
             if choice == "0":
                 return
             if choice == "1":
-                path = input("FASTA path: ").strip()
+                path = style.ask('FASTA path')
                 if not path:
                     continue
                 try:
@@ -2400,7 +2402,7 @@ def crispr_menu(
                 print("\nAVAILABLE RECORDS")
                 for index, name in enumerate(records, start=1):
                     print(f"[{index}] {name}")
-                raw = input("Record number (0 cancel): ").strip()
+                raw = style.ask('Record number (0 cancel)')
                 try:
                     index = int(raw)
                 except ValueError:
@@ -2504,7 +2506,7 @@ def crispr_menu(
                     continue
                 default_dir = _default_export_directory()
                 print(f"Relative paths are saved to: {default_dir}")
-                path = input("Export path (.json, .csv or .fasta): ").strip()
+                path = style.ask('Export path (.json, .csv or .fasta)')
                 if not path:
                     continue
                 try:
@@ -2531,7 +2533,7 @@ def crispr_menu(
                     continue
                 default_dir = _default_export_directory()
                 print(f"Relative paths are saved to: {default_dir}")
-                path = input("Batch CSV export path: ").strip()
+                path = style.ask('Batch CSV export path')
                 if not path:
                     continue
                 try:
@@ -2612,7 +2614,7 @@ def crispr_menu(
             guide_analysis_menu()
 
         elif choice == "6":
-            raw = input("Variant (chr:position REF>ALT; blank cancels): ").strip()
+            raw = style.ask('Variant (chr:position REF>ALT; blank cancels)')
             if not raw:
                 continue
             try:
@@ -2987,8 +2989,8 @@ def _test_variant_parser() -> None:
 
 def _test_system_details() -> None:
     details = format_system_details("SpCas9")
-    _assert("System:          SpCas9" in details, "Selected system missing from details")
-    _assert("PAM:             NGG" in details, "Selected PAM missing from details")
+    _assert(style.field_line("System", "SpCas9") in details, "Selected system missing from details")
+    _assert(style.field_line("PAM", "NGG") in details, "Selected PAM missing from details")
     _assert("SELECTED CRISPR SYSTEM" in details, "System details header missing")
     _assert("SUPPORTED CRISPR SYSTEMS" not in details, "Details should describe one system only")
 

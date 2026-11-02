@@ -4029,10 +4029,7 @@ def run_mutation_analysis_ui(
                     getattr(pipeline, "context", None), "selected_orf", None
                 )
                 if selected_orf and dna:
-                    use_orf = input(
-                        "Use the selected pipeline ORF as CDS? (Y/n): "
-                    ).strip().lower()
-                    if use_orf in ("", "y", "yes"):
+                    if style.confirm("Use the selected pipeline ORF as CDS?", default_yes=True):
                         reference_plain = last_result.aligned_reference.replace("-", "")
                         variant_plain = last_result.aligned_variant.replace("-", "")
                         orf_ref_cds, orf_var_cds, orf_text = orf_reference_cds(
@@ -4044,10 +4041,7 @@ def run_mutation_analysis_ui(
                                 "Variant length differs from the reference: enter the "
                                 "variant CDS explicitly (ORF coordinates do not carry over)."
                             )
-                ref_cds = orf_ref_cds or input(
-                    "Reference CDS "
-                    "(press Enter to use reference sequence): "
-                ).strip()
+                ref_cds = orf_ref_cds or style.ask('Reference CDS (press Enter to use reference sequence)')
 
                 if not ref_cds:
 
@@ -4060,10 +4054,7 @@ def run_mutation_analysis_ui(
                         )
                     )
 
-                var_cds = orf_var_cds or input(
-                    "Variant CDS "
-                    "(press Enter to use variant sequence): "
-                ).strip()
+                var_cds = orf_var_cds or style.ask('Variant CDS (press Enter to use variant sequence)')
 
                 if not var_cds:
 

@@ -1914,41 +1914,41 @@ def build_variant_report(
         major_rule(),
         "SYNAPSE VARIANT ANALYSIS",
         major_rule(),
-        f"Analysis:          {result.name}",
-        f"Total variants:    {s.total_variants}",
-        f"Unique variants:   {s.unique_variants}",
+        style.field_line('Analysis', f"{result.name}"),
+        style.field_line('Total variants', f"{s.total_variants}"),
+        style.field_line('Unique variants', f"{s.unique_variants}"),
         "",
         "VARIANT TYPES",
         minor_rule(),
-        f"SNVs:              {s.snvs}",
-        f"MNVs:              {s.mnvs}",
-        f"Insertions:        {s.insertions}",
-        f"Deletions:         {s.deletions}",
-        f"Indels:            {s.indels}",
-        f"Complex:           {s.complex}",
-        f"Symbolic:          {s.symbolic}",
+        style.field_line('SNVs', f"{s.snvs}"),
+        style.field_line('MNVs', f"{s.mnvs}"),
+        style.field_line('Insertions', f"{s.insertions}"),
+        style.field_line('Deletions', f"{s.deletions}"),
+        style.field_line('Indels', f"{s.indels}"),
+        style.field_line('Complex', f"{s.complex}"),
+        style.field_line('Symbolic', f"{s.symbolic}"),
         "",
         "QUALITY",
         minor_rule(),
-        f"PASS:              {s.passed_filters}",
-        f"Failed filters:    {s.failed_filters}",
-        f"Not filtered (.):  {s.unfiltered}",
-        f"Missing QUAL:      {s.missing_quality}",
-        f"Mean QUAL:         {'.' if s.mean_quality is None else f'{s.mean_quality:.2f}'}",
-        f"Median QUAL:       {'.' if s.median_quality is None else f'{s.median_quality:.2f}'}",
-        f"Min QUAL:          {'.' if s.min_quality is None else f'{s.min_quality:.2f}'}",
-        f"Max QUAL:          {'.' if s.max_quality is None else f'{s.max_quality:.2f}'}",
+        style.field_line('PASS', f"{s.passed_filters}"),
+        style.field_line('Failed filters', f"{s.failed_filters}"),
+        style.field_line('Not filtered (.)', f"{s.unfiltered}"),
+        style.field_line('Missing QUAL', f"{s.missing_quality}"),
+        style.field_line('Mean QUAL', f"{'.' if s.mean_quality is None else f'{s.mean_quality:.2f}'}"),
+        style.field_line('Median QUAL', f"{'.' if s.median_quality is None else f'{s.median_quality:.2f}'}"),
+        style.field_line('Min QUAL', f"{'.' if s.min_quality is None else f'{s.min_quality:.2f}'}"),
+        style.field_line('Max QUAL', f"{'.' if s.max_quality is None else f'{s.max_quality:.2f}'}"),
         "",
         "ALLELE FREQUENCY",
         minor_rule(),
-        f"Mean AF:           {'.' if s.mean_allele_frequency is None else f'{s.mean_allele_frequency:.5f}'}",
-        f"Median AF:         {'.' if s.median_allele_frequency is None else f'{s.median_allele_frequency:.5f}'}",
-        f"Rare variants:     {s.rare_variants}",
+        style.field_line('Mean AF', f"{'.' if s.mean_allele_frequency is None else f'{s.mean_allele_frequency:.5f}'}"),
+        style.field_line('Median AF', f"{'.' if s.median_allele_frequency is None else f'{s.median_allele_frequency:.5f}'}"),
+        style.field_line('Rare variants', f"{s.rare_variants}"),
         "",
         "ANNOTATION",
         minor_rule(),
-        f"Genes affected:    {s.genes_affected}",
-        f"Chromosomes:       {s.chromosomes_affected}",
+        style.field_line('Genes affected', f"{s.genes_affected}"),
+        style.field_line('Chromosomes', f"{s.chromosomes_affected}"),
     ]
 
     if s.consequence_counts:
@@ -1968,9 +1968,9 @@ def build_variant_report(
         "",
         "SUBSTITUTION SPECTRUM",
         minor_rule(),
-        f"Transitions:       {s.transition_count}",
-        f"Transversions:     {s.transversion_count}",
-        f"Ti/Tv ratio:       {ratio}",
+        style.field_line('Transitions', f"{s.transition_count}"),
+        style.field_line('Transversions', f"{s.transversion_count}"),
+        style.field_line('Ti/Tv ratio', f"{ratio}"),
         "",
         "VARIANTS",
         minor_rule(),
@@ -1996,8 +1996,8 @@ def build_variant_report(
             "",
             "FILTER RESULT",
             minor_rule(),
-            f"Passed:            {len(result.filter_result.passed)}",
-            f"Failed:            {len(result.filter_result.failed)}",
+            style.field_line('Passed', f"{len(result.filter_result.passed)}"),
+            style.field_line('Failed', f"{len(result.filter_result.failed)}"),
         ])
 
     if result.cohort_summary:
@@ -2006,9 +2006,9 @@ def build_variant_report(
             "",
             "COHORT",
             minor_rule(),
-            f"Samples:            {c.sample_count}",
-            f"Shared variants:    {c.shared_variant_count}",
-            f"Private variants:   {c.private_variant_count}",
+            style.field_line('Samples', f"{c.sample_count}"),
+            style.field_line('Shared variants', f"{c.shared_variant_count}"),
+            style.field_line('Private variants', f"{c.private_variant_count}"),
         ])
 
     if result.notes:
@@ -2395,13 +2395,13 @@ def assert_variant_analysis_self_test() -> None:
 
 def _prompt_variant() -> Variant:
     print()
-    chromosome = input("Chromosome/contig: ").strip()
-    position = parse_int(input("Position: ").strip())
+    chromosome = style.ask('Chromosome/contig')
+    position = parse_int(style.ask('Position'))
     if position is None:
         raise VariantAnalysisError("Position must be an integer.")
-    reference = input("Reference allele: ").strip()
-    alternative = input("Alternative allele: ").strip()
-    quality = parse_float(input("Quality (Enter for unknown): ").strip())
+    reference = style.ask('Reference allele')
+    alternative = style.ask('Alternative allele')
+    quality = parse_float(style.ask('Quality (Enter for unknown)'))
 
     variant = Variant(
         chromosome=chromosome,
@@ -2417,21 +2417,15 @@ def _prompt_variant() -> Variant:
 def _prompt_filter() -> VariantFilter:
     style.header('VARIANT FILTER')
 
-    quality_text = input("Minimum QUAL (Enter for none): ").strip()
+    quality_text = style.ask('Minimum QUAL (Enter for none)')
     minimum_quality = parse_float(quality_text)
 
-    max_af_text = input("Maximum AF (Enter for none): ").strip()
+    max_af_text = style.ask('Maximum AF (Enter for none)')
     maximum_af = parse_float(max_af_text)
 
-    require_pass = (
-        style.ask('Require FILTER=PASS?', default='y/N').lower() == "y"
-    )
-    include_unknown_quality = (
-        style.ask('Include variants with unknown QUAL?', default='y/N').lower() == "y"
-    )
-    include_unknown_frequency = (
-        style.ask('Include variants with unknown AF?', default='y/N').lower() == "y"
-    )
+    require_pass = style.confirm("Require FILTER=PASS?")
+    include_unknown_quality = style.confirm("Include variants with unknown QUAL?")
+    include_unknown_frequency = style.confirm("Include variants with unknown AF?")
 
     return VariantFilter(
         minimum_quality=minimum_quality,
@@ -2443,7 +2437,7 @@ def _prompt_filter() -> VariantFilter:
 
 
 def _prompt_filename(default_name: str, extension: str) -> str:
-    name = input(f"Output filename [{default_name}.{extension}]: ").strip()
+    name = style.ask(f"Output filename [{default_name}.{extension}]")
     if not name:
         name = f"{default_name}.{extension}"
     elif not name.lower().endswith(f".{extension}"):
@@ -2466,7 +2460,7 @@ def _print_filter_result(result: VariantFilterResult) -> None:
 
 def _load_vcf_text_interactive() -> Tuple[List[Variant], List[str], List[str]]:
     print()
-    path = input("VCF file path (.vcf or .vcf.gz; Enter to paste text instead): ").strip().strip('"')
+    path = style.ask('VCF file path (.vcf or .vcf.gz; Enter to paste text instead)').strip('"')
     if path:
         try:
             return parse_vcf_file(path)
@@ -2497,7 +2491,7 @@ def _prompt_contig_reference(pipeline, variants: Sequence[Variant]) -> Dict[str,
     style.field('Loaded Synapse sequence', f"{header} ({len(sequence)} bp)")
     style.field('Contigs in the VCF', f"{', '.join(contigs)}")
     print("VCF positions must be 1-based positions on this exact sequence.")
-    choice = input("Contig to map onto the loaded sequence (Enter = none): ").strip()
+    choice = style.ask('Contig to map onto the loaded sequence (Enter = none)')
     if not choice:
         return {}
     if choice not in contigs:

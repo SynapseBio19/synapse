@@ -2946,7 +2946,8 @@ def select_orf(orfs):
     style.back()
 
     while True:
-        choice = input("\nSelect ORF: ").strip()
+        print()
+        choice = style.ask("Select ORF")
 
         if choice == "0":
             return None

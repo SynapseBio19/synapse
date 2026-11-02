@@ -2646,10 +2646,8 @@ def print_protein_report(
 
     style.section('Amino Acid Composition')
 
-    print(
-        "AA | 3L | Name             | "
-        "Type       | Count | Percent"
-    )
+    widths = (3, 4, 16, 11, 6)
+    print(style.columns(("AA", "3L", "Name", "Type", "Count", "Percent"), widths))
 
     print(minor_rule())
 
@@ -2669,14 +2667,10 @@ def print_protein_report(
             AMINO_ACIDS[code]
         )
 
-        print(
-            f"{code:2} | "
-            f"{amino_acid['three_letter']:3} | "
-            f"{amino_acid['name']:16} | "
-            f"{amino_acid['type']:10} | "
-            f"{count:5} | "
-            f"{percentages[code]:6.2f}%"
-        )
+        print(style.columns((
+            code, amino_acid["three_letter"], amino_acid["name"],
+            amino_acid["type"], count, f"{percentages[code]:.2f}%",
+        ), widths))
 
     if composition[
         "ambiguous_count"
@@ -2748,10 +2742,7 @@ def print_protein_report(
 
     if analysis["gravy"] is not None:
 
-        print(
-            f"GRAVY:               "
-            f"{analysis['gravy']:+.3f}"
-        )
+        style.field('GRAVY', f"{analysis['gravy']:+.3f}")
 
         if analysis["gravy"] > 0.5:
 
@@ -3220,9 +3211,7 @@ def _protein_input_context(
     style.field('Source', f"{source}")
 
     if orf_id is not None:
-        print(
-            f"ORF:                 {orf_id}"
-        )
+        style.field('ORF', f"{orf_id}")
 
     if orf_length is not None:
         style.field('ORF length', f"{orf_length} bp")
@@ -3302,10 +3291,7 @@ def _protein_key_properties(analysis):
         style.field('Theoretical pI', f"{analysis['pI']:.2f}")
 
     if analysis["gravy"] is not None:
-        print(
-            f"GRAVY:               "
-            f"{analysis['gravy']:+.3f}"
-        )
+        style.field('GRAVY', f"{analysis['gravy']:+.3f}")
 
     if analysis["instability_index"] is not None:
         style.field('Instability index', f"{analysis['instability_index']:.2f}")
@@ -3631,10 +3617,8 @@ def _print_amino_acid_composition(analysis):
         "counts"
     ]
 
-    print(
-        "AA | 3L  | Name             | "
-        "Type       | Count | Percent"
-    )
+    widths = (3, 4, 16, 11, 6)
+    print(style.columns(("AA", "3L", "Name", "Type", "Count", "Percent"), widths))
 
     print(minor_rule())
 
@@ -3651,13 +3635,10 @@ def _print_amino_acid_composition(analysis):
             code
         ]
 
-        print(
-            f"{code:>2} | "
-            f"{amino_acid['three_letter']:<3} | "
-            f"{amino_acid['name']:<16} | "
-            f"{amino_acid['type']:<10} | "
-            f"{count:>5} | "
-            f"{percentages[code]:>6.2f}%"
+        print(style.columns((
+            code, amino_acid["three_letter"], amino_acid["name"],
+            amino_acid["type"], count, f"{percentages[code]:.2f}%",
+        ), widths)
         )
 
     print(minor_rule())
@@ -3898,9 +3879,7 @@ def _print_complete_protein_report(
     style.field('Source', f"{source}")
 
     if orf_id is not None:
-        print(
-            f"ORF:                 {orf_id}"
-        )
+        style.field('ORF', f"{orf_id}")
 
     if orf_length is not None:
         style.field('ORF length', f"{orf_length} bp")
