@@ -8,7 +8,7 @@ separator widths were in use (42, 45, 58, 60, 65, 68, 70, 72, 78, 88, 90),
 This module is the single source of that visual language. It holds no
 scientific logic: it decides how a header, a menu, a prompt or a message is
 drawn, never what it says. Each module keeps its own wording and its own
-sections, which is what makes it recognisable as ORF analysis rather than
+sections, which is what makes it recognizable as ORF analysis rather than
 CRISPR design.
 
 Conventions
@@ -92,9 +92,25 @@ def section(title: str, *, blank_before: bool = True) -> None:
     print(minor_rule())
 
 
+def field_line(label: str, value: object, *, width: int = FIELD_WIDTH) -> str:
+    """One aligned key/value line as text, for reports built as strings."""
+    return f"{str(label) + ':':<{width}} {value}"
+
+
 def field(label: str, value: object, *, width: int = FIELD_WIDTH) -> None:
     """One aligned key/value line."""
-    print(f"{str(label) + ':':<{width}} {value}")
+    print(field_line(label, value, width=width))
+
+
+def columns(values: Sequence[object], widths: Sequence[int]) -> str:
+    """One table row: each value left-aligned in its column, the last unpadded.
+
+    Values are converted to text before padding, so a column stays aligned
+    whatever the number of digits in it.
+    """
+    cells = [str(value) for value in values]
+    padded = [f"{cell:<{width}}" for cell, width in zip(cells[:-1], widths)]
+    return " ".join(padded + cells[len(padded):])
 
 
 # ---------------------------------------------------------------------------
@@ -109,6 +125,32 @@ def option(key: object, label: str) -> None:
 def options(entries: Iterable[Tuple[object, str]]) -> None:
     for key, label in entries:
         option(key, label)
+
+
+def group(title: str) -> None:
+    """A labeled group of entries inside a menu: a blank line, then the label."""
+    print()
+    print(str(title).upper())
+
+
+def menu(groups: Sequence[Tuple[Optional[str], Sequence[Tuple[object, str]]]], *,
+         zero: str = BACK_LABEL) -> None:
+    """The body of a menu screen, from the first entry to the closing rule.
+
+    ``groups`` holds (label or None, entries) pairs; a module chooses its own
+    groups and entries (Master Prompt 5.3), the layout is shared: each group
+    after a blank line, then a blank line, the ``[0]`` entry and a minor rule.
+    The caller asks for the selection with ``ask_choice()``.
+    """
+    for title, entries in groups:
+        if title:
+            group(title)
+        else:
+            print()
+        options(entries)
+    print()
+    option(BACK_KEY, zero)
+    print(minor_rule())
 
 
 def back(label: str = BACK_LABEL) -> None:

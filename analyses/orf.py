@@ -4,6 +4,7 @@ from collections import Counter
 from analyses.sequence import get_reverse_complement
 from core.seqtools import codon_dict
 from ui.style import RULE_WIDTH, major_rule, minor_rule
+from ui import style
 
 
 # ============================================================
@@ -1951,42 +1952,24 @@ def print_orf_report(
     min_length=DEFAULT_MIN_ORF_LENGTH
 ):
 
-    print()
-    print(major_rule())
-    print("ORF ANALYSIS")
-    print(major_rule())
+    style.header('ORF ANALYSIS')
 
-    print(
-        f"\nMinimum ORF Length: "
-        f"{min_length} bp"
-    )
+    print()
+    style.field('Minimum ORF Length', f"{min_length} bp")
 
     if not orfs:
 
         print("\nNo ORFs found.")
 
-        print("\nORF Definition")
-        print(minor_rule())
+        style.section('ORF Definition')
 
-        print(
-            "Search Space:        "
-            "Both strands / six reading frames"
-        )
+        style.field('Search Space', "Both strands / six reading frames")
 
-        print(
-            "Start Codons:        "
-            "ATG, GTG, TTG"
-        )
+        style.field('Start Codons', "ATG, GTG, TTG")
 
-        print(
-            "Stop Codons:         "
-            "TAA, TAG, TGA"
-        )
+        style.field('Stop Codons', "TAA, TAG, TGA")
 
-        print(
-            "Minimum Length:      "
-            f"{min_length} bp"
-        )
+        style.field('Minimum Length', f"{min_length} bp")
 
         print()
         print(major_rule())
@@ -2008,85 +1991,41 @@ def print_orf_report(
     # SUMMARY
     # ========================================================
 
-    print("\nORF Summary")
-    print(minor_rule())
+    style.section('ORF Summary')
 
-    print(
-        f"ORFs Found:              "
-        f"{summary['total']}"
-    )
+    style.field('ORFs Found', f"{summary['total']}")
 
-    print(
-        f"Forward Strand:          "
-        f"{summary['forward']}"
-    )
+    style.field('Forward Strand', f"{summary['forward']}")
 
-    print(
-        f"Reverse Strand:          "
-        f"{summary['reverse']}"
-    )
+    style.field('Reverse Strand', f"{summary['reverse']}")
 
-    print(
-        f"Complete ORFs:           "
-        f"{summary['complete']}"
-    )
+    style.field('Complete ORFs', f"{summary['complete']}")
 
-    print(
-        f"Partial ORFs:            "
-        f"{summary['partial']}"
-    )
+    style.field('Partial ORFs', f"{summary['partial']}")
 
-    print(
-        f"Canonical Start (ATG):   "
-        f"{summary['canonical_start']}"
-    )
+    style.field('Canonical Start (ATG)', f"{summary['canonical_start']}")
 
-    print(
-        f"Alternative Start:       "
-        f"{summary['alternative_start']}"
-    )
+    style.field('Alternative Start', f"{summary['alternative_start']}")
 
-    print(
-        f"ORFs with Ambiguity:     "
-        f"{summary['ambiguous']}"
-    )
+    style.field('ORFs with Ambiguity', f"{summary['ambiguous']}")
 
-    print(
-        f"Translation-Safe:        "
-        f"{summary['translation_safe']}"
-    )
+    style.field('Translation-Safe', f"{summary['translation_safe']}")
 
-    print(
-        f"Kozak Context Available: "
-        f"{summary['kozak_available']}"
-    )
+    style.field('Kozak Context Available', f"{summary['kozak_available']}")
 
-    print(
-        f"Shine-Dalgarno Detected: "
-        f"{summary['shine_dalgarno_detected']}"
-    )
+    style.field('Shine-Dalgarno Detected', f"{summary['shine_dalgarno_detected']}")
 
-    print(
-        f"Average ORF Length:      "
-        f"{summary['average_length']:.1f} bp"
-    )
+    style.field('Average ORF Length', f"{summary['average_length']:.1f} bp")
 
-    print(
-        f"Longest ORF:             "
-        f"{summary['longest']['length']} bp"
-    )
+    style.field('Longest ORF', f"{summary['longest']['length']} bp")
 
-    print(
-        f"ORF Density:             "
-        f"{summary['orf_density']:.2f}%"
-    )
+    style.field('ORF Density', f"{summary['orf_density']:.2f}%")
 
     # ========================================================
     # FRAME STATISTICS
     # ========================================================
 
-    print("\nReading Frame Statistics")
-    print(minor_rule())
+    style.section('Reading Frame Statistics')
 
     for frame in (
         "+1",
@@ -2120,61 +2059,32 @@ def print_orf_report(
     # SEARCH PARAMETERS
     # ========================================================
 
-    print("\nSearch Parameters")
-    print(minor_rule())
+    style.section('Search Parameters')
 
-    print(
-        "Search Space:        "
-        "Both strands / six reading frames"
-    )
+    style.field('Search Space', "Both strands / six reading frames")
 
-    print(
-        "Start Codons:        "
-        "ATG, GTG, TTG"
-    )
+    style.field('Start Codons', "ATG, GTG, TTG")
 
-    print(
-        "Canonical Start:     "
-        "ATG"
-    )
+    style.field('Canonical Start', "ATG")
 
-    print(
-        "Alternative Starts:  "
-        "GTG, TTG"
-    )
+    style.field('Alternative Starts', "GTG, TTG")
 
-    print(
-        "Stop Codons:         "
-        "TAA, TAG, TGA"
-    )
+    style.field('Stop Codons', "TAA, TAG, TGA")
 
-    print(
-        "Minimum Length:      "
-        f"{min_length} bp"
-    )
+    style.field('Minimum Length', f"{min_length} bp")
 
-    print(
-        "Stop Rule:           "
-        "First definite downstream "
-        "in-frame stop"
-    )
+    style.field('Stop Rule', "First definite downstream "
+        "in-frame stop")
 
-    print(
-        "Ambiguous Starts:    "
-        "Only definite starts initiate ORFs"
-    )
+    style.field('Ambiguous Starts', "Only definite starts initiate ORFs")
 
-    print(
-        "Ambiguous Stops:     "
-        "Possible-only stops do not terminate ORFs"
-    )
+    style.field('Ambiguous Stops', "Possible-only stops do not terminate ORFs")
 
     # ========================================================
     # RANKED ORFS
     # ========================================================
 
-    print("\nRanked ORF Candidates")
-    print(minor_rule())
+    style.section('Ranked ORF Candidates')
 
     for orf in orfs:
 
@@ -2186,88 +2096,45 @@ def print_orf_report(
 
         print(minor_rule())
 
-        print(
-            f"Heuristic score:     "
-            f"{orf['heuristic_score']['score']}/100 "
-            f"({orf['heuristic_score']['classification']})"
-        )
+        style.field('Heuristic score', f"{orf['heuristic_score']['score']}/100 "
+            f"({orf['heuristic_score']['classification']})")
 
-        print(
-            f"CDS Quality:         "
-            f"{orf['cds_quality']['score']}/100 "
-            f"({orf['cds_quality']['classification']})"
-        )
+        style.field('CDS Quality', f"{orf['cds_quality']['score']}/100 "
+            f"({orf['cds_quality']['classification']})")
 
-        print(
-            f"Strand:              "
-            f"{orf['strand']}"
-        )
+        style.field('Strand', f"{orf['strand']}")
 
-        print(
-            f"Reading Frame:       "
-            f"{orf['frame']:+d}"
-        )
+        style.field('Reading Frame', f"{orf['frame']:+d}")
 
-        print(
-            f"Start Position:      "
-            f"{orf['start'] + 1}"
-        )
+        style.field('Start Position', f"{orf['start'] + 1}")
 
-        print(
-            f"Stop Position:       "
-            f"{orf['stop'] + 1}"
-        )
+        style.field('Stop Position', f"{orf['stop'] + 1}")
 
-        print(
-            f"Length:              "
-            f"{orf['length']} bp"
-        )
+        style.field('Length', f"{orf['length']} bp")
 
-        print(
-            f"Codons:              "
-            f"{orf['codon_count']}"
-        )
+        style.field('Codons', f"{orf['codon_count']}")
 
-        print(
-            f"Potential Protein:   "
-            f"{orf['protein_length']} aa"
-        )
+        style.field('Potential Protein', f"{orf['protein_length']} aa")
 
-        print(
-            f"Start Codon:         "
-            f"{orf['start_codon']}"
-        )
+        style.field('Start Codon', f"{orf['start_codon']}")
 
-        print(
-            f"Start Type:          "
-            f"{orf['start_type']}"
-        )
+        style.field('Start Type', f"{orf['start_type']}")
 
-        print(
-            f"Status:              "
-            f"{orf['status']}"
-        )
+        style.field('Status', f"{orf['status']}")
 
         if orf["stop_codon"] is None:
 
-            print(
-                "Stop Codon:          "
-                "Not detected"
-            )
+            style.field('Stop Codon', "Not detected")
 
         else:
 
-            print(
-                f"Stop Codon:          "
-                f"{orf['stop_codon']}"
-            )
+            style.field('Stop Codon', f"{orf['stop_codon']}")
 
         # ====================================================
         # START CONTEXT
         # ====================================================
 
-        print("\nStart Context")
-        print(minor_rule())
+        style.section('Start Context')
 
         kozak = (
             orf["start_context"]
@@ -2276,15 +2143,9 @@ def print_orf_report(
 
         if kozak["available"]:
 
-            print(
-                f"Kozak Context:       "
-                f"{kozak['context']}"
-            )
+            style.field('Kozak Context', f"{kozak['context']}")
 
-            print(
-                f"Kozak Score:         "
-                f"{kozak['score']}/3"
-            )
+            style.field('Kozak Score', f"{kozak['score']}/3")
 
             print(
                 f"Kozak Classification:"
@@ -2293,10 +2154,7 @@ def print_orf_report(
 
         else:
 
-            print(
-                "Kozak Context:       "
-                "Unavailable"
-            )
+            style.field('Kozak Context', "Unavailable")
 
         shine = (
             orf["start_context"]
@@ -2305,22 +2163,13 @@ def print_orf_report(
 
         if shine["detected"]:
 
-            print(
-                f"Shine-Dalgarno:      "
-                f"{shine['motif']}"
-            )
+            style.field('Shine-Dalgarno', f"{shine['motif']}")
 
-            print(
-                f"SD Distance:         "
-                f"{shine['distance_to_start']} nt"
-            )
+            style.field('SD Distance', f"{shine['distance_to_start']} nt")
 
         else:
 
-            print(
-                "Shine-Dalgarno:      "
-                "Not detected"
-            )
+            style.field('Shine-Dalgarno', "Not detected")
 
         # ====================================================
         # CODON STATISTICS
@@ -2330,57 +2179,34 @@ def print_orf_report(
             orf["codon_usage"]
         )
 
-        print("\nCodon Statistics")
-        print(minor_rule())
+        style.section('Codon Statistics')
 
-        print(
-            f"Total Codons:        "
-            f"{codon_usage['total_codons']}"
-        )
+        style.field('Total Codons', f"{codon_usage['total_codons']}")
 
-        print(
-            f"Unique Codons:       "
-            f"{codon_usage['unique_codons']}"
-        )
+        style.field('Unique Codons', f"{codon_usage['unique_codons']}")
 
-        print(
-            f"Codon Diversity:     "
-            f"{orf['codon_diversity']:.3f}"
-        )
+        style.field('Codon Diversity', f"{orf['codon_diversity']:.3f}")
 
         if (
             codon_usage["gc3_content"]
             is not None
         ):
 
-            print(
-                f"GC3 Content:         "
-                f"{codon_usage['gc3_content']:.2f}%"
-            )
+            style.field('GC3 Content', f"{codon_usage['gc3_content']:.2f}%")
 
         else:
 
-            print(
-                "GC3 Content:         "
-                "Not available"
-            )
+            style.field('GC3 Content', "Not available")
 
         # ====================================================
         # AMBIGUITY
         # ====================================================
 
-        print("\nSequence Ambiguity")
-        print(minor_rule())
+        style.section('Sequence Ambiguity')
 
-        print(
-            f"Ambiguous Codons:    "
-            f"{orf['ambiguous_codon_count']}"
-        )
+        style.field('Ambiguous Codons', f"{orf['ambiguous_codon_count']}")
 
-        print(
-            f"Deterministic:       "
-            f"{orf['deterministic_ambiguous_count']}"
-        )
+        style.field('Deterministic', f"{orf['deterministic_ambiguous_count']}")
 
         print(
             f"Translation-Uncertain:"
@@ -2399,24 +2225,15 @@ def print_orf_report(
                 == 0
             ):
 
-                print(
-                    "Translation Status: "
-                    " Unambiguous"
-                )
+                style.field('Translation Status', " Unambiguous")
 
             else:
 
-                print(
-                    "Translation Status: "
-                    " Deterministically resolvable"
-                )
+                style.field('Translation Status', " Deterministically resolvable")
 
         else:
 
-            print(
-                "Translation Status: "
-                " Contains uncertainty"
-            )
+            style.field('Translation Status', " Contains uncertainty")
 
         # ====================================================
         # AMBIGUOUS CODON DETAILS
@@ -2424,11 +2241,7 @@ def print_orf_report(
 
         if orf["ambiguous_codons"]:
 
-            print(
-                "\nAmbiguous Codon Details"
-            )
-
-            print(minor_rule())
+            style.section('Ambiguous Codon Details')
 
             for item in (
                 orf["ambiguous_codons"]
@@ -2482,8 +2295,7 @@ def print_orf_report(
         # SEQUENCE
         # ====================================================
 
-        print("\nSequence")
-        print(minor_rule())
+        style.section('Sequence')
 
         print(
             create_orf_preview(
@@ -2495,8 +2307,7 @@ def print_orf_report(
     # INTERPRETATION
     # ========================================================
 
-    print("\nInterpretation")
-    print(minor_rule())
+    style.section('Interpretation')
 
     print(
         "ORFs are sequence-defined candidate "
@@ -2886,11 +2697,10 @@ def print_orf_candidate_comparison(orfs, top_n=5):
     """Print a compact comparison of the highest-ranked candidates."""
     candidates = compare_orf_candidates(orfs, top_n=top_n)
 
-    print("\nTop ORF Candidate Comparison")
-    print(minor_rule())
+    style.section('Top ORF Candidate Comparison')
 
     if not candidates:
-        print("No ORF candidates available.")
+        style.note("No ORF candidates available.")
         return
 
     for candidate in candidates:
@@ -2910,11 +2720,10 @@ def print_orf_relationship_report(orfs):
     """Print detected overlap/nesting relationships."""
     relationships = analyze_orf_relationships(orfs)
 
-    print("\nORF Relationships")
-    print(minor_rule())
+    style.section('ORF Relationships')
 
-    print(f"Overlapping pairs: {relationships['overlap_count']}")
-    print(f"Nested pairs:      {relationships['nested_count']}")
+    style.field('Overlapping pairs', f"{relationships['overlap_count']}")
+    style.field('Nested pairs', f"{relationships['nested_count']}")
 
     if not relationships["relationships"]:
         print("No overlapping or nested ORF relationships detected.")
@@ -2933,134 +2742,105 @@ def print_orf_relationship_report(orfs):
 # ORF UI / SELECTION
 # ============================================================
 
-def _print_orf_header(title):
-    print()
-    print(major_rule())
-    print(title)
-    print(major_rule())
-
-
 def _orf_status_label(orf):
     return "COMPLETE" if orf["status"] == "Complete" else "PARTIAL"
 
 
 def print_orf_summary_card(analysis):
     """Compact executive summary for the ORF UI."""
-    _print_orf_header("ORF ANALYSIS SUMMARY")
+    style.header("ORF ANALYSIS SUMMARY")
 
     summary = analysis.get("summary", {})
     top = analysis.get("top_candidate")
 
-    print(f"Sequence length:       {analysis.get('sequence_length', 0)} bp")
-    print(f"ORF candidates:        {summary.get('total', 0)}")
+    style.field('Sequence length', f"{analysis.get('sequence_length', 0)} bp")
+    style.field('ORF candidates', f"{summary.get('total', 0)}")
 
     if top:
-        print(f"Best candidate:        ORF #{top['rank']}")
-        print(
-            f"Heuristic score:       {top['heuristic_score']['score']}/100 "
-            f"({top['heuristic_score']['classification']})"
-        )
-        print(
-            f"CDS quality:           {top['cds_quality']['score']}/100 "
-            f"({top['cds_quality']['classification']})"
-        )
-        print(f"Status:                {top['status']}")
+        style.field('Best candidate', f"ORF #{top['rank']}")
+        style.field('Heuristic score', f"{top['heuristic_score']['score']}/100 "
+            f"({top['heuristic_score']['classification']})")
+        style.field('CDS quality', f"{top['cds_quality']['score']}/100 "
+            f"({top['cds_quality']['classification']})")
+        style.field('Status', f"{top['status']}")
     else:
-        print("Best candidate:        None")
+        style.field('Best candidate', "None")
 
     print()
-    print(
-        f"Complete: {summary.get('complete', 0)} | "
-        f"Partial: {summary.get('partial', 0)} | "
-        f"Forward: {summary.get('forward', 0)} | "
-        f"Reverse: {summary.get('reverse', 0)}"
-    )
+    style.field('Candidates', f"{summary.get('complete', 0)} complete, "
+        f"{summary.get('partial', 0)} partial; "
+        f"{summary.get('forward', 0)} forward, "
+        f"{summary.get('reverse', 0)} reverse")
 
 
 def print_orf_candidates(orfs, top_n=None):
     """Display a clean candidate list without asking for input."""
-    _print_orf_header("ORF CANDIDATES")
+    style.header("ORF CANDIDATES")
 
     if not orfs:
-        print("No ORF candidates available.")
+        style.note("No ORF candidates available.")
         return
 
     candidates = orfs if top_n is None else orfs[:max(0, top_n)]
 
-    print(
-        f"{'ID':<10}"
-        f"{'Frame':<9}"
-        f"{'Length':<11}"
-        f"{'Protein':<11}"
-        f"{'Start':<8}"
-        f"{'Status':<24}"
-        f"{'Conf.':<8}"
-    )
+    widths = (8, 6, 9, 8, 6, 10)
+    print(style.columns(
+        ("ID", "Frame", "Length", "Protein", "Start", "Status", "Heuristic"), widths))
     print(minor_rule())
 
     for orf in candidates:
-        print(
-            f"ORF-{orf['rank']:03d}  "
-            f"{orf['frame']:+d}{'':<6}"
-            f"{orf['length']} bp{'':<5}"
-            f"{orf['protein_length']} aa{'':<5}"
-            f"{orf['start_codon']:<8}"
-            f"{_orf_status_label(orf):<24}"
-            f"{orf['heuristic_score']['score']}/100"
-        )
+        print(style.columns((
+            f"ORF-{orf['rank']:03d}",
+            f"{orf['frame']:+d}",
+            f"{orf['length']} bp",
+            f"{orf['protein_length']} aa",
+            orf["start_codon"],
+            _orf_status_label(orf),
+            f"{orf['heuristic_score']['score']}/100",
+        ), widths))
 
 
 def print_orf_candidate_details(orf):
     """Detailed view for one candidate."""
-    _print_orf_header(f"ORF-{orf['rank']:03d} — CANDIDATE DETAILS")
+    style.header(f"ORF-{orf['rank']:03d} — CANDIDATE DETAILS")
 
-    print(f"Identifier:            ORF-{orf['rank']:03d}")
-    print(f"Rank:                  #{orf['rank']}")
-    print(f"Strand:                {orf['strand']}")
-    print(f"Reading frame:         {orf['frame']:+d}")
-    print(f"Genomic start:         {orf['start'] + 1}")
-    print(f"Genomic stop:          {orf['stop'] + 1}")
-    print(f"Length:                {orf['length']} bp")
-    print(f"Potential protein:     {orf['protein_length']} aa")
-    print(f"Start codon:           {orf['start_codon']}")
-    print(f"Start type:            {orf['start_type']}")
-    print(f"Status:                {orf['status']}")
+    style.field('Identifier', f"ORF-{orf['rank']:03d}")
+    style.field('Rank', f"#{orf['rank']}")
+    style.field('Strand', f"{orf['strand']}")
+    style.field('Reading frame', f"{orf['frame']:+d}")
+    style.field('Genomic start', f"{orf['start'] + 1}")
+    style.field('Genomic stop', f"{orf['stop'] + 1}")
+    style.field('Length', f"{orf['length']} bp")
+    style.field('Potential protein', f"{orf['protein_length']} aa")
+    style.field('Start codon', f"{orf['start_codon']}")
+    style.field('Start type', f"{orf['start_type']}")
+    style.field('Status', f"{orf['status']}")
 
-    print("\nQuality")
-    print(minor_rule())
-    print(
-        f"Heuristic score:       {orf['heuristic_score']['score']}/100 "
-        f"({orf['heuristic_score']['classification']})"
-    )
-    print(
-        f"CDS quality:           {orf['cds_quality']['score']}/100 "
-        f"({orf['cds_quality']['classification']})"
-    )
-    print(
-        f"Translation safe:      "
-        f"{'YES' if orf['translation_safe'] else 'NO'}"
-    )
+    style.section('Quality')
+    style.field('Heuristic score', f"{orf['heuristic_score']['score']}/100 "
+        f"({orf['heuristic_score']['classification']})")
+    style.field('CDS quality', f"{orf['cds_quality']['score']}/100 "
+        f"({orf['cds_quality']['classification']})")
+    style.field('Translation safe', f"{'YES' if orf['translation_safe'] else 'NO'}")
 
-    print("\nStart Context")
-    print(minor_rule())
+    style.section('Start Context')
 
     kozak = orf["start_context"]["kozak"]
     if kozak["available"]:
-        print(f"Kozak context:         {kozak['context']}")
-        print(f"Kozak score:           {kozak['score']}/3")
-        print(f"Kozak classification:  {kozak['classification']}")
+        style.field('Kozak context', f"{kozak['context']}")
+        style.field('Kozak score', f"{kozak['score']}/3")
+        style.field('Kozak classification', f"{kozak['classification']}")
     else:
-        print("Kozak context:         Unavailable")
+        style.field('Kozak context', "Unavailable")
 
     shine = orf["start_context"]["shine_dalgarno"]
     if shine["detected"]:
-        print(f"Shine-Dalgarno:        {shine['motif']}")
-        print(f"SD distance:           {shine['distance_to_start']} nt")
+        style.field('Shine-Dalgarno', f"{shine['motif']}")
+        style.field('SD distance', f"{shine['distance_to_start']} nt")
     else:
-        print("Shine-Dalgarno:        Not detected")
+        style.field('Shine-Dalgarno', "Not detected")
 
-    print("\nSequence")
-    print(minor_rule())
+    style.section('Sequence')
     print(create_orf_preview(orf["sequence"]))
 
 
@@ -3068,10 +2848,10 @@ def print_orf_comparison_table(orfs, top_n=5):
     """Display the highest-ranked candidates side by side."""
     candidates = compare_orf_candidates(orfs, top_n=top_n)
 
-    _print_orf_header("COMPARE ORFs")
+    style.header("COMPARE ORFs")
 
     if not candidates:
-        print("No ORF candidates available.")
+        style.note("No ORF candidates available.")
         return
 
     print(
@@ -3107,11 +2887,11 @@ def print_orf_relationships(orfs):
     """Display sequence-coordinate relationships between ORFs."""
     data = analyze_orf_relationships(orfs)
 
-    _print_orf_header("ORF RELATIONSHIPS")
+    style.header("ORF RELATIONSHIPS")
 
-    print(f"Relationships found:   {data['relationship_count']}")
-    print(f"Overlapping pairs:     {data['overlap_count']}")
-    print(f"Nested pairs:          {data['nested_count']}")
+    style.field('Relationships found', f"{data['relationship_count']}")
+    style.field('Overlapping pairs', f"{data['overlap_count']}")
+    style.field('Nested pairs', f"{data['nested_count']}")
 
     if not data["relationships"]:
         print("\nNo overlapping or nested ORF relationships detected.")
@@ -3123,24 +2903,12 @@ def print_orf_relationships(orfs):
         print(
             f"ORF #{item['orf_a_rank']} <-> ORF #{item['orf_b_rank']}"
         )
-        print(f"Relationship:          {item['relation']}")
-        print(f"Overlap:               {item['overlap_length']} bp")
-        print(
-            f"ORF A coverage:        "
-            f"{item['overlap_fraction_a'] * 100:.1f}%"
-        )
-        print(
-            f"ORF B coverage:        "
-            f"{item['overlap_fraction_b'] * 100:.1f}%"
-        )
-        print(
-            f"Same strand:           "
-            f"{'YES' if item['same_strand'] else 'NO'}"
-        )
-        print(
-            f"Same frame:            "
-            f"{'YES' if item['same_frame'] else 'NO'}"
-        )
+        style.field('Relationship', f"{item['relation']}")
+        style.field('Overlap', f"{item['overlap_length']} bp")
+        style.field('ORF A coverage', f"{item['overlap_fraction_a'] * 100:.1f}%")
+        style.field('ORF B coverage', f"{item['overlap_fraction_b'] * 100:.1f}%")
+        style.field('Same strand', f"{'YES' if item['same_strand'] else 'NO'}")
+        style.field('Same frame', f"{'YES' if item['same_frame'] else 'NO'}")
         print(minor_rule())
 
 
@@ -3154,13 +2922,13 @@ def select_orf(orfs):
     and protein analysis.
     """
     if not orfs:
-        print("\nNo ORF candidates available for selection.")
+        print()
+        style.note("No ORF candidates available for selection.")
         return None
 
-    _print_orf_header("SELECT ORF")
+    style.header("SELECT ORF")
 
-    print("Available candidates")
-    print(minor_rule())
+    style.section('Available candidates')
 
     for index, orf in enumerate(orfs, start=1):
         print(
@@ -3174,7 +2942,8 @@ def select_orf(orfs):
             f"Heuristic {orf['heuristic_score']['score']}/100"
         )
 
-    print("\n[0] Back")
+    print()
+    style.back()
 
     while True:
         choice = input("\nSelect ORF: ").strip()
@@ -3188,34 +2957,24 @@ def select_orf(orfs):
             if 1 <= index <= len(orfs):
                 selected = orfs[index - 1]
 
-                _print_orf_header("ORF SELECTED")
+                style.header("ORF SELECTED")
 
-                print(f"Identifier:            ORF-{selected['rank']:03d}")
-                print(f"Rank:                  #{selected['rank']}")
-                print(f"Strand:                {selected['strand']}")
-                print(f"Reading frame:         {selected['frame']:+d}")
-                print(f"Length:                {selected['length']} bp")
-                print(
-                    f"Protein length:        "
-                    f"{selected['protein_length']} aa"
-                )
-                print(f"Start codon:           {selected['start_codon']}")
-                print(f"Status:                {selected['status']}")
-                print(
-                    f"Heuristic score:       "
-                    f"{selected['heuristic_score']['score']}/100"
-                )
-                print(
-                    f"CDS quality:           "
-                    f"{selected['cds_quality']['score']}/100"
-                )
+                style.field('Identifier', f"ORF-{selected['rank']:03d}")
+                style.field('Rank', f"#{selected['rank']}")
+                style.field('Strand', f"{selected['strand']}")
+                style.field('Reading frame', f"{selected['frame']:+d}")
+                style.field('Length', f"{selected['length']} bp")
+                style.field('Protein length', f"{selected['protein_length']} aa")
+                style.field('Start codon', f"{selected['start_codon']}")
+                style.field('Status', f"{selected['status']}")
+                style.field('Heuristic score', f"{selected['heuristic_score']['score']}/100")
+                style.field('CDS quality', f"{selected['cds_quality']['score']}/100")
 
-                print("\nPipeline Status")
-                print(minor_rule())
+                style.section('Pipeline Status')
                 print("✓ ORF Selected")
                 print("✓ Ready for RNA Analysis")
                 print("✓ Ready for Protein Analysis")
-                print("✓ Ready for CRISPR Guide Design")
+                style.success("Ready for CRISPR guide design.")
 
                 return selected
 
@@ -3229,34 +2988,38 @@ def _orf_settings_menu(settings):
     """Let the user change the ORF search policy. Returns updated settings."""
     settings = dict(settings)
     while True:
-        _print_orf_header("ORF SEARCH SETTINGS")
-        print(f"[1] Minimum ORF length:  {settings['min_length']} nt (stop codon included)")
-        print(f"[2] Start codons:        {settings['start_codon_policy']}")
-        print(f"[3] Nested ORFs:         {'reported' if settings['nested'] else 'longest per stop only'}")
-        print(f"[4] Ranking:             {settings['ranking']}")
-        print(f"[5] Partial ORFs:        {'included' if settings['include_partial'] else 'excluded'}")
-        print(f"[8] Genetic code:        {_genetic_code_name(settings.get('genetic_code', 1))}")
-        print("[6] Restore Synapse defaults (ORFfinder-style)")
-        print("[7] Restore legacy settings (before 2026-10-29)")
-        print("[0] Back")
-        print()
-        print("Defaults follow NCBI ORFfinder conventions (75 nt, ATG only,")
-        print("one ORF per stop). They are screening conventions, not")
-        print("biological thresholds; adjust them to your organism and question.")
+        style.header("ORF SEARCH SETTINGS")
+        style.menu([
+            ("Search policy", [
+                (1, f"Minimum ORF length:  {settings['min_length']} nt (stop codon included)"),
+                (2, f"Start codons:        {settings['start_codon_policy']}"),
+                (3, f"Nested ORFs:         {'reported' if settings['nested'] else 'longest per stop only'}"),
+                (4, f"Ranking:             {settings['ranking']}"),
+                (5, f"Partial ORFs:        {'included' if settings['include_partial'] else 'excluded'}"),
+                (6, f"Genetic code:        {_genetic_code_name(settings.get('genetic_code', 1))}"),
+            ]),
+            ("Defaults", [
+                (7, "Restore Synapse defaults (ORFfinder-style)"),
+                (8, "Restore legacy settings (before 2026-10-29)"),
+            ]),
+        ])
+        style.note("Defaults follow NCBI ORFfinder conventions (75 nt, ATG only, one ORF per "
+                   "stop). They are screening conventions, not biological thresholds; adjust "
+                   "them to your organism and question.")
 
-        choice = input("\nSelect option: ").strip()
+        choice = style.ask_choice()
 
         if choice == "0":
             return settings
         if choice == "1":
-            raw = input("Minimum length in nt [75]: ").strip()
+            raw = style.ask('Minimum length in nt', default='75')
             try:
                 value = int(raw) if raw else 75
                 if value < 3:
                     raise ValueError
                 settings["min_length"] = value
             except ValueError:
-                print("Please enter an integer >= 3.")
+                style.error("Please enter an integer >= 3.")
         elif choice == "2":
             settings["start_codon_policy"] = (
                 "atg_and_alternative"
@@ -3271,7 +3034,7 @@ def _orf_settings_menu(settings):
             )
         elif choice == "5":
             settings["include_partial"] = not settings["include_partial"]
-        elif choice == "6":
+        elif choice == "7":
             settings.update(
                 min_length=DEFAULT_MIN_ORF_LENGTH,
                 start_codon_policy=DEFAULT_START_CODON_POLICY,
@@ -3279,22 +3042,22 @@ def _orf_settings_menu(settings):
                 ranking=DEFAULT_RANKING,
                 genetic_code=1,
             )
-        elif choice == "7":
+        elif choice == "8":
             settings.update(LEGACY_ORF_SETTINGS)
             settings["genetic_code"] = 1
-        elif choice == "8":
+        elif choice == "6":
             from core.seqtools import available_genetic_codes
             for table in available_genetic_codes():
                 print(f"  {table.table_id:>2}  {table.name}")
-            raw = input("NCBI table number [1]: ").strip()
+            raw = style.ask('NCBI table number', default='1')
             try:
                 value = int(raw) if raw else 1
                 _genetic_code_name(value)
                 settings["genetic_code"] = value
             except ValueError as exc:
-                print(f"Not available: {exc}")
+                style.error(f"Genetic code not available: {exc}")
         else:
-            print("Invalid selection.")
+            style.invalid_selection()
 
 
 def run_orf_analysis_ui(
@@ -3338,61 +3101,54 @@ def run_orf_analysis_ui(
     analysis = run_search()
 
     while True:
-        _print_orf_header("ORF ANALYSIS")
+        style.header("ORF ANALYSIS")
 
-        print(f"Sequence length: {analysis['sequence_length']} bp")
-        print(f"ORF candidates:  {analysis['candidate_count']}")
-        print(
-            f"Search:          >= {settings['min_length']} nt, "
+        style.field('Sequence length', f"{analysis['sequence_length']} bp")
+        style.field('ORF candidates', f"{analysis['candidate_count']}")
+        style.field('Search', f">= {settings['min_length']} nt, "
             f"{settings['start_codon_policy']}, "
             f"{'nested' if settings['nested'] else 'longest per stop'}, "
-            f"ranked by {settings['ranking']}"
-        )
+            f"ranked by {settings['ranking']}")
 
         if settings["genetic_code"] != 1:
-            print(f"Genetic code:    {_genetic_code_name(settings['genetic_code'])}")
+            style.field('Genetic code', f"{_genetic_code_name(settings['genetic_code'])}")
 
         top = analysis.get("top_candidate")
 
         if top:
-            print(
-                f"Best candidate:  "
-                f"ORF-{top['rank']:03d} "
-                f"({top['length']} bp, {top['start_codon']}, {top['status']})"
-            )
+            style.field('Best candidate', f"ORF-{top['rank']:03d} "
+                f"({top['length']} bp, {top['start_codon']}, {top['status']})")
         else:
-            print("Best candidate:  None")
+            style.field('Best candidate', "None")
 
-        print()
-        print("[1] ORF Discovery")
-        print("[2] ORF Candidates")
-        print("[3] Compare ORFs")
-        print("[4] ORF Relationships")
-        print("[5] Select ORF")
-        print("[6] Search Settings")
-        print("[0] Back")
+        style.menu([
+            ("Discovery", [(1, "ORF Discovery"), (2, "ORF Candidates")]),
+            ("Evaluation", [(3, "Compare ORFs"), (4, "ORF Relationships")]),
+            ("Selection", [(5, "Select ORF")]),
+            ("Settings", [(6, "Search Settings")]),
+        ])
 
-        choice = input("\nSelect option: ").strip()
+        choice = style.ask_choice()
 
         if choice == "1":
             print_orf_report(
                 analysis["orfs"],
                 min_length=settings["min_length"],
             )
-            input("\nPress Enter to continue...")
+            style.pause()
 
         elif choice == "2":
             print_orf_summary_card(analysis)
             print_orf_candidates(analysis["orfs"])
-            input("\nPress Enter to continue...")
+            style.pause()
 
         elif choice == "3":
             print_orf_comparison_table(analysis["orfs"])
-            input("\nPress Enter to continue...")
+            style.pause()
 
         elif choice == "4":
             print_orf_relationships(analysis["orfs"])
-            input("\nPress Enter to continue...")
+            style.pause()
 
         elif choice == "5":
             selected = select_orf(analysis["orfs"])
@@ -3408,7 +3164,7 @@ def run_orf_analysis_ui(
             return None
 
         else:
-            print("\nInvalid selection. Please choose 0-6.")
+            style.invalid_selection()
 
 
 # Backward-compatible UI aliases
