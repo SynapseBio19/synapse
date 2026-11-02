@@ -437,3 +437,46 @@ be installed), dependency and compatibility review, documentation
 consistency (`AUDIT_STATUS.md` is dated 2026-10-30 and its test count and
 P2-6 status are stale), the feature matrix, git verification and the
 A-K completion report.
+
+## 12. Addendum: Stage I and the end of Phase 6 (2026-11-02, Opus 5.5)
+
+Phase 6 is complete as far as the environment and the owner's
+restrictions allow. `docs/PHASE6_FINAL_REPORT.md` is the A-K completion
+report; this section only records the handover facts.
+
+### Commits after the Stage G/H checkpoint (`4c31602`)
+
+| Commit | Package |
+|---|---|
+| `2851e11` | Primer Tm vs primer3-py: 2,916 comparisons, max 0.0032 °C, kept in the suite |
+| `835744e` | Biopython reference tests; **IG instability weight corrected** (-7.49 -> 1.0) |
+| `999f77a` | Integration workflow tests (10.1-10.4, 10.7) |
+| `82ae2e9` | AUDIT_STATUS at the end-of-phase state |
+| `70cf362` | FEATURE_STATUS at the end-of-phase state; broken tables repaired |
+| `db74504` | **CRISPR module unimportable on Python 3.10/3.11** fixed; static 3.10 check |
+| (this commit) | Final report, this addendum, S7 status in the audit |
+
+The `2851e11` message says the P1-3 criterion "had never been run"; the
+audit had run 40 comparisons that no document recorded. `docs/CHANGES.md`
+corrects this.
+
+### State
+
+- Suite: 314 run, 314 passed, 0 failed, 0 skipped.
+- Golden master: 13 snapshots match; one intentional change in Phase 6
+  (D18, `317097d`).
+- pyright 1.1.414 at Python 3.10: 112 against the baseline of 134, no new
+  diagnostics.
+- Working tree clean; ReadOnly on exactly the original 15 files.
+- No external request was made in this execution. S11, the remote BLAST
+  run, the REBASE check and a Python 3.10 installation wait for the
+  owner's approval.
+
+### For the next phase
+
+Section J of the final report lists every open item with its module,
+reason, required resource and next action. The unblocked technical items
+are P2-4 (primer/guide vs variant checks), P2-6 (alignment memory), P2-7
+(Type IIS), P2-2 (menus out of the analysis modules), the P1-9 ORF
+sub-items, the hairpin/dimer comparison with primer3-py, and the HGVS
+parentheses. No website, GUI or front-end work was started.

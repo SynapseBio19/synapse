@@ -177,3 +177,5 @@ The full list, per module, is in `docs/METHODS.md`. The most important:
 - `docs/AUDIT_STATUS.md`: the status of every audit recommendation
 - `docs/STYLE_GUIDE.md` and `docs/TERMINAL_UI_STANDARD.md`: communication
   and interface standards
+- `docs/PHASE6_FINAL_REPORT.md`: what Phase 6 changed, what was verified
+  and what remains
