@@ -2325,6 +2325,7 @@ def crispr_menu(
                     base_sequence = normalize_sequence(seq)
                 except CRISPRAnalysisError as exc:
                     style.error(f"{exc}")
+                    style.pause()
                     continue
                 current_name = name
                 region_start = 1
@@ -2336,6 +2337,7 @@ def crispr_menu(
             elif choice == "2":
                 if not base_sequence:
                     style.note("No DNA sequence selected.")
+                    style.pause()
                     continue
                 try:
                     selected_seq, start, end, name, _source = _load_orf_or_region(base_sequence)
@@ -2392,6 +2394,7 @@ def crispr_menu(
             elif choice == "2":
                 if not batch_results:
                     style.note("No batch analysis available. Use [1] first.")
+                    style.pause()
                     continue
                 records = list(batch_results.keys())
                 print("\nAVAILABLE RECORDS")
@@ -2487,6 +2490,7 @@ def crispr_menu(
             if choice == "1":
                 if not last_result:
                     style.note("Run [4] Target Discovery first.")
+                    style.pause()
                     continue
                 print_report(last_result, top_n=10)
                 if last_base_results:
@@ -2496,6 +2500,7 @@ def crispr_menu(
             elif choice == "2":
                 if not last_result:
                     style.note("Run [4] Target Discovery first.")
+                    style.pause()
                     continue
                 default_dir = _default_export_directory()
                 print(f"Relative paths are saved to: {default_dir}")
@@ -2522,6 +2527,7 @@ def crispr_menu(
             elif choice == "3":
                 if not batch_results:
                     style.note("No batch analysis available. Use [2] -> [1] Load FASTA / Batch Analysis first.")
+                    style.pause()
                     continue
                 default_dir = _default_export_directory()
                 print(f"Relative paths are saved to: {default_dir}")
@@ -2579,6 +2585,7 @@ def crispr_menu(
         elif choice == "4":
             if not base_sequence:
                 style.note("No DNA sequence selected.")
+                style.pause()
                 continue
             config.min_gc = _input_float(f"Minimum GC [{config.min_gc}]: ", config.min_gc)
             config.max_gc = _input_float(f"Maximum GC [{config.max_gc}]: ", config.max_gc)
@@ -2627,9 +2634,11 @@ def crispr_menu(
         elif choice == "7":
             if not last_result:
                 style.note("Run [4] Target Discovery first.")
+                style.pause()
                 continue
             if not selected_mutations:
                 style.note("No mutation/variant selected. Use [6] first.")
+                style.pause()
                 continue
             editor = _choose_editor()
             if not editor:
@@ -2645,9 +2654,11 @@ def crispr_menu(
         elif choice == "8":
             if not last_result or not base_sequence:
                 style.note("Run [4] Target Discovery first.")
+                style.pause()
                 continue
             if not selected_mutations:
                 style.note("No mutation/variant selected. Use [6] first.")
+                style.pause()
                 continue
             last_prime_results = []
             for mutation in selected_mutations:
@@ -2666,6 +2677,7 @@ def crispr_menu(
         elif choice == "9":
             if not last_result:
                 style.note("Run [4] Target Discovery first.")
+                style.pause()
                 continue
             local_references = _read_local_references()
             if local_references:
@@ -2711,6 +2723,7 @@ def crispr_menu(
         elif choice == "10":
             if not last_result:
                 style.note("Run [4] Target Discovery first.")
+                style.pause()
                 continue
             style.section('SPECIFICITY PROFILE')
             if has_specificity_analysis(last_result.candidates):
