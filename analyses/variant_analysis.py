@@ -2536,13 +2536,12 @@ def run_variant_analysis_ui(
             style.field('Current filter view', f"{len(filtered_view)} passed")
         style.menu([
             ('Input', [('1', 'Load VCF'), ('2', 'Add Variant Manually')]),
+            ('Processing', [('3', 'Normalize Variants'), ('4', 'Filter Variants')]),
             ('Analysis', [
-                ('3', 'Analyze Variants'),
-                ('4', 'Filter Variants'),
-                ('5', 'Compare Variant Sets'),
-                ('6', 'Variant Statistics'),
-                ('7', 'Cohort / Sample Analysis'),
-                ('8', 'Normalize Variants'),
+                ('5', 'Variant Statistics'),
+                ('6', 'Analyze Variants'),
+                ('7', 'Compare Variant Sets'),
+                ('8', 'Cohort / Sample Analysis'),
             ]),
             ('Output', [('9', 'Export VCF'), ('10', 'Export TSV'), ('11', 'Full Variant Report')]),
             ('System', [('12', 'Run Variant Self-Test')]),
@@ -2578,7 +2577,7 @@ def run_variant_analysis_ui(
             except VariantAnalysisError as error:
                 style.error(f"{error}")
 
-        elif choice == "3":
+        elif choice == "6":
             if not working:
                 style.note("No variants loaded.")
                 style.pause()
@@ -2604,7 +2603,7 @@ def run_variant_analysis_ui(
             except VariantAnalysisError as error:
                 style.error(f"{error}")
 
-        elif choice == "5":
+        elif choice == "7":
             if not working:
                 style.note("No variants loaded.")
                 style.pause()
@@ -2637,7 +2636,7 @@ def run_variant_analysis_ui(
             except (VariantAnalysisError, ValueError) as error:
                 style.error(f"{error}")
 
-        elif choice == "6":
+        elif choice == "5":
             if not working:
                 style.note("No variants loaded.")
                 style.pause()
@@ -2663,7 +2662,7 @@ def run_variant_analysis_ui(
             ratio = stats.transition_transversion_ratio
             style.field('Ti/Tv ratio', f"{'inf' if ratio == math.inf else '.' if ratio is None else f'{ratio:.3f}'}")
 
-        elif choice == "7":
+        elif choice == "8":
             if not working:
                 style.note("No variants loaded.")
                 style.pause()
@@ -2682,7 +2681,7 @@ def run_variant_analysis_ui(
                     f"alt_alleles={sample.allele_count}"
                 )
 
-        elif choice == "8":
+        elif choice == "3":
             if not working:
                 style.note("No variants loaded.")
                 style.pause()

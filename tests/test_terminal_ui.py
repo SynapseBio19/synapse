@@ -162,6 +162,21 @@ class MenuNumberingTests(unittest.TestCase):
         self.assertEqual(dispatched, set(labels),
                          "every BLAST menu entry must have a branch and vice versa")
 
+    def test_variant_menu_follows_the_order_of_the_work(self):
+        """Master Prompt 5.3: input, normalization, filtering, statistics, interpretation."""
+        body = self._menu_source("analyses/variant_analysis.py", "run_variant_analysis_ui")
+        menu = next(n for n in ast.walk(ast.parse(body)) if isinstance(n, ast.Call)
+                    and isinstance(n.func, ast.Attribute) and n.func.attr == "menu")
+        labels = {label: int(key) for _title, entries in ast.literal_eval(menu.args[0])
+                  for key, label in entries}
+        keys = sorted(labels.values())
+        self.assertEqual(keys, list(range(1, len(keys) + 1)))
+        order = ["Load VCF", "Normalize Variants", "Filter Variants", "Variant Statistics",
+                 "Analyze Variants", "Full Variant Report"]
+        self.assertEqual([labels[name] for name in order], sorted(labels[name] for name in order))
+        dispatched = {int(k) for k in re.findall(r'choice == "(\d+)"', body) if k != "0"}
+        self.assertEqual(dispatched, set(keys))
+
     def test_the_main_menu_is_contiguous(self):
         body = read(PROJECT_ROOT / "ui" / "menu.py")
         # Letter keys (P, R, S) are actions; [0] is navigation and sits last.
