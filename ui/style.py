@@ -134,12 +134,14 @@ def group(title: str) -> None:
 
 
 def menu(groups: Sequence[Tuple[Optional[str], Sequence[Tuple[object, str]]]], *,
-         zero: str = BACK_LABEL) -> None:
+         zero: Optional[str] = BACK_LABEL) -> None:
     """The body of a menu screen, from the first entry to the closing rule.
 
     ``groups`` holds (label or None, entries) pairs; a module chooses its own
     groups and entries (Master Prompt 5.3), the layout is shared: each group
     after a blank line, then a blank line, the ``[0]`` entry and a minor rule.
+    ``zero=None`` is for a screen that cannot be left (the sequence
+    selector): it offers no ``[0]`` rather than giving 0 another meaning.
     The caller asks for the selection with ``ask_choice()``.
     """
     for title, entries in groups:
@@ -149,7 +151,8 @@ def menu(groups: Sequence[Tuple[Optional[str], Sequence[Tuple[object, str]]]], *
             print()
         options(entries)
     print()
-    option(BACK_KEY, zero)
+    if zero is not None:
+        option(BACK_KEY, zero)
     print(minor_rule())
 
 

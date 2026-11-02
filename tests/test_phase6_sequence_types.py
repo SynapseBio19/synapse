@@ -564,7 +564,7 @@ class MainMenuSequenceTypeTests(unittest.TestCase):
         self.assertEqual(completed.returncode, 0, output[-2000:])
         self.assertNotIn("Traceback", output)
         self.assertIn(f"pep [moltype=protein]  ({len(IUPAC_LETTER_PEPTIDE)} aa, linear)", output)
-        self.assertIn("SYNAPSE - PROTEIN RECORD", output)
+        self.assertIn("PROTEIN RECORD", output)
         self.assertIn("COMPLETE PROTEIN REPORT", output.upper())
         self.assertIn("SEQUENCE TYPE", output)
         self.assertIn("RNA sequence, analyzed in the DNA alphabet (U read as T).", output)

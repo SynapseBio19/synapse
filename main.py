@@ -78,6 +78,7 @@ from analyses.literature import (
 from ui.report import print_results
 from ui.menu import select_gene, show_menu
 from ui.style import major_rule, minor_rule
+from ui import style
 
 
 LOG_PATH = configure_logging()
@@ -87,15 +88,10 @@ logger = logging.getLogger("synapse.main")
 def report_error(title, error):
     """Show an actionable error and keep the full traceback in the log file."""
     logger.exception("%s", title)
-    print()
-    print(major_rule())
-    print(title)
-    print(major_rule())
-    print()
-    print(f"{type(error).__name__}: {error}")
-    print()
-    print(f"Details (traceback) were written to: {LOG_PATH}")
-    input("\nPress Enter to continue...")
+    style.header(title)
+    style.error(f"{type(error).__name__}: {error}")
+    style.note(f"Details (traceback) were written to: {LOG_PATH}")
+    style.pause()
 
 
 # ============================================================
@@ -122,16 +118,14 @@ def choose_sequence_file():
 
     while True:
 
+        style.header('LOAD SEQUENCE FILE')
+        style.field("Formats", "FASTA (.fasta/.fa) or GenBank (.gb/.gbk)")
+        style.field("Topology", "FASTA headers may contain topology=circular")
+        style.field("Example", default_sequence_file)
+        style.note("Press Enter to load the example; type Q to quit.")
         print()
-        print(major_rule())
-        print("SYNAPSE - LOAD SEQUENCE FILE")
-        print(major_rule())
-        print("FASTA (.fasta/.fa) or GenBank (.gb/.gbk).")
-        print("FASTA headers may contain topology=circular.")
-        print(f"Press Enter for the example: {default_sequence_file}")
-        print("Type Q to quit.")
 
-        raw = input("\nFile path: ").strip().strip('"')
+        raw = style.ask("File path").strip('"')
 
         if raw.upper() == "Q":
             raise SystemExit
@@ -150,11 +144,8 @@ def choose_sequence_file():
 
         except (OSError, ValueError) as error:
             logger.warning("Could not load %s: %s", path, error)
-            print()
-            print(major_rule())
-            print("SEQUENCE FILE ERROR")
-            print(major_rule())
-            print(f"\n{error}")
+            style.header('SEQUENCE FILE ERROR')
+            style.error(str(error))
 
 
 # ============================================================
@@ -188,21 +179,17 @@ def export_report_interactive(pipeline):
         + datetime.now().strftime("%Y%m%d_%H%M%S")
         + ".json",
     )
-    print("\nReport of all results stored in this session.")
-    print("Use .json (complete) or .md (summary).")
-    raw_path = input(
-        f"Path [Enter = {default_report}]: "
-    ).strip().strip('"')
+    style.section("Export analysis report")
+    style.note("Report of all results stored in this session; use .json (complete) or .md (summary).")
+    raw_path = style.ask("Path", default=default_report).strip('"')
     try:
         saved = export_analysis_report(
             pipeline, raw_path or default_report
         )
-        print(f"Report written: {saved.resolve()}")
+        style.success(f"Report written: {saved.resolve()}")
     except (OSError, ValueError) as error:
         report_error("REPORT EXPORT ERROR", error)
-    input(
-        "\nPress Enter to continue..."
-    )
+    style.pause()
 
 
 # ============================================================
@@ -214,17 +201,15 @@ def print_sequence_type_error(record):
     """Explain why a record cannot be analyzed."""
     result = classify_sequence(record.sequence, record.declared_type)
     reason = result.reasons[0]
+    style.header('SEQUENCE VALIDATION ERROR')
+    style.error(f"{reason[0].upper()}{reason[1:]}.")
     print()
-    print(major_rule())
-    print("SEQUENCE VALIDATION ERROR")
-    print(major_rule())
-    print(f"\n{reason[0].upper()}{reason[1:]}.\n")
     for position, symbol in result.invalid_symbols[:20]:
         print(f"Invalid character '{symbol}' at position {position}")
     if len(result.invalid_symbols) > 20:
         print(f"... and {len(result.invalid_symbols) - 20} more")
     print(major_rule())
-    input("\nPress Enter to select another sequence...")
+    style.pause("Press Enter to select another sequence...")
 
 
 def resolve_sequence_type(record):
@@ -234,26 +219,22 @@ def resolve_sequence_type(record):
     the user declares DNA, RNA or protein.
     """
     while record.type_evidence == AMBIGUOUS:
-        print()
-        print(major_rule())
-        print("SEQUENCE TYPE")
-        print(major_rule())
-        print("\nThe type of this sequence cannot be determined from its letters:")
-        print(f"{record.type_reasons[0]}.")
-        print("\n[1] DNA")
-        print("[2] RNA")
-        print("[3] Protein")
-        print("[0] Cancel (choose another sequence)")
-        choice = input("\nSequence type: ").strip()
+        style.header('SEQUENCE TYPE')
+        style.note("The type of this sequence cannot be determined from its letters: "
+                   f"{record.type_reasons[0]}.")
+        style.menu([("Declare the type", [(1, "DNA"), (2, "RNA"), (3, "Protein")])],
+                   zero="Cancel (choose another sequence)")
+        choice = style.ask_choice()
         if choice == "0":
             return None
         declared = {"1": "DNA", "2": "RNA", "3": "PROTEIN"}.get(choice)
         if declared is None:
-            print("\nInvalid selection.")
+            print()
+            style.invalid_selection()
             continue
         candidate = record.with_declared_type(declared)
         if candidate.type_evidence == INVALID:
-            print(f"\nNot possible: {candidate.type_reasons[0]}.")
+            style.error(f"Not possible: {candidate.type_reasons[0]}.")
             continue
         logger.info("Sequence type declared by the user: %s", declared)
         record = candidate
@@ -274,21 +255,17 @@ def run_protein_record(record, selected_index):
     pipeline.attach_record(record)
 
     while True:
-        print()
-        print(major_rule())
-        print("SYNAPSE - PROTEIN RECORD")
-        print(major_rule())
-        print(f"\n{record.description}")
-        print(
-            f"Length: {record.length} aa | "
-            f"Type: protein ({record.type_evidence.lower()})"
-        )
-        print("\n[1] Protein Analysis")
-        print("[2] BLAST Search")
-        print("[R] Export Analysis Report (JSON / Markdown)")
-        print("[S] Select Another Sequence")
-        print("[0] Exit")
-        choice = input("\nSelect an option: ").strip().upper()
+        style.header('PROTEIN RECORD')
+        style.field("Record", record.description)
+        style.field('Length', f"{record.length} aa")
+        style.field('Type', f"protein ({record.type_evidence.lower()})")
+        style.menu([
+            ("Analysis", [(1, "Protein Analysis"), (2, "BLAST Search")]),
+            ("Session", [("R", "Export Analysis Report (JSON / Markdown)"),
+                         ("S", "Select Another Sequence")]),
+        ], zero=style.EXIT_LABEL)
+
+        choice = style.ask_choice().upper()
 
         if choice == "1":
             try:
@@ -314,14 +291,15 @@ def run_protein_record(record, selected_index):
         elif choice == "R":
             export_report_interactive(pipeline)
         elif choice == "S":
-            print("\nReturning to sequence selection...")
+            style.note("Returning to sequence selection.")
             return
         elif choice == "0":
             print("\nThank you for using Synapse.")
             raise SystemExit
         else:
-            print("\nInvalid selection.")
-            input("\nPress Enter to continue...")
+            print()
+            style.invalid_selection()
+            style.pause()
 
 
 def main():
@@ -353,7 +331,7 @@ def main():
         header = record["header"]
 
         for note in record.get("notes", []):
-            print(f"\nNote: {note}")
+            style.note(note)
 
         # ========================================================
         # SEQUENCE TYPE (DNA, RNA or protein; audit D14)
@@ -376,7 +354,7 @@ def main():
         if sequence_record.alphabet == RNA:
             # The nucleotide analyses work in the DNA alphabet.
             dna = dna.replace("U", "T")
-            print("\nNote: RNA sequence, analyzed in the DNA alphabet (U read as T).")
+            style.note("RNA sequence, analyzed in the DNA alphabet (U read as T).")
 
         # ========================================================
         # SYNAPSE PIPELINE
@@ -572,9 +550,7 @@ def main():
                     reverse_complement,
                 )
 
-                input(
-                    "\nPress Enter to continue..."
-                )
+                style.pause()
 
 
             # ====================================================
@@ -608,40 +584,24 @@ def main():
                             ),
                         )
 
+                        style.header('ORF CONNECTED TO PIPELINE')
                         print()
-                        print(major_rule())
-                        print("ORF CONNECTED TO PIPELINE")
-                        print(major_rule())
-                        print()
-                        print(
-                            f"Selected: ORF-{selected_orf['rank']:03d}"
-                        )
-                        print(
-                            f"Length:   {selected_orf['length']} bp"
-                        )
-                        print(
-                            f"Protein:  {selected_orf['protein_length']} aa"
-                        )
-                        print(
-                            f"Location: {selected_orf['start'] + 1}-"
+                        style.field('Selected', f"ORF-{selected_orf['rank']:03d}")
+                        style.field('Length', f"{selected_orf['length']} bp")
+                        style.field('Protein', f"{selected_orf['protein_length']} aa")
+                        style.field('Location', f"{selected_orf['start'] + 1}-"
                             f"{selected_orf['stop'] + 1} "
-                            f"({selected_orf['strand']} strand, 1-based)"
-                        )
+                            f"({selected_orf['strand']} strand, 1-based)")
                         print()
-                        print("✓ ORF stored in pipeline")
-                        print("✓ RNA can use this ORF")
-                        print("✓ Protein can use this ORF")
-                        print("✓ CRISPR Guide Design can use this ORF")
+                        style.success("ORF stored in the pipeline; RNA, protein and CRISPR guide design can use it.")
                         if selected_orf.get("genetic_code", 1) != 1:
-                            print(
-                                "! ORF found with NCBI table "
-                                f"{selected_orf['genetic_code']}; Protein analysis uses this "
-                                "table, the RNA module's codon view uses the standard code."
+                            style.note(
+                                "ORF found with NCBI table "
+                                f"{selected_orf['genetic_code']}; protein analysis and the RNA "
+                                "codon view use this table."
                             )
 
-                        input(
-                            "\nPress Enter to continue..."
-                        )
+                        style.pause()
 
                 except Exception as error:
 
@@ -686,12 +646,9 @@ def main():
 
                 if selected_orf is None:
 
+                    style.header('PROTEIN ANALYSIS')
                     print()
-                    print(major_rule())
-                    print("PROTEIN ANALYSIS")
-                    print(major_rule())
-                    print()
-                    print("No ORF has been selected.")
+                    style.note("No ORF has been selected.")
                     print()
                     print(
                         "Please run [2] ORF Analysis first and "
@@ -703,9 +660,7 @@ def main():
                         "sequence as a fallback."
                     )
 
-                    input(
-                        "\nPress Enter to continue..."
-                    )
+                    style.pause()
 
                     continue
 
@@ -917,9 +872,7 @@ def main():
                     "docs/AUDIT_STATUS.md) and is deferred."
                 )
 
-                input(
-                    "\nPress Enter to continue..."
-                )
+                style.pause()
 
 
             # ====================================================
@@ -934,9 +887,7 @@ def main():
 
                 pipeline.print_status()
 
-                input(
-                    "\nPress Enter to continue..."
-                )
+                style.pause()
 
 
             # ====================================================
@@ -975,13 +926,10 @@ def main():
 
             else:
 
-                print(
-                    "\nInvalid selection."
-                )
+                print()
+                style.invalid_selection()
 
-                input(
-                    "\nPress Enter to continue..."
-                )
+                style.pause()
 
 
 if __name__ == "__main__":

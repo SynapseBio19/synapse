@@ -921,7 +921,7 @@ class MainEntryPointTests(unittest.TestCase):
         output = completed.stdout + completed.stderr
         self.assertEqual(completed.returncode, 0, output[-2000:])
         self.assertIn("IMPORTED True", completed.stdout)
-        self.assertNotIn("SYNAPSE - LOAD SEQUENCE FILE", output)
+        self.assertNotIn("LOAD SEQUENCE FILE", output)
         self.assertNotIn("Traceback", output)
 
     def test_module_level_flow_is_behind_the_guard(self):

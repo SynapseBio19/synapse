@@ -1,61 +1,54 @@
-from ui.style import major_rule, minor_rule
+from ui import style
+
+
 def show_menu():
 
-    print()
-    print(major_rule())
-    print("Choose Analysis")
-    print(major_rule())
+    style.header("Main menu")
+    style.menu([
+        ("Sequence analysis", [
+            (1, "Sequence Overview"),
+            (2, "ORF Analysis"),
+            (3, "RNA Analysis"),
+            (4, "Protein Analysis"),
+        ]),
+        ("Design and comparison", [
+            (5, "Restriction & Cloning Analysis"),
+            (6, "Primer Design"),
+            (7, "Mutation & Variant Analysis"),
+            (8, "CRISPR Guide Design"),
+        ]),
+        ("Search and planning", [
+            (9, "BLAST Search"),
+            (10, "Literature Search"),
+            (11, "AI Experiment Planner (not implemented)"),
+        ]),
+        ("Session", [
+            ("P", "Pipeline Status & Stored Results"),
+            ("R", "Export Analysis Report (JSON / Markdown)"),
+            ("S", "Select Another Sequence"),
+        ]),
+    ], zero=style.EXIT_LABEL)
 
-    print("[1] Sequence Overview")
-    print("[2] ORF Analysis")
-    print("[3] RNA Analysis")
-    print("[4] Protein Analysis")
-
-    print(minor_rule())
-
-    print("[5] Restriction & Cloning Analysis")
-    print("[6] Primer Design")
-    print("[7] Mutation & Variant Analysis")
-    print("[8] CRISPR Guide Design")
-
-    print(minor_rule())
-
-    print("[9] BLAST Search")
-    print("[10] Literature Search")
-    print("[11] AI Experiment Planner (not implemented)")
-
-    print(minor_rule())
-
-    print("[P] Pipeline Status & Stored Results")
-    print("[R] Export Analysis Report (JSON / Markdown)")
-    print("[S] Select Another Sequence")
-
-    print(minor_rule())
-
-    print("[0] Exit")
-
-    return input("\nSelection: ")
+    return style.ask_choice()
 
 
 def select_gene(sequences):
 
-    print(major_rule())
-    print("SYNAPSE")
-    print(major_rule())
+    style.header("Loaded sequences")
 
-    print("\nLoaded Genes\n")
-
+    entries = []
     for index, record in enumerate(sequences, start=1):
         topology = record.get("topology", "linear")
         length = len(record.get("sequence", ""))
         unit = "aa" if record.get("alphabet") == "PROTEIN" else "bp"
-        print(f"[{index}] {record['header']}  ({length} {unit}, {topology})")
+        entries.append((index, f"{record['header']}  ({length} {unit}, {topology})"))
 
-    print("\n[F] Load another file")
+    # The selector cannot be left with 0: a sequence or [F] must be chosen.
+    style.menu([("Sequences", entries), ("File", [("F", "Load another file")])], zero=None)
 
     while True:
 
-        choice = input("\nSelect a sequence: ").strip()
+        choice = style.ask_choice()
 
         if choice.upper() == "F":
             return None, None
@@ -67,4 +60,4 @@ def select_gene(sequences):
             if 1 <= choice <= len(sequences):
                 return choice, sequences[choice - 1]
 
-        print("Invalid selection.")
+        style.invalid_selection()

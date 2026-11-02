@@ -32,6 +32,44 @@ def read(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def zero_labels(source: str) -> list:
+    """Every label given to [0] in ``source``: printed or through ui.style."""
+    labels = [label.strip() for label in MENU_ZERO.findall(source)]
+    constants = {"BACK_LABEL": style.BACK_LABEL, "CANCEL_LABEL": style.CANCEL_LABEL,
+                 "EXIT_LABEL": style.EXIT_LABEL}
+
+    def text(node, default):
+        if node is None:
+            return default
+        if isinstance(node, ast.Constant):
+            return node.value
+        if isinstance(node, ast.Attribute) and node.attr in constants:
+            return constants[node.attr]
+        return "<expression>"
+
+    for node in ast.walk(ast.parse(source)):
+        if not (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                and isinstance(node.func.value, ast.Name) and node.func.value.id == "style"):
+            continue
+        name = node.func.attr
+        if name == "menu":
+            zero = next((k.value for k in node.keywords if k.arg == "zero"), None)
+            has_zero = any(k.arg == "zero" for k in node.keywords)
+            label = text(zero, style.BACK_LABEL) if has_zero else style.BACK_LABEL
+            if label is not None:
+                labels.append(label)
+        elif name == "back":
+            labels.append(text(node.args[0] if node.args else None, style.BACK_LABEL))
+        elif name == "cancel":
+            labels.append(style.CANCEL_LABEL)
+        elif name == "exit_option":
+            labels.append(style.EXIT_LABEL)
+        elif name == "option" and node.args and isinstance(node.args[0], ast.Constant) \
+                and str(node.args[0].value) == "0":
+            labels.append(text(node.args[1], ""))
+    return labels
+
+
 def first_menu_keys(source: str) -> list:
     """The entry keys of the first style.menu([...]) call in ``source``."""
     for node in ast.walk(ast.parse(source)):
@@ -75,8 +113,7 @@ class NavigationTests(unittest.TestCase):
     def test_zero_always_leaves_the_screen(self):
         offenders = []
         for path in UI_FILES:
-            for label in MENU_ZERO.findall(read(path)):
-                label = label.strip()
+            for label in zero_labels(read(path)):
                 # A qualifier in brackets explains the effect; the verb rules.
                 verb = label.split("(")[0].strip()
                 if verb not in self.ALLOWED:
@@ -86,12 +123,12 @@ class NavigationTests(unittest.TestCase):
     def test_exit_belongs_to_the_main_menu_only(self):
         exits = []
         for path in UI_FILES:
-            for label in MENU_ZERO.findall(read(path)):
-                if label.strip() == style.EXIT_LABEL:
+            for label in zero_labels(read(path)):
+                if label == style.EXIT_LABEL:
                     exits.append(path.name)
         self.assertEqual(sorted(set(exits)), ["main.py", "menu.py"], exits)
 
-    def test_is_back_recognises_the_key(self):
+    def test_is_back_recognizes_the_key(self):
         self.assertTrue(style.is_back("0"))
         self.assertTrue(style.is_back("  0 "))
         self.assertFalse(style.is_back("1"))
@@ -124,11 +161,11 @@ class MenuNumberingTests(unittest.TestCase):
 
     def test_the_main_menu_is_contiguous(self):
         body = read(PROJECT_ROOT / "ui" / "menu.py")
-        # [0] is navigation and sits last, so it is not part of the sequence.
-        numbers = [int(k) for k in re.findall(r'print\("\[(\d+)\]', body) if k != "0"]
+        # Letter keys (P, R, S) are actions; [0] is navigation and sits last.
+        numbers = [int(k) for k in first_menu_keys(body) if k.isdigit()]
         self.assertEqual(numbers, list(range(1, len(numbers) + 1)),
                          f"main menu numbers must be contiguous: {numbers}")
-        self.assertIn('print("[0] Exit")', body)
+        self.assertIn("zero=style.EXIT_LABEL", body)
 
 
 class MessageTests(unittest.TestCase):
