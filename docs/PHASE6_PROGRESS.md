@@ -71,17 +71,11 @@ IUPAC, gapped and invalid input (D14):
 | 20 | S21, S10 GenBank reader reports unread symbols and locations; S8 failing `to_dict()` logged; S22 variant reference must be DNA | this package | internal tests; bundled GenBank fixture unaffected | Corrected; suite 236/236 |
 | 21 | S1, S2 assessed as not defects (locked by tests); S9 quantified by measurement; S11, S12 resolved in documentation | this package | execution on constructed minus-strand cases; `tracemalloc` measurement at three sizes | Assessed; suite 240/240 |
 | 22 | D16 part 2: superseded primer generations removed after a reachability review | this package | AST binding order + project-wide reference scan + `sys.settrace` on a real design run; bytecode identical for all 105 surviving callables; pyright 134 -> 112 | Corrected; 1,326 lines removed; suite 240/240 |
-
 | 23 | P1-9 RNA codon view uses the selected ORF's genetic code | this package | internal tests; +1 frame preview equals `translate_orf_sequence` for a table-2 ORF | Corrected; suite 245/245 |
-
 | 24 | S18 recognition-site scans cached; planner no longer rescans | this package | cProfile before (5,002 scans for 16 combinations); measured 11.8 s -> 0.24 s at 8 enzymes, 100-110 s -> 0.57 s at 10 | Corrected; suite 248/248 |
-
 | 25 | S14 API covers cloning, variant filtering, mutation reports, BLAST and literature | this package | internal tests incl. both privacy gates; local BLAST+ run | Resolved for the API; menus stay with Stage F (P2-2); suite 256/256 |
-
 | 26 | S6/P1-7 resume an NCBI search from its request ID | this package | internal tests against a stubbed client (asserts no submission); no live NCBI call | Implemented; suite 265/265 |
-
 | 27 | S13 session moved into `main()` behind a `__main__` guard | this package | `git diff -w` shows only the 12 added lines; fresh-interpreter import test | Corrected; suite 267/267; S24 recorded |
-
 | 28 | Stage F: one separator width through `ui/style.py` (11 -> 1); `[0]` means Back/Cancel/Exit only (7 -> 3); uniform message prefixes; `TERMINAL_UI_STANDARD.md`; enforcement tests | `5db21ab` + this package | interface inventory before and after; enforcement tests verified against deliberate violations | D17 corrected; suite 277/277 |
 | 29 | Stage F: BLAST menu renumbered so SEARCH reads 1-4 instead of 1, 2, 3, 14; numbering rule documented and enforced | this package | each branch checked against its new label; contiguity test for the BLAST and main menus | Corrected; suite 279/279 |
 | 30 | D18 heuristic scores renamed from "confidence" in data, exports and messages (ORF, signal-peptide screen, cloning score component, primer warning); golden key renamed with values proven identical | this package | golden before/after hashes; key-mapped-back equality; unmodified golden test; new tests fail on the previous code | Corrected; suite 288/288 |
