@@ -382,3 +382,58 @@ self-tests pass separately. The 12 interface-standard checks pass, and
 were verified against deliberate violations before being relied on.
 pyright 112 against the 134 baseline, no new diagnostics. Working tree
 clean, ReadOnly restored on exactly the original 15 files.
+
+## 11. Addendum: Stages G and H (2026-11-02, Opus 5.5)
+
+Resumed from `aa5703b` on the owner's instruction to complete Stage G
+(with D18), Stage H and Stage I. No external request was made; S11 stays
+pending the owner's approval.
+
+### Commits (oldest first, after `aa5703b`)
+
+| Commit | Package |
+|---|---|
+| `317097d` | D18: heuristic scores renamed from "confidence" in data, exports and messages; ORF golden key renamed, values proven identical |
+| `bc89394` | D18 part 2: the sequence-type classifier reports an `evidence` level |
+| `ebf4d52` | One notation per unit (%, °C, cal/(mol·K), Da); primer positions shown and read 1-based |
+| `cef464a` | A result's own warnings reach the exported summary (6.4) |
+| `81ccc55` | Restriction parameters and the enzyme data version recorded (6.4) |
+| `1a8f2bc` | Editorial review part 1: American spelling, one wording per message, tone |
+| `4e5dbdc` | BLAST E-values with three significant figures everywhere |
+| `97086ad` | `docs/STYLE_GUIDE.md` with a checked enforcement table |
+| `ccf4ccb` | README rewritten to 15.1 |
+| `1269335` | "Sequence complexity" defined with its limit; METHODS section for the sequence overview |
+
+### Golden master
+
+One intentional change (`317097d`): in `orf.json` and
+`orf_legacy_baseline.json` the key `confidence` became `heuristic_score`
+(6 and 23 occurrences). With the key mapped back the files equal the
+previous ones, and the unmodified golden test confirmed the code
+produces them. Hashes before are in `docs/CHANGES.md`. No other snapshot
+changed.
+
+### Recorded rather than changed
+
+- `site_position` is 1-based in the restriction map and 0-based in digest
+  records; it is stored in the golden master and the pUC19 comparison.
+- Menu-path sequence-overview and cloning results record no input
+  parameters.
+- HGVS parentheses for predicted protein consequences are not used.
+- The "complexity" field names are kept; the meaning is now documented.
+
+### State at this checkpoint
+
+Suite 298/298, 0 skipped; pyright 112 against the 134 baseline, no new
+diagnostics; working tree clean; ReadOnly on exactly the original 15
+files.
+
+### Remaining work
+
+Stage I: full verification, integration workflows (10.x), the local
+reference comparisons that the environment allows (primer3-py 2.4.0 and
+Biopython 1.88 are installed; `METHODS.md` still says Primer3 could not
+be installed), dependency and compatibility review, documentation
+consistency (`AUDIT_STATUS.md` is dated 2026-10-30 and its test count and
+P2-6 status are stale), the feature matrix, git verification and the
+A-K completion report.
