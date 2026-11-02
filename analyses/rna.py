@@ -1,6 +1,7 @@
 import math
 from core.seqtools import codon_dict
 from ui.style import major_rule, minor_rule
+from ui import style
 
 
 # ============================================================
@@ -1626,10 +1627,7 @@ def print_rna_translation_report(rna, genetic_code=1):
 
     translation = analyze_rna_three_frames(rna, genetic_code=genetic_code)
 
-    print()
-    print(major_rule())
-    print("RNA TRANSLATION & CODON ANALYSIS")
-    print(major_rule())
+    style.header('RNA TRANSLATION & CODON ANALYSIS')
 
     for frame in translation["frames"]:
 
@@ -1640,30 +1638,15 @@ def print_rna_translation_report(rna, genetic_code=1):
 
         print(minor_rule())
 
-        print(
-            f"Codons:              "
-            f"{frame['codon_count']}"
-        )
+        style.field('Codons', f"{frame['codon_count']}")
 
-        print(
-            f"Protein length:      "
-            f"{frame['protein_length']} aa"
-        )
+        style.field('Protein length', f"{frame['protein_length']} aa")
 
-        print(
-            f"Stop detected:       "
-            f"{'YES' if frame['complete'] else 'NO'}"
-        )
+        style.field('Stop detected', f"{'YES' if frame['complete'] else 'NO'}")
 
-        print(
-            f"Stop position:       "
-            f"{frame['stop_position'] or '-'}"
-        )
+        style.field('Stop position', f"{frame['stop_position'] or '-'}")
 
-        print(
-            f"Protein preview:     "
-            f"{frame['protein'][:60] or '-'}"
-        )
+        style.field('Protein preview', f"{frame['protein'][:60] or '-'}")
 
     best = translation["best_frame"]
 
@@ -1693,77 +1676,37 @@ def print_rna_feature_report(analysis):
 
     score = analysis["feature_score"]
 
-    print()
-    print(major_rule())
-    print("RNA FEATURES")
-    print(major_rule())
+    style.header('RNA FEATURES')
 
-    print()
-    print("Sequence Feature Screening")
-    print(minor_rule())
+    style.section('Sequence Feature Screening')
 
-    print(
-        f"Screening score:     "
-        f"{score['score']}/100"
-    )
+    style.field('Screening score', f"{score['score']}/100")
 
-    print(
-        f"Screening band:      "
-        f"{score['classification']}"
-    )
+    style.field('Screening band', f"{score['classification']}")
 
-    print()
-    print("Sequence Features")
-    print(minor_rule())
+    style.section('Sequence Features')
 
-    print(
-        f"Complexity:           "
-        f"{analysis['complexity']:.3f}"
-    )
+    style.field('Complexity', f"{analysis['complexity']:.3f}")
 
-    print(
-        f"Homopolymers:         "
-        f"{len(analysis['homopolymers'])}"
-    )
+    style.field('Homopolymers', f"{len(analysis['homopolymers'])}")
 
-    print(
-        f"Hairpin candidates:  "
-        f"{analysis['structure']['hairpin_count']}"
-    )
+    style.field('Hairpin candidates', f"{analysis['structure']['hairpin_count']}")
 
-    print(
-        f"Poly-A regions:       "
-        f"{len(analysis['poly_a'])}"
-    )
+    style.field('Poly-A regions', f"{len(analysis['poly_a'])}")
 
-    print(
-        f"Poly-U regions:       "
-        f"{len(analysis['poly_u'])}"
-    )
+    style.field('Poly-U regions', f"{len(analysis['poly_u'])}")
 
-    print()
-    print("Structure Screening")
-    print(minor_rule())
-    print("Method:              Heuristic stem-loop screening")
-    print("Thermodynamics:      Not calculated")
+    style.section('Structure Screening')
+    style.field('Method', "Heuristic stem-loop screening")
+    style.field('Thermodynamics', "Not calculated")
 
-    print()
-    print("Start / Stop Landscape")
-    print(minor_rule())
+    style.section('Start / Stop Landscape')
 
-    print(
-        f"AUG starts:            "
-        f"{analysis['start_stop']['start_count']}"
-    )
+    style.field('AUG starts', f"{analysis['start_stop']['start_count']}")
 
-    print(
-        f"Stop codons:           "
-        f"{analysis['start_stop']['stop_count']}"
-    )
+    style.field('Stop codons', f"{analysis['start_stop']['stop_count']}")
 
-    print()
-    print("Interpretation")
-    print(minor_rule())
+    style.section('Interpretation')
 
     for reason in score["reasons"]:
         print(f"- {reason}")
@@ -2058,24 +2001,15 @@ def print_rna_report(
         )
     )
 
-    print()
-    print(major_rule())
-    print("COMPLETE RNA REPORT")
-    print(major_rule())
+    style.header('COMPLETE RNA REPORT')
 
     # ========================================================
     # INPUT CONTEXT
     # ========================================================
 
-    print(
-        "\nInput Context"
-    )
+    style.section('Input Context')
 
-    print(minor_rule())
-
-    print(
-        f"Source:              {source_name}"
-    )
+    style.field('Source', f"{source_name}")
 
     if (
         pipeline_info.get("mode") == "orf"
@@ -2096,44 +2030,21 @@ def print_rna_report(
         print(
             f"ORF:                 {orf_name}"
         )
-        print(
-            f"ORF length:          "
-            f"{pipeline_info.get('dna_length', len(dna))} bp"
-        )
-        print(
-            f"Strand:              "
-            f"{_orf_value(orf, 'strand', '-')}"
-        )
-        print(
-            f"Reading frame:       "
-            f"{_orf_value(orf, 'frame', '-')}"
-        )
-        print(
-            f"ORF status:          "
-            f"{_orf_value(orf, 'status', '-')}"
-        )
-        print(
-            "Analysis scope:      Selected ORF"
-        )
+        style.field('ORF length', f"{pipeline_info.get('dna_length', len(dna))} bp")
+        style.field('Strand', f"{_orf_value(orf, 'strand', '-')}")
+        style.field('Reading frame', f"{_orf_value(orf, 'frame', '-')}")
+        style.field('ORF status', f"{_orf_value(orf, 'status', '-')}")
+        style.field('Analysis scope', "Selected ORF")
 
     else:
-        print(
-            f"Sequence length:     "
-            f"{pipeline_info.get('dna_length', len(dna))} bp"
-        )
-        print(
-            "Analysis scope:      Entire DNA sequence"
-        )
+        style.field('Sequence length', f"{pipeline_info.get('dna_length', len(dna))} bp")
+        style.field('Analysis scope', "Entire DNA sequence")
 
     # ========================================================
     # TRANSCRIPTION
     # ========================================================
 
-    print(
-        "\nTranscription Information"
-    )
-
-    print(minor_rule())
+    style.section('Transcription Information')
 
     if pipeline_info.get("mode") == "orf":
         orf = pipeline_info.get("selected_orf")
@@ -2158,99 +2069,52 @@ def print_rna_report(
             f"Selected ORF"
         )
 
-        print(
-            f"Input:               "
-            f"{input_name}"
-        )
+        style.field('Input', f"{input_name}")
 
     else:
-        print(
-            "Input source:        "
-            "Full DNA Sequence"
-        )
+        style.field('Input source', "Full DNA Sequence")
 
-        print(
-            "Input:               "
-            "Complete DNA sequence"
-        )
+        style.field('Input', "Complete DNA sequence")
 
-    print(
-        "Interpretation:      "
-        "Coding / sense strand"
-    )
+    style.field('Interpretation', "Coding / sense strand")
 
-    print(
-        "DNA Direction:       5' -> 3'"
-    )
+    style.field('DNA Direction', "5' -> 3'")
 
-    print(
-        "RNA Direction:       5' -> 3'"
-    )
+    style.field('RNA Direction', "5' -> 3'")
 
-    print(
-        "Transcription Rule:  T -> U"
-    )
+    style.field('Transcription Rule', "T -> U")
 
     # ========================================================
     # BASIC INFORMATION
     # ========================================================
 
-    print(
-        "\nRNA Sequence Information"
-    )
+    style.section('RNA Sequence Information')
 
-    print(minor_rule())
-
-    print(
-        f"RNA Length:          "
-        f"{analysis['length']} nt"
-    )
+    style.field('RNA Length', f"{analysis['length']} nt")
 
     if ranges["ambiguous"]:
 
-        print(
-            f"GC Content Range:    "
-            f"{ranges['gc_min']:.2f}% - "
-            f"{ranges['gc_max']:.2f}%"
-        )
+        style.field('GC Content Range', f"{ranges['gc_min']:.2f}% - "
+            f"{ranges['gc_max']:.2f}%")
 
-        print(
-            f"AU Content Range:    "
-            f"{ranges['au_min']:.2f}% - "
-            f"{ranges['au_max']:.2f}%"
-        )
+        style.field('AU Content Range', f"{ranges['au_min']:.2f}% - "
+            f"{ranges['au_max']:.2f}%")
 
     else:
 
-        print(
-            f"GC Content:          "
-            f"{analysis['gc_content']:.2f}%"
-        )
+        style.field('GC Content', f"{analysis['gc_content']:.2f}%")
 
-        print(
-            f"AU Content:          "
-            f"{analysis['au_content']:.2f}%"
-        )
+        style.field('AU Content', f"{analysis['au_content']:.2f}%")
 
-    print(
-        f"GC Skew:             "
-        f"{analysis['gc_skew']:+.3f}"
-    )
+    style.field('GC Skew', f"{analysis['gc_skew']:+.3f}")
 
-    print(
-        f"AU Skew:             "
-        f"{analysis['au_skew']:+.3f}"
-    )
+    style.field('AU Skew', f"{analysis['au_skew']:+.3f}")
 
     # ========================================================
     # BASE COMPOSITION
     # ========================================================
 
-    print(
-        "\nRNA Base Composition"
-    )
-
-    print(minor_rule())
+    style.section('RNA Base Composition')
 
     for base in (
         "A",
@@ -2269,46 +2133,26 @@ def print_rna_report(
     # MOLECULAR WEIGHT
     # ========================================================
 
-    print(
-        "\nMolecular Weight"
-    )
-
-    print(minor_rule())
+    style.section('Molecular Weight')
 
     if molecular_weight["ambiguous"]:
 
-        print(
-            f"Estimated ssRNA MW:  "
-            f"{molecular_weight['min']:,.0f} - "
-            f"{molecular_weight['max']:,.0f} Da"
-        )
+        style.field('Estimated ssRNA MW', f"{molecular_weight['min']:,.0f} - "
+            f"{molecular_weight['max']:,.0f} Da")
 
     else:
 
-        print(
-            f"Estimated ssRNA MW:  "
-            f"{molecular_weight['min']:,.0f} Da"
-        )
+        style.field('Estimated ssRNA MW', f"{molecular_weight['min']:,.0f} Da")
 
-    print(
-        "Method:              "
-        "Composition-based estimate"
-    )
+    style.field('Method', "Composition-based estimate")
 
     # ========================================================
     # COMPLEXITY
     # ========================================================
 
-    print(
-        "\nRNA Sequence Complexity"
-    )
+    style.section('RNA Sequence Complexity')
 
-    print(minor_rule())
-
-    print(
-        f"Normalized Entropy:  "
-        f"{analysis['complexity']:.3f}"
-    )
+    style.field('Normalized Entropy', f"{analysis['complexity']:.3f}")
 
     # ========================================================
     # CODON STATISTICS
@@ -2316,75 +2160,40 @@ def print_rna_report(
 
     codons = analysis["codon_usage"]
 
-    print(
-        "\nCodon Statistics"
-    )
+    style.section('Codon Statistics')
 
-    print(minor_rule())
+    style.field('Reading Frame', "Frame 0")
 
-    print(
-        "Reading Frame:       "
-        "Frame 0"
-    )
+    style.field('Resolved Codons', f"{codons['total_codons']}")
 
-    print(
-        f"Resolved Codons:     "
-        f"{codons['total_codons']}"
-    )
+    style.field('Unique Codons', f"{codons['unique_codons']}")
 
-    print(
-        f"Unique Codons:       "
-        f"{codons['unique_codons']}"
-    )
-
-    print(
-        f"Codon Diversity:     "
-        f"{analysis['codon_diversity']:.3f}"
-    )
+    style.field('Codon Diversity', f"{analysis['codon_diversity']:.3f}")
 
     if codons["gc3_content"] is not None:
 
-        print(
-            f"GC3 Content:         "
-            f"{codons['gc3_content']:.2f}%"
-        )
+        style.field('GC3 Content', f"{codons['gc3_content']:.2f}%")
 
     else:
 
-        print(
-            "GC3 Content:         "
-            "Not available"
-        )
+        style.field('GC3 Content', "Not available")
 
-    print(
-        "Interpretation:      "
-        "Frame-dependent; coding relevance "
-        "requires a valid CDS context"
-    )
+    style.field('Interpretation', "Frame-dependent; coding relevance "
+        "requires a valid CDS context")
 
     # ========================================================
     # INITIATION CONTEXT
     # ========================================================
 
-    print(
-        "\nTranslation Initiation Context"
-    )
-
-    print(minor_rule())
+    style.section('Translation Initiation Context')
 
     kozak = analysis["kozak"]
 
     if kozak["available"]:
 
-        print(
-            f"Kozak Context:       "
-            f"{kozak['context']}"
-        )
+        style.field('Kozak Context', f"{kozak['context']}")
 
-        print(
-            f"Kozak Score:         "
-            f"{kozak['score']}/3"
-        )
+        style.field('Kozak Score', f"{kozak['score']}/3")
 
         print(
             f"Kozak Classification:"
@@ -2393,41 +2202,25 @@ def print_rna_report(
 
     else:
 
-        print(
-            "Kozak Context:       "
-            "Unavailable"
-        )
+        style.field('Kozak Context', "Unavailable")
 
     shine = analysis["shine_dalgarno"]
 
     if shine["detected"]:
 
-        print(
-            f"Shine-Dalgarno:      "
-            f"{shine['motif']}"
-        )
+        style.field('Shine-Dalgarno', f"{shine['motif']}")
 
-        print(
-            f"SD Distance:         "
-            f"{shine['distance_to_start']} nt"
-        )
+        style.field('SD Distance', f"{shine['distance_to_start']} nt")
 
     else:
 
-        print(
-            "Shine-Dalgarno:      "
-            "Not detected"
-        )
+        style.field('Shine-Dalgarno', "Not detected")
 
     # ========================================================
     # HOMOPOLYMERS
     # ========================================================
 
-    print(
-        "\nHomopolymer Regions"
-    )
-
-    print(minor_rule())
+    style.section('Homopolymer Regions')
 
     if analysis["homopolymers"]:
 
@@ -2452,21 +2245,11 @@ def print_rna_report(
     # POLY-A / POLY-U
     # ========================================================
 
-    print(
-        "\nPoly-A / Poly-U Regions"
-    )
+    style.section('Poly-A / Poly-U Regions')
 
-    print(minor_rule())
+    style.field('Poly-A Regions', f"{len(analysis['poly_a'])}")
 
-    print(
-        f"Poly-A Regions:      "
-        f"{len(analysis['poly_a'])}"
-    )
-
-    print(
-        f"Poly-U Regions:      "
-        f"{len(analysis['poly_u'])}"
-    )
+    style.field('Poly-U Regions', f"{len(analysis['poly_u'])}")
 
     # ========================================================
     # SECONDARY STRUCTURE
@@ -2474,16 +2257,9 @@ def print_rna_report(
 
     structure = analysis["structure"]
 
-    print(
-        "\nRNA Secondary Structure Screening"
-    )
+    style.section('RNA Secondary Structure Screening')
 
-    print(minor_rule())
-
-    print(
-        f"Potential Hairpins:  "
-        f"{structure['hairpin_count']}"
-    )
+    style.field('Potential Hairpins', f"{structure['hairpin_count']}")
 
     if structure["hairpins"]:
 
@@ -2496,87 +2272,45 @@ def print_rna_report(
                 f"\nHairpin {index}"
             )
 
-            print(
-                f"Position:            "
-                f"{hairpin['start']}-"
-                f"{hairpin['end']}"
-            )
+            style.field('Position', f"{hairpin['start']}-"
+                f"{hairpin['end']}")
 
-            print(
-                f"Stem Length:         "
-                f"{hairpin['stem_length']} bp"
-            )
+            style.field('Stem Length', f"{hairpin['stem_length']} bp")
 
-            print(
-                f"Loop Length:         "
-                f"{hairpin['loop_length']} nt"
-            )
+            style.field('Loop Length', f"{hairpin['loop_length']} nt")
 
-            print(
-                f"Pairing Fraction:    "
-                f"{hairpin['pairing_fraction']:.2f}"
-            )
+            style.field('Pairing Fraction', f"{hairpin['pairing_fraction']:.2f}")
 
-    print(
-        "\nMethod:              "
-        "Heuristic stem-loop screening"
-    )
+    print()
+    style.field('Method', "Heuristic stem-loop screening")
 
-    print(
-        "Thermodynamics:      "
-        "Not calculated"
-    )
+    style.field('Thermodynamics', "Not calculated")
 
     # ========================================================
     # QUALITY
     # ========================================================
 
-    print(
-        "\nRNA Sequence Quality"
-    )
+    style.section('RNA Sequence Quality')
 
-    print(minor_rule())
+    style.field('Standard Bases', f"{quality['standard_count']}")
 
-    print(
-        f"Standard Bases:      "
-        f"{quality['standard_count']}"
-    )
+    style.field('Ambiguous Bases', f"{quality['ambiguous_count']}")
 
-    print(
-        f"Ambiguous Bases:     "
-        f"{quality['ambiguous_count']}"
-    )
+    style.field('Invalid Symbols', f"{quality['invalid_count']}")
 
-    print(
-        f"Invalid Symbols:     "
-        f"{quality['invalid_count']}"
-    )
-
-    print(
-        f"Ambiguous Content:   "
-        f"{quality['ambiguous_percentage']:.2f}%"
-    )
+    style.field('Ambiguous Content', f"{quality['ambiguous_percentage']:.2f}%")
 
     if not quality["valid"]:
 
-        print(
-            "Status:              "
-            "INVALID"
-        )
+        style.field('Status', "INVALID")
 
     elif quality["ambiguous_count"] > 0:
 
-        print(
-            "Status:              "
-            "VALID - IUPAC ambiguity present"
-        )
+        style.field('Status', "VALID - IUPAC ambiguity present")
 
     else:
 
-        print(
-            "Status:              "
-            "VALID - Unambiguous RNA"
-        )
+        style.field('Status', "VALID - Unambiguous RNA")
 
     # ========================================================
     # IUPAC
@@ -2584,11 +2318,7 @@ def print_rna_report(
 
     if ambiguity["ambiguous_counts"]:
 
-        print(
-            "\nIUPAC Ambiguous Base Composition"
-        )
-
-        print(minor_rule())
+        style.section('IUPAC Ambiguous Base Composition')
 
         for code, count in (
             ambiguity["ambiguous_counts"].items()
@@ -2606,11 +2336,7 @@ def print_rna_report(
 
     if ambiguity["ambiguous_positions"]:
 
-        print(
-            "\nAmbiguous Positions"
-        )
-
-        print(minor_rule())
+        style.section('Ambiguous Positions')
 
         for item in (
             ambiguity["ambiguous_positions"]
@@ -2633,11 +2359,7 @@ def print_rna_report(
 
     if quality["invalid_positions"]:
 
-        print(
-            "\nInvalid Symbols"
-        )
-
-        print(minor_rule())
+        style.section('Invalid Symbols')
 
         for item in quality["invalid_positions"]:
 
@@ -2651,31 +2373,17 @@ def print_rna_report(
     # COMPLEMENT
     # ========================================================
 
-    print(
-        "\nRNA Strand Transformations"
-    )
+    style.section('RNA Strand Transformations')
 
-    print(minor_rule())
+    style.field('Complement', f"{create_rna_preview(analysis['complement'])}")
 
-    print(
-        f"Complement:         "
-        f"{create_rna_preview(analysis['complement'])}"
-    )
-
-    print(
-        f"Reverse Complement: "
-        f"{create_rna_preview(analysis['reverse_complement'])}"
-    )
+    style.field('Reverse Complement', f"{create_rna_preview(analysis['reverse_complement'])}")
 
     # ========================================================
     # SEQUENCE PREVIEW
     # ========================================================
 
-    print(
-        "\nSequence Preview"
-    )
-
-    print(minor_rule())
+    style.section('Sequence Preview')
 
     print(
         f"DNA 5' -> 3':       "
@@ -2693,21 +2401,11 @@ def print_rna_report(
 
     landscape = analysis["start_stop"]
 
-    print(
-        "\nStart / Stop Landscape"
-    )
+    style.section('Start / Stop Landscape')
 
-    print(minor_rule())
+    style.field('AUG Start Codons', f"{landscape['start_count']}")
 
-    print(
-        f"AUG Start Codons:   "
-        f"{landscape['start_count']}"
-    )
-
-    print(
-        f"Stop Codons:         "
-        f"{landscape['stop_count']}"
-    )
+    style.field('Stop Codons', f"{landscape['stop_count']}")
 
     if landscape["starts"]:
 
@@ -2737,11 +2435,7 @@ def print_rna_report(
         analysis["translation_frames"]
     )
 
-    print(
-        "\nThree-Frame Translation Preview"
-    )
-
-    print(minor_rule())
+    style.section('Three-Frame Translation Preview')
 
     for frame in translation_frames["frames"]:
 
@@ -2758,21 +2452,11 @@ def print_rna_report(
         analysis["feature_score"]
     )
 
-    print(
-        "\nSequence Feature Screening"
-    )
+    style.section('Sequence Feature Screening')
 
-    print(minor_rule())
+    style.field('Screening Score', f"{feature_score['score']}/100")
 
-    print(
-        f"Screening Score:     "
-        f"{feature_score['score']}/100"
-    )
-
-    print(
-        f"Screening Band:      "
-        f"{feature_score['classification']}"
-    )
+    style.field('Screening Band', f"{feature_score['classification']}")
 
     # ========================================================
     # SUMMARY
@@ -2780,56 +2464,27 @@ def print_rna_report(
 
     summary = analysis["summary"]
 
-    print(
-        "\nRNA Summary"
-    )
+    style.section('RNA Summary')
 
-    print(minor_rule())
+    style.field('Length', f"{summary['length']} nt")
 
-    print(
-        f"Length:              "
-        f"{summary['length']} nt"
-    )
+    style.field('GC Content', f"{summary['gc_content']:.2f}%")
 
-    print(
-        f"GC Content:          "
-        f"{summary['gc_content']:.2f}%"
-    )
+    style.field('AU Content', f"{summary['au_content']:.2f}%")
 
-    print(
-        f"AU Content:          "
-        f"{summary['au_content']:.2f}%"
-    )
+    style.field('Ambiguous Bases', f"{summary['ambiguous_count']}")
 
-    print(
-        f"Ambiguous Bases:     "
-        f"{summary['ambiguous_count']}"
-    )
+    style.field('Invalid Symbols', f"{summary['invalid_count']}")
 
-    print(
-        f"Invalid Symbols:     "
-        f"{summary['invalid_count']}"
-    )
+    style.field('AUG Starts', f"{summary['start_count']}")
 
-    print(
-        f"AUG Starts:          "
-        f"{summary['start_count']}"
-    )
-
-    print(
-        f"Stop Codons:         "
-        f"{summary['stop_count']}"
-    )
+    style.field('Stop Codons', f"{summary['stop_count']}")
 
     # ========================================================
     # SCIENTIFIC INTERPRETATION
     # ========================================================
 
-    print(
-        "\nScientific Interpretation"
-    )
-
-    print(minor_rule())
+    style.section('Scientific Interpretation')
 
     print(
         "The supplied DNA is interpreted as the coding "
@@ -3081,25 +2736,14 @@ def print_rna_pipeline_input(analysis):
         {}
     )
 
-    print()
-    print("Pipeline Input")
-    print(minor_rule())
+    style.section('Pipeline Input')
 
-    print(
-        f"Source:              "
-        f"{info.get('source', 'Unknown')}"
-    )
+    style.field('Source', f"{info.get('source', 'Unknown')}")
 
     if info.get("mode") == "orf":
-        print(
-            f"ORF length:          "
-            f"{info.get('dna_length', 0)} bp"
-        )
+        style.field('ORF length', f"{info.get('dna_length', 0)} bp")
     else:
-        print(
-            f"Sequence length:     "
-            f"{info.get('dna_length', 0)} bp"
-        )
+        style.field('Sequence length', f"{info.get('dna_length', 0)} bp")
 
     if (
         info.get("mode") == "orf"
@@ -3126,36 +2770,18 @@ def print_rna_pipeline_input(analysis):
             f"{orf_name}"
         )
 
-        print(
-            f"Strand:              "
-            f"{_orf_value(orf, 'strand', '-')}"
-        )
+        style.field('Strand', f"{_orf_value(orf, 'strand', '-')}")
 
-        print(
-            f"Reading frame:       "
-            f"{_orf_value(orf, 'frame', '-')}"
-        )
+        style.field('Reading frame', f"{_orf_value(orf, 'frame', '-')}")
 
-        print(
-            f"ORF status:          "
-            f"{_orf_value(orf, 'status', '-')}"
-        )
+        style.field('ORF status', f"{_orf_value(orf, 'status', '-')}")
 
-        print(
-            "Analysis scope:      "
-            "Selected ORF"
-        )
+        style.field('Analysis scope', "Selected ORF")
 
     else:
-        print(
-            "Selected ORF:        "
-            "None"
-        )
+        style.field('Selected ORF', "None")
 
-        print(
-            "Analysis scope:      "
-            "Entire DNA sequence"
-        )
+        style.field('Analysis scope', "Entire DNA sequence")
 
 
 def print_rna_pipeline_connection(analysis):
@@ -3166,34 +2792,19 @@ def print_rna_pipeline_connection(analysis):
         {}
     )
 
-    print()
-    print(major_rule())
-    print("RNA CONNECTED TO PIPELINE")
-    print(major_rule())
+    style.header('RNA CONNECTED TO PIPELINE')
 
     print()
-    print(
-        f"Source:              "
-        f"{info.get('source', 'Unknown')}"
-    )
+    style.field('Source', f"{info.get('source', 'Unknown')}")
 
-    print(
-        f"RNA Length:          "
-        f"{len(analysis.get('rna', ''))} nt"
-    )
+    style.field('RNA Length', f"{len(analysis.get('rna', ''))} nt")
 
     if info.get("mode") == "orf":
-        print(
-            "✓ Selected ORF was used as RNA input"
-        )
+        style.success("Selected ORF was used as RNA input")
     else:
-        print(
-            "✓ Full DNA sequence was used as RNA input"
-        )
+        style.success("Full DNA sequence was used as RNA input")
 
-    print(
-        "✓ RNA analysis stored in pipeline"
-    )
+    style.success("RNA analysis stored in pipeline")
 
 
 def print_rna_overview(analysis):
@@ -3204,19 +2815,11 @@ def print_rna_overview(analysis):
     score = analysis["feature_score"]
     info = analysis.get("pipeline_input", {})
 
-    print()
-    print(major_rule())
-    print("RNA OVERVIEW")
-    print(major_rule())
+    style.header('RNA OVERVIEW')
 
-    print()
-    print("Input Context")
-    print(minor_rule())
+    style.section('Input Context')
 
-    print(
-        f"Source:              "
-        f"{info.get('source', 'Unknown')}"
-    )
+    style.field('Source', f"{info.get('source', 'Unknown')}")
 
     if (
         info.get("mode") == "orf"
@@ -3244,81 +2847,36 @@ def print_rna_overview(analysis):
             f"{orf_name}"
         )
 
-        print(
-            f"ORF length:          "
-            f"{info.get('dna_length', summary['length'])} bp"
-        )
+        style.field('ORF length', f"{info.get('dna_length', summary['length'])} bp")
 
-        print(
-            f"Strand:              "
-            f"{_orf_value(orf, 'strand', '-')}"
-        )
+        style.field('Strand', f"{_orf_value(orf, 'strand', '-')}")
 
-        print(
-            f"Reading frame:       "
-            f"{_orf_value(orf, 'frame', '-')}"
-        )
+        style.field('Reading frame', f"{_orf_value(orf, 'frame', '-')}")
 
-        print(
-            f"ORF status:          "
-            f"{_orf_value(orf, 'status', '-')}"
-        )
+        style.field('ORF status', f"{_orf_value(orf, 'status', '-')}")
 
-        print(
-            "Analysis scope:      "
-            "Selected ORF"
-        )
+        style.field('Analysis scope', "Selected ORF")
 
     else:
-        print(
-            f"Sequence length:     "
-            f"{info.get('dna_length', summary['length'])} bp"
-        )
+        style.field('Sequence length', f"{info.get('dna_length', summary['length'])} bp")
 
-        print(
-            "Selected ORF:        None"
-        )
+        style.field('Selected ORF', "None")
 
-        print(
-            "Analysis scope:      "
-            "Entire DNA sequence"
-        )
+        style.field('Analysis scope', "Entire DNA sequence")
 
-    print(
-        f"RNA length:          "
-        f"{summary['length']} nt"
-    )
+    style.field('RNA length', f"{summary['length']} nt")
 
-    print()
-    print("Composition")
-    print(minor_rule())
-    print(
-        f"GC content:          "
-        f"{summary['gc_content']:.2f}%"
-    )
+    style.section('Composition')
+    style.field('GC content', f"{summary['gc_content']:.2f}%")
 
-    print(
-        f"AU content:          "
-        f"{summary['au_content']:.2f}%"
-    )
+    style.field('AU content', f"{summary['au_content']:.2f}%")
 
-    print(
-        f"Complexity:          "
-        f"{summary['complexity']:.3f}"
-    )
+    style.field('Complexity', f"{summary['complexity']:.3f}")
 
-    print()
-    print("Sequence Quality")
-    print(minor_rule())
-    print(
-        f"Ambiguous bases:     "
-        f"{summary['ambiguous_count']}"
-    )
+    style.section('Sequence Quality')
+    style.field('Ambiguous bases', f"{summary['ambiguous_count']}")
 
-    print(
-        f"Invalid symbols:     "
-        f"{summary['invalid_count']}"
-    )
+    style.field('Invalid symbols', f"{summary['invalid_count']}")
 
     if quality["invalid_count"] > 0:
         status = "INVALID"
@@ -3329,36 +2887,17 @@ def print_rna_overview(analysis):
     else:
         status = "VALID - Unambiguous"
 
-    print(
-        f"Status:              "
-        f"{status}"
-    )
+    style.field('Status', f"{status}")
 
-    print()
-    print("Coding Landscape")
-    print(minor_rule())
-    print(
-        f"AUG starts:          "
-        f"{summary['start_count']}"
-    )
+    style.section('Coding Landscape')
+    style.field('AUG starts', f"{summary['start_count']}")
 
-    print(
-        f"Stop codons:         "
-        f"{summary['stop_count']}"
-    )
+    style.field('Stop codons', f"{summary['stop_count']}")
 
-    print()
-    print("Feature Screening")
-    print(minor_rule())
-    print(
-        f"Feature score:       "
-        f"{score['score']}/100"
-    )
+    style.section('Feature Screening')
+    style.field('Feature score', f"{score['score']}/100")
 
-    print(
-        f"Classification:      "
-        f"{score['classification']}"
-    )
+    style.field('Classification', f"{score['classification']}")
 
     print()
     print(
@@ -3375,15 +2914,10 @@ def print_rna_sequence_view(analysis):
         ""
     )
 
-    print()
-    print(major_rule())
-    print("RNA SEQUENCE")
-    print(major_rule())
+    style.header('RNA SEQUENCE')
 
     print()
-    print(
-        f"Length: {len(rna)} nt"
-    )
+    style.field('Length', f"{len(rna)} nt")
 
     print()
     print("5' -> 3'")
@@ -3414,7 +2948,7 @@ def print_rna_sequence_view(analysis):
 
 
 def _pause_rna_ui():
-    input("\nPress Enter to continue...")
+    style.pause()
 
 
 def run_rna_analysis_ui(
@@ -3448,10 +2982,7 @@ def run_rna_analysis_ui(
         **analysis_kwargs
     )
 
-    print()
-    print(major_rule())
-    print("RNA ANALYSIS")
-    print(major_rule())
+    style.header('RNA ANALYSIS')
 
     print_rna_pipeline_input(
         analysis
@@ -3465,25 +2996,16 @@ def run_rna_analysis_ui(
 
     while True:
 
-        print()
-        print(major_rule())
-        print("RNA ANALYSIS MENU")
-        print(major_rule())
+        style.header('RNA ANALYSIS')
 
-        print()
-        print("[1] RNA Overview")
-        print("[2] Translation & Codon Analysis")
-        print("[3] RNA Features")
-        print("[4] Complete RNA Report")
-        print("[5] RNA Sequence")
-        print()
-        print("[0] Back")
+        style.menu([
+            ("Overview", [('1', 'RNA Overview')]),
+            ("Analysis", [('2', 'Translation & Codon Analysis'), ('3', 'RNA Features')]),
+            ("Report", [('4', 'Complete RNA Report')]),
+            ("Sequence", [('5', 'RNA Sequence')]),
+        ])
 
-        print(minor_rule())
-
-        choice = input(
-            "Selection: "
-        ).strip().lower()
+        choice = style.ask_choice().lower()
 
         if choice == "1":
 
@@ -3534,11 +3056,7 @@ def run_rna_analysis_ui(
 
         else:
 
-            print()
-            print(
-                "Invalid selection. "
-                "Please choose one of the available options."
-            )
+            style.invalid_selection()
 
     return analysis
 

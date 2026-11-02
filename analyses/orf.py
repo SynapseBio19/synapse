@@ -2971,9 +2971,9 @@ def select_orf(orfs):
                 style.field('CDS quality', f"{selected['cds_quality']['score']}/100")
 
                 style.section('Pipeline Status')
-                print("✓ ORF Selected")
-                print("✓ Ready for RNA Analysis")
-                print("✓ Ready for Protein Analysis")
+                style.success("ORF Selected")
+                style.success("Ready for RNA Analysis")
+                style.success("Ready for Protein Analysis")
                 style.success("Ready for CRISPR guide design.")
 
                 return selected

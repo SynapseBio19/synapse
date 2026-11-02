@@ -4,6 +4,7 @@ from itertools import product
 from data.genetic_code import CODON_TABLE
 from data.amino_acids import AMINO_ACIDS
 from ui.style import major_rule, minor_rule
+from ui import style
 
 
 # ============================================================
@@ -2513,10 +2514,7 @@ def print_protein_report(
 
     protein = analysis["protein"]
 
-    print()
-    print(major_rule())
-    print("PROTEIN ANALYSIS")
-    print(major_rule())
+    style.header('PROTEIN ANALYSIS')
 
     # ========================================================
     # TRANSLATION
@@ -2528,85 +2526,41 @@ def print_protein_report(
 
     if translation is not None:
 
-        print(
-            "\nTranslation Information"
-        )
+        style.section('Translation Information')
 
-        print(minor_rule())
+        style.field('Reading Frame', f"{translation['reading_frame']}")
 
-        print(
-            f"Reading Frame:       "
-            f"{translation['reading_frame']}"
-        )
+        style.field('First Codon', f"{translation['start_codon'] or 'N/A'}")
 
-        print(
-            f"First Codon:         "
-            f"{translation['start_codon'] or 'N/A'}"
-        )
+        style.field('AUG at Start', f"{'Yes' if translation['starts_with_aug'] else 'No'}")
 
-        print(
-            f"AUG at Start:        "
-            f"{'Yes' if translation['starts_with_aug'] else 'No'}"
-        )
-
-        print(
-            f"Codons Processed:    "
-            f"{translation['codons_processed']}"
-        )
+        style.field('Codons Processed', f"{translation['codons_processed']}")
 
         if translation["stop_found"]:
 
-            print(
-                f"Stop Codon:          "
-                f"{translation['stop_codon']}"
-            )
+            style.field('Stop Codon', f"{translation['stop_codon']}")
 
-            print(
-                f"Stop Position:       "
-                f"{translation['stop_position']}"
-            )
+            style.field('Stop Position', f"{translation['stop_position']}")
 
         else:
 
-            print(
-                "Stop Codon:          "
-                "Not detected"
-            )
+            style.field('Stop Codon', "Not detected")
 
-        print(
-            f"Trailing Bases:      "
-            f"{translation['trailing_nucleotides']}"
-        )
+        style.field('Trailing Bases', f"{translation['trailing_nucleotides']}")
 
     # ========================================================
     # BASIC INFORMATION
     # ========================================================
 
-    print(
-        "\nProtein Sequence"
-    )
+    style.section('Protein Sequence')
 
-    print(minor_rule())
+    style.field('Sequence', f"{create_protein_preview(protein)}")
 
-    print(
-        f"Sequence:            "
-        f"{create_protein_preview(protein)}"
-    )
+    style.field('Protein Length', f"{analysis['length']} aa")
 
-    print(
-        f"Protein Length:      "
-        f"{analysis['length']} aa"
-    )
+    style.field('Resolved Residues', f"{analysis['quality']['standard_residues']}")
 
-    print(
-        f"Resolved Residues:   "
-        f"{analysis['quality']['standard_residues']}"
-    )
-
-    print(
-        f"Ambiguous Residues:  "
-        f"{analysis['quality']['ambiguous_residues']}"
-    )
+    style.field('Ambiguous Residues', f"{analysis['quality']['ambiguous_residues']}")
 
     # ========================================================
     # QUALITY
@@ -2616,16 +2570,9 @@ def print_protein_report(
         "quality"
     ]
 
-    print(
-        "\nProtein Quality"
-    )
+    style.section('Protein Quality')
 
-    print(minor_rule())
-
-    print(
-        f"Standard Residues:   "
-        f"{quality['standard_residues']}"
-    )
+    style.field('Standard Residues', f"{quality['standard_residues']}")
 
     if quality.get("nonstandard_residues"):
         print(
@@ -2633,40 +2580,25 @@ def print_protein_report(
             f"{quality['nonstandard_residues']}"
         )
 
-    print(
-        f"Ambiguous Residues:  "
-        f"{quality['ambiguous_residues']}"
-    )
+    style.field('Ambiguous Residues', f"{quality['ambiguous_residues']}")
 
-    print(
-        f"Invalid Residues:    "
-        f"{quality['invalid_residues']}"
-    )
+    style.field('Invalid Residues', f"{quality['invalid_residues']}")
 
-    print(
-        f"Ambiguous Content:   "
-        f"{quality['ambiguous_percentage']:.2f}%"
-    )
+    style.field('Ambiguous Content', f"{quality['ambiguous_percentage']:.2f}%")
 
     if not quality["valid"]:
 
-        print(
-            "Status:              INVALID"
-        )
+        style.field('Status', "INVALID")
 
     elif not quality["fully_resolved"]:
 
-        print(
-            "Status:              VALID - "
-            "contains unresolved residues"
-        )
+        style.field('Status', "VALID - "
+            "contains unresolved residues")
 
     else:
 
-        print(
-            "Status:              VALID - "
-            "fully resolved"
-        )
+        style.field('Status', "VALID - "
+            "fully resolved")
 
     # ========================================================
     # MOLECULAR WEIGHT
@@ -2676,54 +2608,29 @@ def print_protein_report(
         "molecular_weight"
     ]
 
-    print(
-        "\nMolecular Weight"
-    )
-
-    print(minor_rule())
+    style.section('Molecular Weight')
 
     if mw.get("undetermined"):
 
         if mw.get("known_mass") is not None:
-            print(
-                "Estimated MW:        "
-                "Undetermined"
-            )
+            style.field('Estimated MW', "Undetermined")
 
-            print(
-                f"Known-residue mass:  "
-                f"{mw['known_mass']:,.0f} Da"
-            )
+            style.field('Known-residue mass', f"{mw['known_mass']:,.0f} Da")
         else:
-            print(
-                "Estimated MW:        "
-                "Undetermined"
-            )
+            style.field('Estimated MW', "Undetermined")
 
-        print(
-            "Status:              "
-            "Unresolved sequence prevents an exact mass"
-        )
+        style.field('Status', "Unresolved sequence prevents an exact mass")
 
     elif mw["ambiguous"]:
 
-        print(
-            f"Estimated MW:        "
-            f"{mw['min']:,.0f} - "
-            f"{mw['max']:,.0f} Da"
-        )
+        style.field('Estimated MW', f"{mw['min']:,.0f} - "
+            f"{mw['max']:,.0f} Da")
 
-        print(
-            "Status:              "
-            "Range due to ambiguous translation"
-        )
+        style.field('Status', "Range due to ambiguous translation")
 
     else:
 
-        print(
-            f"Estimated MW:        "
-            f"{mw['min']:,.0f} Da"
-        )
+        style.field('Estimated MW', f"{mw['min']:,.0f} Da")
 
     # ========================================================
     # AMINO ACID COMPOSITION
@@ -2737,11 +2644,7 @@ def print_protein_report(
         "percentages"
     ]
 
-    print(
-        "\nAmino Acid Composition"
-    )
-
-    print(minor_rule())
+    style.section('Amino Acid Composition')
 
     print(
         "AA | 3L | Name             | "
@@ -2799,53 +2702,27 @@ def print_protein_report(
         "properties"
     ]
 
-    print(
-        "\nComposition Properties"
-    )
+    style.section('Composition Properties')
 
-    print(minor_rule())
+    style.field('Hydrophobic', f"{properties['hydrophobic_percentage']:.2f}%")
 
-    print(
-        f"Hydrophobic:         "
-        f"{properties['hydrophobic_percentage']:.2f}%"
-    )
+    style.field('Polar', f"{properties['polar_percentage']:.2f}%")
 
-    print(
-        f"Polar:               "
-        f"{properties['polar_percentage']:.2f}%"
-    )
+    style.field('Positive', f"{properties['positive_percentage']:.2f}%")
 
-    print(
-        f"Positive:            "
-        f"{properties['positive_percentage']:.2f}%"
-    )
+    style.field('Negative', f"{properties['negative_percentage']:.2f}%")
 
-    print(
-        f"Negative:            "
-        f"{properties['negative_percentage']:.2f}%"
-    )
-
-    print(
-        f"Aromatic:            "
-        f"{properties['aromatic_percentage']:.2f}%"
-    )
+    style.field('Aromatic', f"{properties['aromatic_percentage']:.2f}%")
 
     # ========================================================
     # CHARGE / pI
     # ========================================================
 
-    print(
-        "\nCharge Properties"
-    )
-
-    print(minor_rule())
+    style.section('Charge Properties')
 
     if analysis["pI"] is not None:
 
-        print(
-            f"Theoretical pI:      "
-            f"{analysis['pI']:.2f}"
-        )
+        style.field('Theoretical pI', f"{analysis['pI']:.2f}")
 
         for ph, charge in (
             analysis["charges"].items()
@@ -2867,11 +2744,7 @@ def print_protein_report(
     # HYDROPATHY
     # ========================================================
 
-    print(
-        "\nHydropathy"
-    )
-
-    print(minor_rule())
+    style.section('Hydropathy')
 
     if analysis["gravy"] is not None:
 
@@ -2882,24 +2755,15 @@ def print_protein_report(
 
         if analysis["gravy"] > 0.5:
 
-            print(
-                "Interpretation:      "
-                "Overall hydrophobic tendency"
-            )
+            style.field('Interpretation', "Overall hydrophobic tendency")
 
         elif analysis["gravy"] < -0.5:
 
-            print(
-                "Interpretation:      "
-                "Overall hydrophilic tendency"
-            )
+            style.field('Interpretation', "Overall hydrophilic tendency")
 
         else:
 
-            print(
-                "Interpretation:      "
-                "Mixed / intermediate"
-            )
+            style.field('Interpretation', "Mixed / intermediate")
 
     else:
 
@@ -2911,11 +2775,7 @@ def print_protein_report(
     # MOLECULAR PROPERTIES
     # ========================================================
 
-    print(
-        "\nProtein Molecular Properties"
-    )
-
-    print(minor_rule())
+    style.section('Protein Molecular Properties')
 
     instability = (
         analysis[
@@ -2925,10 +2785,7 @@ def print_protein_report(
 
     if instability is not None:
 
-        print(
-            f"Instability Index:   "
-            f"{instability:.2f}"
-        )
+        style.field('Instability Index', f"{instability:.2f}")
 
         if analysis["length"] >= 15:
             classification = (
@@ -2941,35 +2798,23 @@ def print_protein_report(
                 "Not classified - sequence too short"
             )
 
-        print(
-            f"Stability Class:     "
-            f"{classification}"
-        )
+        style.field('Stability Class', f"{classification}")
 
     else:
 
-        print(
-            "Instability Index:   "
-            "Not available"
-        )
+        style.field('Instability Index', "Not available")
 
     if analysis[
         "aliphatic_index"
     ] is not None:
 
-        print(
-            f"Aliphatic Index:     "
-            f"{analysis['aliphatic_index']:.2f}"
-        )
+        style.field('Aliphatic Index', f"{analysis['aliphatic_index']:.2f}")
 
     if analysis[
         "aromaticity"
     ] is not None:
 
-        print(
-            f"Aromaticity:         "
-            f"{analysis['aromaticity']:.3f}"
-        )
+        style.field('Aromaticity', f"{analysis['aromaticity']:.3f}")
 
     # ========================================================
     # EXTINCTION
@@ -2979,53 +2824,26 @@ def print_protein_report(
         "extinction_coefficient"
     ]
 
-    print(
-        "\nExtinction Coefficient"
-    )
+    style.section('Extinction Coefficient')
 
-    print(minor_rule())
+    style.field('Wavelength', "280 nm")
 
-    print(
-        "Wavelength:          280 nm"
-    )
+    style.field('Tryptophan', f"{extinction['tryptophan']}")
 
-    print(
-        f"Tryptophan:          "
-        f"{extinction['tryptophan']}"
-    )
+    style.field('Tyrosine', f"{extinction['tyrosine']}")
 
-    print(
-        f"Tyrosine:            "
-        f"{extinction['tyrosine']}"
-    )
+    style.field('Cysteine', f"{extinction['cysteine']}")
 
-    print(
-        f"Cysteine:            "
-        f"{extinction['cysteine']}"
-    )
+    style.field('All Cys reduced', f"{extinction['reduced_cysteine']} "
+        f"M^-1 cm^-1")
 
-    print(
-        f"All Cys reduced:     "
-        f"{extinction['reduced_cysteine']} "
-        f"M^-1 cm^-1"
-    )
+    style.field('Max. disulfide form', f"{extinction['oxidized_cysteine']} "
+        f"M^-1 cm^-1")
 
-    print(
-        f"Max. disulfide form: "
-        f"{extinction['oxidized_cysteine']} "
-        f"M^-1 cm^-1"
-    )
-
-    print(
-        f"Disulfide pairs:     "
-        f"{extinction['disulfide_pairs']}"
-    )
+    style.field('Disulfide pairs', f"{extinction['disulfide_pairs']}")
 
     if extinction["unpaired_cysteine"]:
-        print(
-            "Unpaired cysteine:   "
-            "1"
-        )
+        style.field('Unpaired cysteine', "1")
 
     # ========================================================
     # SECONDARY STRUCTURE
@@ -3035,31 +2853,15 @@ def print_protein_report(
         "secondary_structure"
     ]
 
-    print(
-        "\nSecondary Structure Tendencies"
-    )
+    style.section('Secondary Structure Tendencies')
 
-    print(minor_rule())
+    style.field('Helix Propensity', f"{secondary['helix']:.3f}")
 
-    print(
-        f"Helix Propensity:    "
-        f"{secondary['helix']:.3f}"
-    )
+    style.field('Turn Propensity', f"{secondary['turn']:.3f}")
 
-    print(
-        f"Turn Propensity:     "
-        f"{secondary['turn']:.3f}"
-    )
+    style.field('Sheet Propensity', f"{secondary['sheet']:.3f}")
 
-    print(
-        f"Sheet Propensity:    "
-        f"{secondary['sheet']:.3f}"
-    )
-
-    print(
-        "Method:              "
-        "Chou-Fasman residue propensities"
-    )
+    style.field('Method', "Chou-Fasman residue propensities")
 
     print(
         "Note: Propensity values are not "
@@ -3075,11 +2877,7 @@ def print_protein_report(
         "hydrophobic_regions"
     ]
 
-    print(
-        "\nHydrophobic Regions"
-    )
-
-    print(minor_rule())
+    style.section('Hydrophobic Regions')
 
     if regions:
 
@@ -3113,11 +2911,7 @@ def print_protein_report(
         "transmembrane_domains"
     ]
 
-    print(
-        "\nTransmembrane Domain Heuristic"
-    )
-
-    print(minor_rule())
+    style.section('Transmembrane Domain Heuristic')
 
     if tm_domains:
 
@@ -3151,23 +2945,13 @@ def print_protein_report(
         "signal_peptide"
     ]
 
-    print(
-        "\nSignal Peptide Heuristic"
-    )
-
-    print(minor_rule())
+    style.section('Signal Peptide Heuristic')
 
     if signal["predicted"]:
 
-        print(
-            "Prediction:          "
-            "Possible N-terminal signal peptide"
-        )
+        style.field('Prediction', "Possible N-terminal signal peptide")
 
-        print(
-            f"Heuristic evidence:  "
-            f"{signal['evidence']}"
-        )
+        style.field('Heuristic evidence', f"{signal['evidence']}")
 
         core = signal.get(
             "hydrophobic_core"
@@ -3175,16 +2959,10 @@ def print_protein_report(
 
         if core:
 
-            print(
-                f"Hydrophobic Core:    "
-                f"{core['start']}-"
-                f"{core['end']}"
-            )
+            style.field('Hydrophobic Core', f"{core['start']}-"
+                f"{core['end']}")
 
-            print(
-                f"Core Hydropathy:     "
-                f"{core['score']:+.2f}"
-            )
+            style.field('Core Hydropathy', f"{core['score']:+.2f}")
 
         if signal.get("cleavage_site") is not None:
 
@@ -3195,10 +2973,7 @@ def print_protein_report(
 
     else:
 
-        print(
-            "Prediction:          "
-            "No convincing pattern"
-        )
+        style.field('Prediction', "No convincing pattern")
 
     print(
         "Note: Sequence-only heuristic."
@@ -3212,11 +2987,7 @@ def print_protein_report(
         "flexibility"
     ]
 
-    print(
-        "\nFlexibility Analysis"
-    )
-
-    print(minor_rule())
+    style.section('Flexibility Analysis')
 
     if flexibility:
 
@@ -3225,20 +2996,11 @@ def print_protein_report(
             for entry in flexibility
         ]
 
-        print(
-            f"Average:             "
-            f"{sum(scores) / len(scores):.3f}"
-        )
+        style.field('Average', f"{sum(scores) / len(scores):.3f}")
 
-        print(
-            f"Minimum:             "
-            f"{min(scores):.3f}"
-        )
+        style.field('Minimum', f"{min(scores):.3f}")
 
-        print(
-            f"Maximum:             "
-            f"{max(scores):.3f}"
-        )
+        style.field('Maximum', f"{max(scores):.3f}")
 
     else:
 
@@ -3272,11 +3034,7 @@ def print_protein_report(
 
         if ambiguous_records:
 
-            print(
-                "\nAmbiguous Codon Analysis"
-            )
-
-            print(minor_rule())
+            style.section('Ambiguous Codon Analysis')
 
             for record in (
                 ambiguous_records
@@ -3306,11 +3064,7 @@ def print_protein_report(
     # SCIENTIFIC INTERPRETATION
     # ========================================================
 
-    print(
-        "\nScientific Interpretation"
-    )
-
-    print(minor_rule())
+    style.section('Scientific Interpretation')
 
     print(
         "Protein properties are calculated from the "
@@ -3382,7 +3136,7 @@ def _protein_ui_header(title):
 
 
 def _protein_ui_pause():
-    input("\nPress Enter to continue...")
+    style.pause()
 
 
 def _frame_display(frame):
@@ -3428,16 +3182,11 @@ def _protein_limitations_block(analysis):
         analysis["length"]
     )
 
-    print("ANALYSIS APPLICABILITY")
-    print(minor_rule())
+    style.section('ANALYSIS APPLICABILITY')
 
-    print(
-        f"Level:               {level}"
-    )
+    style.field('Level', f"{level}")
 
-    print(
-        f"Reason:              {reason}"
-    )
+    style.field('Reason', f"{reason}")
 
     print()
     print(
@@ -3466,12 +3215,9 @@ def _protein_input_context(
     reading_frame=None,
     orf_status=None,
 ):
-    print("INPUT")
-    print(minor_rule())
+    style.section('INPUT')
 
-    print(
-        f"Source:              {source}"
-    )
+    style.field('Source', f"{source}")
 
     if orf_id is not None:
         print(
@@ -3479,30 +3225,18 @@ def _protein_input_context(
         )
 
     if orf_length is not None:
-        print(
-            f"ORF length:          {orf_length} bp"
-        )
+        style.field('ORF length', f"{orf_length} bp")
 
     if strand is not None:
-        print(
-            f"Strand:              {strand}"
-        )
+        style.field('Strand', f"{strand}")
 
     if reading_frame is not None:
-        print(
-            f"Reading frame:       "
-            f"{_frame_display(reading_frame)}"
-        )
+        style.field('Reading frame', f"{_frame_display(reading_frame)}")
 
     if orf_status is not None:
-        print(
-            f"ORF status:          {orf_status}"
-        )
+        style.field('ORF status', f"{orf_status}")
 
-    print(
-        f"Protein length:      "
-        f"{analysis['length']} aa"
-    )
+    style.field('Protein length', f"{analysis['length']} aa")
 
 
 def _protein_status_line(analysis):
@@ -3520,13 +3254,9 @@ def _protein_status_line(analysis):
 def _protein_quality_block(analysis):
     quality = analysis["quality"]
 
-    print("SEQUENCE QUALITY")
-    print(minor_rule())
+    style.section('SEQUENCE QUALITY')
 
-    print(
-        f"Standard residues:   "
-        f"{quality['standard_residues']}"
-    )
+    style.field('Standard residues', f"{quality['standard_residues']}")
 
     if quality.get("nonstandard_residues"):
         print(
@@ -3534,77 +3264,42 @@ def _protein_quality_block(analysis):
             f"{quality['nonstandard_residues']}"
         )
 
-    print(
-        f"Ambiguous residues:  "
-        f"{quality['ambiguous_residues']}"
-    )
+    style.field('Ambiguous residues', f"{quality['ambiguous_residues']}")
 
-    print(
-        f"Invalid residues:    "
-        f"{quality['invalid_residues']}"
-    )
+    style.field('Invalid residues', f"{quality['invalid_residues']}")
 
-    print(
-        f"Status:              "
-        f"{_protein_status_line(analysis)}"
-    )
+    style.field('Status', f"{_protein_status_line(analysis)}")
 
 
 def _protein_composition_block(analysis):
     properties = analysis["properties"]
 
-    print("COMPOSITION")
-    print(minor_rule())
+    style.section('COMPOSITION')
 
-    print(
-        f"Hydrophobic:         "
-        f"{properties['hydrophobic_percentage']:.2f}%"
-    )
+    style.field('Hydrophobic', f"{properties['hydrophobic_percentage']:.2f}%")
 
-    print(
-        f"Polar:                "
-        f"{properties['polar_percentage']:.2f}%"
-    )
+    style.field('Polar', f"{properties['polar_percentage']:.2f}%")
 
-    print(
-        f"Positive:             "
-        f"{properties['positive_percentage']:.2f}%"
-    )
+    style.field('Positive', f"{properties['positive_percentage']:.2f}%")
 
-    print(
-        f"Negative:             "
-        f"{properties['negative_percentage']:.2f}%"
-    )
+    style.field('Negative', f"{properties['negative_percentage']:.2f}%")
 
-    print(
-        f"Aromatic:             "
-        f"{properties['aromatic_percentage']:.2f}%"
-    )
+    style.field('Aromatic', f"{properties['aromatic_percentage']:.2f}%")
 
 
 def _protein_key_properties(analysis):
-    print("KEY PROPERTIES")
-    print(minor_rule())
+    style.section('KEY PROPERTIES')
 
     mw = analysis["molecular_weight"]
 
     if mw["ambiguous"]:
-        print(
-            f"Molecular weight:    "
-            f"{mw['min']:,.0f} - "
-            f"{mw['max']:,.0f} Da"
-        )
+        style.field('Molecular weight', f"{mw['min']:,.0f} - "
+            f"{mw['max']:,.0f} Da")
     else:
-        print(
-            f"Molecular weight:    "
-            f"{mw['min']:,.0f} Da"
-        )
+        style.field('Molecular weight', f"{mw['min']:,.0f} Da")
 
     if analysis["pI"] is not None:
-        print(
-            f"Theoretical pI:      "
-            f"{analysis['pI']:.2f}"
-        )
+        style.field('Theoretical pI', f"{analysis['pI']:.2f}")
 
     if analysis["gravy"] is not None:
         print(
@@ -3613,55 +3308,30 @@ def _protein_key_properties(analysis):
         )
 
     if analysis["instability_index"] is not None:
-        print(
-            f"Instability index:   "
-            f"{analysis['instability_index']:.2f}"
-        )
+        style.field('Instability index', f"{analysis['instability_index']:.2f}")
 
-    print(
-        f"Aliphatic index:     "
-        f"{analysis['aliphatic_index']:.2f}"
-    )
+    style.field('Aliphatic index', f"{analysis['aliphatic_index']:.2f}")
 
-    print(
-        f"Aromaticity:         "
-        f"{analysis['aromaticity']:.3f}"
-    )
+    style.field('Aromaticity', f"{analysis['aromaticity']:.3f}")
 
 
 def _translation_quality_block(translation):
-    print("TRANSLATION QUALITY")
-    print(minor_rule())
+    style.section('TRANSLATION QUALITY')
 
-    print(
-        f"Start codon:         "
-        f"{translation['start_codon'] or 'Not detected'}"
-    )
+    style.field('Start codon', f"{translation['start_codon'] or 'Not detected'}")
 
-    print(
-        f"Start detected:      "
-        f"{'Yes' if translation['start_codon'] else 'No'}"
-    )
+    style.field('Start detected', f"{'Yes' if translation['start_codon'] else 'No'}")
 
-    print(
-        f"Stop codon:          "
-        f"{translation['stop_codon'] if translation['stop_found'] else 'Not detected'}"
-    )
+    style.field('Stop codon', f"{translation['stop_codon'] if translation['stop_found'] else 'Not detected'}")
 
-    print(
-        f"Complete endpoint:   "
-        f"{'Yes' if translation['stop_found'] else 'No'}"
-    )
+    style.field('Complete endpoint', f"{'Yes' if translation['stop_found'] else 'No'}")
 
     print(
         f"Trailing nucleotides:"
         f" {translation['trailing_nucleotides']}"
     )
 
-    print(
-        f"Translation status:  "
-        f"{'Complete' if translation['stop_found'] else 'Partial'}"
-    )
+    style.field('Translation status', f"{'Complete' if translation['stop_found'] else 'Partial'}")
 
 
 def _safe_extinction_values(analysis):
@@ -3786,27 +3456,16 @@ def _print_protein_overview(
         orf_status=orf_status,
     )
 
-    print()
-    print("PROTEIN")
-    print(minor_rule())
+    style.section('PROTEIN')
 
-    print(
-        f"Length:              "
-        f"{analysis['length']} aa"
-    )
+    style.field('Length', f"{analysis['length']} aa")
 
-    print(
-        f"Sequence:            "
-        f"{analysis['protein']}"
-    )
+    style.field('Sequence', f"{analysis['protein']}")
 
     translation = analysis["translation"]
 
     if translation is not None:
-        print(
-            f"Translation:         "
-            f"{'Complete' if translation['stop_found'] else 'Partial'}"
-        )
+        style.field('Translation', f"{'Complete' if translation['stop_found'] else 'Partial'}")
 
     print()
     _protein_quality_block(
@@ -3823,21 +3482,15 @@ def _print_protein_overview(
         analysis
     )
 
-    print()
-    print("ANALYSIS QUALITY")
-    print(minor_rule())
+    style.section('ANALYSIS QUALITY')
 
     level, reason = _sequence_applicability(
         analysis["length"]
     )
 
-    print(
-        f"Applicability level: {level}"
-    )
+    style.field('Applicability level', f"{level}")
 
-    print(
-        f"Reason:              {reason}"
-    )
+    style.field('Reason', f"{reason}")
 
     if analysis["length"] < 30:
         print()
@@ -3875,36 +3528,21 @@ def _print_translation_and_sequence(analysis):
         )
 
     else:
-        print("TRANSLATION")
-        print(minor_rule())
+        style.section('TRANSLATION')
 
-        print(
-            f"Reading frame:       "
-            f"{_frame_display(translation['reading_frame'])}"
-        )
+        style.field('Reading frame', f"{_frame_display(translation['reading_frame'])}")
 
-        print(
-            f"First codon:         "
-            f"{translation['start_codon'] or 'N/A'}"
-        )
+        style.field('First codon', f"{translation['start_codon'] or 'N/A'}")
 
-        print(
-            f"AUG at start:        "
-            f"{'Yes' if translation['starts_with_aug'] else 'No'}"
-        )
+        style.field('AUG at start', f"{'Yes' if translation['starts_with_aug'] else 'No'}")
 
-        print(
-            f"Codons processed:    "
-            f"{translation['codons_processed']}"
-        )
+        style.field('Codons processed', f"{translation['codons_processed']}")
 
         _translation_quality_block(
             translation
         )
 
-        print()
-        print("CODON TRANSLATION")
-        print(minor_rule())
+        style.section('CODON TRANSLATION')
 
         for record in translation[
             "codon_records"
@@ -3939,9 +3577,7 @@ def _print_translation_and_sequence(analysis):
                 f"{result}"
             )
 
-    print()
-    print("PROTEIN SEQUENCE")
-    print(minor_rule())
+    style.section('PROTEIN SEQUENCE')
 
     sequence = analysis[
         "protein"
@@ -3964,9 +3600,8 @@ def _print_translation_and_sequence(analysis):
             f"{sequence[start:end]}"
         )
 
-    print(
-        f"\nLength: {len(sequence)} aa"
-    )
+    print()
+    style.field('Length', f"{len(sequence)} aa")
 
     print()
     _protein_limitations_block(
@@ -4027,19 +3662,11 @@ def _print_amino_acid_composition(analysis):
 
     print(minor_rule())
 
-    print(
-        f"Resolved residues:   "
-        f"{composition['resolved_length']}"
-    )
+    style.field('Resolved residues', f"{composition['resolved_length']}")
 
-    print(
-        f"Unresolved residues: "
-        f"{composition['ambiguous_count']}"
-    )
+    style.field('Unresolved residues', f"{composition['ambiguous_count']}")
 
-    print()
-    print("COMPOSITION GROUPS")
-    print(minor_rule())
+    style.section('COMPOSITION GROUPS')
 
     _protein_composition_block(
         analysis
@@ -4062,21 +3689,12 @@ def _print_amino_acid_composition(analysis):
         ]
 
         print()
-        print(
-            f"Most abundant residue: "
-            f"{residue} ({name})"
-        )
+        style.field('Most abundant residue', f"{residue} ({name})")
 
-        print(
-            f"Occurrences:           "
-            f"{count} / "
-            f"{composition['resolved_length']}"
-        )
+        style.field('Occurrences', f"{count} / "
+            f"{composition['resolved_length']}")
 
-        print(
-            f"Relative abundance:    "
-            f"{percent:.2f}%"
-        )
+        style.field('Relative abundance', f"{percent:.2f}%")
 
     print()
     _protein_limitations_block(
@@ -4099,33 +3717,20 @@ def _print_physicochemical_structural(analysis):
         analysis
     )
 
-    print()
-    print("MOLECULAR PROPERTIES")
-    print(minor_rule())
+    style.section('MOLECULAR PROPERTIES')
 
     _protein_key_properties(
         analysis
     )
 
     print()
-    print(
-        f"Hydropathy:          "
-        f"{_hydropathy_interpretation(analysis['gravy'])}"
-    )
+    style.field('Hydropathy', f"{_hydropathy_interpretation(analysis['gravy'])}")
 
-    print(
-        f"Charge:              "
-        f"{_charge_interpretation(analysis)}"
-    )
+    style.field('Charge', f"{_charge_interpretation(analysis)}")
 
-    print(
-        f"Stability:           "
-        f"{_stability_interpretation(analysis)}"
-    )
+    style.field('Stability', f"{_stability_interpretation(analysis)}")
 
-    print()
-    print("CHARGE PROFILE")
-    print(minor_rule())
+    style.section('CHARGE PROFILE')
 
     for ph, charge in analysis[
         "charges"
@@ -4135,9 +3740,7 @@ def _print_physicochemical_structural(analysis):
             f"{charge:+.2f}"
         )
 
-    print()
-    print("EXTINCTION COEFFICIENT")
-    print(minor_rule())
+    style.section('EXTINCTION COEFFICIENT')
 
     extinction, reduced, oxidized = (
         _safe_extinction_values(
@@ -4145,82 +3748,40 @@ def _print_physicochemical_structural(analysis):
         )
     )
 
-    print(
-        "Wavelength:          280 nm"
-    )
+    style.field('Wavelength', "280 nm")
 
-    print(
-        f"Tryptophan:          "
-        f"{extinction['tryptophan']}"
-    )
+    style.field('Tryptophan', f"{extinction['tryptophan']}")
 
-    print(
-        f"Tyrosine:            "
-        f"{extinction['tyrosine']}"
-    )
+    style.field('Tyrosine', f"{extinction['tyrosine']}")
 
-    print(
-        f"Cysteine:            "
-        f"{extinction['cysteine']}"
-    )
+    style.field('Cysteine', f"{extinction['cysteine']}")
 
-    print(
-        f"All Cys reduced:     "
-        f"{reduced} M^-1 cm^-1"
-    )
+    style.field('All Cys reduced', f"{reduced} M^-1 cm^-1")
 
-    print(
-        f"Max. disulfide form: "
-        f"{oxidized} M^-1 cm^-1"
-    )
+    style.field('Max. disulfide form', f"{oxidized} M^-1 cm^-1")
 
-    print(
-        f"Disulfide pairs:     "
-        f"{extinction['disulfide_pairs']}"
-    )
+    style.field('Disulfide pairs', f"{extinction['disulfide_pairs']}")
 
     if extinction["unpaired_cysteine"]:
-        print(
-            "Unpaired cysteine:   "
-            "1"
-        )
+        style.field('Unpaired cysteine', "1")
 
-    print()
-    print("SECONDARY STRUCTURE SCREENING")
-    print(minor_rule())
+    style.section('SECONDARY STRUCTURE SCREENING')
 
     secondary = analysis[
         "secondary_structure"
     ]
 
-    print(
-        f"Helix propensity:    "
-        f"{secondary['helix']:.3f}"
-    )
+    style.field('Helix propensity', f"{secondary['helix']:.3f}")
 
-    print(
-        f"Turn propensity:     "
-        f"{secondary['turn']:.3f}"
-    )
+    style.field('Turn propensity', f"{secondary['turn']:.3f}")
 
-    print(
-        f"Sheet propensity:    "
-        f"{secondary['sheet']:.3f}"
-    )
+    style.field('Sheet propensity', f"{secondary['sheet']:.3f}")
 
-    print(
-        "Interpretation:      "
-        "Chou-Fasman sequence propensity"
-    )
+    style.field('Interpretation', "Chou-Fasman sequence propensity")
 
-    print(
-        "Limitation:          "
-        "Not a 3D structure prediction"
-    )
+    style.field('Limitation', "Not a 3D structure prediction")
 
-    print()
-    print("HYDROPHOBIC REGION SCREENING")
-    print(minor_rule())
+    style.section('HYDROPHOBIC REGION SCREENING')
 
     regions = analysis[
         "hydrophobic_regions"
@@ -4243,9 +3804,7 @@ def _print_physicochemical_structural(analysis):
             "No strongly hydrophobic windows detected."
         )
 
-    print()
-    print("TRANSMEMBRANE SCREENING")
-    print(minor_rule())
+    style.section('TRANSMEMBRANE SCREENING')
 
     tm_domains = analysis[
         "transmembrane_domains"
@@ -4264,19 +3823,11 @@ def _print_physicochemical_structural(analysis):
                 f"{domain['hydropathy']:+.2f}"
             )
     else:
-        print(
-            "Prediction:          "
-            "No strong TM-like region detected"
-        )
+        style.field('Prediction', "No strong TM-like region detected")
 
-    print(
-        "Method:              "
-        "Sequence-only heuristic"
-    )
+    style.field('Method', "Sequence-only heuristic")
 
-    print()
-    print("SIGNAL PEPTIDE SCREENING")
-    print(minor_rule())
+    style.section('SIGNAL PEPTIDE SCREENING')
 
     signal = analysis[
         "signal_peptide"
@@ -4285,29 +3836,15 @@ def _print_physicochemical_structural(analysis):
     if signal[
         "predicted"
     ]:
-        print(
-            "Prediction:          "
-            "Possible N-terminal signal peptide"
-        )
+        style.field('Prediction', "Possible N-terminal signal peptide")
 
-        print(
-            f"Heuristic evidence:  "
-            f"{signal['evidence']}"
-        )
+        style.field('Heuristic evidence', f"{signal['evidence']}")
     else:
-        print(
-            "Prediction:          "
-            "No convincing pattern"
-        )
+        style.field('Prediction', "No convincing pattern")
 
-    print(
-        "Method:              "
-        "Sequence-only heuristic"
-    )
+    style.field('Method', "Sequence-only heuristic")
 
-    print()
-    print("FLEXIBILITY SCREENING")
-    print(minor_rule())
+    style.section('FLEXIBILITY SCREENING')
 
     flexibility = analysis[
         "flexibility"
@@ -4319,20 +3856,11 @@ def _print_physicochemical_structural(analysis):
             for entry in flexibility
         ]
 
-        print(
-            f"Average:             "
-            f"{sum(scores) / len(scores):.3f}"
-        )
+        style.field('Average', f"{sum(scores) / len(scores):.3f}")
 
-        print(
-            f"Minimum:             "
-            f"{min(scores):.3f}"
-        )
+        style.field('Minimum', f"{min(scores):.3f}")
 
-        print(
-            f"Maximum:             "
-            f"{max(scores):.3f}"
-        )
+        style.field('Maximum', f"{max(scores):.3f}")
     else:
         print(
             "Sequence too short for "
@@ -4365,12 +3893,9 @@ def _print_complete_protein_report(
         "COMPLETE PROTEIN REPORT"
     )
 
-    print("1. INPUT")
-    print(minor_rule())
+    style.section('1. INPUT')
 
-    print(
-        f"Source:              {source}"
-    )
+    style.field('Source', f"{source}")
 
     if orf_id is not None:
         print(
@@ -4378,34 +3903,20 @@ def _print_complete_protein_report(
         )
 
     if orf_length is not None:
-        print(
-            f"ORF length:          {orf_length} bp"
-        )
+        style.field('ORF length', f"{orf_length} bp")
 
     if strand is not None:
-        print(
-            f"Strand:              {strand}"
-        )
+        style.field('Strand', f"{strand}")
 
     if reading_frame is not None:
-        print(
-            f"Reading frame:       "
-            f"{_frame_display(reading_frame)}"
-        )
+        style.field('Reading frame', f"{_frame_display(reading_frame)}")
 
     if orf_status is not None:
-        print(
-            f"ORF status:          {orf_status}"
-        )
+        style.field('ORF status', f"{orf_status}")
 
-    print(
-        f"Protein length:      "
-        f"{analysis['length']} aa"
-    )
+    style.field('Protein length', f"{analysis['length']} aa")
 
-    print()
-    print("2. TRANSLATION")
-    print(minor_rule())
+    style.section('2. TRANSLATION')
 
     translation = analysis[
         "translation"
@@ -4416,52 +3927,30 @@ def _print_complete_protein_report(
             "Translation context: Not supplied"
         )
     else:
-        print(
-            f"Reading frame:       "
-            f"{_frame_display(translation['reading_frame'])}"
-        )
+        style.field('Reading frame', f"{_frame_display(translation['reading_frame'])}")
 
-        print(
-            f"Start codon:         "
-            f"{translation['start_codon'] or 'Not detected'}"
-        )
+        style.field('Start codon', f"{translation['start_codon'] or 'Not detected'}")
 
-        print(
-            f"Stop codon:          "
-            f"{translation['stop_codon'] if translation['stop_found'] else 'Not detected'}"
-        )
+        style.field('Stop codon', f"{translation['stop_codon'] if translation['stop_found'] else 'Not detected'}")
 
-        print(
-            f"Complete endpoint:   "
-            f"{'Yes' if translation['stop_found'] else 'No'}"
-        )
+        style.field('Complete endpoint', f"{'Yes' if translation['stop_found'] else 'No'}")
 
-        print(
-            f"Translation status:  "
-            f"{'Complete' if translation['stop_found'] else 'Partial'}"
-        )
+        style.field('Translation status', f"{'Complete' if translation['stop_found'] else 'Partial'}")
 
         print(
             f"Trailing nucleotides:"
             f" {translation['trailing_nucleotides']}"
         )
 
-    print(
-        f"Protein sequence:    "
-        f"{analysis['protein']}"
-    )
+    style.field('Protein sequence', f"{analysis['protein']}")
 
-    print()
-    print("3. SEQUENCE QUALITY")
-    print(minor_rule())
+    style.section('3. SEQUENCE QUALITY')
 
     _protein_quality_block(
         analysis
     )
 
-    print()
-    print("4. COMPOSITION")
-    print(minor_rule())
+    style.section('4. COMPOSITION')
 
     _protein_composition_block(
         analysis
@@ -4479,85 +3968,46 @@ def _print_complete_protein_report(
             key=lambda item: item[1]
         )
 
-        print(
-            f"Most abundant residue: "
-            f"{residue} "
-            f"({AMINO_ACIDS[residue]['name']})"
-        )
+        style.field('Most abundant residue', f"{residue} "
+            f"({AMINO_ACIDS[residue]['name']})")
 
-        print(
-            f"Occurrences:           "
-            f"{count}"
-        )
+        style.field('Occurrences', f"{count}")
 
-    print()
-    print("5. PHYSICOCHEMISTRY")
-    print(minor_rule())
+    style.section('5. PHYSICOCHEMISTRY')
 
     _protein_key_properties(
         analysis
     )
 
-    print(
-        f"Hydropathy:          "
-        f"{_hydropathy_interpretation(analysis['gravy'])}"
-    )
+    style.field('Hydropathy', f"{_hydropathy_interpretation(analysis['gravy'])}")
 
-    print(
-        f"Charge:              "
-        f"{_charge_interpretation(analysis)}"
-    )
+    style.field('Charge', f"{_charge_interpretation(analysis)}")
 
-    print(
-        f"Stability:           "
-        f"{_stability_interpretation(analysis)}"
-    )
+    style.field('Stability', f"{_stability_interpretation(analysis)}")
 
-    print()
-    print("6. STRUCTURAL SCREENING")
-    print(minor_rule())
+    style.section('6. STRUCTURAL SCREENING')
 
     secondary = analysis[
         "secondary_structure"
     ]
 
-    print(
-        f"Helix propensity:    "
-        f"{secondary['helix']:.3f}"
-    )
+    style.field('Helix propensity', f"{secondary['helix']:.3f}")
 
-    print(
-        f"Turn propensity:     "
-        f"{secondary['turn']:.3f}"
-    )
+    style.field('Turn propensity', f"{secondary['turn']:.3f}")
 
-    print(
-        f"Sheet propensity:    "
-        f"{secondary['sheet']:.3f}"
-    )
+    style.field('Sheet propensity', f"{secondary['sheet']:.3f}")
 
-    print(
-        f"TM-like regions:     "
-        f"{len(analysis['transmembrane_domains'])}"
-    )
+    style.field('TM-like regions', f"{len(analysis['transmembrane_domains'])}")
 
     signal = analysis[
         "signal_peptide"
     ]
 
-    print(
-        f"Signal peptide:      "
-        f"{'Possible' if signal['predicted'] else 'Not detected'}"
-    )
+    style.field('Signal peptide', f"{'Possible' if signal['predicted'] else 'Not detected'}")
 
-    print(
-        "Structural method:   "
-        "Sequence-level heuristics"
-    )
+    style.field('Structural method', "Sequence-level heuristics")
 
-    print()
-    print("7. EXTINCTION COEFFICIENT")
-    print(minor_rule())
+    style.section('7. EXTINCTION COEFFICIENT')
 
     extinction, reduced, oxidized = (
         _safe_extinction_values(
@@ -4565,63 +4015,32 @@ def _print_complete_protein_report(
         )
     )
 
-    print(
-        "Wavelength:          280 nm"
-    )
+    style.field('Wavelength', "280 nm")
 
-    print(
-        f"Tryptophan:          "
-        f"{extinction['tryptophan']}"
-    )
+    style.field('Tryptophan', f"{extinction['tryptophan']}")
 
-    print(
-        f"Tyrosine:            "
-        f"{extinction['tyrosine']}"
-    )
+    style.field('Tyrosine', f"{extinction['tyrosine']}")
 
-    print(
-        f"Cysteine:            "
-        f"{extinction['cysteine']}"
-    )
+    style.field('Cysteine', f"{extinction['cysteine']}")
 
-    print(
-        f"All Cys reduced:     "
-        f"{reduced} M^-1 cm^-1"
-    )
+    style.field('All Cys reduced', f"{reduced} M^-1 cm^-1")
 
-    print(
-        f"Max. disulfide form: "
-        f"{oxidized} M^-1 cm^-1"
-    )
+    style.field('Max. disulfide form', f"{oxidized} M^-1 cm^-1")
 
-    print(
-        f"Disulfide pairs:     "
-        f"{extinction['disulfide_pairs']}"
-    )
+    style.field('Disulfide pairs', f"{extinction['disulfide_pairs']}")
 
     if extinction["unpaired_cysteine"]:
-        print(
-            "Unpaired cysteine:   "
-            "1"
-        )
+        style.field('Unpaired cysteine', "1")
 
-    print()
-    print("8. INTERPRETATION")
-    print(minor_rule())
+    style.section('8. INTERPRETATION')
 
     level, reason = _sequence_applicability(
         analysis["length"]
     )
 
-    print(
-        f"Applicability level: "
-        f"{level}"
-    )
+    style.field('Applicability level', f"{level}")
 
-    print(
-        f"Reason:              "
-        f"{reason}"
-    )
+    style.field('Reason', f"{reason}")
 
     print()
     print(
@@ -4646,22 +4065,14 @@ def _print_complete_protein_report(
 
 def _protein_ui_menu():
 
-    print()
-    print(major_rule())
-    print("PROTEIN ANALYSIS MENU")
-    print(major_rule())
+    style.header('PROTEIN ANALYSIS')
 
-    print()
-    print("[1] Protein Overview")
-    print("[2] Translation & Sequence")
-    print("[3] Amino Acid Composition")
-    print("[4] Physicochemical & Structural Properties")
-    print("[5] Complete Protein Report")
-
-    print()
-    print("[0] Back")
-
-    print(minor_rule())
+    style.menu([
+        ("Overview", [('1', 'Protein Overview'), ('2', 'Translation & Sequence')]),
+        ("Analysis", [('3', 'Amino Acid Composition'),
+                      ('4', 'Physicochemical & Structural Properties')]),
+        ("Report", [('5', 'Complete Protein Report')]),
+    ])
 
 
 # ============================================================
@@ -4728,9 +4139,7 @@ def protein_analysis_menu(
             "PROTEIN ANALYSIS ERROR"
         )
 
-        print(
-            "No resolvable protein sequence is available."
-        )
+        style.note("No resolvable protein sequence is available.")
 
         _protein_ui_pause()
 
@@ -4759,9 +4168,7 @@ def protein_analysis_menu(
 
         _protein_ui_menu()
 
-        selection = input(
-            "Selection: "
-        ).strip()
+        selection = style.ask_choice()
 
         if selection == "0":
             return
@@ -4820,11 +4227,7 @@ def protein_analysis_menu(
 
         else:
 
-            print()
-            print(
-                "Invalid selection. "
-                "Please choose 0-5."
-            )
+            style.invalid_selection()
 
 
 # ============================================================

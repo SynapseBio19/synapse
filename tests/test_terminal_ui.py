@@ -248,6 +248,15 @@ def render_first_screen(module, answers=("0",)):
         "literature": lambda: __import__("analyses.literature", fromlist=["x"])._interactive_menu(),
         "primer": lambda: __import__("analyses.primer", fromlist=["x"]).run_primer_analysis_ui(dna, "demo"),
         "variant_analysis": lambda: __import__("analyses.variant_analysis", fromlist=["x"]).run_variant_analysis_ui(),
+        "rna": lambda: __import__("analyses.rna", fromlist=["x"]).run_rna_analysis_ui(dna, header="demo"),
+        "protein": lambda: __import__("analyses.protein", fromlist=["x"]).run_protein_analysis_from_record(
+            "MKTAYIAKQRQISFVKSHFSRQLEERLGLIEVQAPILSRVGDGTQDNLSGAEKAVQVKVKALPDAQFEVVHSLAKWKRQTLGQHDFSAGEGLYTHMKALRPDEDRLSPLHSVYVDQWDWERVMGDGERQFSTLKSTVEAIWAGIKATEAAVSEEFGLAPFLPDQIHFVHSQELLSRYPDLDAKGRERAIAKDLGAVFLVGIGGKLSDGHRHDVRAPDYDDWUAAEERNWLGAMLGRSAL",
+            name="demo"),
+        "restriction": lambda: __import__("analyses.restriction", fromlist=["x"]).run_restriction_cloning_ui(
+            dna, "demo", [{"header": "demo", "sequence": dna, "topology": "linear"}]),
+        "mutation": lambda: __import__("analyses.mutation", fromlist=["x"]).run_mutation_variant_ui(
+            dna, "demo", [{"header": "demo", "sequence": dna}]),
+        "menu": lambda: __import__("ui.menu", fromlist=["x"]).show_menu(),
     }
     buffer = io.StringIO()
     logging.disable(logging.CRITICAL)
