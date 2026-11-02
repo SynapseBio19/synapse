@@ -1475,11 +1475,17 @@ list when it is created, without duplicates. Every path that stores a
 result uses it, so the API and the menus agree, and the payload and its
 `data_sha256` are unchanged.
 
-Measured and left as recorded follow-up: results stored from the menus
-for sequence overview, restriction and cloning record no parameters (the
-API path records topology, enzymes and the other inputs). Supplying them
-needs each module's parameters named explicitly rather than guessed from
-the payload.
+Measured at the same time: results stored from the menus for sequence
+overview, restriction and cloning recorded no parameters, while the API
+path records topology, enzymes and the other inputs, and neither path
+recorded which version of the enzyme definitions was used. Restriction
+results from the menu now record `enzymes` and `topology`, named
+explicitly from the analysis result, and restriction and cloning results
+on both paths record `enzyme_database_version`
+(`data/restriction_enzymes.py`, currently `synapse-2026-10-29`). The
+menu-path sequence overview and cloning analysis still record no input
+parameters; that remains follow-up work, because naming them means
+choosing per module which inputs matter rather than copying the payload.
 
-Tests: 2 new (`ExportedWarningsTests`), both failing on the previous
+Tests: 3 new (`ExportedWarningsTests`), each failing on the previous
 code.

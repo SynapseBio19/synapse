@@ -1170,6 +1170,24 @@ class ExportedWarningsTests(unittest.TestCase):
         self.assertEqual(result.warnings, ["W0", "W1", "W2"])
         self.assertEqual(AnalysisResult(module="x", data={"value": 1}).warnings, [])
 
+    def test_restriction_results_record_parameters_and_enzyme_data_version(self):
+        from analyses.restriction import analyze_restriction
+        from core import api
+        from core.pipeline import SynapsePipeline
+        from data.restriction_enzymes import ENZYME_DATABASE_VERSION
+        from tests._support import deterministic_dna
+        sequence = deterministic_dna(600)
+        pipeline = SynapsePipeline(sequence=sequence, header="x")
+        pipeline.context.store_restriction_analysis(
+            analyze_restriction(sequence, ["EcoRI", "BamHI"], "linear"))
+        latest = pipeline.context.latest("restriction")
+        assert latest is not None
+        stored = latest.parameters
+        self.assertEqual(stored, {"enzymes": ["EcoRI", "BamHI"], "topology": "linear",
+                                  "enzyme_database_version": ENZYME_DATABASE_VERSION})
+        digest = api.restriction_digest(sequence, ["EcoRI"])
+        self.assertEqual(digest.parameters["enzyme_database_version"], ENZYME_DATABASE_VERSION)
+
 
 if __name__ == "__main__":
     unittest.main()

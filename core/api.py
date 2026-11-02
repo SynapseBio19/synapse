@@ -46,6 +46,11 @@ def _result(module: str, data: Any, sequence: str, description: str, *,
     )
 
 
+def _enzyme_database_version() -> str:
+    from data.restriction_enzymes import ENZYME_DATABASE_VERSION
+    return ENZYME_DATABASE_VERSION
+
+
 def _sequence_of(record_or_sequence: Any, *, accepted: Sequence[str] = _NUCLEOTIDE,
                  sequence_type: Optional[str] = None,
                  context: str = "This analysis") -> tuple[str, str, str, List[str]]:
@@ -213,7 +218,8 @@ def restriction_digest(record_or_sequence: Any, enzymes: Sequence[str], *,
                           include_possible=include_possible)
     return _result("restriction", data, sequence, description,
                    parameters={"enzymes": list(enzymes), "topology": topology,
-                               "include_possible": include_possible},
+                               "include_possible": include_possible,
+                               "enzyme_database_version": _enzyme_database_version()},
                    warnings=warnings,
                    limitations=["Methylation notes are informational; blocking by methylation and star activity are not modelled."])
 
@@ -374,7 +380,8 @@ def plan_cloning(vector: Any, insert: Any, enzymes: Optional[Sequence[str]] = No
     return _result("cloning", data, vector_sequence, f"{vector_name} + {insert_name}",
                    parameters={"enzymes": list(enzymes) if enzymes else None, "top_n": top_n,
                                "vector_topology": vector_topology,
-                               "insert_topology": insert_topology},
+                               "insert_topology": insert_topology,
+                               "enzyme_database_version": _enzyme_database_version()},
                    warnings=list(dict.fromkeys(vector_warnings + insert_warnings)),
                    limitations=[
                        "Strategies are sequence-level; they do not model ligation "

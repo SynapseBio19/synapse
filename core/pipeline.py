@@ -21,6 +21,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
 from core.models import AnalysisResult, SequenceRecord, sha256_text
+from data.restriction_enzymes import ENZYME_DATABASE_VERSION
 
 logger = logging.getLogger("synapse.pipeline")
 
@@ -315,7 +316,11 @@ class PipelineContext:
     ):
         self.restriction_analysis = result
         self.completed["restriction"] = True
-        self.store("restriction", result)
+        parameters: Dict[str, Any] = {"enzyme_database_version": ENZYME_DATABASE_VERSION}
+        if isinstance(result, dict):
+            parameters["enzymes"] = list(result.get("enzymes") or [])
+            parameters["topology"] = result.get("topology")
+        self.store("restriction", result, parameters=parameters)
 
     # ========================================================
     # CLONING
@@ -327,7 +332,8 @@ class PipelineContext:
     ):
         self.cloning_analysis = result
         self.completed["cloning"] = True
-        self.store("cloning", result)
+        self.store("cloning", result,
+                   parameters={"enzyme_database_version": ENZYME_DATABASE_VERSION})
 
     def store_cloning_planner(
         self,
@@ -335,7 +341,8 @@ class PipelineContext:
     ):
         self.cloning_planner = result
         self.completed["cloning"] = True
-        self.store("cloning", result, parameters={"mode": "automatic planner"})
+        self.store("cloning", result, parameters={"mode": "automatic planner",
+                                                "enzyme_database_version": ENZYME_DATABASE_VERSION})
 
     # ========================================================
     # PRIMER (called by analyses.primer UI)
