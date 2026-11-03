@@ -530,10 +530,10 @@ def _leading_text(node):
     if isinstance(node, ast.JoinedStr):
         text = ""
         for part in node.values:
-            if isinstance(part, ast.Constant):
-                text += part.value
-            else:
+            if isinstance(part, ast.FormattedValue):
                 return text, part.value
+            if isinstance(part, ast.Constant):
+                text += str(part.value)
         return text, None
     if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add):
         return _leading_text(node.left)
