@@ -429,14 +429,14 @@ RNA, protein, restriction, cloning, mutation and `core/pipeline.py`.
 | 1. Shared renderers unused | All files use them: 779 `field`, 172 `section`, 142 `field_line`, 102 `header`, 36 `menu`, 74 `ask`, 31 `ask_choice`, 58 `pause`, 7 `confirm`, 17 `columns`, and 168 message helpers. |
 | 2. Local helpers | Also removed: `_cloning_ui_print_header`/`_footer`, `_protein_ui_header`. |
 | 3. Titles | Each menu carries its main-menu name ("MAIN MENU", "RNA ANALYSIS", "PROTEIN ANALYSIS", "RESTRICTION & CLONING ANALYSIS", ...); no "SYNAPSE" prefix anywhere. |
-| 4./5. Headings, fields | Upper-case sections and values at column 24 in every screen, including the sequence overview, the pipeline status and the text reports of CRISPR, BLAST, primer, variant, literature and mutation. |
+| 4./5. Headings, fields | Upper-case sections and values at column 24 in the converted screens (19 headings were still printed directly, see section 12), including the sequence overview, the pipeline status and the text reports of CRISPR, BLAST, primer, variant, literature and mutation. |
 | 6. Prompts | `Selection:` in every menu; 52 value prompts through `ask()`. |
 | 7. Menu frame | One footer everywhere; the sequence selector and the mutation sequence prompt, which cannot be left, offer no `[0]` through `menu(zero=None)`. |
-| 8. Messages | Categories throughout; the checkmark lines ("✓ ...") are `OK:` messages. |
+| 8. Messages | Categories for the messages the passes recognized (31 uncategorized ones remained, see section 12); the checkmark lines ("✓ ...") are `OK:` messages. |
 | 9. Invalid selection | One reply in every menu ("Please choose 0-5" and similar variants removed). |
 | 10. Confirmation | All six yes/no questions through `confirm()` (`[y/N]`/`[Y/n]`). |
 | 11./12. Tables | One `columns()` definition per table. Four tables were misaligned and are fixed: BLAST database status (Status 42 vs 24 columns), CRISPR guide list (position column), both protein composition tables (3L column); BLAST hits, restriction enzymes and taxonomy now fit the 70-column rule. |
-| 13. Tests | `RenderedScreenTests` render all eleven menus, the sequence overview and the pipeline status; the source rule covers all sixteen files; a numbering test checks the variant order. They give 11 failures on the code before this round. |
+| 13. Tests | `RenderedScreenTests` render the first screen of all eleven menus, the sequence overview and the pipeline status; the source rule covers all sixteen files; a numbering test checks the variant order. They give 11 failures on the code before this round. |
 
 Variant menu (requirement 4 of the owner's instruction): reordered to the
 5.3 sequence (normalization [3] and filtering [4] before statistics [5]
@@ -451,12 +451,54 @@ Also corrected on the way:
 - **A message.** The ORF hand-over said the RNA codon view uses the
   standard code, which has been untrue since P1-9.
 
-**Verdict.** With this round, Stage F is implemented as a unified
-interface: every screen, menu, prompt, message, table and text report
-of the sixteen interface files goes through `ui/style.py`, and the
-rendered result is tested. What still prints itself is listed, with
-its reason, in `TERMINAL_UI_STANDARD.md` section 9: raw line input, two
-numeric helpers, closing rules, analysis result lines, the documented
-mutation deviation, the pipeline's printing from `core/`, and menus
-living inside the analysis modules (P2-2). Each is a stated exception,
-not an inconsistency.
+**Verdict as first written, corrected by the closing review.** This
+paragraph originally said that Stage F was "implemented as a unified
+interface" and that "every screen, menu, prompt, message, table and
+text report" went through `ui/style.py`. That overstated the result.
+
+The independent closing review (`docs/STAGE_F_FINAL_REVIEW.md`,
+2026-11-03) measured the following:
+
+- **Adoption.** All sixteen files use the shared renderers. But 59
+  direct prints remained, and none of them was documented:
+  - 31 validation or status messages without a category;
+  - 19 upper-case headings printed directly;
+  - 9 dynamic option lists (`print(f"[{i}] ...")`) in BLAST and CRISPR.
+- **Test coverage.** The rendered tests drive the first screen of every
+  menu, which is 17 of the 38 `style.menu` call sites. The source rule
+  matched literal keys only.
+- **Behavior.** It was not preserved from round 1 until `1516339`
+  (section 12 below).
+- **`core/pipeline.py`.** It still depends on `ui/` at call time. The
+  function-local imports only defer the dependency.
+
+The state after this round is a broad adoption of the shared renderers,
+not yet a unified interface. Section 12 records what followed.
+
+## 12. Enter regression and closing review (2026-11-03)
+
+**Enter regression (`1516339`).** The rewriting pass had turned
+`Label [hint]: ` prompts into `ask(label, default=hint)`, so Enter
+returned the hint text instead of an empty answer. Fifteen prompts were
+affected; four dialogs broke:
+
+- the literature dates;
+- the primer conditions;
+- the BLAST word size and filter;
+- the cloning strategy count, which looped endlessly.
+
+The defect came in with `5cb4c9a`, `b181ae3`, `fb4070a` and `85c22ac`.
+Until `1516339` the claim "the workflow is preserved" was false for
+those dialogs. `EmptyAnswerTests` now drive them with an empty answer.
+
+**Closing review.** `docs/STAGE_F_FINAL_REVIEW.md` checks the history
+`623a0a8..1516339` and records the open points:
+
+- the 59 direct prints;
+- the deferred core→ui dependency;
+- the stale menu numbers in `FEATURE_STATUS.md`;
+- the test coverage (17 of 38 menus).
+
+The owner released its recommendations 1–3: correct the claims,
+convert the 59 prints, and correct `FEATURE_STATUS.md`. Recommendations
+4 (core/ui) and 5 (full menu coverage) are deferred.

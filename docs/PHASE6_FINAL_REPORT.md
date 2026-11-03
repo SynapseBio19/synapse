@@ -53,10 +53,15 @@ Python 3.10 blocker in Stage I.
 - Architecture: one input contract for menu and API; `core/api.py`
   covers every analysis without keyboard input; one shared presentation
   module (`ui/style.py`); the superseded primer generations are gone.
-- Interface and language: since the Stage F completion every screen,
-  menu, prompt, yes/no question, message, table and text report of the
-  sixteen interface files is drawn by the shared renderers in
-  `ui/style.py` and tested as rendered; one message prefix per category, one
+- Interface and language: Stage F first standardized the rules, the `[0]`
+  meanings and the message prefixes only (partial standardization). The
+  two completion rounds then put all sixteen interface files on the
+  shared renderers in `ui/style.py`. The closing review
+  (`docs/STAGE_F_FINAL_REVIEW.md`) still found 59 direct prints: 31
+  messages, 19 headings and 9 dynamic option lists. It also found that
+  rendered tests reach 17 of the 38 menus, and that the behavior of the
+  converted dialogs was not preserved until `1516339`: Enter on
+  bracketed prompts returned the hint. One message prefix per category, one
   notation per unit, 1-based positions everywhere a user sees them, and a
   style guide whose mechanical rules the test suite enforces.
 - Evidence: 314 tests (109 at the end of the previous cycle), including
@@ -224,8 +229,20 @@ deliberate violations). The Stage F re-examination
 `[0]` and prefixes only and that no module used the shared renderers;
 the six modules named there were then converted and are checked as
 rendered screens (`RenderedScreenTests`); a second round converted the
-remaining ten interface files, so all sixteen use them and all eleven
-menus are tested as rendered. **Remaining exceptions**, each with its
+remaining ten interface files, so all sixteen use them and the first
+screens of all eleven menus are tested as rendered.
+
+The closing review (`docs/STAGE_F_FINAL_REVIEW.md`) corrected the claim
+that every screen, menu and message went through `ui/style.py`. It also
+corrected the claim that the dialogs behaved as before:
+
+- 59 direct prints remained, none of them documented: 31 messages, 19
+  headings and 9 dynamic option lists.
+- Rendered tests reach 17 of the 38 `style.menu` call sites.
+- From round 1 to `1516339`, Enter on 15 bracketed prompts returned the
+  hint text instead of an empty answer.
+
+**Remaining exceptions**, each with its
 reason in `TERMINAL_UI_STANDARD.md` section 9: raw line input, two
 CRISPR numeric helpers, closing rules, analysis result lines; the mutation
 module's sequence prompt offers no `[0]` (a cancel needs a control-flow

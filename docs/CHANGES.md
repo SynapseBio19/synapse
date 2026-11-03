@@ -1906,6 +1906,25 @@ this round they give 11 failures. The extended tests found what the
 passes had left: the protein module's own header helper and four
 "SYNAPSE ... SELF-TEST" titles, fixed in `7970e5a`. Suite 322/322.
 
+**Correction (closing review, 2026-11-03).** The summary above
+overstated round 2 in two points:
+
+- **"Data, API, golden master and the scientific results are
+  unchanged" is true, but the workflow was not.** From round 1 until
+  `1516339`, Enter on fifteen bracketed prompts returned the hint text
+  (next entry).
+- **"All sixteen files on the shared renderers" is true for adoption,
+  not for completeness.** 59 direct prints remained, none of them
+  documented:
+  - 31 messages without a category;
+  - 19 headings printed directly;
+  - 9 dynamic option lists in BLAST and CRISPR.
+
+  The rendered tests drive the first screen of each menu: 17 of the
+  38 `style.menu` call sites.
+
+`docs/STAGE_F_FINAL_REVIEW.md` has the measurements.
+
 ### Fix: pressing Enter in six dialogs broke them (Stage F regression, 2026-11-03)
 
 Reported by the owner: a literature search never ran. The Stage F
