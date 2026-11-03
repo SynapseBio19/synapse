@@ -4442,9 +4442,8 @@ def _cloning_ui_select_two_distinct_enzymes():
             return None, None
 
         if second == first:
-            print(
-                "\nThe two enzymes must be different."
-            )
+            print()
+            style.error("The two enzymes must be different.")
             continue
 
         return first, second
@@ -4634,9 +4633,8 @@ def _cloning_ui_select_two_enzyme_architecture(
         return None, None
 
     if right_enzyme == left_enzyme:
-        print(
-            "\nThe two enzymes must be different."
-        )
+        print()
+        style.error("The two enzymes must be different.")
         style.pause()
         return _cloning_ui_select_two_enzyme_architecture(
             molecule_name

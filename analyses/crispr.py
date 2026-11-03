@@ -2515,7 +2515,7 @@ def crispr_menu(
                     elif lower.endswith(".fasta") or lower.endswith(".fa"):
                         exported = export_guides_fasta(last_result, path)
                     else:
-                        print("Use .json, .csv or .fasta/.fa extension.")
+                        style.error("Use .json, .csv or .fasta/.fa extension.")
                         continue
                     style.success(f"Exported: {exported}")
                 except PermissionError:
