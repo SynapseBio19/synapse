@@ -2105,7 +2105,7 @@ def _input_int(prompt: str, default: Optional[int] = None, minimum: Optional[int
             return value
         except ValueError:
             suffix = f" (>= {minimum})" if minimum is not None else ""
-            print(f"Invalid integer{suffix}.")
+            style.error(f"Invalid integer{suffix}.")
 
 
 def _input_float(prompt: str, default: float) -> float:
@@ -2116,7 +2116,7 @@ def _input_float(prompt: str, default: float) -> float:
         try:
             return float(raw)
         except ValueError:
-            print("Invalid number.")
+            style.error("Invalid number.")
 
 
 def _choose_system() -> str:
@@ -2208,7 +2208,7 @@ def _choose_candidate(candidates: Sequence[GuideCandidate]) -> Optional[GuideCan
             return candidates[index - 1]
     except ValueError:
         pass
-    print("Invalid candidate selection.")
+    style.invalid_selection()
     return None
 
 
@@ -2222,7 +2222,7 @@ def _read_local_references() -> Dict[str, str]:
         if not line:
             break
         if "=" not in line:
-            print("Expected name=sequence.")
+            style.error("Expected name=sequence.")
             continue
         name, seq = line.split("=", 1)
         try:
@@ -2250,7 +2250,7 @@ def _cli_design() -> None:
     style.header('CRISPR GUIDE DESIGN')
     name, sequence = _manual_sequence()
     if not sequence:
-        print("No sequence entered.")
+        style.error("No sequence entered.")
         return
     system = _choose_system()
     if not system:
@@ -2505,7 +2505,7 @@ def crispr_menu(
                     style.pause()
                     continue
                 default_dir = _default_export_directory()
-                print(f"Relative paths are saved to: {default_dir}")
+                style.note(f"Relative paths are saved to: {default_dir}")
                 path = style.ask('Export path (.json, .csv or .fasta)')
                 if not path:
                     continue
@@ -2532,7 +2532,7 @@ def crispr_menu(
                     style.pause()
                     continue
                 default_dir = _default_export_directory()
-                print(f"Relative paths are saved to: {default_dir}")
+                style.note(f"Relative paths are saved to: {default_dir}")
                 path = style.ask('Batch CSV export path')
                 if not path:
                     continue
@@ -2693,7 +2693,7 @@ def crispr_menu(
                 )
                 last_result.candidates = rank_guides(last_result.candidates, config=config)
                 total_hits = sum(len(c.local_off_target_hits) for c in last_result.candidates)
-                print("PAM-aware local specificity analysis completed.")
+                style.success("PAM-aware local specificity analysis completed.")
                 if total_hits:
                     print(f"Local PAM-compatible hits found: {total_hits}")
                     print("Top local matches:")
@@ -2732,7 +2732,7 @@ def crispr_menu(
                 print("Candidates with explicit local specificity analysis are marked in the ranking.")
                 print("Select the candidate to inspect its local specificity profile.")
             else:
-                print("No local specificity analysis has been performed yet.")
+                style.note("No local specificity analysis has been performed yet.")
                 print("Use [9] Off-Target Analysis first and supply reference sequences.")
             candidate = _choose_candidate(last_result.candidates)
             if candidate:
@@ -3060,4 +3060,4 @@ if __name__ == "__main__":
     if not run_self_test(verbose=True):
         raise SystemExit(1)
     print()
-    print("CRISPR analysis engine self-test completed successfully.")
+    style.success("CRISPR analysis engine self-test completed successfully.")

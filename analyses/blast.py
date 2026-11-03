@@ -3981,7 +3981,7 @@ def _select_local_database(
     try:
         return available[int(choice) - 1]
     except (ValueError, IndexError):
-        print("Invalid database selection.")
+        style.invalid_selection()
         return None
 
 
@@ -4037,13 +4037,13 @@ def blast_database_manager_menu(
             try:
                 name = names[int(raw) - 1]
             except (ValueError, IndexError):
-                print("Invalid database selection.")
+                style.invalid_selection()
                 continue
 
             print()
             style.field('Selected database', f"{name}")
-            print(
-                "IMPORTANT: The database will be downloaded from NCBI into the "
+            style.warning(
+                "The database will be downloaded from NCBI into the "
                 f"following directory:\r\n{manager.root}"
             )
             print(
@@ -4052,12 +4052,13 @@ def blast_database_manager_menu(
             )
             confirm = style.ask('Type DOWNLOAD to continue')
             if confirm != "DOWNLOAD":
-                print("Download cancelled.")
+                style.note("Download cancelled.")
                 continue
 
             try:
                 database = manager.update_ncbi_database(name)
-                print(f"\r\nUpdate completed: {database.name}")
+                print()
+                style.success(f"Update completed: {database.name}")
                 style.field('Status', f"{database.verification_status}")
                 style.field('Files', f"{database.file_count}")
                 style.field('Size', f"{database.size_gb:.3f} GB")
@@ -4083,12 +4084,12 @@ def blast_database_manager_menu(
         if choice == "4":
             fasta = style.ask('FASTA file path')
             if not fasta:
-                print("No FASTA path supplied.")
+                style.error("No FASTA path supplied.")
                 continue
 
             name = style.ask('New database name')
             if not name:
-                print("No database name supplied.")
+                style.error("No database name supplied.")
                 continue
 
             style.menu([
@@ -4099,7 +4100,7 @@ def blast_database_manager_menu(
                 continue
             database_type = {"1": "nucleotide", "2": "protein"}.get(db_choice)
             if database_type is None:
-                print("Invalid database type.")
+                style.invalid_selection()
                 continue
 
             try:
@@ -4126,17 +4127,17 @@ def blast_database_manager_menu(
 
             database = manager.scan_database(name)
             if not database.installed:
-                print("Database is not installed.")
+                style.error("Database is not installed.")
                 continue
 
             confirm = style.ask(f"Type REMOVE {database.name} to permanently remove its local files")
             if confirm != f"REMOVE {database.name}":
-                print("Removal cancelled.")
+                style.note("Removal cancelled.")
                 continue
 
             try:
                 removed = manager.remove_database(name)
-                print(f"Removed {len(removed)} files.")
+                style.success(f"Removed {len(removed)} files.")
             except BlastAnalysisError as exc:
                 style.error(f"{exc}")
             continue
@@ -4331,7 +4332,7 @@ def blast_menu(
             elif query_source_choice == "2":
                 raw_path = style.ask('FASTA file path').strip('\"')
                 if not raw_path:
-                    print("No FASTA path supplied.")
+                    style.error("No FASTA path supplied.")
                     continue
 
                 try:
@@ -4357,7 +4358,7 @@ def blast_menu(
                     try:
                         search_query = fasta_queries[int(record_choice) - 1]
                     except (ValueError, IndexError):
-                        print("Invalid FASTA record.")
+                        style.invalid_selection()
                         continue
 
                 active_query = search_query
@@ -4365,7 +4366,7 @@ def blast_menu(
                     f"({search_query.length} {search_query.sequence_type.lower()})")
 
             else:
-                print("Invalid query source.")
+                style.invalid_selection()
                 continue
 
             if search_query is None:
@@ -4386,7 +4387,7 @@ def blast_menu(
 
             engine = {"1": "local", "2": "remote"}.get(engine_choice)
             if engine is None:
-                print("Invalid engine.")
+                style.invalid_selection()
                 continue
 
             print("\nBLAST PROGRAM")
@@ -4405,7 +4406,7 @@ def blast_menu(
                 program_index = int(program_choice)
                 program = compatible_programs[program_index - 1]
             except (ValueError, IndexError):
-                print("Invalid program.")
+                style.invalid_selection()
                 continue
 
             database: Optional[str] = None
@@ -4454,7 +4455,7 @@ def blast_menu(
                     db_index = int(db_choice)
                     database = compatible_databases[db_index - 1]
                 except (ValueError, IndexError):
-                    print("Invalid database.")
+                    style.invalid_selection()
                     continue
 
             raw_evalue = style.ask('E-value [10]')
@@ -4685,7 +4686,7 @@ def blast_menu(
 
             path = style.ask('Export path (.json/.csv/.txt)')
             if not path:
-                print("No path supplied.")
+                style.error("No path supplied.")
                 continue
 
             try:
@@ -4747,7 +4748,7 @@ def blast_menu(
             )
             rid = style.ask('Request ID (RID)')
             if not rid:
-                print("No request ID supplied.")
+                style.error("No request ID supplied.")
                 continue
 
             if not style.confirm(f"Contact NCBI for request {rid}?"):
@@ -4763,7 +4764,7 @@ def blast_menu(
 
             last_run = resumed
             active_query = resumed.query
-            print(
+            style.success(
                 f"Resumed request {rid}: {len(resumed.hits)} hit(s) for "
                 f"{resumed.query.name} ({resumed.query.length} "
                 f"{resumed.query.sequence_type.lower()})."
@@ -5570,6 +5571,6 @@ if __name__ == "__main__":
         raise SystemExit(1)
 
     print()
-    print("Synapse BLAST module is ready.")
-    print("No network search was executed during self-test.")
-    print("Use blast_menu(...) from main.py for interactive BLAST Search.")
+    style.success("Synapse BLAST module is ready.")
+    style.note("No network search was executed during self-test.")
+    style.note("Use blast_menu(...) from main.py for interactive BLAST Search.")

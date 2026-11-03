@@ -650,7 +650,7 @@ def main():
                     print()
                     style.note("No ORF has been selected.")
                     print()
-                    print(
+                    style.note(
                         "Please run [2] ORF Analysis first and "
                         "select an ORF."
                     )
@@ -897,8 +897,9 @@ def main():
 
             elif choice == "S":
 
-                print(
-                    "\nReturning to "
+                print()
+                style.note(
+                    "Returning to "
                     "sequence selection..."
                 )
 

@@ -2353,11 +2353,11 @@ def _synapse_ui_select_enzymes(
         ]
 
         if invalid:
-            print("Unknown enzyme(s): " + ", ".join(invalid))
+            style.error("Unknown enzyme(s): " + ", ".join(invalid))
             continue
 
         if len(selected) < minimum:
-            print(f"Please select at least {minimum} enzyme(s).")
+            style.error(f"Please select at least {minimum} enzyme(s).")
             continue
 
         if maximum is not None and len(selected) > maximum:
@@ -2386,7 +2386,7 @@ def _synapse_ui_select_topology(default="linear"):
         if choice == "2":
             return "circular"
 
-        print("Invalid topology selection.")
+        style.invalid_selection()
 
 
 def _restriction_overview_ui(dna, pipeline=None, topology="linear"):

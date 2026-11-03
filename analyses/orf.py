@@ -2973,10 +2973,8 @@ def select_orf(orfs):
 
                 return selected
 
-        print(
-            "Invalid selection. "
-            "Enter a candidate number or 0 to go back."
-        )
+        style.invalid_selection()
+        style.note("Enter a candidate number or 0 to go back.")
 
 
 def _orf_settings_menu(settings):

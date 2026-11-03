@@ -4526,7 +4526,7 @@ def _cloning_ui_automatic_planner(
                     raise ValueError
                 break
             except ValueError:
-                print("Please enter a positive integer.")
+                style.error("Please enter a positive integer.")
 
     result = automatic_cloning_planner(
         vector_sequence,
@@ -4780,7 +4780,8 @@ def run_cloning_analysis_ui(
         style.header(
             "CLONING ANALYSIS"
         )
-        print("\nInvalid vector sequence.")
+        print()
+        style.error("Invalid vector sequence.")
 
         if vector_validation["invalid_positions"]:
             style.field('Invalid positions', f"{vector_validation['invalid_positions']}")
@@ -4821,7 +4822,8 @@ def run_cloning_analysis_ui(
         style.header(
             "CLONING ANALYSIS"
         )
-        print("\nInvalid insert sequence.")
+        print()
+        style.error("Invalid insert sequence.")
 
         if insert_validation["invalid_positions"]:
             style.field('Invalid positions', f"{insert_validation['invalid_positions']}")

@@ -2247,7 +2247,7 @@ def _interactive_menu(context: Optional[dict[str, Any]] = None) -> None:
 
         if not search_text:
 
-            print("Query cannot be empty.")
+            style.error("Query cannot be empty.")
 
             continue
 
@@ -2271,7 +2271,7 @@ def _interactive_menu(context: Optional[dict[str, Any]] = None) -> None:
 
             if not selected:
 
-                print("Select at least one valid source.")
+                style.error("Select at least one valid source.")
 
                 continue
 

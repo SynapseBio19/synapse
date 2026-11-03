@@ -2490,7 +2490,7 @@ def _prompt_contig_reference(pipeline, variants: Sequence[Variant]) -> Dict[str,
     print()
     style.field('Loaded Synapse sequence', f"{header} ({len(sequence)} bp)")
     style.field('Contigs in the VCF', f"{', '.join(contigs)}")
-    print("VCF positions must be 1-based positions on this exact sequence.")
+    style.note("VCF positions must be 1-based positions on this exact sequence.")
     choice = style.ask('Contig to map onto the loaded sequence (Enter = none)')
     if not choice:
         return {}
