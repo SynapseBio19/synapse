@@ -3935,10 +3935,9 @@ def _select_local_database(
     ]
 
     if not available:
-        print(
-            "\r\nNo compatible local BLAST database is installed.\r\n"
-            "Use [3] BLAST Database Manager to download or create one."
-        )
+        print()
+        style.note("No compatible local BLAST database is installed.")
+        style.note("Use [4] BLAST Database Manager to download or create one.")
         return None
 
     # Prefer a fully verified database and, among equal states, prefer the
@@ -3957,7 +3956,7 @@ def _select_local_database(
         )
     )
 
-    print("\nLOCAL DATABASE")
+    entries = []
     for index, database in enumerate(available, start=1):
         if database.verification_status == "VERIFIED":
             status_label = "VERIFIED"
@@ -3968,11 +3967,12 @@ def _select_local_database(
             if database.sequence_count is not None
             else ""
         )
-        print(
-            f"[{index}] {database.name} | "
-            f"{database.size_gb:.2f} GB | {status_label}{sequence_info}"
-        )
-    style.cancel()
+        entries.append((
+            index,
+            f"{database.name} | "
+            f"{database.size_gb:.2f} GB | {status_label}{sequence_info}",
+        ))
+    style.menu([("Local database", entries)], zero=style.CANCEL_LABEL)
 
     choice = style.ask('Database')
     if choice == "0":
@@ -4016,18 +4016,20 @@ def blast_database_manager_menu(
             continue
 
         if choice == "2":
-            style.section('NCBI DATABASES AVAILABLE THROUGH update_blastdb.pl')
+            entries = []
             for index, (name, info) in enumerate(
                 LOCAL_DATABASE_CATALOG.items(), start=1
             ):
                 recommendation = "RECOMMENDED START" if info["recommended"] else "ADVANCED"
-                print(
-                    f"[{index}] {name:<18} "
+                entries.append((
+                    index,
+                    f"{name:<18} "
                     f"{info['type']:<12} "
                     f"{recommendation:<16} "
-                    f"{info['description']}"
-                )
-            style.cancel()
+                    f"{info['description']}",
+                ))
+            style.menu([("NCBI databases available through update_blastdb.pl", entries)],
+                       zero=style.CANCEL_LABEL)
 
             raw = style.ask('Database')
             if raw == "0":
@@ -4093,7 +4095,7 @@ def blast_database_manager_menu(
                 continue
 
             style.menu([
-                ('\r\nDatabase Type', [('1', 'Nucleotide'), ('2', 'Protein')]),
+                ('Database Type', [('1', 'Nucleotide'), ('2', 'Protein')]),
             ], zero="Cancel")
             db_choice = style.ask('Type')
             if db_choice == "0":
@@ -4288,7 +4290,7 @@ def blast_menu(
 
         if choice == "1":
             style.menu([
-                ('\r\nQuery Source', [
+                ('Query Source', [
                     ('1', 'Selected Synapse Sequence'),
                     ('2', 'Load FASTA File'),
                 ]),
@@ -4345,13 +4347,12 @@ def blast_menu(
                 if len(fasta_queries) == 1:
                     search_query = fasta_queries[0]
                 else:
-                    print("\nFASTA RECORDS")
-                    for index, fasta_query in enumerate(fasta_queries, start=1):
-                        print(
-                            f"[{index}] {fasta_query.name} | "
-                            f"{fasta_query.length} {fasta_query.sequence_type.lower()}"
-                        )
-                    style.cancel()
+                    style.menu([("FASTA records", [
+                        (index,
+                         f"{fasta_query.name} | "
+                         f"{fasta_query.length} {fasta_query.sequence_type.lower()}")
+                        for index, fasta_query in enumerate(fasta_queries, start=1)
+                    ])], zero=style.CANCEL_LABEL)
                     record_choice = style.ask('Record')
                     if record_choice == "0":
                         continue
@@ -4379,7 +4380,7 @@ def blast_menu(
             compatible_programs = programs_for_query_type(available_query_type)
 
             style.menu([
-                ('\r\nSearch Engine', [('1', 'Local BLAST+'), ('2', 'NCBI BLAST')]),
+                ('Search Engine', [('1', 'Local BLAST+'), ('2', 'NCBI BLAST')]),
             ], zero="Cancel")
             engine_choice = style.ask('Engine')
             if engine_choice == "0":
@@ -4390,13 +4391,10 @@ def blast_menu(
                 style.invalid_selection()
                 continue
 
-            print("\nBLAST PROGRAM")
-            for index, name in enumerate(compatible_programs, start=1):
-                print(
-                    f"[{index}] {name.upper()} - "
-                    f"{PROGRAMS[name]['description']}"
-                )
-            style.cancel()
+            style.menu([("BLAST program", [
+                (index, f"{name.upper()} - {PROGRAMS[name]['description']}")
+                for index, name in enumerate(compatible_programs, start=1)
+            ])], zero=style.CANCEL_LABEL)
 
             program_choice = style.ask('Program')
             if program_choice == "0":
@@ -4439,13 +4437,10 @@ def blast_menu(
                     if info["type"] == PROGRAMS[program]["database_type"]
                 ]
 
-                print("\nNCBI REMOTE DATABASE")
-                for index, name in enumerate(compatible_databases, start=1):
-                    print(
-                        f"[{index}] {name} - "
-                        f"{DATABASES[name]['description']}"
-                    )
-                style.cancel()
+                style.menu([("NCBI remote database", [
+                    (index, f"{name} - {DATABASES[name]['description']}")
+                    for index, name in enumerate(compatible_databases, start=1)
+                ])], zero=style.CANCEL_LABEL)
 
                 db_choice = style.ask('Database')
                 if db_choice == "0":
@@ -4581,14 +4576,15 @@ def blast_menu(
                 continue
 
             ranked = rank_hits(last_run.hits)
-            for index, hit in enumerate(ranked[:20], start=1):
-                print(
-                    f"[{index}] {hit.accession or hit.hit_id} | "
-                    f"{hit.best_identity_percent:.2f}% identity | "
-                    f"{hit.best_coverage_percent:.2f}% coverage"
-                )
+            style.menu([("Ranked hits", [
+                (index,
+                 f"{hit.accession or hit.hit_id} | "
+                 f"{hit.best_identity_percent:.2f}% identity | "
+                 f"{hit.best_coverage_percent:.2f}% coverage")
+                for index, hit in enumerate(ranked[:20], start=1)
+            ])], zero=style.CANCEL_LABEL)
 
-            raw = style.ask('Hit number (0 cancel)')
+            raw = style.ask('Hit number')
             if raw == "0":
                 continue
 
@@ -4610,7 +4606,7 @@ def blast_menu(
             style.section('EVIDENCE PROFILE')
             for index, profile in enumerate(build_evidence_profile(last_run), start=1):
                 print(
-                    f"[{index}] {profile.accession or profile.hit_id}: "
+                    f"{index}. {profile.accession or profile.hit_id}: "
                     f"{profile.evidence_score:.2f}/100 | "
                     f"{profile.evidence_band}"
                 )

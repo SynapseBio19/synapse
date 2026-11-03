@@ -2121,13 +2121,12 @@ def _input_float(prompt: str, default: float) -> float:
 
 def _choose_system() -> str:
     systems = list_crispr_systems()
-    style.section('Available CRISPR systems')
-    for i, system in enumerate(systems, 1):
-        print(
-            f"[{i}] {system.name:<12} PAM={system.pam:<6} Guide={system.guide_length:<2} nt | "
-            f"{system.description}"
-        )
-    style.cancel()
+    style.menu([('Available CRISPR systems', [
+        (i,
+         f"{system.name:<12} PAM={system.pam:<6} Guide={system.guide_length:<2} nt | "
+         f"{system.description}")
+        for i, system in enumerate(systems, 1)
+    ])], zero=style.CANCEL_LABEL)
     while True:
         choice = style.ask('System')
         if choice == "0":
@@ -2143,11 +2142,11 @@ def _choose_system() -> str:
 
 def _choose_editor() -> str:
     editors = list_base_editors()
-    style.section('Available computational base-editor models')
+    entries = []
     for i, name in enumerate(editors, 1):
         data = get_base_editor(name)
-        print(f"[{i}] {name:<5} {data['conversion'][0]}>{data['conversion'][1]} window={data['window'][0]}-{data['window'][1]}")
-    style.cancel()
+        entries.append((i, f"{name:<5} {data['conversion'][0]}>{data['conversion'][1]} window={data['window'][0]}-{data['window'][1]}"))
+    style.menu([('Available computational base-editor models', entries)], zero=style.CANCEL_LABEL)
     while True:
         choice = style.ask('Editor')
         if choice == "0":
@@ -2366,7 +2365,7 @@ def crispr_menu(
             style.menu([
                 (None, [
                     ('1', 'Load FASTA / Batch Analysis'),
-                    ('2', 'Use First Record as Current Sequence'),
+                    ('2', 'Select Record as Current Sequence'),
                 ]),
             ])
             choice = style.ask_choice()
@@ -2398,10 +2397,9 @@ def crispr_menu(
                     style.pause()
                     continue
                 records = list(batch_results.keys())
-                print("\nAVAILABLE RECORDS")
-                for index, name in enumerate(records, start=1):
-                    print(f"[{index}] {name}")
-                raw = style.ask('Record number (0 cancel)')
+                style.menu([("Available records", list(enumerate(records, start=1)))],
+                           zero=style.CANCEL_LABEL)
+                raw = style.ask('Record number')
                 try:
                     index = int(raw)
                 except ValueError:
@@ -2732,7 +2730,7 @@ def crispr_menu(
                 print("Select the candidate to inspect its local specificity profile.")
             else:
                 style.note("No local specificity analysis has been performed yet.")
-                print("Use [9] Off-Target Analysis first and supply reference sequences.")
+                style.note("Use [9] Off-Target Analysis first and supply reference sequences.")
             candidate = _choose_candidate(last_result.candidates)
             if candidate:
                 profile = candidate.specificity_profile or {
