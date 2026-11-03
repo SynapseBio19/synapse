@@ -517,5 +517,113 @@ class EmptyAnswerTests(unittest.TestCase):
                 if re.search(r"style\.ask\([^)]*default=", line)]
         self.assertEqual(hits, [])
 
+
+def _leading_text(node):
+    """The literal text a print argument starts with, and the node that follows it.
+
+    Returns (text, next_node): for "abc" -> ("abc", None); for f"[{i}] x" ->
+    ("[", <i>); for "Unknown: " + x -> ("Unknown: ", None). None if the
+    argument does not start with literal text.
+    """
+    if isinstance(node, ast.Constant) and isinstance(node.value, str):
+        return node.value, None
+    if isinstance(node, ast.JoinedStr):
+        text = ""
+        for part in node.values:
+            if isinstance(part, ast.Constant):
+                text += part.value
+            else:
+                return text, part.value
+        return text, None
+    if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Add):
+        return _leading_text(node.left)
+    return None, None
+
+
+def direct_output(source: str):
+    """(line, kind, text) for each print() that bypasses a shared renderer.
+
+    - "computed menu key": an entry "[{i}] ..." printed inside a loop over
+      enumerate(), whose counter i is the key (a hand-built option list);
+    - "uncategorized message": a validation or status sentence without
+      error()/warning()/note()/success()/invalid_selection();
+    - "direct heading": an upper-case heading without section();
+    - "rule inside a printed text": a heading drawn with its own dashes.
+    """
+    tree = ast.parse(source)
+    counters = {}
+    for loop in ast.walk(tree):
+        if isinstance(loop, (ast.For, ast.comprehension)) and isinstance(loop.iter, ast.Call) \
+                and getattr(loop.iter.func, "id", None) == "enumerate" \
+                and isinstance(loop.target, ast.Tuple) and isinstance(loop.target.elts[0], ast.Name):
+            for inner in ast.walk(loop) if isinstance(loop, ast.For) else ():
+                counters[id(inner)] = loop.target.elts[0].id
+    found = []
+    for node in ast.walk(tree):
+        if not (isinstance(node, ast.Call) and getattr(node.func, "id", None) == "print" and node.args):
+            continue
+        text, following = _leading_text(node.args[0])
+        if text is None:
+            continue
+        stripped = text.lstrip("\r\n ")
+        if re.search(r"\n[-=]{3,}", text):
+            found.append((node.lineno, "rule inside a printed text", text))
+        elif stripped == "[" and isinstance(following, ast.Name) and counters.get(id(node)) == following.id:
+            found.append((node.lineno, "computed menu key", text))
+        elif DIRECT_MESSAGE.match(stripped) and not any(
+                stripped.startswith(allowed) for allowed in RESULT_LINES):
+            found.append((node.lineno, "uncategorized message", text))
+        elif following is None and DIRECT_HEADING.fullmatch(stripped) \
+                or following is not None and stripped.endswith("(") and DIRECT_HEADING.fullmatch(stripped[:-1].strip()):
+            found.append((node.lineno, "direct heading", text))
+    return sorted(found)
+
+
+# Sentences that are interface messages, whatever their wording in detail.
+DIRECT_MESSAGE = re.compile(
+    r"(Invalid |Please |Cannot |Could not |Unknown |Expected |Query cannot|Select at least"
+    r"|No \w+(?: \w+)? (?:supplied|entered|selected|loaded)\b"
+    r"|IMPORTANT:|Returning to |Resumed |Removed |Update completed"
+    r"|[A-Z][\w -]* (?:cancelled|completed|completed successfully)\.$"
+    r"|No local specificity analysis|No compatible local)"
+)
+# Lines that look like messages but are part of a result.
+RESULT_LINES = (
+    "Invalid character '",  # main.py: the positions listed under the validation ERROR
+)
+DIRECT_HEADING = re.compile(r"[A-Z][A-Z0-9]+(?: [A-Z0-9/&+-]+)+|[A-Z]{4,}")
+
+
+class DirectOutputTests(unittest.TestCase):
+    """Output the earlier source rule missed: computed keys, plain messages, plain headings."""
+
+    def test_rules_recognize_each_kind(self):
+        sample = (
+            "for i, name in enumerate(names, 1):\n"
+            "    print(f'[{i}] {name}')\n"
+            "for result in results:\n"
+            "    print(f\"[{'PASS' if ok else 'FAIL'}] {result}\")\n"
+            "print('Invalid engine.')\n"
+            "print('\\nDownload cancelled.')\n"
+            "print('No FASTA path supplied.')\n"
+            "print(\"Invalid character '\" + c)\n"
+            "print('\\nPRIVACY NOTICE')\n"
+            "print(f'RANKED GUIDES ({mode})')\n"
+            "print(f'HSP {n}: identity')\n"
+            "print('No restriction sites detected.')\n"
+            "print('\\nABSTRACT\\n--------')\n"
+        )
+        self.assertEqual([(line, kind) for line, kind, _ in direct_output(sample)], [
+            (2, "computed menu key"), (5, "uncategorized message"), (6, "uncategorized message"),
+            (7, "uncategorized message"), (9, "direct heading"), (10, "direct heading"),
+            (13, "rule inside a printed text"),
+        ])
+
+    def test_no_interface_file_prints_around_the_renderers(self):
+        hits = [f"{path.relative_to(PROJECT_ROOT).as_posix()}:{line}: {kind}: {text.strip()!r}"
+                for path in INTERFACE_SOURCES for line, kind, text in direct_output(read(path))]
+        self.assertEqual(hits, [])
+
+
 if __name__ == "__main__":
     unittest.main()
