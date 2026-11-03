@@ -61,10 +61,14 @@ Python 3.10 blocker in Stage I.
   messages, 19 headings and 9 dynamic option lists. It also found that
   rendered tests reach 17 of the 38 menus, and that the behavior of the
   converted dialogs was not preserved until `1516339`: Enter on
-  bracketed prompts returned the hint. One message prefix per category, one
+  bracketed prompts returned the hint. Recommendations 1-3 of that
+  review then converted the 59 prints, plus 13 more messages found on
+  the way, and added a rule that catches them
+  (`docs/STAGE_F_FINAL_REVIEW.md` §9). The core→ui dependency and
+  rendered tests for the remaining 21 menus are still open. One message prefix per category, one
   notation per unit, 1-based positions everywhere a user sees them, and a
   style guide whose mechanical rules the test suite enforces.
-- Evidence: 314 tests (109 at the end of the previous cycle), including
+- Evidence: 328 tests (109 at the end of the previous cycle), including
   external reference comparisons with Biopython 1.88 and primer3-py
   2.4.0, BLAST+ 2.17.0 executions, and cross-module workflow tests.
 
@@ -242,6 +246,16 @@ corrected the claim that the dialogs behaved as before:
 - From round 1 to `1516339`, Enter on 15 bracketed prompts returned the
   hint text instead of an empty answer.
 
+Recommendations 1-3 were carried out on 2026-11-03 (`46710cd` to
+`163c54d`):
+
+- the claims were corrected;
+- 44 messages, 18 headings and the 9 lists were converted;
+- `DirectOutputTests` was added;
+- the `FEATURE_STATUS.md` numbers were corrected.
+
+Recommendations 4 and 5 are deferred.
+
 **Remaining exceptions**, each with its
 reason in `TERMINAL_UI_STANDARD.md` section 9: raw line input, two
 CRISPR numeric helpers, closing rules, analysis result lines; the mutation
@@ -315,8 +329,8 @@ report, on the development machine:
 
 | Measure | Value |
 |---|---|
-| Tests run | 314 |
-| Passed | 314 |
+| Tests run | 328 (2026-11-03) |
+| Passed | 328 |
 | Failed | 0 |
 | Skipped | 0 (BLAST+, Biopython and primer3-py all present) |
 | Golden-master snapshots | 13, all matching; one intentional change in Phase 6 (D18, key rename, values proven identical) |

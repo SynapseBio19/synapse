@@ -88,6 +88,13 @@ the modules ORF, CRISPR, BLAST, literature, primer, variant analysis,
 sequence overview, RNA, protein, restriction, cloning and mutation. What
 they still print themselves is listed in section 9.
 
+Since the closing review (2026-11-03) this also holds for the output the
+rewriting passes had missed: validation and status messages go through the
+message helpers, headings through `section()`, and option lists built in a
+loop through `menu()`. A numbered result list that is not followed by a
+choice is numbered `1.`, `2.` (literature results, BLAST evidence profile),
+so `[n]` always marks a key the user can type.
+
 **Tables** take their header and rows from one `columns()` definition;
 values are left-aligned in their column and a table stays within the
 70-column rule. **Text reports** that are built as line lists write
@@ -216,6 +223,15 @@ menus from the analysis modules is the remaining part of audit item P2-2.
 9. The variant menu follows the order of 5.3 (input, normalization,
    filtering, statistics, interpretation, reporting), with every entry
    dispatched.
+10. **Direct output** (`DirectOutputTests`, read through the AST of all
+    sixteen files): no option entry `[{i}] ...` printed in a loop over
+    `enumerate()`; no validation or status sentence ("Invalid ...",
+    "Please ...", "No ... supplied", "... cancelled.", "IMPORTANT:", ...)
+    outside the message helpers; no upper-case heading, also not as the
+    start of an f-string, outside `section()`; no heading drawn with its
+    own dashes. The one named exception is the invalid-character list
+    under the sequence validation error, which is a result line. On
+    `1516339` the rule reports 68 sites.
 
 ## 8. Numbering
 
@@ -239,7 +255,9 @@ What remains outside the shared renderers, each for a stated reason:
 
 - **Raw line input** (`input()` without a prompt) where a sequence or VCF
   is pasted line by line (CRISPR, variant analysis): the raw line must
-  not be stripped or reformatted.
+  not be stripped or reformatted. `crispr._read_local_references` also
+  reads raw lines but strips them; it belongs here because its prompt
+  is the explanation printed above it, not a label.
 - **Two CRISPR numeric helpers** take a complete prompt text from their
   callers (`input(prompt)`); converting them means changing every
   caller's prompt string.
@@ -247,9 +265,24 @@ What remains outside the shared renderers, each for a stated reason:
   or frame its closing summary line, which section 2 allows.
 - **Result lines** of the analyses (profile windows, sites, islands,
   alignments, interpretation prose) remain module text: they are
-  scientific content, not interface furniture.
-- **The mutation sequence prompt** offers no `[0]` (section 3, "Known
-  deviation"); it is drawn through `style.menu(zero=None)`.
+  scientific content, not interface furniture. This includes result
+  statements such as "No restriction sites detected." or "No ORFs
+  found." (16 in ORF, CRISPR, protein, restriction and `ui/report.py`)
+  and the invalid-character list under the sequence validation error.
+- **Headings inside text reports** that are built as strings (the primer
+  pair block's PRIMER PAIR #n, FORWARD, REVERSE, PAIR; the BLAST report's
+  TOP HITS) are part of the stored report text, not printed screens.
+- **The mutation sequence prompt and the sequence selector** offer no
+  `[0]` (section 3); both are drawn through `style.menu(zero=None)`.
+- **Prompts of the converted option lists** keep their own label
+  (`Database:`, `Program:`, `Record number:`), not `Selection:`; changing
+  them was not part of recommendation 2.
+- **Not yet covered by a rule**: about 20 hand-padded label lines
+  (e.g. "Retrieved before deduplication: 0", "Input source:        Selected
+  ORF"), the prefixes "SCIENTIFIC LIMITATION:" and "RESULT:", and
+  status lines such as "Loaded 2 FASTA record(s).". The BLAST hit
+  selector answers an out-of-range number with "ERROR: list index out
+  of range" instead of "Invalid selection." (unchanged behavior).
 - **`core/pipeline.py`** prints from `core/` through function-local
   imports (section 6); moving `print_status` to `ui/` is structural work.
 - **Menus inside the analysis modules** (P2-2): every menu uses the

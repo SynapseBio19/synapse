@@ -1954,3 +1954,45 @@ No test had driven these dialogs with an empty answer. New
 relevance), the primer conditions (50, 1.5, 0.2, 250), the cloning
 strategy count (5), and a source rule against `ask(..., default=...)`
 in the modules. All four fail on the previous code.
+
+## Stage F closing review, recommendations 1-3 (2026-11-03)
+
+`docs/STAGE_F_FINAL_REVIEW.md` measured what the completion rounds had
+left; the owner released recommendations 1-3.
+
+- **Claims (`46710cd`).** The final report, the UI review and the
+  progress log no longer call Stage F "unified" for round 2. They now
+  separate three things: the partial standardization of Stage F, the
+  adoption reached in the completion rounds, and what was still open.
+  They also state that the workflow was not preserved until `1516339`.
+- **Messages (`4e2cace`).** 44 plain prints go through the helpers of
+  section 5 of the standard:
+  - an invalid choice gets `invalid_selection()`;
+  - a failed input check is an ERROR;
+  - a cancelled action or context is a NOTE;
+  - a completed action is OK;
+  - BLAST's "IMPORTANT:" is a WARNING.
+
+  Control flow is unchanged.
+- **Headings (`e559255`).** The primer report sections, the literature
+  WARNINGS / SOURCE ERRORS / ABSTRACT / KEYWORDS, the CRISPR ranking and
+  the BLAST privacy and resume blocks go through `section()`. Each now
+  carries a rule under the title; blank lines are kept. "BLAST SEARCH
+  COMPLETED" is an OK message.
+- **Option lists (`b9ec344`).** Six BLAST lists and three CRISPR lists
+  go through `style.menu(zero="Cancel")`. They gain a group label, the
+  blank line before `[0]` and the closing rule. The hit and record lists
+  show `[0] Cancel` instead of "(0 cancel)" in the prompt. The BLAST
+  evidence profile, a result list, is numbered "1.".
+- **Also corrected:**
+  - three group labels with a stray `"\r\n"`;
+  - the pointer to "[3] BLAST Database Manager", which is [4];
+  - the CRISPR batch entry label.
+- **Tests (`73a1d93`, `ccc987b`).** `DirectOutputTests`; 68 sites on
+  `1516339`, none now.
+- **`FEATURE_STATUS.md` (`163c54d`).** Variant, ORF-settings and BLAST
+  menu numbers as in the code; the summary gives 328 tests and the final
+  defect status.
+
+No scientific calculation, data model or golden-master value changed.
+Suite 328/328, golden master 12/12, pyright 112 with no new diagnostic.

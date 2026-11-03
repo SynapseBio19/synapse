@@ -285,3 +285,118 @@ network test. The figures do not show that the external services work.
      an empty answer.
 6. **Settle §9:** add `crispr:2221` and the sequence selector, or remove
    the exceptions by converting the code.
+
+## 9. Follow-up: recommendations 1-3 carried out (2026-11-03)
+
+The owner released recommendations 1-3; 4 (core/ui) and 5 (full menu
+coverage) are deferred. Commits:
+
+| Commit | Package |
+|---|---|
+| `46710cd` | 1. Claims corrected in the final report, the change log, the UI review and the progress log; this review committed |
+| `4e2cace` | 2a. Messages through the message helpers |
+| `e559255` | 2b. Headings through `section()` |
+| `b9ec344` | 2c. Dynamic option lists through `menu()` |
+| `73a1d93`, `ccc987b` | 2d. `DirectOutputTests` |
+| `163c54d` | 3. `FEATURE_STATUS.md` menu numbers and summary |
+
+**Each site checked individually.** The three counts of section 1 came
+from a regular expression. Read in context, they come to this:
+
+| Kind | Counted | Converted | Not converted, with reason |
+|---|---:|---:|---|
+| Messages | 31 | 31, plus 13 more found on the way | none |
+| Headings | 19 | 18 | "HSP n: identity=..." is a BLAST result line that matched by its first word |
+| Dynamic option lists | 9 | 9 | none |
+
+- **The 13 additional messages.** Among them are BLAST "Database is not
+  installed.", "Removed n files.", "Update completed", the "IMPORTANT:"
+  download notice (now a WARNING) and the self-test closing lines, and
+  CRISPR "Expected name=sequence." and "Use [9] Off-Target Analysis
+  first".
+- **Headings.** 12 headings became `section()`, plus ABSTRACT, which
+  drew its own 8-dash rule. "BLAST SEARCH COMPLETED" became an OK
+  message, because the framed summary directly below has its own title.
+  5 headings head a list and became that menu's group label.
+- **Option lists.** The 9 lists are:
+  - BLAST: local database, NCBI catalog, FASTA records, program, remote
+    database, ranked hits;
+  - CRISPR: system, base editor, batch records.
+- **The evidence profile.** The review counted it as a tenth list, but it
+  is a result with no choice after it. It is now numbered "1." like the
+  literature results.
+
+The review's 16 "No ... detected." result statements and the
+invalid-character list stay as they are. Both are now named in
+`TERMINAL_UI_STANDARD.md` §9.
+
+**Found while rendering, and corrected:**
+
+- Three menu group labels began with `"\r\n"` and drew a double blank
+  line.
+- The no-local-database message sent the user to "[3] BLAST Database
+  Manager", which is [4].
+- The CRISPR batch entry "Use First Record as Current Sequence" let the
+  user pick any record. It is now "Select Record as Current Sequence".
+- `FEATURE_STATUS.md` had more stale numbers than the review found: every
+  BLAST row after [1] still used the numbers from before the resume
+  entry moved to [2].
+
+**Behavior.** No `continue`, `return` or loop changed. A leading `"\n"`
+became `print()` before the message. Headings that already followed a
+blank line use `section(blank_before=False)`. Prompts and the handling
+of `0` and of invalid input are unchanged, with one exception: the two
+lists that offered 0 only in their prompt ("Hit number (0 cancel)",
+"Record number (0 cancel)") now show `[0] Cancel` and drop the
+parenthesis.
+
+The following were rendered with scripted input; BLAST ran against a
+mocked client, so nothing was sent:
+
+- every changed dialog: the BLAST database manager errors, the catalog,
+  the local selector with and without databases, the FASTA, engine,
+  program, remote-database and hit lists, the privacy notice and resume;
+- CRISPR: system, editor, batch records, no sequence, invalid number;
+- the cloning count, vector and insert errors;
+- the literature empty query, results and article detail;
+- the ORF selector and the restriction topology;
+- the primer report with and without pairs.
+
+**Tests.** `DirectOutputTests` reads every `print()` of the sixteen files
+through the AST. It reports:
+
+- computed menu keys;
+- plain messages;
+- plain headings, also as the start of an f-string;
+- dashes drawn inside a printed text.
+
+A sample test pins each rule. Against `1516339` the rules report 68
+sites; against `HEAD`, none.
+
+**Verification at `ccc987b`:**
+
+| Check | Result |
+|---|---|
+| Full suite | 328 tests, OK, 0 skipped |
+| Golden master | 12 tests, OK; no golden file changed since `1516339` |
+| Built-in self-tests | BLAST 33/33, CRISPR 28/28, literature 64/64, mutation 44/44, variant 27/27 |
+| pyright 1.1.414 (`--pythonversion 3.10`) | 112, no new diagnostic. The first test commit had added two; `ccc987b` removed them. |
+| `git diff --check 1516339 HEAD` | clean; line endings unchanged in every file (CRLF sources, LF tests and docs, the two bare-LF lines of `orf.py`) |
+| ReadOnly | restored on all 15 files |
+
+**What remains, and is documented in `TERMINAL_UI_STANDARD.md` §9:**
+
+- the core→ui dependency at call time (recommendation 4);
+- rendered tests for the other 21 menus (recommendation 5);
+- headings inside text reports built as strings;
+- about 20 hand-padded label lines;
+- the prefixes "SCIENTIFIC LIMITATION:" and "RESULT:";
+- the BLAST hit selector's "list index out of range" reply;
+- the own prompt labels of the converted lists.
+
+**Verdict after this follow-up.** The 59 direct prints the review found
+are gone, and a test now catches their return. What is left is either a
+stated exception or listed as open work. Stage F can be called unified
+for printed screens, menus and messages. It cannot yet be called
+architecturally complete (recommendation 4) or fully tested as rendered
+(recommendation 5).

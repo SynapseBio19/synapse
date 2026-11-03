@@ -502,3 +502,17 @@ those dialogs. `EmptyAnswerTests` now drive them with an empty answer.
 The owner released its recommendations 1–3: correct the claims,
 convert the 59 prints, and correct `FEATURE_STATUS.md`. Recommendations
 4 (core/ui) and 5 (full menu coverage) are deferred.
+
+## 13. Recommendations 1-3 of the closing review (2026-11-03)
+
+The following were converted:
+
+- 44 messages: the review's 31 and 13 found on the way;
+- 18 headings: 13 through `section()`, one as an OK message, and 5 as
+  group labels;
+- the 9 dynamic option lists, through `style.menu()`.
+
+`DirectOutputTests` now fails on the code before the conversion, with
+68 sites. `FEATURE_STATUS.md` has the menu numbers of the code. Details,
+counts and the remaining open items are in
+`docs/STAGE_F_FINAL_REVIEW.md` section 9.
