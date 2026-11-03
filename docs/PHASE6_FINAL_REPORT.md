@@ -64,11 +64,16 @@ Python 3.10 blocker in Stage I.
   bracketed prompts returned the hint. Recommendations 1-3 of that
   review then converted the 59 prints, plus 13 more messages found on
   the way, and added a rule that catches them
-  (`docs/STAGE_F_FINAL_REVIEW.md` §9). The core→ui dependency and
-  rendered tests for the remaining 21 menus are still open. One message prefix per category, one
+  (`docs/STAGE_F_FINAL_REVIEW.md` §9). Recommendations 4 and 5 then
+  removed core's dependency on `ui` (core hands the status to a
+  renderer; a test runs core with `ui` refused) and rendered all 47
+  menus with their invalid input, cancel, error states and results
+  (§10). That found the single-enzyme cloning crash present since the
+  audit, and a second Enter regression. The analyses still import
+  `ui` because their menus live in them (P2-2). One message prefix per category, one
   notation per unit, 1-based positions everywhere a user sees them, and a
   style guide whose mechanical rules the test suite enforces.
-- Evidence: 328 tests (109 at the end of the previous cycle), including
+- Evidence: 356 tests (109 at the end of the previous cycle), including
   external reference comparisons with Biopython 1.88 and primer3-py
   2.4.0, BLAST+ 2.17.0 executions, and cross-module workflow tests.
 
@@ -254,15 +259,16 @@ Recommendations 1-3 were carried out on 2026-11-03 (`46710cd` to
 - `DirectOutputTests` was added;
 - the `FEATURE_STATUS.md` numbers were corrected.
 
-Recommendations 4 and 5 are deferred.
+Recommendations 4 and 5 followed the same day (`b25e800` to
+`a39c39f`, `docs/STAGE_F_FINAL_REVIEW.md` §10).
 
 **Remaining exceptions**, each with its
 reason in `TERMINAL_UI_STANDARD.md` section 9: raw line input, two
 CRISPR numeric helpers, closing rules, analysis result lines; the mutation
 module's sequence prompt offers no `[0]` (a cancel needs a control-flow
-change in four callers); `core/pipeline.py` prints status from inside
-`core/` through two function-local imports; the menus still live inside
-the analysis modules (P2-2).
+change in four callers); the menus still live inside the analysis
+modules, which therefore import `ui` (P2-2). `core/` no longer imports
+`ui` (recommendation 4).
 
 ---
 
@@ -329,14 +335,14 @@ report, on the development machine:
 
 | Measure | Value |
 |---|---|
-| Tests run | 328 (2026-11-03) |
-| Passed | 328 |
+| Tests run | 356 (2026-11-03) |
+| Passed | 356 |
 | Failed | 0 |
 | Skipped | 0 (BLAST+, Biopython and primer3-py all present) |
 | Golden-master snapshots | 13, all matching; one intentional change in Phase 6 (D18, key rename, values proven identical) |
 | Built-in module self-tests | all passing (run by the suite) |
 | Integration workflows | 7 tests (10.1-10.4, 10.7), all passing |
-| pyright 1.1.414, `--pythonversion 3.10` | 112 diagnostics against the Phase 6 baseline of 134; no new diagnostic in any package |
+| pyright 1.1.414, `--pythonversion 3.10` | 111 diagnostics against the Phase 6 baseline of 134; no new diagnostic in any package |
 
 **Scientific reference comparisons** (external, not experimental):
 
@@ -419,9 +425,9 @@ at the start. Not committed by design: `exports/`, `logs/`,
 | NEBcutter comparison of a circular digest (P1-4) | restriction | web service; largely covered by the Biopython pUC19 comparison | approval | decide whether still needed | environmental |
 | Local BLAST on a real database | BLAST | `nt` is too large; only test databases used | approval for a ~0.5 GB download | swissprot as a proportionate step | environmental |
 | HGVS conformance against a validator | mutation | no validator installed | `hgvs` package or Mutalyzer (approval) | compare a variant set | scientific |
-| `core/pipeline.py` prints from `core/` | pipeline | layering follow-up of Stage F | none | move `print_status` to `ui/` | technical |
+| Analysis modules import `ui` (their menus, P2-2) | all analyses | ~8,900 lines of menu code in 133 definitions; core itself is free of `ui` since recommendation 4 | none | move the menus out of the modules | technical |
 | "complexity" field names | sequence, RNA, CRISPR, mutation | kept for compatibility; meaning documented | none | rename with a documented snapshot change, if wanted | technical |
-| 112 pyright errors (standard mode, Python 3.10) | primer, CRISPR, mutation, tests | reduced from 134, not cleared | none | triage for reachable `None` paths | technical |
+| 111 pyright errors (standard mode, Python 3.10) | primer, CRISPR, mutation, tests | reduced from 134, not cleared | none | triage for reachable `None` paths | technical |
 | Tool and data ledger (1.3.1, 11.8) | project | versions recorded; source, access date, license and checksum are not | none | write the ledger | environmental |
 | Line coverage | tests | no coverage tool installed | approval to install `coverage` | measure and report | technical |
 | Missing-file and runtime invalid-selection tests (11.4) | input, menus | not written | none | add both | technical |

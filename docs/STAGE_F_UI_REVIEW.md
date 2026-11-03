@@ -516,3 +516,18 @@ The following were converted:
 68 sites. `FEATURE_STATUS.md` has the menu numbers of the code. Details,
 counts and the remaining open items are in
 `docs/STAGE_F_FINAL_REVIEW.md` section 9.
+
+## 14. Recommendations 4 and 5 of the closing review (2026-11-03)
+
+`core` no longer imports `ui`. It hands the pipeline status, as data, to a
+renderer that `ui.report` supplies, and `LayeringTests` checks this with
+`ui` refused.
+
+`tests/test_rendered_menus.py` renders and drives all 47 menus. While
+doing so it found three defects, which are now corrected:
+
+- the single-enzyme cloning analysis had always crashed;
+- Enter in the Tm model dialog no longer chose nearest-neighbor;
+- three messages were still printed without a category.
+
+Details are in `docs/STAGE_F_FINAL_REVIEW.md` section 10.

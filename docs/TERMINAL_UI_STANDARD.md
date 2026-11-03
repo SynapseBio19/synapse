@@ -83,7 +83,7 @@ as strings.
 
 **Adoption.** Every interface file draws its screens through these
 renderers (Stage F completion, 2026-11-02): `main.py`, `ui/menu.py`,
-`ui/report.py`, `core/pipeline.py` (through function-local imports) and
+`ui/report.py` (which also draws the pipeline status that `core` hands it) and
 the modules ORF, CRISPR, BLAST, literature, primer, variant analysis,
 sequence overview, RNA, protein, restriction, cloning and mutation. What
 they still print themselves is listed in section 9.
@@ -186,11 +186,25 @@ vocabulary.
 `ui/style.py` holds the presentation and nothing else: it decides how
 something is drawn, never what it says or what it means.
 
-`core/pipeline.py` prints status to the terminal from inside `core/`. It
-takes `ui.style` through function-local imports so `core` keeps no
-module-level dependency on `ui`. Moving `print_status()` into `ui/` would
-be the cleaner arrangement and is recorded as follow-up work; the layering
-inversion is confined to two imports rather than spread through the file.
+`core/` draws nothing and imports nothing from `ui/` (Stage F,
+recommendation 4, 2026-11-03). `PipelineContext.status_report()` returns
+the pipeline status as data; `print_status(render)` hands that data to a
+`StatusRenderer`, a callable the interface supplies. The terminal passes
+`ui.report.print_pipeline_status`, which draws the screen with the shared
+renderers. Until then `print_status()` drew the screen itself through
+function-local imports of `ui.style`, which only deferred the dependency
+to call time.
+
+**The analysis modules still need `ui`.** All twelve import `ui.style`
+when they are imported, because their menus live with the science
+(P2-2): 133 top-level definitions with about 8,900 lines use it. The
+functions that `core/api.py` and the pipeline call are scientific ones;
+of them only `orf.select_orf` (an interactive selector) and
+`mutation.build_mutation_report` (which aligns its text report with
+`field_line()`) touch `ui.style`. So `core` itself runs without `ui`, but
+an analysis run through `core.api` still imports `ui` with its analysis
+module. Removing that means moving the menus out of the modules, which
+is P2-2 and a change of its own, not part of recommendation 4.
 
 The analysis modules still own their own menus (`run_*_ui`, `*_menu`).
 `core/api.py` is the non-interactive layer for every analysis, so a
@@ -207,7 +221,11 @@ menus from the analysis modules is the remaining part of audit item P2-2.
 3. `Exit` appears only in the main menu and the sequence selector.
 4. No `Error:`/`Warning:` prefix variants in user-facing messages.
 5. `ui/style.py` imports nothing from `analyses/` or `core/`, so the
-   presentation layer stays free of scientific logic.
+   presentation layer stays free of scientific logic. `core/` imports
+   `ui` nowhere, not even inside a function; in an interpreter that
+   refuses `ui`, every core module imports, the pipeline builds, reports
+   and exports its status, and `python -m core.pipeline` runs
+   (`LayeringTests`).
 6. Menu numbers are contiguous, and every entry has a dispatch branch
    and every branch an entry (BLAST menu and main menu).
 7. **Rendered screens** (`RenderedScreenTests`), driven with scripted
@@ -232,6 +250,13 @@ menus from the analysis modules is the remaining part of audit item P2-2.
     own dashes. The one named exception is the invalid-character list
     under the sequence validation error, which is a result line. On
     `1516339` the rule reports 68 sites.
+11. **Every menu rendered** (`tests/test_rendered_menus.py`): 39 dialogs
+    driven with scripted keys; every `style.menu` call site of the
+    sixteen files must be drawn by a scenario or a first-screen test
+    (47 of 47); every drawn menu has unique keys, numbers 1..n, an
+    allowed `[0]`, the entries it was given, a blank line before `[0]`
+    and the closing rule; each dialog is checked for its entries, the
+    reply to an unknown key, `0`, its error states and its result view.
 
 ## 8. Numbering
 
@@ -283,7 +308,14 @@ What remains outside the shared renderers, each for a stated reason:
   status lines such as "Loaded 2 FASTA record(s).". The BLAST hit
   selector answers an out-of-range number with "ERROR: list index out
   of range" instead of "Invalid selection." (unchanged behavior).
-- **`core/pipeline.py`** prints from `core/` through function-local
-  imports (section 6); moving `print_status` to `ui/` is structural work.
+- **`ui` imported by the analysis modules** (section 6): resolved for
+  `core` itself; for the analyses it is part of P2-2.
+- **Screens behind no menu test** (instrumented 2026-11-03): 46 of 101
+  `header()` calls, 41 of 72 `ask()` calls and 2 of 7 `confirm()` calls
+  are executed by the suite. The rest are export paths, NCBI downloads
+  and removals, remote submissions and similar dialogs that need files,
+  tools or network; all 47 menus and all 33 `ask_choice()` calls run.
+- **BLAST query type**: the explanation of an undetermined type is the
+  exception text printed as it is, and an unknown key cancels like `0`.
 - **Menus inside the analysis modules** (P2-2): every menu uses the
   shared renderer, but the menu code still lives with the science.

@@ -400,3 +400,133 @@ stated exception or listed as open work. Stage F can be called unified
 for printed screens, menus and messages. It cannot yet be called
 architecturally complete (recommendation 4) or fully tested as rendered
 (recommendation 5).
+
+## 10. Follow-up: recommendations 4 and 5 carried out (2026-11-03)
+
+| Commit | Package |
+|---|---|
+| `b25e800` | 4. core hands the status to a renderer; `ui.report.print_pipeline_status` draws it |
+| `b4e5a53` | 4. `LayeringTests`: core imports and runs with `ui` refused |
+| `c78800e` | Found: Enter in the Tm model dialog (Stage F regression) |
+| `61d0d38` | Found: three more input-check messages as ERROR lines |
+| `8eddc72` | Found: the single-enzyme cloning analysis always crashed |
+| `a39c39f` | 5. `tests/test_rendered_menus.py` |
+
+### Recommendation 4: core and ui
+
+**Analysis first.** With `ui` refused by the import system, all nine
+core modules imported, but `print_status()` failed. `print_status()` and
+the `__main__` demonstration were the only places in `core/` that used
+`ui`.
+
+The analysis modules are a different matter. All twelve import
+`ui.style` at import time, because their menus live inside them (P2-2):
+133 top-level definitions with about 8,900 lines use it. Making the
+analyses independent of `ui` means moving those menus out. That is P2-2,
+so it was analyzed and recorded, not started.
+
+**Change.**
+
+- `PipelineContext.status_report()` returns the status as data.
+- `print_status(render)` passes it to a `StatusRenderer`, a callable the
+  interface supplies. `SynapsePipeline` forwards both.
+- `ui.report.print_pipeline_status(report)` draws the screen. The `[P]`
+  entry in `main.py` passes it.
+- The `__main__` smoke test prints the status as JSON.
+- `core/` imports `ui` nowhere.
+- The rendered screen is byte-identical to the previous one in four
+  pipeline states.
+
+**Tests.** `LayeringTests` checks four things:
+
+- no `ui` import anywhere in `core/`;
+- a fresh interpreter that refuses `ui` imports every core module and
+  runs core's own logic: pipeline, status report, an arbitrary renderer,
+  classification, reverse complement, translation, and the analysis
+  report built and exported;
+- `python -m core.pipeline` runs with `ui` refused;
+- the terminal renderer draws the shared frame.
+
+On the commit before, three of these fail and one errors.
+
+### Recommendation 5: rendered tests
+
+`tests/test_rendered_menus.py` runs 39 dialogs with scripted keys and
+records every menu drawn: its call site, entries, group labels, `[0]`
+label, screen title and the text on screen.
+
+- **Coverage.** All 47 `style.menu` call sites are drawn: 39 by the
+  scenarios, the rest by the first-screen tests. Independent
+  instrumentation of the full suite confirms 47 of 47. A new menu without
+  a scenario fails the suite.
+- **Layout.** All 185 drawn menus have unique keys, numbers 1..n and an
+  allowed `[0]`. Each shows the entries it was given, a blank line before
+  `[0]` and the closing rule.
+- **Each dialog** is checked for:
+  - its entries and numbering;
+  - the reply to an unknown key (36 replies across the scenarios);
+  - `0` as Back or Cancel and what it returns;
+  - its error states, such as an unknown or missing enzyme, duplicate
+    enzymes, a wrong export extension, an invalid minimum length, or a
+    result that does not exist yet;
+  - its result views. These include the BLAST summary, alignment and
+    evidence profile from a mocked NCBI run, every restriction view, the
+    cloning reports, the CRISPR ranking and exports, the mutation
+    comparison, and the ORF settings following their values.
+- **Dynamic menus** are tested too:
+  - BLAST: local databases, catalog, FASTA records, programs, remote
+    databases, hits;
+  - CRISPR: systems, editors, batch records;
+  - cloning: enzymes and inserts;
+  - ORF candidates, the mutation sequence prompt and the sequence
+    selector.
+
+**What the tests found:**
+
+1. **Single-Enzyme Analysis had never worked** (`8eddc72`). Every enzyme
+   raised `KeyError: 'left'`, already at the audit commit `0dad3bb`;
+   FEATURE_STATUS had listed the entry as "Reachable". The cause:
+   `print_cloning_report()` sent the single-enzyme result to the
+   two-enzyme report. It now has a report of its own, built from the
+   fields `analyze_cloning()` returns. No calculation changed.
+2. **The Tm model dialog** (`c78800e`). Enter at "Selection [1]" had
+   chosen nearest-neighbor until `fb4070a` dropped that key, so both
+   primer dialogs now answered "Invalid selection.". The empty answer
+   maps to nearest-neighbor again.
+3. **Three plain messages** became ERROR lines (`61d0d38`): the two
+   duplicate-enzyme errors in cloning and the wrong CRISPR export
+   extension. The direct-output rule did not match their wording.
+
+**Observed, not changed:**
+
+- The score reasons of the single-enzyme design speak of "two-end
+  architectures". That is the scoring function's text.
+- The BLAST hit selector answers an out-of-range number with "ERROR:
+  list index out of range".
+- An unknown key at the BLAST query-type question cancels like `0`.
+
+### Verification at `a39c39f`
+
+| Check | Result |
+|---|---|
+| Full suite | 356 tests, OK, 0 skipped (48 s) |
+| Golden master | 12 tests, OK; no golden file changed |
+| Module self-tests | BLAST, CRISPR, literature: pass; mutation 44/44; variant 27/27 |
+| pyright 1.1.414 (`--pythonversion 3.10`) | 111, no new diagnostic (baseline 134) |
+| `git diff --check 228b800 HEAD` | clean; line endings unchanged |
+| ReadOnly | restored on all 15 files |
+| Count in the commit message of `a39c39f` | it says 186 drawn menus; the committed scenarios draw 185 (one redundant answer was removed before the commit) |
+| Instrumented coverage | `menu` 47/47, `ask_choice` 33/33, `ask` 41/72, `header` 46/101, `confirm` 2/7 |
+
+### Verdict
+
+Recommendation 4 is done for `core`: it neither imports nor needs `ui`,
+and a test enforces this. The analyses' dependency on `ui` is part of
+P2-2 and is documented with its size.
+
+Recommendation 5 is done for the menus: every menu is rendered and
+driven, with its invalid input, cancel, error states and result view.
+
+Not every screen is tested. Export, download, removal and remote-submit
+dialogs need files, tools or network, and remain covered only partly
+(see the instrumented figures above).

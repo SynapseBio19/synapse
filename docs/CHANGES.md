@@ -1996,3 +1996,33 @@ left; the owner released recommendations 1-3.
 
 No scientific calculation, data model or golden-master value changed.
 Suite 328/328, golden master 12/12, pyright 112 with no new diagnostic.
+
+## Stage F closing review, recommendations 4 and 5 (2026-11-03)
+
+- **core/ui (`b25e800`, `b4e5a53`).**
+  - `PipelineContext.status_report()` returns the status as data.
+  - `print_status(render)` takes a `StatusRenderer`; `[P]` passes
+    `ui.report.print_pipeline_status`.
+  - core imports `ui` nowhere; the screen is byte-identical.
+  - `LayeringTests` runs core in an interpreter that refuses `ui`.
+  - API change: `print_status()` now needs the renderer argument. Its
+    only callers were `main.py`, `SynapsePipeline` and a test.
+- **Single-Enzyme Analysis (`8eddc72`).**
+  - Previous behavior: every enzyme raised `KeyError: 'left'`, since at
+    least the audit commit, because the result went to the two-enzyme
+    report.
+  - Corrected behavior: a report of its own from the fields
+    `analyze_cloning()` returns. No calculation changed.
+- **Tm model dialog (`c78800e`).**
+  - Previous behavior (since `fb4070a`): Enter answered "Invalid
+    selection.".
+  - Corrected behavior: Enter chooses nearest-neighbor, as the prompt
+    says.
+- **Messages (`61d0d38`).** Two duplicate-enzyme errors in cloning and the
+  CRISPR export-extension error are ERROR lines.
+- **Rendered menus (`a39c39f`).** `tests/test_rendered_menus.py` drives all
+  47 menus: entries, numbering, `0`, invalid input, error states and
+  result views. The NCBI client is mocked.
+
+Golden master unchanged; suite 356/356; pyright 111 with no new
+diagnostic.
