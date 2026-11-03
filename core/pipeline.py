@@ -18,7 +18,7 @@
 
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 
 from core.models import AnalysisResult, SequenceRecord, sha256_text
 from data.restriction_enzymes import ENZYME_DATABASE_VERSION
@@ -51,6 +51,11 @@ STATUS_LABELS = {
     "literature": "Literature Search",
 }
 STATUS_MODULES = tuple(STATUS_LABELS)
+
+# The interface between core and whatever displays the pipeline status:
+# a callable that receives PipelineContext.status_report(). core imports no
+# interface module; the terminal passes ui.report.print_pipeline_status.
+StatusRenderer = Callable[[Dict[str, Any]], None]
 
 
 @dataclass
@@ -429,58 +434,33 @@ class PipelineContext:
     # STATUS REPORT
     # ========================================================
 
-    def print_status(self):
-        # Terminal output living in core; it uses the shared presentation
-        # module through a local import so core keeps no module-level
-        # dependency on ui (Stage F).
-        from ui import style
-        from ui.style import major_rule, minor_rule
+    def status_report(self) -> Dict[str, Any]:
+        """The pipeline status as plain data, for whichever interface shows it.
 
-        labels = STATUS_LABELS
+        core decides what the status is; how it is drawn belongs to the
+        interface (``ui.report.print_pipeline_status`` for the terminal).
+        """
+        return {
+            "header": self.header,
+            "length": self.length,
+            "topology": self.topology,
+            "sequence_sha256": self.sequence_sha256 if self.sequence else None,
+            "source_path": (self.record.source_path
+                            if self.record is not None and self.record.source_path else None),
+            # None: no ORF selected; "-": an ORF without a rank.
+            "selected_orf_rank": (None if self.selected_orf is None
+                                  else self.selected_orf.get("rank", "-")),
+            "rna_source": self.rna_source or None,
+            "protein_source": self.protein_source or None,
+            "analyses": [
+                {"key": key, "label": label, "stored": len(self.results.get(key, []))}
+                for key, label in STATUS_LABELS.items()
+            ],
+        }
 
-        style.header('Pipeline status')
-
-        style.section('Current Sequence')
-
-        style.field('Header', f"{self.header or '-'}")
-
-        style.field('Length', f"{self.length} bp")
-
-        style.field('Topology', f"{self.topology}")
-
-        if self.sequence:
-            style.field('SHA-256', f"{self.sequence_sha256[:16]}...")
-
-        if self.record is not None and self.record.source_path:
-            style.field('Source file', f"{self.record.source_path}")
-
-        if self.selected_orf is not None:
-
-            style.field('Selected ORF', f"#{self.selected_orf.get('rank', '-')}")
-
-        if self.rna_source:
-
-            style.field('RNA Source', f"{self.rna_source}")
-
-        if self.protein_source:
-
-            style.field('Protein Source', f"{self.protein_source}")
-
-        style.section('Analysis Status')
-
-        for key, label in labels.items():
-
-            count = len(self.results.get(key, []))
-            state = (
-                f"COMPLETED ({count} stored)"
-                if count
-                else "NOT RUN"
-            )
-
-            print(style.columns((label, state), (28,)))
-
-        print()
-        print(major_rule())
+    def print_status(self, render: StatusRenderer) -> None:
+        """Hand the status to an interface's renderer; core itself draws nothing."""
+        render(self.status_report())
 
 
 # ============================================================
@@ -1278,9 +1258,13 @@ class SynapsePipeline:
 
         return self.context.status()
 
-    def print_status(self):
+    def status_report(self) -> Dict[str, Any]:
 
-        self.context.print_status()
+        return self.context.status_report()
+
+    def print_status(self, render: StatusRenderer) -> None:
+
+        self.context.print_status(render)
 
     def get_results(self):
 
@@ -1311,8 +1295,9 @@ def create_pipeline(
 # ============================================================
 
 if __name__ == "__main__":
-    from ui import style
-    from ui.style import major_rule
+    # A smoke test of core alone: it prints the status as data, so it runs
+    # without any interface module.
+    import json
 
     test_sequence = (
         "ATGCGTACGAATTCGGGATCCATGCGAAGCTTACGTCGAGCTCGGTACCT"
@@ -1326,11 +1311,4 @@ if __name__ == "__main__":
         topology="linear",
     )
 
-    style.header('Pipeline test')
-    style.field('Sequence', f"{pipeline.context.header}")
-
-    style.field('Length', f"{pipeline.context.length} bp")
-
-    style.success("Pipeline initialized.")
-
-    pipeline.print_status()
+    print(json.dumps(pipeline.status_report(), indent=2))

@@ -9,6 +9,42 @@ from ui import style
 
 
 # ============================================================
+# PIPELINE STATUS
+# ============================================================
+
+def print_pipeline_status(report):
+    """The pipeline status screen, drawn from ``PipelineContext.status_report()``.
+
+    core produces the data and imports nothing from ui; this is the
+    terminal's renderer for it (Stage F, recommendation 4).
+    """
+    style.header('Pipeline status')
+
+    style.section('Current Sequence')
+    style.field('Header', f"{report['header'] or '-'}")
+    style.field('Length', f"{report['length']} bp")
+    style.field('Topology', f"{report['topology']}")
+    if report["sequence_sha256"]:
+        style.field('SHA-256', f"{report['sequence_sha256'][:16]}...")
+    if report["source_path"]:
+        style.field('Source file', f"{report['source_path']}")
+    if report["selected_orf_rank"] is not None:
+        style.field('Selected ORF', f"#{report['selected_orf_rank']}")
+    if report["rna_source"]:
+        style.field('RNA Source', f"{report['rna_source']}")
+    if report["protein_source"]:
+        style.field('Protein Source', f"{report['protein_source']}")
+
+    style.section('Analysis Status')
+    for entry in report["analyses"]:
+        state = f"COMPLETED ({entry['stored']} stored)" if entry["stored"] else "NOT RUN"
+        print(style.columns((entry["label"], state), (28,)))
+
+    print()
+    print(major_rule())
+
+
+# ============================================================
 # REPORT HELPERS
 # ============================================================
 

@@ -380,6 +380,7 @@ class RenderedScreenTests(unittest.TestCase):
         import sys
         import tempfile
         from core.pipeline import SynapsePipeline
+        from ui.report import print_pipeline_status
         with tempfile.TemporaryDirectory() as logs:
             env = dict(os.environ, SYNAPSE_LOG_DIR=logs, PYTHONIOENCODING="utf-8")
             overview = subprocess.run([sys.executable, "main.py"], cwd=PROJECT_ROOT, input="\n1\n0\n",
@@ -388,7 +389,7 @@ class RenderedScreenTests(unittest.TestCase):
         buffer = io.StringIO()
         pipeline = SynapsePipeline("ACGT" * 30, "demo")
         with contextlib.redirect_stdout(buffer):
-            pipeline.print_status()
+            pipeline.print_status(print_pipeline_status)
         field = re.compile(r"^([A-Za-z][^:\[]{0,20}):( +)\S")
         for name, text in (("sequence overview", overview), ("pipeline status", buffer.getvalue())):
             with self.subTest(screen=name):

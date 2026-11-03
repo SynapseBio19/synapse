@@ -75,7 +75,7 @@ from analyses.literature import (
     build_sequence_literature_context,
 )
 
-from ui.report import print_results
+from ui.report import print_pipeline_status, print_results
 from ui.menu import select_gene, show_menu
 from ui.style import major_rule, minor_rule
 from ui import style
@@ -885,7 +885,7 @@ def main():
 
             elif choice == "P":
 
-                pipeline.print_status()
+                pipeline.print_status(print_pipeline_status)
 
                 style.pause()
 
