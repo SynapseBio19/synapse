@@ -219,16 +219,93 @@ class LayeringTests(unittest.TestCase):
         self.assertEqual(imported & {"analyses", "core", "data", "fileio"}, set(),
                          f"ui.style must stay presentation-only, imports: {sorted(imported)}")
 
-    def test_core_has_no_module_level_dependency_on_ui(self):
-        for path in (PROJECT_ROOT / "core").glob("*.py"):
-            tree = ast.parse(read(path))
-            top_level = [n for n in tree.body if isinstance(n, (ast.Import, ast.ImportFrom))]
-            for node in top_level:
-                module = getattr(node, "module", "") or ""
-                names = [a.name for a in node.names]
-                with self.subTest(file=path.name):
-                    self.assertFalse(module.startswith("ui") or any(n.startswith("ui") for n in names),
-                                     f"{path.name} imports ui at module level")
+    def test_core_imports_ui_nowhere(self):
+        """Not at module level and not inside a function: a deferred import is still a dependency."""
+        hits = []
+        for path in sorted((PROJECT_ROOT / "core").glob("*.py")):
+            for node in ast.walk(ast.parse(read(path))):
+                if isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
+                    modules = [node.module]
+                elif isinstance(node, ast.Import):
+                    modules = [alias.name for alias in node.names]
+                else:
+                    continue
+                hits.extend(f"{path.name}:{node.lineno}: {m}" for m in modules
+                            if m == "ui" or m.startswith("ui."))
+        self.assertEqual(hits, [])
+
+    def test_core_runs_with_the_ui_package_unavailable(self):
+        """Import every core module and run core's own logic while `ui` cannot be imported."""
+        import subprocess
+        import sys
+        import textwrap
+        probe = textwrap.dedent('''
+            import importlib.abc, json, pkgutil, sys, tempfile, os
+
+            class BlockUi(importlib.abc.MetaPathFinder):
+                def find_spec(self, name, path, target=None):
+                    if name == "ui" or name.startswith("ui."):
+                        raise ImportError("ui is unavailable: " + name)
+
+            sys.meta_path.insert(0, BlockUi())
+            import core
+            for info in pkgutil.iter_modules(core.__path__):
+                __import__("core." + info.name)
+
+            from core.pipeline import SynapsePipeline
+            from core.report import build_analysis_report, export_analysis_report
+            from core.alphabets import classify_sequence
+            from core.seqtools import reverse_complement, get_genetic_code
+
+            pipeline = SynapsePipeline("ATGAAACCCGGGTTTTAA" * 5, "demo")
+            report = pipeline.status_report()
+            assert report["length"] == 90 and len(report["analyses"]) == 12, report
+            seen = []
+            pipeline.print_status(seen.append)          # any renderer, here a list
+            assert seen == [report]
+            assert classify_sequence("ACGU").sequence_type == "RNA"
+            assert reverse_complement("AACG") == "CGTT"
+            assert get_genetic_code(11).translate("ATGAAATAA") == "MK"
+            build_analysis_report(pipeline)
+            export_analysis_report(pipeline, os.path.join(tempfile.mkdtemp(), "r.json"))
+            assert not any(n == "ui" or n.startswith("ui.") for n in sys.modules)
+            print("CORE WITHOUT UI OK")
+        ''')
+        completed = subprocess.run([sys.executable, "-c", probe], cwd=PROJECT_ROOT,
+                                   capture_output=True, text=True, timeout=120)
+        self.assertIn("CORE WITHOUT UI OK", completed.stdout, completed.stderr[-2000:])
+
+    def test_core_smoke_test_runs_without_ui(self):
+        """`python -m core.pipeline` prints the status as data, with ui unavailable."""
+        import json
+        import subprocess
+        import sys
+        probe = ("import importlib.abc, runpy, sys\n"
+                 "class B(importlib.abc.MetaPathFinder):\n"
+                 "    def find_spec(self, name, path, target=None):\n"
+                 "        if name == 'ui' or name.startswith('ui.'): raise ImportError(name)\n"
+                 "sys.meta_path.insert(0, B())\n"
+                 "runpy.run_module('core.pipeline', run_name='__main__')\n")
+        completed = subprocess.run([sys.executable, "-c", probe], cwd=PROJECT_ROOT,
+                                   capture_output=True, text=True, timeout=120)
+        self.assertEqual(completed.returncode, 0, completed.stderr[-2000:])
+        self.assertEqual(json.loads(completed.stdout)["header"], "TEST_DNA")
+
+    def test_terminal_status_screen_is_drawn_by_ui(self):
+        """The renderer core receives is ui.report's, and it draws the shared screen."""
+        import contextlib
+        import io
+        from core.pipeline import SynapsePipeline
+        from ui.report import print_pipeline_status
+        pipeline = SynapsePipeline("ACGT" * 30, "demo")
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            pipeline.print_status(print_pipeline_status)
+        lines = buffer.getvalue().splitlines()
+        self.assertEqual(lines[1:4], [style.major_rule(), "PIPELINE STATUS", style.major_rule()])
+        self.assertIn(style.field_line("Length", "120 bp"), lines)
+        self.assertIn(style.columns(("Sequence Overview", "NOT RUN"), (28,)), lines)
+        self.assertEqual(lines[-1], style.major_rule())
 
 
 # ----------------------------------------------------------------------
