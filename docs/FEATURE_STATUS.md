@@ -4,6 +4,9 @@ State as of the Phase 6 initial audit, 2026-10-30, commit `0dad3bb`,
 updated through the end of Phase 6 (2026-11-02). A finding marked
 corrected names the date; the evidence is in `docs/CHANGES.md` and
 `docs/PHASE6_PROGRESS.md`.
+Menu numbers are those of the code at the end of Stage F (2026-11-03);
+the line and definition counts in the section headings are those of the
+initial audit (non-blank lines at `0dad3bb`).
 Companion to `docs/PHASE6_INITIAL_AUDIT.md`, which holds the evidence for
 every defect referenced here as `D…` (confirmed) or `S…` (suspected).
 
@@ -38,10 +41,10 @@ simulated keystrokes (see audit §11.5).
 | Functions and classes inventoried | ~1,100 |
 | Main-menu entries | 15 |
 | Sub-menu entries inventoried | 78 |
-| Automated tests | 283, all passing (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1 + 5 D2 + 5 D14-F2 + 11 sequence-type classifier + 6 D14-F3/F11 + 7 D14-F1 + 9 D13/D14-F4/F5/F7 + 5 D14-F6 + 3 D14-F8–F10 + 3 D6 + 3 D9 + 3 D8 + 4 D10/D11 + 2 D19 + 1 D15 + 2 S15/S16 + 2 S17 + 2 S19 + 9 S23/S3/S4/S5 + 1 D16 + 7 S8/S10/S21/S22 + 4 S1/S2/S9 + 5 P1-9 + 3 S18 + 8 S14 + 9 P1-7 + 2 S13 + 12 Stage F + 4 S24) |
-| Module self-tests | 12 suites, all passing (CRISPR 28, BLAST 33, mutation 44, variant 27, others aggregated) |
+| Automated tests | 328, all passing (2026-11-03). The count at the end of Stage 4 was 283: (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1 + 5 D2 + 5 D14-F2 + 11 sequence-type classifier + 6 D14-F3/F11 + 7 D14-F1 + 9 D13/D14-F4/F5/F7 + 5 D14-F6 + 3 D14-F8–F10 + 3 D6 + 3 D9 + 3 D8 + 4 D10/D11 + 2 D19 + 1 D15 + 2 S15/S16 + 2 S17 + 2 S19 + 9 S23/S3/S4/S5 + 1 D16 + 7 S8/S10/S21/S22 + 4 S1/S2/S9 + 5 P1-9 + 3 S18 + 8 S14 + 9 P1-7 + 2 S13 + 12 Stage F + 4 S24) |
+| Module self-tests | 12 suites, all passing (literature 64, mutation 44, BLAST 33, CRISPR 28, variant 27, others aggregated) |
 | Golden-master scenarios | 12 |
-| Confirmed defects | 19 (D1–D19); corrected so far: 16 (D12, D4, D3, D5, D1, D2, D13, D14 with all sub-findings F1–F12, D6, D7, D8, D9, D10, D11, D15, D19; 2026-10-31) and D16 partially (duplicate definition removed; v5–v11 chain deferred) |
+| Confirmed defects | 19 (D1–D19), all corrected by the end of Phase 6 (`docs/PHASE6_FINAL_REPORT.md`, section A; D16 finished with the removal of the superseded primer generations). The first 16 corrections are dated 2026-10-31 in the rows below. |
 | Suspected / unverified concerns | 14 at the audit (S1–S14); S15–S24 recorded since |
 | External validations performed in this audit | 8 (audit §3, §6) |
 | Features advertised but not implemented | 1 (`[11] AI Experiment Planner`, labeled "not implemented" since D15) |
@@ -112,8 +115,8 @@ relative to its use (every session runs it).
 | 6.3 | Nested ORFs | `_keep_longest_per_stop` | Implemented | Execution-tested | Not applicable | **S2 not a defect** (verified by execution 2026-10-31): nested minus-strand ORFs share frame and 3' end and collapse correctly. |
 | 6.4 | Ranking | `_orf_sort_key`, `rank_orf_candidates` | Implemented | Execution-tested | Not applicable | `length` (default) or `heuristic`. |
 | 6.5 | Partial ORFs | `find_orfs(include_partial=)` | Partially implemented | Execution-tested | Not applicable | 3′-partial (missing stop) only. **5′-partial not implemented** (METHODS states this). |
-| 6.8 | Genetic code | `codon_table_for` | Implemented | Execution-tested | Independently validated | NCBI 1, 2, 4, 11 verified against `Bio.Data.CodonTable`. |
-| 6.6/6.7 | Restore Synapse / legacy settings | `LEGACY_ORF_SETTINGS` | Implemented | Execution-tested | Not applicable | Golden-master proves legacy equivalence. |
+| 6.6 | Genetic code | `codon_table_for` | Implemented | Execution-tested | Independently validated | NCBI 1, 2, 4, 11 verified against `Bio.Data.CodonTable`. |
+| 6.7/6.8 | Restore Synapse / legacy settings | `LEGACY_ORF_SETTINGS` | Implemented | Execution-tested | Not applicable | Golden-master proves legacy equivalence. |
 | — | Start-codon classification | `classify_start_codon` | Implemented | Execution-tested | Not applicable | |
 | — | Ambiguity analysis | `analyze_orf_ambiguity` | Implemented | Execution-tested | Not applicable | Deterministic vs uncertain codons separated. |
 | — | Codon usage, diversity, GC3 | `analyze_codon_usage`, `calculate_codon_diversity` | Implemented | Execution-tested | Not applicable | |
@@ -295,14 +298,14 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 | — | Genotype parsing, phasing, categories | `parse_genotype`, `genotype_category` | Implemented | Execution-tested | Not applicable | |
 | — | FILTER semantics | `_normalize_filter_status` | Implemented | Execution-tested | Not applicable | `.` = not applied, not failed. |
 | 2 | Add Variant Manually | `_prompt_variant` | Implemented | Reachable | Not applicable | |
-| 3 | Analyze Variants | `analyze_variants`, `annotate_variant`, `annotate_from_info` | Implemented | Execution-tested | Not applicable | |
-| 4 | Filter Variants | `variant_passes_filter`, `filter_variants`, `VariantFilter` | Implemented | Execution-tested | Not applicable | Missing-value filtering covered by a self-test. |
-| 5 | Compare Variant Sets | `compare_variant_sets`, `variant_key_set` | Implemented | Execution-tested | Not applicable | |
-| 6 | Variant Statistics | `calculate_variant_statistics`, `is_transition_variant` | Implemented | Execution-tested | Not applicable | Ti/Tv, allele frequencies, quality. |
-| 7 | Cohort / Sample Analysis | `sample_variant_summary`, `calculate_cohort_summary` | Implemented | Execution-tested | Not applicable | |
-| 8 | Normalize Variants | `left_normalize_variant`, `normalize_variants`, `trim_common_bases` | Implemented | Execution-tested | **Partially validated** | Algorithm hand-verified against Tan et al. 2015 on 5 constructed cases (audit §3.7). **No bcftools comparison** — blocked on Windows. |
+| 3 | Normalize Variants | `left_normalize_variant`, `normalize_variants`, `trim_common_bases` | Implemented | Execution-tested | **Partially validated** | Algorithm hand-verified against Tan et al. 2015 on 5 constructed cases (audit §3.7). **No bcftools comparison** — blocked on Windows. |
 | — | REF validation | `check_reference_alleles`, `_reference_allele_matches` | Implemented | Execution-tested | Not applicable | **D12 corrected 2026-10-31**: a contig without a reference is flagged `REFERENCE_CONTIG_NOT_FOUND` and listed in `contigs_not_found`; `not_checked` is split by reason. Previously it was skipped silently. Tests: `tests/test_phase6_tier1.py::VariantContigMatchingTests`. |
 | — | Contig-name matching | `resolve_contig_names`, `ContigResolution`, `contig_matching=` | Implemented | Execution-tested | Not applicable | Exact by default; opt-in `chr_prefix` pairs `1`/`chr1` (flag `CONTIG_NAME_ALIASED`, CHROM unchanged). Mitochondrial names never paired; case variants not folded. **Not covered**: contig-length checks against `##contig`, RefSeq/GenBank accession names. |
+| 4 | Filter Variants | `variant_passes_filter`, `filter_variants`, `VariantFilter` | Implemented | Execution-tested | Not applicable | Missing-value filtering covered by a self-test. |
+| 5 | Variant Statistics | `calculate_variant_statistics`, `is_transition_variant` | Implemented | Execution-tested | Not applicable | Ti/Tv, allele frequencies, quality. |
+| 6 | Analyze Variants | `analyze_variants`, `annotate_variant`, `annotate_from_info` | Implemented | Execution-tested | Not applicable | |
+| 7 | Compare Variant Sets | `compare_variant_sets`, `variant_key_set` | Implemented | Execution-tested | Not applicable | |
+| 8 | Cohort / Sample Analysis | `sample_variant_summary`, `calculate_cohort_summary` | Implemented | Execution-tested | Not applicable | |
 | 9 | Export VCF | `variants_to_vcf`, `write_vcf` | Implemented | Execution-tested | Not applicable | Round-trip self-tested. |
 | 10 | Export TSV | `variants_to_tsv` | Implemented | Execution-tested | Not applicable | |
 | 11 | Full Variant Report | `build_variant_report`, `print_variant_report` | Implemented | Reachable | Not applicable | |
@@ -353,26 +356,26 @@ relative to size; the 28 self-tests are the module's own fixtures.
 | 1 | Run BLAST Search (remote) | `NCBIBlastClient.submit/status/fetch_xml/run` | Implemented | **Not tested** | Blocked by external dependency | No live call made in this audit. Privacy confirmation before sending is implemented. |
 | — | Query building | `build_query`, `build_orf_query`, `infer_sequence_type`, `normalize_sequence` | Implemented | Execution-tested | Not applicable | ORF query retains global coordinates and strand. The query type comes from `core.alphabets`; an undetermined type is asked for (menu) or refused (API), RNA is searched as DNA with a note (**D14-F1**, corrected 2026-10-31). |
 | — | FASTA query loading | `load_fasta_queries`, `_resolve_synapse_user_path` | Implemented | Execution-tested | Not applicable | |
-| 2 | Search Configuration | `BlastParameters`, `.normalized()` | Implemented | Reachable | Not applicable | Program/database compatibility self-tested; program/query-type compatibility via `check_program_query_type` (D14-F2). |
-| 3 | BLAST Database Manager | `blast_database_manager_menu`, `LocalBlastDatabaseManager` | Implemented | Execution-tested | Not applicable | 8 sub-entries: status, download/update, verify, create custom from FASTA, remove, information, BLAST+ tool status, change root. |
-| 3.1 | Database status / scan / verify | `scan_database`, `verify_database`, `database_info`, `_parse_blastdbcmd_info` | Implemented | Execution-tested | Not applicable | 6 catalog entries correctly report `NOT_INSTALLED`. Multi-volume and alias discovery self-tested. |
-| 3.2 | Download / update NCBI database | `update_ncbi_database` | Implemented | **Not tested** | Blocked by external dependency | Would be a very large download; deliberately not run. |
-| 3.4 | Create custom database from FASTA | `create_custom_database` | Implemented | Not tested | Not applicable | `makeblastdb` is available, so this is now testable. |
+| 2 | Resume Search by Request ID (RID) | `NCBIBlastClient.resume`, `core.api.blast_resume` | Implemented | Execution-tested (stubbed client) | Not applicable | **S6 implemented 2026-10-31** (P1-7). A live resume was not run (external request). |
+| 3 | Search Configuration | `BlastParameters`, `.normalized()` | Implemented | Reachable | Not applicable | Program/database compatibility self-tested; program/query-type compatibility via `check_program_query_type` (D14-F2). |
+| 4 | BLAST Database Manager | `blast_database_manager_menu`, `LocalBlastDatabaseManager` | Implemented | Execution-tested | Not applicable | 8 sub-entries: status, download/update, verify, create custom from FASTA, remove, information, BLAST+ tool status, change root. |
+| 4.1/4.3/4.6 | Database status / scan / verify | `scan_database`, `verify_database`, `database_info`, `_parse_blastdbcmd_info` | Implemented | Execution-tested | Not applicable | 6 catalog entries correctly report `NOT_INSTALLED`. Multi-volume and alias discovery self-tested. |
+| 4.2 | Download / update NCBI database | `update_ncbi_database` | Implemented | **Not tested** | Blocked by external dependency | Would be a very large download; deliberately not run. |
+| 4.4 | Create custom database from FASTA | `create_custom_database` | Implemented | Not tested | Not applicable | `makeblastdb` is available, so this is now testable. |
 | — | XML parsing | `parse_blast_xml`, `_parse_hsp`, `_parse_hit`, `_parse_parameters`, `_parse_database_statistics` | Implemented | **Execution-tested** | **Independently validated** | Validated on real BLAST+ output, not only synthetic XML. |
-| 4 | Result Summary | `print_hit_summary`, `rank_hits` | Implemented | Execution-tested | Not applicable | |
-| 5 | Hit Detail & Alignment | `print_hit_detail`, `alignment_text` | Implemented | Execution-tested | Not applicable | |
+| 5 | Result Summary | `print_hit_summary`, `rank_hits` | Implemented | Execution-tested | Not applicable | |
+| 6 | Hit Detail & Alignment | `print_hit_detail`, `alignment_text` | Implemented | Execution-tested | Not applicable | |
 | — | Query coverage | `BlastHSP.query_coverage`, `BlastHit.best_coverage_percent` | Implemented | Execution-tested | **Independently validated** | Union of HSP query intervals / query length (NCBI "Query cover"); 51/51 and 50/51 verified. P0-1 confirmed on real output. |
-| 6 | Evidence Profile | `calculate_evidence_score`, `build_evidence_profile`, `HitEvidence` | Implemented | Execution-tested | Not applicable | Bands gated at E ≤ 1e-3 (`DEFAULT_EVIDENCE_EVALUE_THRESHOLD`, configurable); `NOT_SIGNIFICANT` otherwise. |
-| 7 | Taxonomic Overview | `group_hits_by_taxonomy`, `_taxonomy_source`, `_infer_scientific_name_from_definition` | Implemented | Execution-tested | Not applicable | Definition-line fallback is self-tested. |
-| 8 | Compare BLAST Runs | `compare_blast_runs`, `BlastComparison` | Implemented | Execution-tested | Not applicable | |
-| 9 | Export Results | `export_json`, `export_csv`, `export_text`, `run_to_dict`, `run_to_json` | Implemented | Execution-tested | Not applicable | |
-| 10 | Full BLAST Report | `build_text_report` | Implemented | **Execution-tested** | Not applicable | Rendered from the real run. |
+| 7 | Evidence Profile | `calculate_evidence_score`, `build_evidence_profile`, `HitEvidence` | Implemented | Execution-tested | Not applicable | Bands gated at E ≤ 1e-3 (`DEFAULT_EVIDENCE_EVALUE_THRESHOLD`, configurable); `NOT_SIGNIFICANT` otherwise. |
+| 8 | Taxonomic Overview | `group_hits_by_taxonomy`, `_taxonomy_source`, `_infer_scientific_name_from_definition` | Implemented | Execution-tested | Not applicable | Definition-line fallback is self-tested. |
+| 9 | Compare BLAST Runs | `compare_blast_runs`, `BlastComparison` | Implemented | Execution-tested | Not applicable | |
+| 10 | Export Results | `export_json`, `export_csv`, `export_text`, `run_to_dict`, `run_to_json` | Implemented | Execution-tested | Not applicable | |
+| 11 | Full BLAST Report | `build_text_report` | Implemented | **Execution-tested** | Not applicable | Rendered from the real run. |
 | — | Provenance | `BlastRunMetadata`, `database_details`, `reported_parameters` | Partially implemented | Execution-tested | Not applicable | Effective parameters, BLAST version, engine, local path and timestamps all recorded. Title/date/size are also recorded on the user-supplied-path branch (**S7** corrected 2026-10-31). |
-| — | RID resume | `NCBIBlastClient.resume`, `core.api.blast_resume`, BLAST menu [2] | Implemented | Execution-tested (stubbed client) | Not applicable | **S6 implemented 2026-10-31** (P1-7). A live resume was not run (external request). |
 | — | BLAST+ executable management | `BlastExecutableManager` (`available`, `resolve`, `require`, …) | Implemented | **Execution-tested** | Not applicable | Correctly located BLAST+ 2.17.0+ in `C:\Program Files\NCBI\`. |
 | — | Short-query rescue | `_should_run_short_query_rescue`, task configuration | Implemented | Execution-tested | Not applicable | Self-tested policy for short queries. |
-| 11 | Self-Test | `run_self_test` | Implemented | Execution-tested | Not applicable | 33/33. |
-| 12/13 | Supported programs; database status | `PROGRAMS`, `LOCAL_DATABASE_CATALOG` | Implemented | Execution-tested | Not applicable | |
+| 12 | Self-Test | `run_self_test` | Implemented | Execution-tested | Not applicable | 33/33. |
+| 13/14 | Supported programs; database status | `PROGRAMS`, `LOCAL_DATABASE_CATALOG` | Implemented | Execution-tested | Not applicable | |
 | — | Stored run artifact | `blast_results/TEST_8_REFERENCE_blast.json` | Legacy record | Not applicable | Not applicable | Labeled as a pre-P0-1 legacy record in `blast_results/README.md` (**D7** corrected 2026-10-31; deletion left to the owner). Originally: stale pre-P0-1 values (100 % coverage at E = 7.45, null query length) and an obsolete key schema; no test reads it. |
 
 ---
