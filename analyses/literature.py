@@ -1812,13 +1812,13 @@ def print_results(run: LiteratureSearchRun, limit: int = 10) -> None:
 
     if run.warnings:
 
-        print("WARNINGS")
+        style.section("WARNINGS", blank_before=False)
 
         for warning in run.warnings: print(f"- {warning}")
 
     if run.errors:
 
-        print("SOURCE ERRORS")
+        style.section("SOURCE ERRORS", blank_before=bool(run.warnings))
 
         for error in run.errors: print(f"- {error}")
 
@@ -1880,11 +1880,11 @@ def print_article_detail(run: LiteratureSearchRun, article_index: int) -> None:
 
         print(f"  {url}")
 
-    print("\nABSTRACT\n--------")
+    style.section("ABSTRACT")
 
     print(article.abstract or "Abstract not available from the retrieved sources.")
 
-    print("\nKEYWORDS / SUBJECT TERMS")
+    style.section("KEYWORDS / SUBJECT TERMS")
 
     print(", ".join(_normalize_keywords(article.keywords)) or "Not available")
 

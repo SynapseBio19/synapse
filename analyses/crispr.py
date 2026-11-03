@@ -2174,9 +2174,8 @@ def _manual_sequence() -> Tuple[str, str]:
 
 
 def _print_candidate_table(candidates: Sequence[GuideCandidate], limit: int = 20) -> None:
-    print("\n" + minor_rule())
     mode = ranking_mode_label(candidates)
-    print(f"RANKED GUIDES ({mode.upper()})")
+    style.section(f"RANKED GUIDES ({mode.upper()})")
     print("Score = transparent computational prioritization heuristic.")
     if has_specificity_analysis(candidates):
         print("Specificity component uses only explicitly supplied local reference sequences.")

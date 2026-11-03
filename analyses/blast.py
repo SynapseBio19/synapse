@@ -4512,7 +4512,7 @@ def blast_menu(
                     )
                 else:
                     normalized = parameters.normalized()
-                    print("\nPRIVACY NOTICE")
+                    style.section("PRIVACY NOTICE")
                     print(
                         "The query sequence will be sent to NCBI (blast.ncbi.nlm.nih.gov) "
                         "and processed on NCBI servers. Do not submit confidential or "
@@ -4531,7 +4531,8 @@ def blast_menu(
 
                 comparison_run = last_run
                 last_run = new_run
-                print("\nBLAST SEARCH COMPLETED")
+                print()
+                style.success("BLAST search completed.")
                 print_hit_summary(last_run)
                 if not last_run.hits:
                     print(
@@ -4739,7 +4740,7 @@ def blast_menu(
 
         elif choice == "2":
             # P1-7: collect a search submitted earlier instead of repeating it.
-            print("\nRESUME A PREVIOUS SEARCH")
+            style.section("RESUME A PREVIOUS SEARCH")
             print(
                 "Enter the request ID (RID) of a search submitted earlier. Only "
                 "the RID is sent to NCBI; the query sequence is not transmitted "

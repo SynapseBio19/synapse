@@ -897,8 +897,7 @@ def print_primer_report(report: PrimerDesignReport) -> None:
     style.header('PRIMER DESIGN')
     style.field('Sequence length', f"{report.sequence_length} bp")
     style.field('Target region', f"{report.target_start + 1}-{report.target_end} (1-based; {report.target_length} bp)")
-    print()
-    print("THERMODYNAMIC SETTINGS")
+    style.section("THERMODYNAMIC SETTINGS")
     style.field('Tm model', f"{report.tm_model}")
     conditions = report.thermodynamic_conditions
     style.field('Na+ / salt', f"{conditions['salt_mM']:.2f} mM")
@@ -906,14 +905,12 @@ def print_primer_report(report: PrimerDesignReport) -> None:
     style.field('dNTPs', f"{conditions['dntp_mM']:.2f} mM")
     style.field('Primer concentration', f"{conditions['primer_concentration_nM']:.1f} nM")
     style.field('Symmetry correction', f"{'YES' if conditions['include_symmetry_correction'] else 'NO'}")
-    print()
-    print("CANDIDATE GENERATION")
+    style.section("CANDIDATE GENERATION")
     style.field('Forward evaluated', f"{report.forward_candidates_evaluated}")
     style.field('Forward accepted', f"{report.forward_candidates_accepted}")
     style.field('Reverse evaluated', f"{report.reverse_candidates_evaluated}")
     style.field('Reverse accepted', f"{report.reverse_candidates_accepted}")
-    print()
-    print("PAIR EVALUATION")
+    style.section("PAIR EVALUATION")
     style.field('Pairs evaluated', f"{report.pairs_evaluated}")
     style.field('Pairs accepted/ranked', f"{report.pairs_accepted}")
     print()
@@ -922,15 +919,15 @@ def print_primer_report(report: PrimerDesignReport) -> None:
             print(summarize_primer_pair(pair, index))
             print()
     else:
-        print("NO ACCEPTABLE PRIMER PAIR FOUND")
+        style.section("NO ACCEPTABLE PRIMER PAIR FOUND", blank_before=False)
         print()
         if report.failure_reasons:
-            print("MAIN LIMITING FACTORS")
+            style.section("MAIN LIMITING FACTORS", blank_before=False)
             for reason in report.failure_reasons:
                 print(f"- {reason}")
             print()
     if report.warnings:
-        print("WARNINGS")
+        style.section("WARNINGS", blank_before=False)
         for warning in report.warnings:
             print(f"- {warning}")
     print(major_rule())
