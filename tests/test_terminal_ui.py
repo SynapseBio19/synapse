@@ -588,6 +588,13 @@ class EmptyAnswerTests(unittest.TestCase):
                 self._run(["2", ""], lambda: cloning._cloning_ui_automatic_planner("ACGT" * 50, "ACGT" * 20))
         self.assertEqual(seen, [5])
 
+    def test_primer_tm_model_accepts_enter_for_nearest_neighbor(self):
+        """"Selection [1]" took Enter as model 1 before Stage F; the rewrite had lost that key."""
+        from analyses import primer
+        result = []
+        self._run([""], lambda: result.append(primer._primer_ui_select_tm_model()))
+        self.assertEqual(result, ["nearest_neighbor"])
+
     def test_modules_keep_bracket_hints_in_the_label(self):
         """A bracket in a prompt is a hint; ask(..., default=...) would return it as a value."""
         hits = [f"{path.name}:{number}" for path in INTERFACE_SOURCES if path.name != "main.py"

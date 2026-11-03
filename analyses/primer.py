@@ -3826,6 +3826,7 @@ def _primer_ui_read_conditions():
 def _primer_ui_select_tm_model():
     """Select the Tm model."""
     methods = {
+        "": "nearest_neighbor",  # Enter takes the [1] the prompt shows
         "1": "nearest_neighbor",
         "2": "wallace",
         "3": "salt_adjusted",
