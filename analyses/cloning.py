@@ -3697,9 +3697,86 @@ def print_cloning_report(
         )
         return
 
+    if analysis.get("mode") == "single-enzyme":
+        _print_single_enzyme_report(
+            analysis
+        )
+        return
+
     _print_single_strategy_report(
         analysis
     )
+
+
+def _pass_fail(value):
+    return "PASS" if value else "FAIL"
+
+
+def _print_single_enzyme_report(
+    analysis,
+):
+    """Report for analyze_cloning(): one enzyme opens the vector and cuts the insert.
+
+    The two-enzyme report reads left and right ends, which this result does
+    not have; it shows the fields analyze_cloning() returns.
+    """
+    validity = analysis["validity"]
+    strategy = analysis["strategy"]
+    compatibility = analysis["compatibility"]
+    score = analysis["score"]
+
+    for title, site, molecule in (
+        ("VECTOR", analysis["vector_site"], analysis["vector"]),
+        ("INSERT", analysis["insert_site"], analysis["insert"]),
+    ):
+        style.section(title)
+        style.field('Enzyme', f"{site['enzyme']}")
+        style.field('Sites found', f"{molecule['site_count']}")
+        style.field('First site position', f"{site['position'] if site['position'] is not None else '-'}")
+        style.field('Recognition', f"{site['recognition_sequence']}")
+        style.field('Overhang', f"{site['overhang'] or '-'} ({site['overhang_type']})")
+
+    style.section('CLONING JUNCTION')
+    style.field('Status', f"{compatibility['status']}")
+    style.field('Ends', f"{compatibility['vector_end'] or '-'} -> {compatibility['insert_end'] or '-'}")
+    style.field('Mechanism', f"{compatibility['mechanism']}")
+
+    style.section('ORIENTATION')
+    style.field('Strategy', f"{strategy['strategy']}")
+    style.field('Orientation', f"{strategy['orientation']}")
+    style.field('Directional', f"{_yes_no(strategy['directional'])}")
+    style.field('Self-ligation risk', f"{'POSSIBLE' if strategy['self_ligation_risk'] else 'REDUCED'}")
+
+    style.section('DESIGN SCORE')
+    style.field('Score', f"{score['score']}/{score['maximum']}")
+    style.field('Category', f"{score['category']}")
+    for reason in score["reasons"]:
+        print(f"- {reason}")
+
+    style.section('VALIDATION')
+    style.field('Required sites', _pass_fail(validity['all_required_sites']))
+    style.field('Vector site unique', _pass_fail(validity['vector_unique']))
+    style.field('Insert site unique', _pass_fail(validity['insert_unique']))
+    style.field('Junction', _pass_fail(validity['junctions_compatible']))
+    style.field('Overall valid', f"{'YES' if validity['valid'] else 'NO'}")
+
+    if analysis.get("warnings"):
+        style.section('WARNINGS')
+        for warning in analysis["warnings"]:
+            print(f"- {warning}")
+
+    style.section('INTERPRETATION')
+    if validity["valid"]:
+        print("The selected design passes the implemented sequence-level cloning checks.")
+    else:
+        print("The selected design does not pass all implemented sequence-level cloning checks.")
+    print(
+        "\nThis is a sequence-level design assessment. "
+        "It does not guarantee experimental cleavage, ligation, "
+        "enzyme activity, methylation behavior, buffer compatibility, "
+        "or wet-lab success."
+    )
+    print(major_rule())
 
 
 def _print_single_strategy_report(
