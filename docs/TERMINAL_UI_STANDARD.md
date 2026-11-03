@@ -139,7 +139,7 @@ rather than done quietly.
 | Helper | Use |
 |---|---|
 | `ask_choice()` | A menu selection. Renders `Selection: `. |
-| `ask(label, default=...)` | A value. A default is shown in brackets and used for empty input. |
+| `ask(label, default=...)` | A value. Pass `default=` only when it is the value the caller wants back for an empty answer. A hint such as `[none]` or `[50.0 mM]` stays in the label (`ask("From date [none]")`), and the caller maps the empty answer to its default. |
 | `confirm(question, default_yes=False)` | A yes/no question, written `[y/N]` (or `[Y/n]` when yes is the default). `y`, `yes`, `j`, `ja` mean yes; anything else no, an empty answer the default. Every yes/no question in Synapse uses it. |
 | `pause()` | `Press Enter to continue...` |
 

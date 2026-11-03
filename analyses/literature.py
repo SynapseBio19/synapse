@@ -2251,7 +2251,7 @@ def _interactive_menu(context: Optional[dict[str, Any]] = None) -> None:
 
             continue
 
-        max_raw = style.ask('Maximum results per source', default='30')
+        max_raw = style.ask('Maximum results per source [30]')
 
         try:
 
@@ -2275,9 +2275,9 @@ def _interactive_menu(context: Optional[dict[str, Any]] = None) -> None:
 
                 continue
 
-            date_from = style.ask('From date YYYY or YYYY-MM-DD', default='none') or None
+            date_from = style.ask('From date YYYY or YYYY-MM-DD [none]') or None
 
-            date_to = style.ask('To date YYYY or YYYY-MM-DD', default='none') or None
+            date_to = style.ask('To date YYYY or YYYY-MM-DD [none]') or None
 
             oa = style.confirm("Open-access only?")
 
@@ -2290,7 +2290,7 @@ def _interactive_menu(context: Optional[dict[str, Any]] = None) -> None:
 
         except (ValueError, KeyError) as exc:
 
-            style.field('Invalid configuration', f"{exc}")
+            style.error(f"Invalid configuration: {exc}")
 
             continue
 

@@ -434,5 +434,88 @@ class RenderedScreenTests(unittest.TestCase):
         self.assertEqual(buffer.getvalue().splitlines(), ["", "[F] Load another file", "", style.minor_rule()])
 
 
+
+# ----------------------------------------------------------------------
+# Pressing Enter keeps the documented default (regression, 2026-11-03)
+# ----------------------------------------------------------------------
+class _Stop(Exception):
+    """Raised by a stub to end a dialog once it has handed over its input."""
+
+
+def _scripted(answers):
+    pending = list(answers)
+
+    def answer(prompt=""):
+        if not pending:
+            raise EOFError("script exhausted")
+        return pending.pop(0)
+    return answer
+
+
+class EmptyAnswerTests(unittest.TestCase):
+    """The Stage F conversion once turned bracket hints into values:
+    Enter at "From date ... [none]" returned "none" and every literature
+    search failed with "Invalid configuration"; "[50.0 mM]" broke the primer
+    conditions and "[default 5]" the cloning planner. Enter must give the
+    caller an empty answer, which each caller maps to its own default."""
+
+    def _run(self, answers, call):
+        import builtins
+        import contextlib
+        import io
+        from unittest import mock
+        with mock.patch.object(builtins, "input", _scripted(answers)), \
+                contextlib.redirect_stdout(io.StringIO()):
+            call()
+
+    def test_literature_search_accepts_enter_for_every_option(self):
+        from unittest import mock
+        from analyses import literature
+        seen = []
+
+        def stub(query):
+            seen.append(query)
+            raise _Stop
+
+        with mock.patch.object(literature, "run_literature_search", stub):
+            with self.assertRaises(_Stop):
+                self._run(["1", "BRCA1 DNA repair", "", "", "", "", "", ""],
+                          literature._interactive_menu)
+        query = seen[0]
+        self.assertEqual((query.date_from, query.date_to, query.max_results),
+                         (None, None, 30))
+        self.assertFalse(query.open_access_only)
+        self.assertEqual(query.sort_by, "relevance")
+
+    def test_primer_conditions_accept_enter_for_the_defaults(self):
+        from analyses import primer
+        result = []
+        self._run(["", "", "", ""], lambda: result.append(primer._primer_ui_read_conditions()))
+        conditions = result[0]
+        self.assertIsNotNone(conditions)
+        self.assertEqual((conditions.sodium_mM, conditions.magnesium_mM, conditions.dntp_mM,
+                          conditions.primer_nM), (50.0, 1.5, 0.2, 250.0))
+
+    def test_cloning_planner_accepts_enter_for_the_strategy_count(self):
+        from unittest import mock
+        from analyses import cloning
+        seen = []
+
+        def stub(*args, **kwargs):
+            seen.append(kwargs.get("top_n"))
+            raise _Stop
+
+        with mock.patch.object(cloning, "automatic_cloning_planner", stub):
+            with self.assertRaises(_Stop):
+                self._run(["2", ""], lambda: cloning._cloning_ui_automatic_planner("ACGT" * 50, "ACGT" * 20))
+        self.assertEqual(seen, [5])
+
+    def test_modules_keep_bracket_hints_in_the_label(self):
+        """A bracket in a prompt is a hint; ask(..., default=...) would return it as a value."""
+        hits = [f"{path.name}:{number}" for path in INTERFACE_SOURCES if path.name != "main.py"
+                for number, line in enumerate(read(path).splitlines(), 1)
+                if re.search(r"style\.ask\([^)]*default=", line)]
+        self.assertEqual(hits, [])
+
 if __name__ == "__main__":
     unittest.main()

@@ -4514,7 +4514,7 @@ def _cloning_ui_automatic_planner(
         top_n = 1
     else:
         while True:
-            raw = style.ask('Number of strategies to display', default='default 5')
+            raw = style.ask('Number of strategies to display [default 5]')
 
             if not raw:
                 top_n = 5

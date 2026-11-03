@@ -4457,16 +4457,16 @@ def blast_menu(
                     print("Invalid database.")
                     continue
 
-            raw_evalue = style.ask('E-value', default='10')
+            raw_evalue = style.ask('E-value [10]')
             raw_max = style.ask(f"Maximum target sequences [{DEFAULT_MAX_HITS}]")
 
             raw_threads = ""
             raw_word_size = ""
             raw_filter = ""
             if engine == "local":
-                raw_threads = style.ask('CPU threads', default='4')
-                raw_word_size = style.ask('Word size', default='default')
-                raw_filter = style.ask('Filtering', default='default/none').lower()
+                raw_threads = style.ask('CPU threads [4]')
+                raw_word_size = style.ask('Word size [default]')
+                raw_filter = style.ask('Filtering [default/none]').lower()
 
             try:
                 evalue = float(raw_evalue) if raw_evalue else 10.0

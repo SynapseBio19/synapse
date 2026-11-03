@@ -3007,7 +3007,7 @@ def _orf_settings_menu(settings):
         if choice == "0":
             return settings
         if choice == "1":
-            raw = style.ask('Minimum length in nt', default='75')
+            raw = style.ask('Minimum length in nt [75]')
             try:
                 value = int(raw) if raw else 75
                 if value < 3:
@@ -3044,7 +3044,7 @@ def _orf_settings_menu(settings):
             from core.seqtools import available_genetic_codes
             for table in available_genetic_codes():
                 print(f"  {table.table_id:>2}  {table.name}")
-            raw = style.ask('NCBI table number', default='1')
+            raw = style.ask('NCBI table number [1]')
             try:
                 value = int(raw) if raw else 1
                 _genetic_code_name(value)

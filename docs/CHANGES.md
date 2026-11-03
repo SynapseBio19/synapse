@@ -1905,3 +1905,33 @@ status, and the source rule covers all sixteen files. On the code before
 this round they give 11 failures. The extended tests found what the
 passes had left: the protein module's own header helper and four
 "SYNAPSE ... SELF-TEST" titles, fixed in `7970e5a`. Suite 322/322.
+
+### Fix: pressing Enter in six dialogs broke them (Stage F regression, 2026-11-03)
+
+Reported by the owner: a literature search never ran. The Stage F
+rewriting pass had turned prompts of the form `Label [hint]: ` into
+`style.ask("Label", default="hint")`, so Enter returned the hint text
+instead of an empty answer. Where the hint was the value itself
+(`[10]`, `[30]`, `[75]`) that was harmless; where it was a description,
+the dialog broke:
+
+| Dialog | Enter returned | Effect |
+|---|---|---|
+| Literature: From / To date `[none]` | `none` | "Invalid configuration: date_from must use YYYY ..."; no search ever ran |
+| Primer: Na+ `[50.0 mM]`, Mg2+ `[1.5 mM]`, primer `[250 nM]` | the hint | `float()` failed; primer design stopped at the conditions |
+| BLAST (local): word size `[default]`, filtering `[default/none]` | the hint | an error instead of the default settings |
+| Cloning planner: strategies `[default 5]` | `default 5` | an endless "Please enter a positive integer." |
+
+Introduced in `5cb4c9a` (BLAST), `b181ae3` (literature), `fb4070a`
+(primer) and `85c22ac` (cloning). All fifteen converted prompts keep
+the bracket in the label again, so Enter returns `""` and the caller
+applies its default, as before Stage F; the prompt text is unchanged.
+`main.py`'s report path keeps a real default, which the caller
+already used for an empty answer. The literature configuration error
+is now an ERROR message.
+
+No test had driven these dialogs with an empty answer. New
+`EmptyAnswerTests` do: the literature dialog (dates None, 30 results,
+relevance), the primer conditions (50, 1.5, 0.2, 250), the cloning
+strategy count (5), and a source rule against `ask(..., default=...)`
+in the modules. All four fail on the previous code.

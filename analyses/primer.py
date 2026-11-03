@@ -3777,7 +3777,7 @@ def _primer_ui_read_target(sequence):
     print("Press Enter to use the complete sequence.")
     print()
 
-    start_input = style.ask('Target start', default='1')
+    start_input = style.ask('Target start [1]')
     end_input = style.ask(f"Target end [{len(sequence)}]")
 
     try:
@@ -3803,10 +3803,10 @@ def _primer_ui_read_conditions():
     print()
 
     try:
-        sodium_input = style.ask('Na+ / salt', default='50.0 mM')
-        mg_input = style.ask('Mg2+', default='1.5 mM')
+        sodium_input = style.ask('Na+ / salt [50.0 mM]')
+        mg_input = style.ask('Mg2+ [1.5 mM]')
         dntp_input = style.ask('dNTPs [0.2 mM]')
-        primer_input = style.ask('Primer concentration', default='250 nM')
+        primer_input = style.ask('Primer concentration [250 nM]')
 
         sodium_mM = 50.0 if not sodium_input else float(sodium_input)
         magnesium_mM = 1.5 if not mg_input else float(mg_input)
@@ -3837,7 +3837,7 @@ def _primer_ui_select_tm_model():
         style.menu([
             ("Tm model", [('1', 'Nearest-neighbor'), ('2', 'Wallace'), ('3', 'Salt-adjusted')]),
         ], zero="Cancel")
-        choice = style.ask('Selection', default='1')
+        choice = style.ask('Selection [1]')
         if choice == "0":
             return None
         if choice in methods:
