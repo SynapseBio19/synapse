@@ -978,7 +978,10 @@ class NCBIBlastClient:
                 self._last_request_at = time.monotonic()
                 return response.read().decode("utf-8", errors="replace")
         except HTTPError as exc:
-            body = exc.read().decode("utf-8", errors="replace")
+            try:
+                body = exc.read().decode("utf-8", errors="replace")
+            finally:
+                exc.close()
             raise BlastAnalysisError(
                 f"NCBI BLAST HTTP error {exc.code}: {body[:500]}"
             ) from exc

@@ -256,6 +256,36 @@ class LiteratureTests(unittest.TestCase):
             with self.assertRaises(L.LiteratureSourceError):
                 L._request_text("https://example.org/y")
 
+    def test_http_error_responses_are_closed(self):
+        """An HTTPError holds the open response; retrying or reporting must not leak it."""
+        from analyses import literature as L
+        bodies = [io.BytesIO(b"busy"), io.BytesIO(b"not found")]
+        errors = [urllib.error.HTTPError("https://example.org/z", 503, "busy", {"Retry-After": "0"}, bodies[0]),
+                  urllib.error.HTTPError("https://example.org/z", 404, "nf", {}, bodies[1])]
+        kept = list(errors)   # keep them alive: only an explicit close() may close the bodies
+
+        def fake_urlopen(request, timeout=None):
+            raise errors.pop(0)
+
+        with mock.patch.object(L.urllib.request, "urlopen", fake_urlopen), \
+                mock.patch.object(L.time, "sleep", lambda s: None):
+            with self.assertRaises(L.LiteratureSourceError):
+                L._request_text("https://example.org/z")
+        self.assertTrue(all(body.closed for body in bodies))
+        self.assertEqual(len(kept), 2)
+
+    def test_blast_http_error_response_is_closed(self):
+        from analyses import blast as B
+        body = io.BytesIO(b"Message ID#24 Error: busy")
+        error = urllib.error.HTTPError(B.NCBI_BLAST_URL, 500, "error", {}, body)
+        client = B.NCBIBlastClient(tool="Synapse", email="")
+        with mock.patch.object(B, "urlopen", side_effect=error), \
+                mock.patch.object(client, "_throttle_request", lambda: None):
+            with self.assertRaises(B.BlastAnalysisError) as raised:
+                client._request({"CMD": "Get"})
+        self.assertIn("HTTP error 500: Message ID#24 Error: busy", str(raised.exception))
+        self.assertTrue(body.closed)
+
     def test_sequence_context_suggestion(self):
         from analyses import literature as L
         context = L.build_sequence_literature_context("BRCA1|Homo sapiens topology=circular 1234")

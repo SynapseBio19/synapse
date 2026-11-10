@@ -359,6 +359,9 @@ def _request_text(url: str, timeout: int = DEFAULT_TIMEOUT, headers: Optional[di
 
         except urllib.error.HTTPError as exc:
 
+            # The error carries the open response; its headers stay readable after close().
+            exc.close()
+
             if exc.code in RETRY_STATUS_CODES and attempt < MAX_REQUEST_ATTEMPTS:
 
                 time.sleep(_retry_delay(exc, attempt))
