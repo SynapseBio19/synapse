@@ -236,11 +236,15 @@ def find_type_iis_sites(sequence, enzyme_name, topology="linear"):
     """Sites of a Type IIS enzyme on both strands, with their cut coordinates (P2-7).
 
     The recognition sequence is asymmetric, so it is searched as given (strand
-    "+") and as its reverse complement (strand "-"). Cut coordinates are
-    0-based positions between bases on the top strand. For a "+" site at p,
+    "+") and as its reverse complement (strand "-"). The arithmetic uses cut
+    boundaries (bases before the cut, top-strand coordinates). For a "+" site at p,
     top = p + cut_top and bottom = p + cut_bottom; for a "-" site the cuts are
     mirrored to the other side: top = p + L - cut_bottom, bottom = p + L - cut_top.
     The overhang is the top-strand sequence between the two cuts.
+
+    Records follow the restriction-map convention: site_position, top_cut
+    and bottom_cut are 1-based (for a cut, the first base after it); the
+    *_0based keys hold the 0-based site start and the cut boundaries.
 
     On a linear molecule a site whose cuts fall outside the sequence does not
     cut ("cuts_inside" False); on a circular molecule the cuts wrap around the
@@ -280,20 +284,23 @@ def find_type_iis_sites(sequence, enzyme_name, topology="linear"):
             sites.append({
                 "enzyme": enzyme_name,
                 "strand": strand,
-                "site_position": start,
+                "site_position": start + 1,
+                "site_position_0based": start,
                 "site_position_1based": start + 1,
                 "site_sequence": match["sequence"],
                 "status": match["status"],
                 "wraps_origin": match["wraps_origin"] or (circular and not 0 <= min(top, bottom) <= max(top, bottom) <= length),
                 "cuts_inside": inside,
-                "top_cut": top_physical,
-                "bottom_cut": bottom_physical,
+                "top_cut": top_physical + 1,
+                "bottom_cut": bottom_physical + 1,
+                "top_cut_0based": top_physical,
+                "bottom_cut_0based": bottom_physical,
                 "top_cut_1based": top_physical + 1,
                 "bottom_cut_1based": bottom_physical + 1,
                 "overhang": overhang,
                 "overhang_length": abs(bottom - top),
             })
-    sites.sort(key=lambda item: (item["top_cut"], item["strand"]))
+    sites.sort(key=lambda item: (item["top_cut_0based"], item["strand"]))
     return sites
 
 
@@ -659,16 +666,19 @@ def get_cut_positions(sequence, enzyme_names, include_possible=False, topology="
                 if not site["cuts_inside"]:
                     continue
                 cuts.append({
-                    "position": site["top_cut"],
-                    "position_0based": site["top_cut"],
-                    "position_1based": site["top_cut"] + 1,
+                    "position": site["top_cut_0based"],
+                    "position_0based": site["top_cut_0based"],
+                    "position_1based": site["top_cut"],
                     "enzyme": enzyme_name,
                     "site_position": site["site_position"],
-                    "site_position_1based": site["site_position_1based"],
+                    "site_position_0based": site["site_position_0based"],
+                    "site_position_1based": site["site_position"],
                     "top_cut": site["top_cut"],
                     "bottom_cut": site["bottom_cut"],
-                    "top_cut_1based": site["top_cut_1based"],
-                    "bottom_cut_1based": site["bottom_cut_1based"],
+                    "top_cut_0based": site["top_cut_0based"],
+                    "bottom_cut_0based": site["bottom_cut_0based"],
+                    "top_cut_1based": site["top_cut"],
+                    "bottom_cut_1based": site["bottom_cut"],
                     "cut_info": {"strand": site["strand"], "overhang": site["overhang"],
                                  "overhang_length": site["overhang_length"]},
                     "status": site["status"],
@@ -706,10 +716,13 @@ def get_cut_positions(sequence, enzyme_names, include_possible=False, topology="
                 "position_0based": physical_cut,
                 "position_1based": physical_cut + 1,
                 "enzyme": enzyme_name,
-                "site_position": position,
+                "site_position": position + 1,
+                "site_position_0based": position,
                 "site_position_1based": position + 1,
-                "top_cut": cut_info["top_cut"],
-                "bottom_cut": cut_info["bottom_cut"],
+                "top_cut": cut_info["top_cut_1based"],
+                "bottom_cut": cut_info["bottom_cut_1based"],
+                "top_cut_0based": cut_info["top_cut"],
+                "bottom_cut_0based": cut_info["bottom_cut"],
                 "top_cut_1based": cut_info["top_cut_1based"],
                 "bottom_cut_1based": cut_info["bottom_cut_1based"],
                 "cut_info": cut_info,
@@ -2629,7 +2642,7 @@ def _restriction_digest_gel_ui(dna, topology="linear"):
             for cut in type_iis_cuts:
                 print(style.columns((
                     cut["enzyme"], cut["strand"], cut["site_position_1based"],
-                    f"after {cut['top_cut']}", f"after {cut['bottom_cut']}",
+                    f"after {cut['top_cut_0based']}", f"after {cut['bottom_cut_0based']}",
                     cut["cut_info"]["overhang"] or "-",
                 ), widths))
             style.note("Positions are 1-based; a cut lies after the base given. The overhang "

@@ -216,6 +216,23 @@ use 0-based inclusive `start <= stop` on the forward strand.
   every site-based result (map, per-enzyme results, unique and non-cutters,
   enzyme pairs). Positions on a circular sequence are reported modulo its
   length; a cut exactly at the origin is position 0 (1-based 1).
+- Coordinates in site and cut records: `site_position`, `top_cut` and
+  `bottom_cut` are 1-based (for a cut, the first base after it); the
+  `*_0based` keys hold the 0-based site start and the cut boundary (the
+  number of bases before the cut). `cut_positions` and fragment boundaries
+  are cut boundaries. Until 2026-11-11 digest events used the unsuffixed
+  names for 0-based values while maps used them for 1-based values; both now
+  follow the map (golden master unchanged, as it stores map records and cut
+  boundaries).
+- Type IIS enzymes (BsaI, BsmBI, BbsI, SapI; `TYPE_IIS_ENZYMES`) cut outside
+  their asymmetric site. The digest searches the site and its reverse
+  complement; for a forward site at p the cuts are p + cut_top and
+  p + cut_bottom, for a reverse site they are mirrored to the other side.
+  The overhang is the top-strand sequence between the cuts, so it depends on
+  the molecule; for that reason Type IIS enzymes are not part of the cloning
+  compatibility model, which assigns each enzyme one fixed overhang, and
+  Golden Gate assembly planning is not implemented. On a linear molecule a
+  site whose cuts would fall beyond an end does not cut.
 - End compatibility requires the same overhang sequence *and* polarity
   (5′ vs 3′); blunt ends are compatible with blunt ends.
 - Methylation sensitivity is shown as a note (ClaI, XbaI, DpnI, HpaII);
@@ -226,7 +243,10 @@ use 0-based inclusive `start <= stop` on the forward strand.
   derived data) on pUC19, NCBI L09137.2: enzyme definitions 22/22, digest
   cut positions and fragments 132/132, circular restriction map 132/132,
   end-compatibility matrix 484/484 (`docs/PHASE6_INITIAL_AUDIT.md` §3).
-  Not compared against NEBcutter.
+  Type IIS (2026-11-11, `tests/test_external_reference.py`): definitions
+  4/4 and 32 digests of a 3,000 bp sequence with sites in both orientations
+  and at both ends (linear and circular, four origin rotations), 140 cut
+  positions, 0 differences. Not compared against NEBcutter.
 
 ## Primer design (`analyses/primer.py`)
 
