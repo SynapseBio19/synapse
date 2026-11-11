@@ -980,15 +980,149 @@ def _orf_sort_key(orf, ranking):
 
 
 def _keep_longest_per_stop(orfs):
-    """Keep only the outermost ORF for each (strand, frame, 3' end)."""
+    """Keep only the outermost ORF for each (strand, 3' end, status).
+
+    Strand and 3' end fix the reading frame on a linear sequence, so the frame
+    adds nothing there; on a circle whose length is not a multiple of 3 the
+    frame changes across the origin, and comparing frames would keep two ORFs
+    that end at the same stop.
+    """
     best = {}
     for orf in orfs:
-        three_prime = orf["stop"] if orf["strand"] == "+" else orf["start"]
-        key = (orf["strand"], orf["frame"], three_prime, orf["status"])
+        # An ORF across the origin ends at stop_on_circle; it competes with
+        # the ORFs ending at that base.
+        three_prime = (orf.get("stop_on_circle", orf["stop"])
+                       if orf["strand"] == "+" else orf["start"])
+        key = (orf["strand"], three_prime, orf["status"])
         current = best.get(key)
         if current is None or orf["length"] > current["length"]:
             best[key] = orf
     return list(best.values())
+
+
+# Statuses of ORFs that do not begin at a start codon inside the sequence.
+MISSING_START_STATUSES = ("Partial - Missing Start", "Partial - Missing Start and Stop")
+
+
+def orf_has_start_codon(orf_or_status):
+    """False for a 5'-partial ORF, whose first codon is not a start codon."""
+    status = orf_or_status.get("status") if isinstance(orf_or_status, dict) else orf_or_status
+    return status not in MISSING_START_STATUSES
+
+
+def _five_prime_partial_orfs(dna, *, min_length, start_codons, stop_codons, codon_table,
+                             genetic_code, include_partial):
+    """Open frames that run in from the 5' end of a linear sequence (P1-9).
+
+    In each frame the segment from the first codon to the first stop is
+    open but has no start codon in the sequence: the start lies upstream,
+    outside it. It is reported as "Partial - Missing Start" when it reaches
+    min_length; with include_partial also a frame without any stop, as
+    "Partial - Missing Start and Stop". A frame whose first codon is itself
+    a start codon gives an ordinary complete ORF and no partial one. Complete
+    ORFs inside the segment are kept: the per-stop rule compares ORFs of the
+    same status only.
+    """
+    records = []
+    length = len(dna)
+    for strand, sequence in (("+", dna), ("-", get_reverse_complement(dna))):
+        for offset in range(3):
+            if offset + 3 > len(sequence):
+                continue
+            first_codon = sequence[offset:offset + 3]
+            if analyze_codon_identity(first_codon, start_codons) == "definite":
+                continue
+            frame_number = offset + 1 if strand == "+" else -(offset + 1)
+            possible_stop_sites = []
+            stop_codon = None
+            position = offset
+            while position <= len(sequence) - 3:
+                codon = sequence[position:position + 3]
+                status = analyze_codon_identity(codon, stop_codons)
+                if status == "definite":
+                    stop_codon = codon
+                    break
+                if status == "possible":
+                    possible_stop_sites.append({"codon": codon, "position": position + 1})
+                position += 3
+            if stop_codon is not None:
+                end = position + 3
+                status_text = "Partial - Missing Start"
+            elif include_partial:
+                end = offset + ((len(sequence) - offset) // 3) * 3
+                status_text = "Partial - Missing Start and Stop"
+            else:
+                continue
+            orf_sequence = sequence[offset:end]
+            if len(orf_sequence) < max(3, min_length):
+                continue
+            if strand == "+":
+                genomic_start, genomic_stop = offset, end - 1
+            else:
+                genomic_start, genomic_stop = length - end, length - offset - 1
+            ambiguity = analyze_orf_ambiguity(orf_sequence, codon_table=codon_table)
+            codon_count = len(orf_sequence) // 3
+            orf = {
+                "genetic_code": genetic_code,
+                "strand": strand,
+                "frame": frame_number,
+                "start": genomic_start,
+                "stop": genomic_stop,
+                "length": len(orf_sequence),
+                "codon_count": codon_count,
+                "protein_length": codon_count - 1 if stop_codon else codon_count,
+                "start_codon": first_codon,
+                "start_type": "None (5' partial)",
+                "start_status": "absent",
+                "stop_codon": stop_codon,
+                "status": status_text,
+                "sequence": orf_sequence,
+                "possible_stop_sites": possible_stop_sites,
+                "ambiguous_codon_count": ambiguity["ambiguous_codon_count"],
+                "ambiguous_codons": ambiguity["ambiguous_codons"],
+                "deterministic_ambiguous_count": ambiguity["deterministic_ambiguous_count"],
+                "uncertain_codon_count": ambiguity["uncertain_codon_count"],
+                "possible_stop_codon_count": ambiguity["possible_stop_codon_count"],
+                "translation_safe": ambiguity["translation_safe"],
+                "start_context": analyze_start_context(sequence, offset),
+                "codon_usage": analyze_codon_usage(orf_sequence, codon_table=codon_table),
+                "codon_diversity": calculate_codon_diversity(orf_sequence, codon_table=codon_table),
+            }
+            orf["cds_quality"] = calculate_cds_quality(orf)
+            orf["heuristic_score"] = calculate_orf_heuristic_score(orf)
+            records.append(orf)
+    return records
+
+
+def _origin_spanning_orfs(dna, **search):
+    """Complete ORFs that run across the origin of a circular sequence (P1-9).
+
+    The sequence is searched once more as dna + dna[:n-1], which lets a frame
+    continue across the origin. An ORF from that search is kept when it
+    starts in the first copy and ends in the second, and it is not longer
+    than the circle. Coordinates stay unrolled, so start <= stop and the
+    length, sequence and interval arithmetic hold; "stop_on_circle" gives the
+    last base on the circle and "wraps_origin" marks the ORF.
+    """
+    length = len(dna)
+    if length < 6:
+        return []
+    doubled = dna + dna[:length - 1]
+    wrapped = []
+    for orf in find_orfs(doubled, include_partial=False, nested=True, **search):
+        if orf["start"] < length <= orf["stop"] and orf["length"] <= length:
+            orf["wraps_origin"] = True
+            orf["stop_on_circle"] = orf["stop"] - length
+            # the frame of its start codon on the circle (strand-relative)
+            orf["frame"] = (orf["start"] % 3 + 1 if orf["strand"] == "+"
+                            else -((length - 1 - orf["stop_on_circle"]) % 3 + 1))
+            wrapped.append(orf)
+    return wrapped
+
+
+def orf_end_on_sequence(orf):
+    """1-based last base of an ORF on its sequence (across the origin: on the circle)."""
+    return orf.get("stop_on_circle", orf["stop"]) + 1
 
 
 def find_orfs(
@@ -1001,6 +1135,8 @@ def find_orfs(
     nested=DEFAULT_REPORT_NESTED,
     ranking=DEFAULT_RANKING,
     genetic_code=1,
+    topology="linear",
+    include_5prime_partial=False,
 ):
     """Find open reading frames on both strands.
 
@@ -1017,6 +1153,13 @@ def find_orfs(
     ranking:
         "length" (default, longest first) or "heuristic" (legacy
         heuristic score).
+    topology:
+        "circular" adds the ORFs that run across the origin
+        (wraps_origin, stop_on_circle) and drops the partial ORFs, which on
+        a circle are artifacts of the arbitrary origin.
+    include_5prime_partial:
+        Also report open frames entering from the 5' end without a start
+        codon ("Partial - Missing Start"; linear sequences only).
 
     Coordinates in the result are 0-based and inclusive on the forward
     strand ("start" <= "stop"), for both strands.
@@ -1544,6 +1687,17 @@ def find_orfs(
 
                 position += 3
 
+    if str(topology).lower() == "circular":
+        orfs = [orf for orf in orfs if orf["status"] == "Complete"]
+        orfs.extend(_origin_spanning_orfs(
+            dna, min_length=min_length, start_codons=start_codons,
+            stop_codons=stop_codons, ranking=ranking, genetic_code=genetic_code))
+    elif include_5prime_partial:
+        orfs.extend(_five_prime_partial_orfs(
+            dna, min_length=min_length, start_codons=start_codons,
+            stop_codons=stop_codons, codon_table=codon_table,
+            genetic_code=genetic_code, include_partial=include_partial))
+
     if not nested:
         orfs = _keep_longest_per_stop(orfs)
 
@@ -1854,6 +2008,8 @@ def analyze_orfs(
     nested=DEFAULT_REPORT_NESTED,
     ranking=DEFAULT_RANKING,
     genetic_code=1,
+    topology="linear",
+    include_5prime_partial=False,
 ):
 
     """
@@ -1871,6 +2027,8 @@ def analyze_orfs(
         nested=nested,
         ranking=ranking,
         genetic_code=genetic_code,
+        topology=topology,
+        include_5prime_partial=include_5prime_partial,
     )
 
     summary = summarize_orfs(
@@ -1891,6 +2049,8 @@ def analyze_orfs(
         "parameters": {
             "min_length_nt": min_length,
             "include_partial": include_partial,
+            "include_5prime_partial": include_5prime_partial,
+            "topology": str(topology).lower(),
             "start_codon_policy": start_codon_policy or DEFAULT_START_CODON_POLICY,
             "start_codons": sorted(start_codons_for(genetic_code, start_codon_policy)),
             "stop_codons": sorted(_stop_codons_of(codon_table_for(genetic_code))),
@@ -2108,7 +2268,11 @@ def print_orf_report(
 
         style.field('Start Position', f"{orf['start'] + 1}")
 
-        style.field('Stop Position', f"{orf['stop'] + 1}")
+        style.field('Stop Position', f"{orf_end_on_sequence(orf)}")
+
+        if orf.get("wraps_origin"):
+
+            style.field('Across origin', 'yes (circular sequence)')
 
         style.field('Length', f"{orf['length']} bp")
 
@@ -2527,6 +2691,8 @@ def translate_orf_sequence(orf_sequence, initiator_start=True, genetic_code=None
                 f"translating it with table {genetic_code} would be inconsistent."
             )
         genetic_code = orf_code
+        if not orf_has_start_codon(orf_sequence):
+            initiator_start = False
         orf_sequence = orf_sequence["sequence"]
 
     if genetic_code is None:
@@ -2655,6 +2821,8 @@ def analyze_orfs_enhanced(
     nested=DEFAULT_REPORT_NESTED,
     ranking=DEFAULT_RANKING,
     genetic_code=1,
+    topology="linear",
+    include_5prime_partial=False,
 ):
     """
     Full ORF analysis with ranking, candidate comparison, overlap/nesting
@@ -2668,6 +2836,8 @@ def analyze_orfs_enhanced(
         nested=nested,
         ranking=ranking,
         genetic_code=genetic_code,
+        topology=topology,
+        include_5prime_partial=include_5prime_partial,
     )
 
     ranked = rank_orf_candidates(result["orfs"], ranking=ranking)
@@ -2809,7 +2979,9 @@ def print_orf_candidate_details(orf):
     style.field('Strand', f"{orf['strand']}")
     style.field('Reading frame', f"{orf['frame']:+d}")
     style.field('Genomic start', f"{orf['start'] + 1}")
-    style.field('Genomic stop', f"{orf['stop'] + 1}")
+    style.field('Genomic stop', f"{orf_end_on_sequence(orf)}")
+    if orf.get("wraps_origin"):
+        style.field('Across origin', 'yes (circular sequence)')
     style.field('Length', f"{orf['length']} bp")
     style.field('Potential protein', f"{orf['protein_length']} aa")
     style.field('Start codon', f"{orf['start_codon']}")
@@ -2977,6 +3149,14 @@ def select_orf(orfs):
         style.note("Enter a candidate number or 0 to go back.")
 
 
+def _partial_label(settings):
+    if not settings["include_partial"]:
+        return "excluded"
+    if settings.get("include_5prime_partial"):
+        return "5' and 3' ends"
+    return "3' end (missing stop)"
+
+
 def _orf_settings_menu(settings):
     """Let the user change the ORF search policy. Returns updated settings."""
     settings = dict(settings)
@@ -2988,7 +3168,7 @@ def _orf_settings_menu(settings):
                 (2, f"Start codons:        {settings['start_codon_policy']}"),
                 (3, f"Nested ORFs:         {'reported' if settings['nested'] else 'longest per stop only'}"),
                 (4, f"Ranking:             {settings['ranking']}"),
-                (5, f"Partial ORFs:        {'included' if settings['include_partial'] else 'excluded'}"),
+                (5, f"Partial ORFs:        {_partial_label(settings)}"),
                 (6, f"Genetic code:        {_genetic_code_name(settings.get('genetic_code', 1))}"),
             ]),
             ("Defaults", [
@@ -3026,7 +3206,14 @@ def _orf_settings_menu(settings):
                 "heuristic" if settings["ranking"] == "length" else "length"
             )
         elif choice == "5":
-            settings["include_partial"] = not settings["include_partial"]
+            # 3' end only -> both ends -> excluded -> 3' end only
+            if settings["include_partial"] and not settings.get("include_5prime_partial"):
+                settings["include_5prime_partial"] = True
+            elif settings["include_partial"]:
+                settings["include_partial"] = False
+                settings["include_5prime_partial"] = False
+            else:
+                settings["include_partial"] = True
         elif choice == "7":
             settings.update(
                 min_length=DEFAULT_MIN_ORF_LENGTH,
@@ -3034,10 +3221,12 @@ def _orf_settings_menu(settings):
                 nested=DEFAULT_REPORT_NESTED,
                 ranking=DEFAULT_RANKING,
                 genetic_code=1,
+                include_5prime_partial=False,
             )
         elif choice == "8":
             settings.update(LEGACY_ORF_SETTINGS)
             settings["genetic_code"] = 1
+            settings["include_5prime_partial"] = False
         elif choice == "6":
             from core.seqtools import available_genetic_codes
             for table in available_genetic_codes():
@@ -3061,6 +3250,7 @@ def run_orf_analysis_ui(
     nested=DEFAULT_REPORT_NESTED,
     ranking=DEFAULT_RANKING,
     genetic_code=1,
+    topology="linear",
 ):
     """
     Professional ORF module.
@@ -3073,6 +3263,7 @@ def run_orf_analysis_ui(
     """
     settings = {
         "include_partial": include_partial,
+        "include_5prime_partial": False,
         "min_length": min_length,
         "start_codon_policy": start_codon_policy or DEFAULT_START_CODON_POLICY,
         "nested": nested,
@@ -3089,6 +3280,8 @@ def run_orf_analysis_ui(
             nested=settings["nested"],
             ranking=settings["ranking"],
             genetic_code=settings["genetic_code"],
+            topology=topology,
+            include_5prime_partial=settings["include_5prime_partial"],
         )
 
     analysis = run_search()
@@ -3097,6 +3290,8 @@ def run_orf_analysis_ui(
         style.header("ORF ANALYSIS")
 
         style.field('Sequence length', f"{analysis['sequence_length']} bp")
+        if str(topology).lower() == "circular":
+            style.field('Topology', 'circular (ORFs across the origin included)')
         style.field('ORF candidates', f"{analysis['candidate_count']}")
         style.field('Search', f">= {settings['min_length']} nt, "
             f"{settings['start_codon_policy']}, "

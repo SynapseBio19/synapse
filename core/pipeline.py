@@ -623,6 +623,7 @@ class SynapsePipeline:
             "nested": orf_module.DEFAULT_REPORT_NESTED if nested is None else nested,
             "ranking": ranking or orf_module.DEFAULT_RANKING,
             "genetic_code": genetic_code,
+            "topology": self.context.topology,
         }
 
         if (
@@ -942,7 +943,10 @@ class SynapsePipeline:
             rna, source_name = (
                 self.get_protein_source_rna()
             )
-            initiator_start = source_name == "Selected ORF"
+            # A 5'-partial ORF has no start codon in the sequence.
+            initiator_start = (source_name == "Selected ORF"
+                               and self.context.selected_orf.get("status") not in (
+                                   "Partial - Missing Start", "Partial - Missing Start and Stop"))
 
         else:
 

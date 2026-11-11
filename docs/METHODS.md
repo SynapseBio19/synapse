@@ -146,10 +146,34 @@ use 0-based inclusive `start <= stop` on the forward strand.
   coding. It adds fixed points for completeness, start codon, length,
   translation safety, ambiguous codons, Kozak context and a
   Shine-Dalgarno match; the weights are Synapse conventions.
-- Not implemented: 5′-partial ORFs without a start codon, ORFs across the
-  origin of circular sequences.
+- Partial ORFs (P1-9, 2026-11-11). 3′-partial ORFs (a start codon but no
+  stop before the end) are reported by default. 5′-partial ORFs, open frames
+  entering from the 5′ end whose start codon lies upstream of the sequence,
+  are reported on request ("Partial - Missing Start", `include_5prime_partial`;
+  in the menu the Partial ORFs setting cycles 3′ end / 5′ and 3′ ends /
+  excluded). Their first codon is not a start codon, so it is never read as
+  initiator Met (ORF translation, protein analysis, `core.api`). Complete ORFs
+  inside such a frame are kept; the per-stop rule compares ORFs of one
+  status.
+- Circular sequences (P1-9, 2026-11-11). The search is repeated on
+  dna + dna[:n−1], and an ORF that starts in the first copy and ends in the
+  second is reported as running across the origin (`wraps_origin`). Its
+  coordinates stay unrolled (start ≤ stop, so length and sequence hold);
+  `stop_on_circle` and the displays give its last base on the circle. Partial
+  ORFs are not reported on a circle, where they would be artifacts of the
+  arbitrary origin. The pipeline and `core.api` pass the record's topology.
+  The longest-ORF-per-stop rule keys on strand, 3′ end and status; the frame
+  was dropped from the key because it changes across the origin of a circle
+  whose length is not a multiple of 3 (on a linear sequence strand and 3′
+  end fix the frame, so linear results are unchanged).
 - Validation: known-answer tests for frames, strands, coordinates and the
-  table-2 read-through of TGA; not compared against ORFfinder output.
+  table-2 read-through of TGA; for circles, an ORF across the origin on both
+  strands and rotation invariance (the same ORFs for four origin positions of
+  a 900 bp circle); not compared against ORFfinder output (no ORFfinder
+  binary; its web service would need an external request).
+- Organism mode (P1-9) is not implemented as a separate switch: the genetic
+  code and the start-codon policy cover the cases (e.g. table 11 with
+  `table_starts` for bacteria), and a preset would only bundle them.
 
 ## RNA and protein (`analyses/rna.py`, `analyses/protein.py`)
 

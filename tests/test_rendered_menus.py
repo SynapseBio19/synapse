@@ -584,8 +584,9 @@ class OrfMenuTests(unittest.TestCase):
         self.assertIn("100 nt", dict(last["entries"])["1"])
         self.assertIn("ERROR: Please enter an integer >= 3.", s.output)
         self.assertEqual(s.result["genetic_code"], 11)
-        self.assertEqual((s.result["nested"], s.result["ranking"], s.result["include_partial"]),
-                         (True, "heuristic", False))
+        # [5] cycles 3' end -> 5' and 3' ends -> excluded (one press here)
+        self.assertEqual((s.result["nested"], s.result["ranking"], s.result["include_partial"],
+                          s.result["include_5prime_partial"]), (True, "heuristic", True, True))
         restored = scenarios()["orf_settings_restore"].result
         self.assertEqual((restored["min_length"], restored["start_codon_policy"], restored["genetic_code"]),
                          (75, "atg_only", 1))

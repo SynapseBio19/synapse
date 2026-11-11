@@ -4309,11 +4309,13 @@ def run_protein_analysis_from_orf(
         "U"
     )
 
-    # Every Synapse ORF begins at its start codon, so the first codon is
-    # decoded as initiator Met (also for GTG/TTG starts).
+    # A Synapse ORF begins at its start codon, so the first codon is decoded
+    # as initiator Met (also for GTG/TTG starts) - except a 5'-partial ORF,
+    # whose start lies upstream of the sequence.
+    has_start = orf_status not in ("Partial - Missing Start", "Partial - Missing Start and Stop")
     translation = analyze_translation(
         rna,
-        initiator_start=True,
+        initiator_start=has_start,
         genetic_code=genetic_code,
     )
 
@@ -4340,7 +4342,7 @@ def run_protein_analysis_from_orf(
     if pipeline is not None:
         context = getattr(pipeline, "context", None)
         try:
-            analysis = analyze_complete_protein("", rna=rna, initiator_start=True, genetic_code=genetic_code)
+            analysis = analyze_complete_protein("", rna=rna, initiator_start=has_start, genetic_code=genetic_code)
             if context is not None:
                 context.protein_source = "Selected ORF"
                 context.store_protein_analysis(analysis, protein_sequence=analysis.get("protein", ""))
@@ -4363,6 +4365,6 @@ def run_protein_analysis_from_orf(
             else "+1"
         ),
         orf_status=orf_status,
-        initiator_start=True,
+        initiator_start=has_start,
         genetic_code=genetic_code,
     )

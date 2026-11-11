@@ -121,10 +121,12 @@ def find_orfs(record_or_sequence: Any, *, min_length: Optional[int] = None,
         nested=O.DEFAULT_REPORT_NESTED if nested is None else nested,
         ranking=ranking or O.DEFAULT_RANKING,
         genetic_code=genetic_code,
+        topology=topology,
     )
     limitations = ["ORFs are sequence features, not evidence of protein-coding genes."]
     if topology == "circular":
-        limitations.append("ORFs spanning the origin of a circular sequence are not reported.")
+        limitations.append("Circular sequence: ORFs across the origin are included "
+                           "(wraps_origin, stop_on_circle); partial ORFs are not reported.")
     return _result("orf", data, sequence, description,
                    parameters=data.get("parameters", {}), warnings=warnings,
                    limitations=limitations)
@@ -162,7 +164,7 @@ def analyze_protein_from_cds(cds: Any, *, initiator_start: bool = True,
     ``genetic_code`` raises ``ValueError``. A string uses ``genetic_code``
     (default 1). A protein sequence is refused; use ``analyze_protein``.
     """
-    from analyses.orf import is_initiation_codon
+    from analyses.orf import is_initiation_codon, orf_has_start_codon as O_has_start
     from analyses.protein import analyze_complete_protein
 
     if isinstance(cds, dict):
@@ -171,6 +173,8 @@ def analyze_protein_from_cds(cds: Any, *, initiator_start: bool = True,
             raise ValueError(f"The ORF was found with NCBI table {orf_code}; "
                              f"translating it with table {genetic_code} would be inconsistent.")
         genetic_code = orf_code
+        if not O_has_start(cds):
+            initiator_start = False
         cds = cds["sequence"]
     genetic_code = 1 if genetic_code is None else int(genetic_code)
 

@@ -566,6 +566,7 @@ def main():
                         dna,
                         include_partial=True,
                         min_length=DEFAULT_MIN_ORF_LENGTH,
+                        topology=topology,
                     )
 
                     if selected_orf_result is not None:
@@ -590,7 +591,7 @@ def main():
                         style.field('Length', f"{selected_orf['length']} bp")
                         style.field('Protein', f"{selected_orf['protein_length']} aa")
                         style.field('Location', f"{selected_orf['start'] + 1}-"
-                            f"{selected_orf['stop'] + 1} "
+                            f"{selected_orf.get('stop_on_circle', selected_orf['stop']) + 1} "
                             f"({selected_orf['strand']} strand, 1-based)")
                         print()
                         style.success("ORF stored in the pipeline; RNA, protein and CRISPR guide design can use it.")
