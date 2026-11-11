@@ -5,7 +5,7 @@ that the next session starts with full context. **Phase 6 is not
 complete.** Start the next session from this file.
 
 State at stop: `main` at the commit that adds this file, working tree
-clean, ReadOnly restored on the 15 files, suite 409 tests OK, golden master
+clean, ReadOnly restored on the 15 files, suite 421 tests OK, golden master
 unchanged, pyright 111 errors with no new diagnostic against the baseline
 of `ab4bd2a` (134).
 
