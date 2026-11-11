@@ -704,6 +704,19 @@ class DirectOutputTests(unittest.TestCase):
             (13, "rule inside a printed text"),
         ])
 
+    def test_no_message_is_drawn_as_a_field(self):
+        """style.field('Error', ...) looks like data; an error is an ERROR line."""
+        label = re.compile(r"(Error|Warning|Note|.+ (failed|error))")
+        hits = []
+        for path in INTERFACE_SOURCES:
+            for node in ast.walk(ast.parse(read(path))):
+                if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) \
+                        and node.func.attr == "field" and node.args \
+                        and isinstance(node.args[0], ast.Constant) and isinstance(node.args[0].value, str) \
+                        and label.fullmatch(node.args[0].value):
+                    hits.append(f"{path.relative_to(PROJECT_ROOT).as_posix()}:{node.lineno}: {node.args[0].value}")
+        self.assertEqual(hits, [])
+
     def test_no_interface_file_prints_around_the_renderers(self):
         hits = [f"{path.relative_to(PROJECT_ROOT).as_posix()}:{line}: {kind}: {text.strip()!r}"
                 for path in INTERFACE_SOURCES for line, kind, text in direct_output(read(path))]

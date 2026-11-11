@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import email.message
 import gzip
 import io
 import json
@@ -260,8 +261,10 @@ class LiteratureTests(unittest.TestCase):
         """An HTTPError holds the open response; retrying or reporting must not leak it."""
         from analyses import literature as L
         bodies = [io.BytesIO(b"busy"), io.BytesIO(b"not found")]
-        errors = [urllib.error.HTTPError("https://example.org/z", 503, "busy", {"Retry-After": "0"}, bodies[0]),
-                  urllib.error.HTTPError("https://example.org/z", 404, "nf", {}, bodies[1])]
+        retry_after = email.message.Message()
+        retry_after["Retry-After"] = "0"
+        errors = [urllib.error.HTTPError("https://example.org/z", 503, "busy", retry_after, bodies[0]),
+                  urllib.error.HTTPError("https://example.org/z", 404, "nf", email.message.Message(), bodies[1])]
         kept = list(errors)   # keep them alive: only an explicit close() may close the bodies
 
         def fake_urlopen(request, timeout=None):
@@ -277,7 +280,7 @@ class LiteratureTests(unittest.TestCase):
     def test_blast_http_error_response_is_closed(self):
         from analyses import blast as B
         body = io.BytesIO(b"Message ID#24 Error: busy")
-        error = urllib.error.HTTPError(B.NCBI_BLAST_URL, 500, "error", {}, body)
+        error = urllib.error.HTTPError(B.NCBI_BLAST_URL, 500, "error", email.message.Message(), body)
         client = B.NCBIBlastClient(tool="Synapse", email="")
         with mock.patch.object(B, "urlopen", side_effect=error), \
                 mock.patch.object(client, "_throttle_request", lambda: None):

@@ -2382,7 +2382,7 @@ def main(context: Optional[dict[str, Any]] = None) -> int:
 
         except (ValueError, LiteratureError) as exc:
 
-            style.field('Search failed', f"{exc}")
+            style.error(f"Search failed: {exc}")
 
             return 1
 

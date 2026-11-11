@@ -132,14 +132,15 @@ Letter keys name actions that are not navigation: `[R]` export report,
 sequence manually. Numeric keys are reserved for list items and ordered
 options.
 
-### Known deviation
+### The mutation sequence prompt
 
-`analyses/mutation.py::_prompt_sequence` offers no `[0]`. It used to mean
-"enter a sequence manually", which is a choice rather than an exit; that
-moved to `[M]`. A real cancel would need `_prompt_sequence` to gain a
-cancel contract and its four call sites to handle it, which is a control
-flow change rather than a presentation one. Recorded as follow-up work
-rather than done quietly.
+`analyses/mutation.py::_prompt_sequence` once offered no `[0]`: `[0]` had
+meant "enter a sequence manually", which moved to `[M]`, and the four call
+sites had no way to abandon the comparison. Since 2026-11-11 it offers
+`[0] Cancel`, which raises `SequencePromptCancelled`; both menu branches
+that ask for sequences catch it and return to the mutation menu without
+comparing anything. The only screen without `[0]` is the sequence
+selector, which cannot be left without choosing a sequence or `[F]`.
 
 ## 4. Input
 
@@ -249,14 +250,20 @@ menus from the analysis modules is the remaining part of audit item P2-2.
     start of an f-string, outside `section()`; no heading drawn with its
     own dashes. The one named exception is the invalid-character list
     under the sequence validation error, which is a result line. On
-    `1516339` the rule reports 68 sites.
-11. **Every menu rendered** (`tests/test_rendered_menus.py`): 39 dialogs
+    `1516339` the rule reports 68 sites. No message is drawn as a field
+    (`style.field("Error", ...)`, `"... failed"`, `"... error"`); ten such
+    lines in mutation, restriction and literature became ERROR and NOTE
+    lines on 2026-11-11.
+11. **Every menu rendered** (`tests/test_rendered_menus.py`): 40 dialogs
     driven with scripted keys; every `style.menu` call site of the
     sixteen files must be drawn by a scenario or a first-screen test
     (47 of 47); every drawn menu has unique keys, numbers 1..n, an
     allowed `[0]`, the entries it was given, a blank line before `[0]`
     and the closing rule; each dialog is checked for its entries, the
     reply to an unknown key, `0`, its error states and its result view.
+    A missing file is reported as an ERROR by every dialog that reads one
+    (sequence loader, VCF, CRISPR batch, BLAST query and database FASTA),
+    and the dialog stays usable (`MissingFileTests`).
 
 ## 8. Numbering
 
@@ -297,8 +304,9 @@ What remains outside the shared renderers, each for a stated reason:
 - **Headings inside text reports** that are built as strings (the primer
   pair block's PRIMER PAIR #n, FORWARD, REVERSE, PAIR; the BLAST report's
   TOP HITS) are part of the stored report text, not printed screens.
-- **The mutation sequence prompt and the sequence selector** offer no
-  `[0]` (section 3); both are drawn through `style.menu(zero=None)`.
+- **The sequence selector** offers no `[0]` (section 3); it is drawn
+  through `style.menu(zero=None)`. The cloning enzyme list does the same
+  where a choice is required (`allow_back=False`).
 - **Prompts of the converted option lists** keep their own label
   (`Database:`, `Program:`, `Record number:`), not `Selection:`; changing
   them was not part of recommendation 2.

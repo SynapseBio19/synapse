@@ -247,6 +247,9 @@ def scenarios():
     # --- Mutation: sub-menu, the sequence prompt without [0], manual entry
     run("mutation", ["9", "1", "9", "1", "2", "", "0"],
         lambda: mutation.run_mutation_analysis_ui(sequences=records))
+    # [0] at the reference prompt, and at the variant prompt after a reference was chosen
+    run("mutation_cancel", ["1", "0", "1", "1", "0", "0"],
+        lambda: mutation.run_mutation_analysis_ui(sequences=records))
 
     # --- ORF: selector and settings
     run("orf_select", ["9", "1"], lambda: orf.select_orf(orfs))
@@ -543,10 +546,20 @@ class MutationMenuTests(unittest.TestCase):
         self.assertEqual([k for k, _ in analysis["entries"]], ["1", "2", "3", "4", "5"])
         prompts = [m for m in s.menus if m["site"][1] != analysis["site"][1]]
         self.assertEqual(prompts[0]["entries"], [("1", "ref"), ("2", "var"), ("M", "Enter sequence manually")])
-        self.assertIsNone(prompts[0]["zero"])                    # known deviation: no [0]
+        self.assertEqual(prompts[0]["zero"], style.CANCEL_LABEL)
         self.assertGreaterEqual(s.output.count(style.INVALID_SELECTION), 2)
         self.assertIsNotNone(s.result)                           # the comparison ran
         self.assertIn("Variant selection: 2", s.output)
+
+    def test_sequence_prompt_cancel_returns_to_the_menu(self):
+        s = scenarios()["mutation_cancel"]
+        analysis_menus = [m for m in s.menus if m["screen"] == "MUTATION ANALYSIS"
+                          and m["entries"][0] == ("1", "Compare Sequences")]
+        self.assertEqual(len(analysis_menus), 3)                 # drawn again after each cancel
+        self.assertNotIn("ERROR", s.output)
+        self.assertIn("Reference selection: 0", s.output)
+        self.assertIn("Variant selection: 0", s.output)
+        self.assertIsNone(s.result)                              # nothing was compared
 
 
 class OrfMenuTests(unittest.TestCase):
@@ -613,6 +626,57 @@ class SessionMenuTests(unittest.TestCase):
         self.assertEqual(s.output.count(style.INVALID_SELECTION), 2)
         self.assertEqual(s.result[0], 2)
         self.assertEqual(scenarios()["selector_file"].result, (None, None))
+
+
+class MissingFileTests(unittest.TestCase):
+    """Master Prompt 11.4: a missing file is reported and the dialog stays usable."""
+
+    MISSING = str(PROJECT_ROOT / "no_such_dir" / "missing.fasta")
+
+    def test_loaders_raise_a_clear_error(self):
+        from analyses import blast, crispr, variant_analysis
+        from fileio.loader import load_sequences
+        cases = [
+            (lambda: load_sequences(self.MISSING), FileNotFoundError, "Sequence file not found"),
+            (lambda: load_sequences(""), FileNotFoundError, "Sequence file not found"),
+            (lambda: crispr.load_fasta(self.MISSING), crispr.CRISPRAnalysisError, "Unable to read FASTA"),
+            (lambda: blast.load_fasta_queries(self.MISSING), blast.BlastAnalysisError, "FASTA file not found"),
+            (lambda: variant_analysis.parse_vcf_file(self.MISSING), FileNotFoundError, "missing.fasta"),
+        ]
+        for call, error, text in cases:
+            with self.subTest(error=error.__name__, text=text):
+                with self.assertRaises(error) as raised:
+                    call()
+                self.assertIn(text, str(raised.exception))
+
+    def test_menus_report_the_missing_file_and_continue(self):
+        from analyses import blast, crispr, variant_analysis
+        manager = blast.LocalBlastDatabaseManager(str(PROJECT_ROOT / "no_such_dir"))
+        cases = [
+            ("variant", ["1", self.MISSING, "0"], variant_analysis.run_variant_analysis_ui,
+             "ERROR: Could not read VCF file:"),
+            ("crispr batch", ["2", "1", self.MISSING, "0", "0"], lambda: crispr.crispr_menu(DNA, "demo"),
+             "ERROR: Unable to read FASTA:"),
+            ("blast query", ["1", "2", self.MISSING, "", "0"], lambda: blast.blast_menu(DNA, "demo"),
+             "ERROR: FASTA file not found:"),
+            ("blast database", ["4", self.MISSING, "db", "1", "0"],
+             lambda: blast.blast_database_manager_menu(manager), "ERROR: FASTA file not found:"),
+        ]
+        for name, answers, call, message in cases:
+            with self.subTest(menu=name):
+                session = Session(answers).run(call)
+                self.assertIn(message, session.output)
+                self.assertNotIn("Traceback", session.output)
+        self.assertFalse((PROJECT_ROOT / "no_such_dir").exists())   # nothing was created
+
+    def test_main_loader_asks_again_after_a_missing_file(self):
+        import main
+        with self.assertRaises(_Exhausted):        # it keeps asking; the script ends it
+            Session([self.MISSING]).run(main.choose_sequence_file)
+        session = Session([self.MISSING, "Q"])
+        session.run(main.choose_sequence_file)
+        self.assertIn("SEQUENCE FILE ERROR", session.output)
+        self.assertIn("ERROR: Sequence file not found:", session.output)
 
 
 if __name__ == "__main__":

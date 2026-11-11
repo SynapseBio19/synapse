@@ -2419,7 +2419,7 @@ def _restriction_overview_ui(dna, pipeline=None, topology="linear"):
 
     except (ValueError, TypeError, KeyError) as error:
         print()
-        style.field('Restriction analysis error', f"{error}")
+        style.error(f"Restriction analysis failed: {error}")
         _synapse_ui_pause()
         return None
 
@@ -2467,7 +2467,7 @@ def _restriction_map_ui(dna, topology="linear"):
 
     except (ValueError, TypeError, KeyError) as error:
         print()
-        style.field('Restriction map error', f"{error}")
+        style.error(f"Restriction map failed: {error}")
         _synapse_ui_pause()
         return None
 
@@ -2504,9 +2504,9 @@ def _restriction_digest_gel_ui(dna, topology="linear"):
         possible = digest.get("possible_cuts", [])
         if possible:
             print()
-            style.field('Note', f"{len(possible)} ambiguity-dependent site(s) "
-                "(IUPAC symbols such as N inside the recognition "
-                "sequence) were NOT counted as cuts.")
+            style.note(f"{len(possible)} ambiguity-dependent site(s) "
+                       "(IUPAC symbols such as N inside the recognition "
+                       "sequence) were NOT counted as cuts.")
 
         for enzyme_name in enzymes:
             enzyme = get_restriction_enzyme(enzyme_name) or {}
@@ -2538,7 +2538,7 @@ def _restriction_digest_gel_ui(dna, topology="linear"):
 
     except (ValueError, TypeError, KeyError) as error:
         print()
-        style.field('Digest analysis error', f"{error}")
+        style.error(f"Digest analysis failed: {error}")
         _synapse_ui_pause()
         return None
 
@@ -2577,7 +2577,7 @@ def _restriction_complete_report_ui(
 
     except (ValueError, TypeError, KeyError) as error:
         print()
-        style.field('Restriction analysis error', f"{error}")
+        style.error(f"Restriction analysis failed: {error}")
         _synapse_ui_pause()
         return None
 

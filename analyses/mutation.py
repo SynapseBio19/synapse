@@ -132,6 +132,10 @@ PYRIMIDINES = {"C", "T"}
 # EXCEPTIONS
 # ============================================================================
 
+class SequencePromptCancelled(Exception):
+    """The user left a sequence prompt with [0]; the caller returns to its menu."""
+
+
 class MutationAnalysisError(ValueError):
     """Raised when mutation-analysis input or state is invalid."""
 
@@ -3683,17 +3687,20 @@ def _prompt_sequence(
 
     if available:
 
-        # No [0] here: the four callers have no cancel path (recorded in
-        # docs/TERMINAL_UI_STANDARD.md, "Known deviation").
+        # [0] raises SequencePromptCancelled; both menu branches that ask
+        # for sequences catch it and return to the mutation menu.
         style.menu([
             (f"Available sequences for {prompt}",
              [(i, header) for i, (header, _) in enumerate(available, 1)]),
             (None, [("M", "Enter sequence manually")]),
-        ], zero=None)
+        ], zero=style.CANCEL_LABEL)
 
         while True:
 
             choice = style.ask_choice(f"{prompt} selection")
+
+            if choice == "0":
+                raise SequencePromptCancelled(prompt)
 
             if choice.upper() == "M":
                 break
@@ -3902,13 +3909,17 @@ def run_mutation_analysis_ui(
                     last_result.to_dict(),
                 )
 
+            except SequencePromptCancelled:
+
+                continue
+
             except MutationAnalysisError as error:
 
-                style.field('Error', f"{error}")
+                style.error(f"{error}")
 
             except Exception as error:
 
-                style.field('Mutation analysis failed', f"{error}")
+                style.error(f"Mutation analysis failed: {error}")
 
         # ------------------------------------------------------------------
         # STATISTICS
@@ -4131,13 +4142,17 @@ def run_mutation_analysis_ui(
                     style.field('Premature stop', f"codon "
                         f"{coding.premature_stop_position}")
 
+            except SequencePromptCancelled:
+
+                continue
+
             except MutationAnalysisError as error:
 
-                style.field('Error', f"{error}")
+                style.error(f"{error}")
 
             except Exception as error:
 
-                style.field('Coding analysis failed', f"{error}")
+                style.error(f"Coding analysis failed: {error}")
 
         # ------------------------------------------------------------------
         # REPORT
