@@ -322,10 +322,22 @@ Validation:
   max |ΔTm| 0.0032 °C, mean 0.0024 °C. The systematic offset comes from
   the gas constant (1.98720 vs 1.987). A reduced grid runs in the suite
   (`Primer3ReferenceComparison`, skipped without the `reference` extra).
-- Not compared: hairpin and dimer screens are heuristic and not
-  independently validated. Predicted Tm is not an annealing temperature,
-  and agreement with Primer3 shows that the equations are implemented as
-  published, not that the model predicts experiments.
+- Hairpin and dimer screens are heuristics: the length of the longest
+  perfectly complementary stem (≥ 4 / 7 / 10 bp: MODERATE / HIGH / VERY
+  HIGH) and the 3′ complementarity, not free energies. Compared on
+  2026-11-11 with primer3-py 2.4.0 (`calc_hairpin`, `calc_homodimer`,
+  `calc_heterodimer`, same buffer) on 250 primers and 100 pairs
+  (`tests/test_primer_structure_reference.py`): the stem length orders
+  Primer3's ΔG for hairpins (Spearman ρ −0.78; median ΔG 0.00 / −1.77 /
+  −4.82 kcal/mol for LOW / MODERATE / HIGH) and self-dimers (ρ −0.74), and
+  less well for heterodimers (ρ −0.51). The classes overlap: a MODERATE
+  self-dimer can reach −15.6 kcal/mol, and VERY HIGH (driven by 3′
+  complementarity) is not more stable than HIGH in the median. A severity
+  is therefore a screening flag; Primer3's ΔG is the better measure of
+  structure stability.
+- Predicted Tm is not an annealing temperature, and agreement with Primer3
+  shows that the equations are implemented as published, not that the model
+  predicts experiments.
 
 ## Mutation analysis (`analyses/mutation.py`)
 
