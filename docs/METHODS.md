@@ -184,6 +184,14 @@ use 0-based inclusive `start <= stop` on the forward strand.
   coefficient and similar) are computed over the resolved residues only.
 - The transmembrane and signal-peptide outputs are screens based on the
   Kyte–Doolittle scale, not predictions from TMHMM/Phobius or SignalP.
+- RNA hairpin screen: stems of 4-7 nt around loops of 3-12 nt are reported
+  when at least 75 % of the stem positions form Watson-Crick pairs. It is a
+  sequence screen without free energies (no Turner parameters, no RNAfold).
+  G·U wobble pairs (P2-5, 2026-11-11) are counted in a second figure,
+  "Including G-U pairs" (`hairpin_count_with_gu`, `allow_gu=True`), not in
+  the screen itself: treating G·U like G·C without an energy model raises
+  the candidates on the golden-master reference from 58 to 260 rather than
+  finding stronger stems.
 - RNA codon view (P1-9): the three-frame preview uses the genetic code of
   the selected ORF, taken from the ORF itself; without a selected ORF it
   uses table 1. The +1 frame therefore agrees with the ORF's own

@@ -1148,8 +1148,20 @@ def find_rna_hairpins(
     rna,
     min_stem=4,
     min_loop=3,
-    max_loop=12
+    max_loop=12,
+    allow_gu=False,
 ):
+    """Candidate stem-loops: stems of min_stem..min_stem+3 nt around a loop.
+
+    A candidate is reported when at least 75 % of the stem positions with
+    standard bases pair. Watson-Crick pairs (A-U, G-C) count; with
+    allow_gu=True the G-U wobble pair, a regular but weaker pair in RNA
+    helices, counts as well and "wobble_pairs" says how many a stem uses.
+    The default stays Watson-Crick only: without free energies, counting
+    G-U like G-C multiplies the candidates (58 -> 260 on the golden-master
+    reference) instead of finding stronger stems, so the structure summary
+    reports the G-U count separately. A sequence screen, not a prediction.
+    """
 
     structures = []
 
@@ -1206,6 +1218,7 @@ def find_rna_hairpins(
                 ]
 
                 paired = 0
+                wobble = 0
                 possible_pairs = 0
 
                 for left_base, right_base in zip(
@@ -1247,6 +1260,11 @@ def find_rna_hairpins(
 
                         paired += 1
 
+                    elif allow_gu and {left_base, right_base} == {"G", "U"}:
+
+                        paired += 1
+                        wobble += 1
+
                 if possible_pairs == 0:
                     continue
 
@@ -1272,6 +1290,9 @@ def find_rna_hairpins(
 
                         "pairing_fraction":
                             pairing_fraction,
+
+                        "wobble_pairs":
+                            wobble,
 
                         "left_stem":
                             left,
@@ -1333,6 +1354,11 @@ def summarize_rna_structure(rna):
 
         "hairpin_count":
             len(hairpins),
+
+        # Candidates when G-U wobble pairs count as pairs (P2-5); reported
+        # beside the Watson-Crick screen, not instead of it.
+        "hairpin_count_with_gu":
+            len(find_rna_hairpins(rna, allow_gu=True)),
 
         "homopolymers":
             homopolymers,
@@ -2258,6 +2284,7 @@ def print_rna_report(
     style.section('RNA Secondary Structure Screening')
 
     style.field('Potential Hairpins', f"{structure['hairpin_count']}")
+    style.field('Including G-U pairs', f"{structure['hairpin_count_with_gu']}")
 
     if structure["hairpins"]:
 
@@ -2513,8 +2540,9 @@ def print_rna_report(
 
     print(
         "Hairpin detection identifies candidate stem-loop "
-        "motifs but does not calculate thermodynamic "
-        "stability or minimum free energy."
+        "motifs from Watson-Crick pairing (the G-U count also "
+        "accepts wobble pairs) but does not calculate "
+        "thermodynamic stability or minimum free energy."
     )
 
     print(
