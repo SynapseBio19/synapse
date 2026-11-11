@@ -3823,6 +3823,28 @@ def _primer_ui_read_conditions():
         return None
 
 
+def primer_pair_binding_sites(pair, three_prime_window: int = 5) -> list[dict]:
+    """The two binding sites of a primer pair, 1-based inclusive (audit P2-4).
+
+    Accepts a PrimerPair or an AdvancedPrimerPair. A primer's start/end are
+    0-based half-open on the template; the forward primer's 3' end is the
+    right end of its site, the reverse primer's 3' end the left end (it binds
+    the top strand reverse-complemented). three_prime_window bases at the 3'
+    end form the critical region, where a mismatch most affects extension.
+    """
+    pair = getattr(pair, "pair", pair)
+    window = max(int(three_prime_window), 1)
+    forward, reverse = pair.forward, pair.reverse
+    f_start, f_end = forward.start + 1, forward.end
+    r_start, r_end = reverse.start + 1, reverse.end
+    return [
+        {"name": "forward primer", "kind": "primer", "start": f_start, "end": f_end,
+         "critical": (max(f_start, f_end - window + 1), f_end), "critical_label": "3' end"},
+        {"name": "reverse primer", "kind": "primer", "start": r_start, "end": r_end,
+         "critical": (r_start, min(r_end, r_start + window - 1)), "critical_label": "3' end"},
+    ]
+
+
 def _primer_ui_select_tm_model():
     """Select the Tm model."""
     methods = {

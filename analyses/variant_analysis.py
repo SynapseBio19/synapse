@@ -1674,6 +1674,50 @@ def prioritize_variants(
 # Region / interval operations
 # ============================================================================
 
+def check_features_against_variants(
+    features: Sequence[Dict[str, Any]],
+    variants: Sequence[Variant],
+    *,
+    chromosome: Optional[str] = None,
+) -> List[Dict[str, Any]]:
+    """Variants inside primer or guide binding sites (audit P2-4).
+
+    Each feature is a dict with "name", "kind", "start" and "end" (1-based
+    inclusive on the sequence the variants are mapped to) and optionally
+    "critical" (start, end) with a "critical_label", the part where a
+    mismatch matters most: a primer's 3' end, a guide's seed and PAM. A
+    variant overlaps when any base of its REF allele lies in the site.
+    Overlaps in the critical part are HIGH, elsewhere in the site MODERATE.
+    chromosome restricts the check to variants on that contig; the caller is
+    responsible for the variants being on the analyzed sequence.
+    """
+    findings: List[Dict[str, Any]] = []
+    for feature in features:
+        start, end = int(feature["start"]), int(feature["end"])
+        critical = feature.get("critical")
+        for variant in variants:
+            if chromosome is not None and variant.chromosome != chromosome:
+                continue
+            first = variant.position
+            last = variant.position + max(len(variant.reference), 1) - 1
+            if first > end or last < start:
+                continue
+            in_critical = bool(critical) and not (first > critical[1] or last < critical[0])
+            findings.append({
+                "feature": feature["name"],
+                "kind": feature.get("kind", ""),
+                "feature_start": start,
+                "feature_end": end,
+                "chromosome": variant.chromosome,
+                "position": variant.position,
+                "reference": variant.reference,
+                "alternative": variant.alternative,
+                "region": feature.get("critical_label", "critical region") if in_critical else "binding site",
+                "severity": "HIGH" if in_critical else "MODERATE",
+            })
+    return findings
+
+
 def variants_in_interval(
     variants: Sequence[Variant],
     chromosome: str,

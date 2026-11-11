@@ -742,6 +742,29 @@ def cut_site_forward(strand: str, guide_start: int, guide_end: int, cut_after: i
     return guide_end - cut_after
 
 
+def guide_binding_site(candidate: "GuideCandidate", seed_length: int = DEFAULT_SEED_LENGTH) -> Dict[str, Any]:
+    """Protospacer plus PAM of a guide, 1-based inclusive (audit P2-4).
+
+    The critical region is the PAM and the seed, the seed_length guide bases
+    next to the PAM, where a mismatch most reduces cleavage. Taking the bases
+    adjacent to the PAM in sequence coordinates gives the PAM-proximal end on
+    either strand and for 3'- and 5'-PAM systems alike.
+    """
+    length = min(max(int(seed_length), 1), candidate.guide_end - candidate.guide_start + 1)
+    if candidate.pam_start > candidate.guide_end:          # PAM to the right
+        critical = (candidate.guide_end - length + 1, candidate.pam_end)
+    else:                                                   # PAM to the left
+        critical = (candidate.pam_start, candidate.guide_start + length - 1)
+    return {
+        "name": f"guide {candidate.candidate_id}",
+        "kind": "guide",
+        "start": min(candidate.guide_start, candidate.pam_start),
+        "end": max(candidate.guide_end, candidate.pam_end),
+        "critical": critical,
+        "critical_label": "seed or PAM",
+    }
+
+
 def pam_proximal_seed(guide: str, system: CRISPRSystem, seed_length: int) -> str:
     """Return the PAM-proximal seed of a guide in targeting orientation.
 

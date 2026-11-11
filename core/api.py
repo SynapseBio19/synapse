@@ -356,6 +356,35 @@ def design_crispr_guides(record_or_sequence: Any, *, system: str = "SpCas9",
                    limitations=["Off-target search covers only the supplied sequence, not a genome."])
 
 
+def cross_check_variants(result: AnalysisResult, variants: Sequence[Any], *,
+                         chromosome: Optional[str] = None, top_n: int = 5,
+                         three_prime_window: int = 5,
+                         seed_length: Optional[int] = None) -> List[Dict[str, Any]]:
+    """Variants inside the binding sites of designed primers or guides (P2-4).
+
+    ``result`` is the AnalysisResult of ``design_primers`` (its top_n ranked
+    pairs are checked) or ``design_crispr_guides`` (its top_n ranked guides).
+    ``variants`` are ``variant_analysis.Variant`` objects whose positions are
+    1-based on the same sequence; ``chromosome`` restricts them to one contig.
+    """
+    from analyses.variant_analysis import check_features_against_variants
+
+    features: List[Dict[str, Any]] = []
+    if result.module == "primer":
+        from analyses.primer import primer_pair_binding_sites
+        for rank, pair in enumerate(list(result.data.ranked_pairs)[:top_n], start=1):
+            for site in primer_pair_binding_sites(pair, three_prime_window):
+                site["name"] = f"pair {rank} {site['name']}"
+                features.append(site)
+    elif result.module == "crispr":
+        from analyses.crispr import DEFAULT_SEED_LENGTH, guide_binding_site
+        for candidate in list(result.data.candidates)[:top_n]:
+            features.append(guide_binding_site(candidate, seed_length or DEFAULT_SEED_LENGTH))
+    else:
+        raise ValueError("cross_check_variants needs a primer or CRISPR design result.")
+    return check_features_against_variants(features, variants, chromosome=chromosome)
+
+
 def plan_cloning(vector: Any, insert: Any, enzymes: Optional[Sequence[str]] = None, *,
                  top_n: int = 5, vector_topology: Optional[str] = None,
                  insert_topology: Optional[str] = None,
@@ -529,5 +558,5 @@ __all__ = [
     "load_records", "sequence_overview", "find_orfs", "analyze_rna", "analyze_protein_from_cds",
     "analyze_protein", "restriction_digest", "design_primers", "compare_sequences", "analyze_vcf",
     "design_crispr_guides", "plan_cloning", "filter_variants", "mutation_report", "blast_search",
-    "blast_resume", "literature_search",
+    "blast_resume", "literature_search", "cross_check_variants",
 ]

@@ -381,6 +381,19 @@ Validation:
   (`docs/PHASE6_INITIAL_AUDIT.md` §3.7); not compared against
   `bcftools norm` (no native Windows build; recommended next validation
   step).
+- Primers and guides against variants (P2-4, 2026-11-11,
+  `core.api.cross_check_variants`): a variant overlaps a binding site when
+  any base of its REF allele lies in it. Primer sites are the primer's
+  template positions; their 3′ end (5 nt by default: the right end of a
+  forward primer, the left end of a reverse primer) is the critical part.
+  Guide sites are protospacer plus PAM; the PAM and the 8 seed bases next to
+  it are the critical part, taken as the guide bases adjacent to the PAM so
+  that strand and PAM side need no separate rule. Overlaps in the critical
+  part are HIGH, elsewhere MODERATE. The variants must be mapped to the
+  analyzed sequence (1-based positions; `chromosome` selects a contig); the
+  check is available through `core.api` and is not wired into the menus,
+  because the pipeline does not record which VCF contig was mapped to the
+  loaded sequence.
 
 ## CRISPR guide design (`analyses/crispr.py`)
 
