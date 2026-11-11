@@ -46,6 +46,61 @@ def _test_sequence():
     return sequence
 
 
+def _type_iis_sequence():
+    """3,000 bp with every Type IIS site planted in both orientations, near both ends too."""
+    from analyses.restriction import reverse_complement
+    from data.restriction_enzymes import TYPE_IIS_ENZYMES
+    rng = random.Random(20261111)
+    sequence = "".join(rng.choice("ACGT") for _ in range(3000))
+    sites = [entry["recognition_sequence"] for entry in TYPE_IIS_ENZYMES.values()]
+    planted = [(site, rng.randrange(20, 2960)) for site in sites] + \
+              [(reverse_complement(site), rng.randrange(20, 2960)) for site in sites] + \
+              [("GGTCTC", 2990), ("GAGACC", 3)]          # cuts beyond the ends on a linear molecule
+    for site, position in planted:
+        sequence = sequence[:position] + site + sequence[position + len(site):]
+    return sequence[:3000]
+
+
+@unittest.skipUnless(HAS_BIOPYTHON, SKIP_REASON)
+class TypeIISReferenceTests(unittest.TestCase):
+    """Type IIS enzymes (P2-7): definitions and both-strand cuts against Biopython 1.88."""
+
+    def test_definitions_match_rebase_data(self):
+        from Bio import Restriction
+        from data.restriction_enzymes import TYPE_IIS_ENZYMES
+        differences = []
+        for name, entry in TYPE_IIS_ENZYMES.items():
+            enzyme = getattr(Restriction, name)
+            ours = (entry["recognition_sequence"], entry["cut_top"], entry["cut_bottom"],
+                    entry["overhang_length"])
+            theirs = (str(enzyme.site), enzyme.fst5, enzyme.size + enzyme.fst3, abs(enzyme.ovhg))
+            if ours != theirs:
+                differences.append((name, ours, theirs))
+        self.assertEqual(sorted(TYPE_IIS_ENZYMES), ["BbsI", "BsaI", "BsmBI", "SapI"])
+        self.assertEqual(differences, [])
+
+    def test_both_strand_cuts_match_on_both_topologies_and_rotated_origins(self):
+        from Bio import Restriction
+        from Bio.Seq import Seq
+        from analyses.restriction import perform_digest
+        from data.restriction_enzymes import TYPE_IIS_ENZYMES
+        base = _type_iis_sequence()
+        differences, cuts = [], 0
+        for topology in ("linear", "circular"):
+            for rotation in (0, 5, 1500, 2996):
+                sequence = base[rotation:] + base[:rotation]
+                for name in TYPE_IIS_ENZYMES:
+                    ours = sorted(position + 1 for position in
+                                  perform_digest(sequence, [name], topology=topology)["cut_positions"])
+                    theirs = sorted(getattr(Restriction, name).search(
+                        Seq(sequence), linear=(topology == "linear")))
+                    cuts += len(theirs)
+                    if ours != theirs:
+                        differences.append((topology, rotation, name, ours, theirs))
+        self.assertGreater(cuts, 60)
+        self.assertEqual(differences, [])
+
+
 @unittest.skipUnless(HAS_BIOPYTHON, SKIP_REASON)
 class RestrictionReferenceTests(unittest.TestCase):
     def setUp(self):

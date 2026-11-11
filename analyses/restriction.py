@@ -4,6 +4,8 @@ from itertools import combinations
 from data.restriction_enzymes import (
     RESTRICTION_ENZYMES,
     get_restriction_enzyme,
+    get_type_iis_enzyme,
+    TYPE_IIS_ENZYMES,
 )
 from ui.style import major_rule, minor_rule
 from ui import style
@@ -228,6 +230,71 @@ def _scan_recognition_sites(sequence, recognition, circular):
         })
 
     return tuple(matches)
+
+
+def find_type_iis_sites(sequence, enzyme_name, topology="linear"):
+    """Sites of a Type IIS enzyme on both strands, with their cut coordinates (P2-7).
+
+    The recognition sequence is asymmetric, so it is searched as given (strand
+    "+") and as its reverse complement (strand "-"). Cut coordinates are
+    0-based positions between bases on the top strand. For a "+" site at p,
+    top = p + cut_top and bottom = p + cut_bottom; for a "-" site the cuts are
+    mirrored to the other side: top = p + L - cut_bottom, bottom = p + L - cut_top.
+    The overhang is the top-strand sequence between the two cuts.
+
+    On a linear molecule a site whose cuts fall outside the sequence does not
+    cut ("cuts_inside" False); on a circular molecule the cuts wrap around the
+    origin. As for every enzyme, a site with an IUPAC ambiguity inside the
+    recognition sequence is POSSIBLE, not CONFIRMED.
+    """
+    enzyme = get_type_iis_enzyme(enzyme_name)
+    if enzyme is None:
+        raise ValueError(f"Not a Type IIS enzyme in the Synapse database: {enzyme_name}")
+    sequence = _require_valid_restriction_sequence(sequence)
+    circular = str(topology).lower() == "circular"
+    length = len(sequence)
+    site = _normalize_restriction_sequence(enzyme["recognition_sequence"])
+    size = len(site)
+    cut_top, cut_bottom = int(enzyme["cut_top"]), int(enzyme["cut_bottom"])
+
+    sites = []
+    orientations = [("+", site)]
+    if reverse_complement(site) != site:
+        orientations.append(("-", reverse_complement(site)))
+    for strand, pattern in orientations:
+        for match in _scan_recognition_sites(sequence, pattern, circular):
+            start = match["position"]
+            if strand == "+":
+                top, bottom = start + cut_top, start + cut_bottom
+            else:
+                top, bottom = start + size - cut_bottom, start + size - cut_top
+            if circular:
+                inside = length >= size + max(cut_top, cut_bottom)
+                left = min(top, bottom)
+                overhang = "".join(sequence[(left + i) % length] for i in range(abs(bottom - top)))
+                top_physical, bottom_physical = top % length, bottom % length
+            else:
+                inside = 0 < top < length and 0 < bottom < length
+                overhang = sequence[min(top, bottom):max(top, bottom)] if inside else ""
+                top_physical, bottom_physical = top, bottom
+            sites.append({
+                "enzyme": enzyme_name,
+                "strand": strand,
+                "site_position": start,
+                "site_position_1based": start + 1,
+                "site_sequence": match["sequence"],
+                "status": match["status"],
+                "wraps_origin": match["wraps_origin"] or (circular and not 0 <= min(top, bottom) <= max(top, bottom) <= length),
+                "cuts_inside": inside,
+                "top_cut": top_physical,
+                "bottom_cut": bottom_physical,
+                "top_cut_1based": top_physical + 1,
+                "bottom_cut_1based": bottom_physical + 1,
+                "overhang": overhang,
+                "overhang_length": abs(bottom - top),
+            })
+    sites.sort(key=lambda item: (item["top_cut"], item["strand"]))
+    return sites
 
 
 def find_restriction_sites(sequence, enzyme_name, topology="linear"):
@@ -585,6 +652,31 @@ def get_cut_positions(sequence, enzyme_names, include_possible=False, topology="
     cuts = []
 
     for enzyme_name in dict.fromkeys(enzyme_names):
+        if get_type_iis_enzyme(enzyme_name) is not None:
+            for site in find_type_iis_sites(sequence, enzyme_name, topology=topology):
+                if site["status"] != "CONFIRMED" and not include_possible:
+                    continue
+                if not site["cuts_inside"]:
+                    continue
+                cuts.append({
+                    "position": site["top_cut"],
+                    "position_0based": site["top_cut"],
+                    "position_1based": site["top_cut"] + 1,
+                    "enzyme": enzyme_name,
+                    "site_position": site["site_position"],
+                    "site_position_1based": site["site_position_1based"],
+                    "top_cut": site["top_cut"],
+                    "bottom_cut": site["bottom_cut"],
+                    "top_cut_1based": site["top_cut_1based"],
+                    "bottom_cut_1based": site["bottom_cut_1based"],
+                    "cut_info": {"strand": site["strand"], "overhang": site["overhang"],
+                                 "overhang_length": site["overhang_length"]},
+                    "status": site["status"],
+                    "wraps_origin": site["wraps_origin"],
+                    "strand": site["strand"],
+                })
+            continue
+
         enzyme = get_restriction_enzyme(enzyme_name)
         if enzyme is None:
             continue
@@ -754,6 +846,7 @@ def perform_digest(sequence, enzyme_names, topology="linear", include_possible=F
         name
         for name in enzyme_names
         if get_restriction_enzyme(name) is None
+        and get_type_iis_enzyme(name) is None
     ]
     if unknown:
         raise ValueError(
@@ -2312,11 +2405,12 @@ def _synapse_ui_select_enzymes(
     allow_all=True,
     minimum=1,
     maximum=None,
+    include_type_iis=False,
 ):
     enzyme_names = list(RESTRICTION_ENZYMES.keys())
+    type_iis_names = list(TYPE_IIS_ENZYMES) if include_type_iis else []
 
-    print("\nAvailable restriction enzymes:")
-    print(minor_rule())
+    style.section("Available restriction enzymes")
 
     for number, enzyme_name in enumerate(enzyme_names, start=1):
         enzyme = RESTRICTION_ENZYMES[enzyme_name]
@@ -2324,6 +2418,17 @@ def _synapse_ui_select_enzymes(
             f"{number:>2}. {enzyme_name:<10} "
             f"{enzyme['recognition_sequence']}"
         )
+
+    if type_iis_names:
+        print("\nType IIS (cut outside the site; both strands are searched):")
+        for number, enzyme_name in enumerate(type_iis_names, start=len(enzyme_names) + 1):
+            enzyme = TYPE_IIS_ENZYMES[enzyme_name]
+            size = len(enzyme["recognition_sequence"])
+            print(
+                f"{number:>2}. {enzyme_name:<10} "
+                f"{enzyme['recognition_sequence']}"
+                f"({enzyme['cut_top'] - size}/{enzyme['cut_bottom'] - size})"
+            )
 
     print("\nEnter enzyme names separated by commas.")
     print("Example: EcoRI,HindIII")
@@ -2350,6 +2455,7 @@ def _synapse_ui_select_enzymes(
         invalid = [
             name for name in selected
             if name not in RESTRICTION_ENZYMES
+            and name not in type_iis_names
         ]
 
         if invalid:
@@ -2478,6 +2584,7 @@ def _restriction_digest_gel_ui(dna, topology="linear"):
     enzymes = _synapse_ui_select_enzymes(
         allow_all=False,
         minimum=1,
+        include_type_iis=True,
     )
     if enzymes is None:
         return None
@@ -2513,6 +2620,20 @@ def _restriction_digest_gel_ui(dna, topology="linear"):
             note = enzyme.get("methylation_note")
             if note:
                 print(f"Methylation note ({enzyme_name}): {note}")
+
+        type_iis_cuts = [cut for cut in digest["cuts"] if "strand" in cut]
+        if type_iis_cuts:
+            style.section('Type IIS cuts')
+            widths = (8, 7, 10, 10, 13)
+            print(style.columns(("Enzyme", "Strand", "Site", "Top cut", "Bottom cut", "Overhang"), widths))
+            for cut in type_iis_cuts:
+                print(style.columns((
+                    cut["enzyme"], cut["strand"], cut["site_position_1based"],
+                    f"after {cut['top_cut']}", f"after {cut['bottom_cut']}",
+                    cut["cut_info"]["overhang"] or "-",
+                ), widths))
+            style.note("Positions are 1-based; a cut lies after the base given. The overhang "
+                       "is the top-strand sequence between the two cuts.")
 
         style.section('Fragments')
         for fragment in digest.get("fragments", []):

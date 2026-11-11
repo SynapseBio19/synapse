@@ -281,6 +281,77 @@ RESTRICTION_ENZYMES = {
 
 
 # ============================================================
+# TYPE IIS ENZYMES (audit P2-7)
+# ============================================================
+#
+# A Type IIS enzyme cuts outside its asymmetric recognition site. The site
+# therefore occurs in two orientations, and the overhang is whatever
+# sequence lies between the two cuts. cut_top / cut_bottom follow the
+# convention above, measured from the first base of the site in its
+# forward orientation, so they exceed the site length
+# (BsaI GGTCTC(1/5): 6 + 1 and 6 + 5).
+#
+# The entries are kept apart from RESTRICTION_ENZYMES on purpose: the
+# cloning engine gives every enzyme one fixed overhang, which a Type IIS
+# enzyme does not have. They take part in digests (both strands) but not
+# in the cloning compatibility model.
+#
+# Source: the REBASE-derived enzyme data shipped with Biopython 1.88
+# (Bio.Restriction, elucidate()): BsaI GGTCTCN^NNNN_N, BsmBI
+# CGTCTCN^NNNN_N, BbsI GAAGACNN^NNNN_N, SapI GCTCTTCN^NNN_N.
+# tests/test_external_reference.py compares the entries and the cut
+# positions on both strands with Biopython.
+
+TYPE_IIS_DATABASE_VERSION = "synapse-2026-11-11"
+
+TYPE_IIS_ENZYMES = {
+    "BsaI": {
+        "name": "BsaI",
+        "recognition_sequence": "GGTCTC",
+        "cut_top": 7,
+        "cut_bottom": 11,
+        "overhang_type": "5_prime",
+        "overhang_length": 4,
+        "is_blunt": False,
+        "type": "IIS",
+    },
+
+    "BsmBI": {
+        "name": "BsmBI",
+        "recognition_sequence": "CGTCTC",
+        "cut_top": 7,
+        "cut_bottom": 11,
+        "overhang_type": "5_prime",
+        "overhang_length": 4,
+        "is_blunt": False,
+        "type": "IIS",
+    },
+
+    "BbsI": {
+        "name": "BbsI",
+        "recognition_sequence": "GAAGAC",
+        "cut_top": 8,
+        "cut_bottom": 12,
+        "overhang_type": "5_prime",
+        "overhang_length": 4,
+        "is_blunt": False,
+        "type": "IIS",
+    },
+
+    "SapI": {
+        "name": "SapI",
+        "recognition_sequence": "GCTCTTC",
+        "cut_top": 8,
+        "cut_bottom": 11,
+        "overhang_type": "5_prime",
+        "overhang_length": 3,
+        "is_blunt": False,
+        "type": "IIS",
+    },
+}
+
+
+# ============================================================
 # HELPER FUNCTIONS
 # ============================================================
 
@@ -289,6 +360,15 @@ def get_restriction_enzyme(
 ):
 
     return RESTRICTION_ENZYMES.get(
+        enzyme_name
+    )
+
+
+def get_type_iis_enzyme(
+    enzyme_name
+):
+
+    return TYPE_IIS_ENZYMES.get(
         enzyme_name
     )
 

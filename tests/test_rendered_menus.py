@@ -205,6 +205,7 @@ def scenarios():
                         "2", "EcoRI", "", "",
                         "3", "EcoRI,BamHI", "0",
                         "3", "EcoRI,BamHI", "2", "",
+                        "3", "BsaI,EcoRI", "", "",
                         "4", "", "EcoRI", "", "",
                         "0"],
         lambda: restriction.run_restriction_analysis_ui(VECTOR, header="vec"))
@@ -421,6 +422,8 @@ class RestrictionMenuTests(unittest.TestCase):
         self.assertIn(style.INVALID_SELECTION, s.output)
         self.assertIn("ERROR: Unknown enzyme(s): FooI", s.output)
         self.assertIn("ERROR: Please select at least 1 enzyme(s).", s.output)
+        self.assertIn("23. BsaI       GGTCTC(1/5)", s.output)          # Type IIS offered in the digest
+        self.assertIn("Enzymes:               BsaI, EcoRI", s.output)      # no BsaI site: EcoRI only
         for view in ("RESTRICTION OVERVIEW", "RESTRICTION MAP", "DIGEST & GEL ANALYSIS",
                      "COMPLETE RESTRICTION REPORT", "PREDICTED GEL BANDS", "FRAGMENTS"):
             with self.subTest(view=view):
