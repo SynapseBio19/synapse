@@ -2048,7 +2048,7 @@ def annotate_from_mutation_analysis(
     # passed keyword arguments compare_sequences does not have, so this
     # function always failed.
     try:
-        from analyses.mutation import compare_sequences
+        from analyses.mutation import compare_sequences, mutation_hgvs_p
     except ImportError as exc:
         raise VariantAnalysisError(
             "mutation.py could not be imported for sequence-derived annotation."
@@ -2075,7 +2075,9 @@ def annotate_from_mutation_analysis(
         if first.reference_codon and first.alternative_codon
         else None
     )
-    variant.protein_change = first.consequence
+    # The consequence class goes to `consequence`; `protein_change` holds the
+    # predicted protein notation, e.g. p.(R12C), or nothing outside a codon.
+    variant.protein_change = mutation_hgvs_p(first)
     variant.annotation["mutation_signature"] = {
         "position": first.position,
         "reference": first.reference,

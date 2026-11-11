@@ -282,8 +282,15 @@ Validation:
 - Coding consequences assume that position 1 is the first base of codon 1.
   A CDS can be taken from the selected ORF; plausibility warnings are given
   when that assumption looks wrong. Start-loss is reported only for codon 1.
-- Notation is HGVS-like (`c.`/`p.` prefixes on Synapse notation), not
-  validated against the HGVS recommendations (den Dunnen et al. 2016).
+- Notation is HGVS-style (den Dunnen et al. 2016), not checked against an
+  HGVS validator. `c.` positions count bases of the supplied sequence and
+  equal HGVS c. numbering only if that sequence is the CDS. Protein changes
+  are predicted from the DNA and therefore written in parentheses, with
+  one-letter codes: `p.(R12C)` missense, `p.(R12=)` synonymous, `p.(W24*)`
+  nonsense, `p.(M1?)` for a changed initiator codon (effect on initiation
+  unknown), `p.(*110Qext*?)` for a lost stop whose new stop is not
+  determined. The mutation report shows the notation next to the effect,
+  and the variant bridge stores it as `protein_change` (2026-11-11).
 - Comparisons above 2,000 nt are flagged (O(n·m) time and memory).
 
 ## Variant analysis (`analyses/variant_analysis.py`)

@@ -2801,10 +2801,16 @@ def mutation_hgvs_c(
 def mutation_hgvs_p(
     mutation: Mutation,
 ) -> Optional[str]:
-    """HGVS-like protein notation with one-letter amino-acid codes.
+    """Predicted protein consequence in HGVS style, one-letter codes.
 
-    Not validated against the HGVS specification; predicted consequences
-    would conventionally be written in parentheses, e.g. p.(R12C).
+    The consequence is inferred from the DNA, not observed, so it is
+    written in parentheses (HGVS recommendations, den Dunnen et al. 2016):
+    p.(R12C) missense, p.(R12=) synonymous, p.(W24*) nonsense, p.(M1?)
+    for a change of the initiator codon (the effect on initiation is
+    unknown) and p.(*110Qext*?) for a lost stop codon whose new stop is not
+    determined. Positions count codons of the supplied sequence, which is
+    HGVS p. numbering only if that sequence is the CDS. Not checked
+    against an HGVS validator. None when no codon change is known.
     """
 
     if (
@@ -2818,23 +2824,18 @@ def mutation_hgvs_p(
 
     ref = mutation.reference_amino_acid
     alt = mutation.alternative_amino_acid
+    index = mutation.codon_index
 
     if ref == alt:
-        return (
-            f"p.{ref}{mutation.codon_index}="
-        )
+        return f"p.({ref}{index}=)"
 
-    if alt == "*":
-        alt_text = "Ter"
+    if index == 1 and ref == "M":
+        return "p.(M1?)"
 
-    else:
-        alt_text = alt
+    if ref == "*":
+        return f"p.(*{index}{alt}ext*?)"
 
-    return (
-        f"p.{ref}"
-        f"{mutation.codon_index}"
-        f"{alt_text}"
-    )
+    return f"p.({ref}{index}{alt})"
 
 
 def compare_proteins(
@@ -3153,8 +3154,10 @@ def format_mutation(
     extra = ""
 
     if mutation.effect:
+        protein = mutation_hgvs_p(mutation)
         extra = (
-            f"  [{mutation.effect}]"
+            f"  [{mutation.effect}"
+            f"{' ' + protein if protein else ''}]"
         )
 
     return (
