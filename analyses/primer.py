@@ -4460,19 +4460,31 @@ def analyze_hairpin(sequence: str, max_stem: int = 4) -> StructureResult:
 
     best = 0
     best_position = None
-    max_test_stem = min(8, len(sequence) // 2)
+    length = len(sequence)
+    max_test_stem = min(8, length // 2)
+    # The reverse complement of sequence[r:r + stem] is the slice
+    # [length - r - stem:length - r] of the whole reverse complement, so
+    # it is computed once (P2-6: this loop dominated primer design).
+    reverse = reverse_complement(sequence) if length else ""
 
+    # Stems are tried from the longest down, and only the first match at
+    # the longest matching stem sets best and best_position, so the
+    # search ends there.
     for stem in range(max_test_stem, 2, -1):
-        for left_start in range(0, len(sequence) - stem - 3):
+        for left_start in range(0, length - stem - 3):
             left = sequence[left_start:left_start + stem]
             for right_start in range(
                 left_start + stem + 3,
-                len(sequence) - stem + 1,
+                length - stem + 1,
             ):
-                right = sequence[right_start:right_start + stem]
-                if left == reverse_complement(right) and stem > best:
+                if left == reverse[length - right_start - stem:length - right_start]:
                     best = stem
                     best_position = left_start
+                    break
+            if best:
+                break
+        if best:
+            break
 
     result = StructureResult(
         max_stem=best,

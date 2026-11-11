@@ -938,6 +938,69 @@ def alignment_identity(
     )
 
 
+def _full_edit_distance(ref: str, var: str) -> int:
+    previous = list(range(len(var) + 1))
+    for i, ref_base in enumerate(ref, 1):
+        current = [i]
+        for j, var_base in enumerate(var, 1):
+            current.append(min(
+                current[-1] + 1,
+                previous[j] + 1,
+                previous[j - 1] + (0 if ref_base == var_base else 1),
+            ))
+        previous = current
+    return previous[-1]
+
+
+def _banded_edit_distance(ref: str, var: str, band: int) -> int:
+    """Edit distance over paths with |i - j| <= band (larger outside it)."""
+    rows, cols = len(ref), len(var)
+    width = 2 * band + 1
+    infinite = rows + cols + 1
+    previous = [infinite] * width
+    for k in range(width):                 # row 0: j = k - band
+        j = k - band
+        if 0 <= j <= cols:
+            previous[k] = j
+    for i in range(1, rows + 1):
+        ref_base = ref[i - 1]
+        current = [infinite] * width
+        for k in range(width):
+            j = i - band + k
+            if j < 0 or j > cols:
+                continue
+            if j == 0:
+                current[k] = i
+                continue
+            best = previous[k] + (0 if ref_base == var[j - 1] else 1)
+            if k + 1 < width and previous[k + 1] + 1 < best:
+                best = previous[k + 1] + 1
+            if k > 0 and current[k - 1] + 1 < best:
+                best = current[k - 1] + 1
+            current[k] = best
+        previous = current
+    return previous[cols - rows + band]
+
+
+def _edit_distance(ref: str, var: str) -> int:
+    """Levenshtein distance; exact banded computation for large inputs (P2-6).
+
+    A path of cost d never leaves |i - j| <= d, because every step off the
+    diagonal is an insertion or deletion of cost 1. A banded result <= band
+    is therefore the true distance; otherwise the band is doubled (Ukkonen's
+    observation). Small inputs use the full matrix directly.
+    """
+    rows, cols = len(ref), len(var)
+    if (rows + 1) * (cols + 1) > BANDED_ALIGNMENT_MIN_CELLS:
+        band = max(abs(rows - cols), 32)
+        while band < max(rows, cols):
+            distance = _banded_edit_distance(ref, var, band)
+            if distance <= band:
+                return distance
+            band *= 2
+    return _full_edit_distance(ref, var)
+
+
 def sequence_similarity(
     reference: str,
     variant: str,
@@ -960,31 +1023,7 @@ def sequence_similarity(
     if max_length == 0:
         return 100.0
 
-    previous = list(range(len(var) + 1))
-
-    for i, ref_base in enumerate(ref, 1):
-
-        current = [i]
-
-        for j, var_base in enumerate(var, 1):
-
-            substitution_cost = (
-                0
-                if ref_base == var_base
-                else 1
-            )
-
-            current.append(
-                min(
-                    current[-1] + 1,
-                    previous[j] + 1,
-                    previous[j - 1] + substitution_cost,
-                )
-            )
-
-        previous = current
-
-    distance = previous[-1]
+    distance = _edit_distance(ref, var)
 
     return max(
         0.0,
