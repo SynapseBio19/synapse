@@ -694,6 +694,14 @@ def global_align(
     mismatch_score: int = -1,
     gap_score: int = -2,
 ) -> Tuple[str, str, int]:
+    """Needleman-Wunsch global alignment with a linear gap cost.
+
+    Ties are broken deterministically: diagonal > up (gap in the variant) >
+    left (gap in the reference). The scores are kept for two rows only and the
+    traceback as one byte per cell (audit P2-6), about 1 byte per cell instead
+    of the ~45 of a matrix of Python objects; the recurrence and the
+    tie-breaking are unchanged, so is every alignment. Time stays O(n*m).
+    """
 
     ref = normalize_iupac_sequence(
         reference
@@ -703,119 +711,71 @@ def global_align(
         variant
     )
 
-    rows = len(ref) + 1
-    cols = len(var) + 1
+    rows = len(ref)
+    cols = len(var)
+    diagonal_step, up_step, left_step = 1, 2, 3
 
-    score = [
-        [0] * cols
-        for _ in range(rows)
-    ]
+    # IUPAC-aware substitution score of each reference base against the
+    # whole variant, computed once per distinct base.
+    substitution: Dict[str, List[int]] = {}
+    for base in set(ref):
+        substitution[base] = [
+            match_score if _nucleotide_match(base, other) else mismatch_score
+            for other in var
+        ]
 
-    trace = [
-        [""] * cols
-        for _ in range(rows)
-    ]
+    trace = [bytearray(cols + 1) for _ in range(rows + 1)]
+    trace[0][1:] = bytes([left_step]) * cols
+    previous = [j * gap_score for j in range(cols + 1)]
 
-    for i in range(1, rows):
+    for i in range(1, rows + 1):
+        scores = substitution[ref[i - 1]]
+        current = [0] * (cols + 1)
+        current[0] = i * gap_score
+        row = trace[i]
+        row[0] = up_step
 
-        score[i][0] = (
-            i * gap_score
-        )
+        for j in range(1, cols + 1):
+            diagonal = previous[j - 1] + scores[j - 1]
+            up = previous[j] + gap_score
+            left = current[j - 1] + gap_score
 
-        trace[i][0] = "U"
-
-    for j in range(1, cols):
-
-        score[0][j] = (
-            j * gap_score
-        )
-
-        trace[0][j] = "L"
-
-    for i in range(1, rows):
-
-        for j in range(1, cols):
-
-            diagonal = (
-                score[i - 1][j - 1]
-                + (
-                    match_score
-                    if _nucleotide_match(
-                        ref[i - 1],
-                        var[j - 1],
-                    )
-                    else mismatch_score
-                )
-            )
-
-            up = (
-                score[i - 1][j]
-                + gap_score
-            )
-
-            left = (
-                score[i][j - 1]
-                + gap_score
-            )
-
-            # Deterministic tie-breaking:
-            # diagonal > up > left
-            best = max(
-                diagonal,
-                up,
-                left,
-            )
-
-            score[i][j] = best
-
-            if diagonal == best:
-                trace[i][j] = "D"
-            elif up == best:
-                trace[i][j] = "U"
+            if diagonal >= up and diagonal >= left:
+                current[j] = diagonal
+                row[j] = diagonal_step
+            elif up >= left:
+                current[j] = up
+                row[j] = up_step
             else:
-                trace[i][j] = "L"
+                current[j] = left
+                row[j] = left_step
+
+        previous = current
 
     aligned_ref: List[str] = []
     aligned_var: List[str] = []
 
-    i = len(ref)
-    j = len(var)
+    i = rows
+    j = cols
 
     while i > 0 or j > 0:
 
         direction = trace[i][j]
 
-        if direction == "D":
-
-            aligned_ref.append(
-                ref[i - 1]
-            )
-
-            aligned_var.append(
-                var[j - 1]
-            )
-
+        if direction == diagonal_step:
+            aligned_ref.append(ref[i - 1])
+            aligned_var.append(var[j - 1])
             i -= 1
             j -= 1
 
-        elif direction == "U":
-
-            aligned_ref.append(
-                ref[i - 1]
-            )
-
+        elif direction == up_step:
+            aligned_ref.append(ref[i - 1])
             aligned_var.append("-")
-
             i -= 1
 
-        elif direction == "L":
-
+        elif direction == left_step:
             aligned_ref.append("-")
-
-            aligned_var.append(
-                var[j - 1]
-            )
-
+            aligned_var.append(var[j - 1])
             j -= 1
 
         else:
@@ -826,7 +786,7 @@ def global_align(
     return (
         "".join(reversed(aligned_ref)),
         "".join(reversed(aligned_var)),
-        score[-1][-1],
+        previous[-1],
     )
 
 
@@ -2032,9 +1992,10 @@ def compare_sequences(
         result.notes.append(
             f"Sequences up to {longest} nt were aligned globally "
             f"(recommended maximum {MAX_RECOMMENDED_ALIGNMENT_LENGTH} nt): the "
-            "global alignment fills a dynamic-programming matrix of "
-            "(n+1)x(m+1) cells, measured at roughly 45 bytes per cell, so "
-            "about 180 MB is needed at 2,000 nt and about 4.5 GB at 10,000 nt. "
+            "global alignment visits (n+1)x(m+1) cells and keeps one traceback "
+            "byte per cell (about 1 byte per cell: 4 MB at 2,000 nt, 100 MB at "
+            "10,000 nt); the time grows with n x m (measured about 0.7 s at "
+            "2,000 nt and 23 s at 10,000 nt). "
             "For genome-scale comparisons use VCF-based variant analysis."
         )
 

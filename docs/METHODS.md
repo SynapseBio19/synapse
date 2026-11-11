@@ -355,7 +355,14 @@ Validation:
   unknown), `p.(*110Qext*?)` for a lost stop whose new stop is not
   determined. The mutation report shows the notation next to the effect,
   and the variant bridge stores it as `protein_change` (2026-11-11).
-- Comparisons above 2,000 nt are flagged (O(n·m) time and memory).
+- The alignment keeps two score rows and a one-byte traceback per cell (P2-6,
+  2026-11-11): about 1 byte per cell (4 MB at 2,000 nt, 100 MB at 10,000 nt)
+  instead of ~46 for the earlier matrices of Python objects, with an
+  unchanged recurrence and tie-breaking (49 alignments byte-identical before
+  and after). Time remains O(n·m): measured 0.7 s at 2,000 nt, 4.8 s at
+  5,000 nt and 23 s at 10,000 nt, so the audit target of 10 kb in under
+  10 s is not met; a banded alignment would be the next step. Comparisons
+  above 2,000 nt carry a note with these figures.
 
 ## Variant analysis (`analyses/variant_analysis.py`)
 

@@ -613,8 +613,8 @@ class AlignmentCostNoteTests(unittest.TestCase):
         variant = reference[:100] + "T" + reference[101:]
         note = next(n for n in compare_sequences(reference, variant).notes
                     if "aligned globally" in n)
-        self.assertIn("bytes per cell", note)
-        self.assertIn("4.5 GB", note)
+        self.assertIn("byte per cell", note)
+        self.assertIn("100 MB at 10,000 nt", note)     # P2-6: was 4.5 GB with a matrix of objects
 
     def test_short_sequences_get_no_such_note(self):
         from analyses.mutation import compare_sequences
