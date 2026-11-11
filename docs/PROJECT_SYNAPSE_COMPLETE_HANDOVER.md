@@ -721,7 +721,9 @@ session runs as follows:
 
 NCBI BLAST, the four literature providers and `update_blastdb.pl`
 downloads. None runs without explicit user action in the menus. In
-development none may run without the owner's approval.
+development they follow the approval policy in Part X (owner decision of
+2026-11-12): neutral requests are allowed, sending private sequences or
+data needs approval.
 
 ### Implemented architecture improvements
 
@@ -1203,7 +1205,7 @@ byte-identical rendered output as evidence.
 | Runtime dependencies | None (`dependencies = []`). The optional extras are `reference = biopython, primer3-py` and `dev = pytest, pyright`. |
 | External tools | BLAST+ 2.17.0 at `C:\Program Files\NCBI\blast-2.17.0+\bin`; Strawberry Perl. WSL is **not** installed, so there is no bcftools and no ORFfinder. |
 | Project-local skills | `.claude/skills/`, git-ignored: biopython, bioservices, experimental-design, genomic-coordinates, gget, literature-review, primer-design, pysam, research-lookup, scientific-critical-thinking, scikit-bio |
-| MCP research tools | Bio Research plugins (PubMed, bioRxiv, ChEMBL and others) appear in the session but **must not be used without the owner's approval** |
+| MCP research tools | Bio Research plugins (PubMed, bioRxiv, ChEMBL and others) appear in the session. Since 2026-11-12 they may be used under the approval policy below (no private data) |
 | `.gitignore` | `__pycache__/`, `*.pyc`, `.pytest_cache/`, `/output/`, `/exports/`, `*.log`, `/data/blast_db/`, `.DS_Store`, `Thumbs.db`, `.sync/`, `/logs/`, `/.claude/skills/` |
 
 ### Line endings and file conventions [VERIFIED]
@@ -1246,12 +1248,9 @@ it back to `$true` at the end of the package. Count afterwards that 15 of
 - Never discard pre-existing changes; check `git status` first.
 - Never rewrite history, reset, delete commits or force-push.
 - Preserve the ReadOnly attributes.
-- Install nothing (packages, Python versions, WSL, system components)
-  without the owner's approval.
-- Make no external network requests (NCBI, literature services, REBASE,
-  NEBcutter, PubMed and MCP research tools included) without explicit
-  approval. Never send sequences or user data to external services
-  without authorization.
+- Follow the approval policy below for installations, downloads and
+  external requests. Never send private sequences, source code or user
+  data to external services without authorization.
 - Do not bypass safety restrictions or application control.
 - Never change golden-master values just to make tests pass.
 - Fabricate no scientific data, citations or validation.
@@ -1261,6 +1260,38 @@ it back to `$true` at the end of the package. Count afterwards that 15 of
 - Commit each logical package separately. End every commit message with
   `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`, or the
   attribution the harness prescribes.
+
+### Approval policy (owner decision of 2026-11-12)
+
+This handover first required approval for every installation and every
+external request. That was stricter than the Master Prompt. On 2026-11-12
+the owner decided that the Master Prompt's rules apply (§1.3, §1.3.1,
+§14.5). This supersedes the stricter wording.
+
+**Allowed without asking**, with the purpose recorded and with the
+traceability of §1.3 (source, version, date, licence, checksum):
+
+- installing packages into the project-local `.venv` (for example
+  `coverage`);
+- downloading small or moderate reference data, test fixtures and
+  official enzyme or sequence records, kept outside Git where large;
+- consulting authoritative sources and official documentation (NCBI,
+  EMBL-EBI, REBASE, PubMed, Biopython, Primer3 and others), including
+  the connected MCP research tools, after checking that they work;
+- live literature-provider requests with neutral queries.
+
+**Approval required first**:
+
+- very large downloads (for example the swissprot BLAST database, about
+  0.5 GB, or complete genomes);
+- system-wide installations or configuration changes (for example WSL,
+  or a system-wide Python 3.10);
+- anything that costs money;
+- uploading private project files, source code, private sequences or
+  user data. A remote BLAST of a project sequence of unknown origin
+  counts as such an upload; a published reference sequence (for example
+  pUC19 L09137.2) does not;
+- destructive or irreversible operations.
 
 ---
 
@@ -1373,7 +1404,7 @@ sequence overview and cloning.
 | T4 | 3 | Pipeline menu-path parameters (sequence overview, cloning) | Which inputs to record is not yet defined | `core/pipeline.py`, `main.py` | Name the parameters explicitly in `store()` | Report export test | No |
 | T5 | 4 | P2-1: merge the surviving primer generations | Deliberately deferred | `analyses/primer.py` | Decide first; if done, prove with bytecode and golden checks | Golden, snapshots | No |
 | T6 | 4 | Pyright triage (111) | Reachable `None` paths | primer, CRISPR, mutation, tests | Fix real defects first; no blanket ignores | `pyright_diff`: fewer errors, nothing new | No |
-| T7 | 4 | Line coverage | `coverage` not installed | – | Standard-library `trace` over the suite; report the uncovered dialogs | Report in docs | Installing `coverage` needs approval |
+| T7 | 4 | Line coverage | `coverage` not installed | – | Standard-library `trace` over the suite; report the uncovered dialogs | Report in docs | No (since 2026-11-12 a project-local `coverage` install is allowed) |
 | T8 | 5 | Documentation reconciliation for 2026-11-11 | Not yet done | CHANGES, FEATURE_STATUS, AUDIT_STATUS, PHASE6_PROGRESS, FINAL_REPORT §J, README | One entry or row per commit | Table checker; cross-check against the code | No |
 | T9 | 5 | Tool and data ledger | Versions recorded, but not sources, dates, licences or checksums | new section in METHODS or a ledger doc | List Biopython 1.88, primer3-py 2.4.0, BLAST+ 2.17.0, pyright 1.1.414, pUC19 L09137.2 and the fixtures with SHA-256 | – | No |
 | T10 | 6 | Full verification, independent audit, final report A–K | Final stage | all docs | Re-read the Master Prompt; build the requirement matrix COMPLETE / PARTIAL / UNVERIFIED / BLOCKED | – | No |
@@ -1383,14 +1414,17 @@ sequence overview and cloning.
 
 ### Blocked (need the owner's decision)
 
+Re-assessed on 2026-11-12 under the approval policy of Part X.
+
 | Item | Needs |
 |---|---|
-| Python 3.10 runtime test | Install a 3.10 interpreter |
-| `bcftools norm` and ORFfinder comparisons | WSL or a Linux host |
-| Live NCBI BLAST run and RID resume; live literature providers (S11) | Approval for external requests |
-| REBASE online re-check, NEBcutter, PubMed check of four METHODS references, the Guruprasad 1990 primary table | Approval for external requests or the sources |
-| CFD off-target scoring (P2-3) | The published matrix supplied as a data file with citation |
-| `coverage` package | Approval to install |
+| Python 3.10 runtime test | A 3.10 interpreter. A system-wide install needs approval; a project-local interpreter kept outside Git may be used if one can be obtained from an official source |
+| `bcftools norm` and ORFfinder comparisons | WSL or a Linux host (system-wide: approval) |
+| Live NCBI BLAST run and RID resume | Allowed with a published reference sequence; a project sequence of unknown origin needs approval |
+| Live literature providers (S11) | Allowed with neutral queries since 2026-11-12 |
+| REBASE online re-check, NEBcutter, PubMed check of four METHODS references, the Guruprasad 1990 primary table | Allowed since 2026-11-12 (consulting public sources); record source and date |
+| CFD off-target scoring (P2-3) | The published matrix as a data file with citation and licence; obtaining it from the publication is allowed |
+| `coverage` package | Allowed since 2026-11-12 (project-local) |
 | Licence (`pyproject.toml`: "decision pending"); `blast_results/TEST_8_REFERENCE_blast.json` | Owner decisions |
 | Local BLAST on a real database (swissprot about 0.5 GB) | Approval for the download |
 | P3-1 Experiment planner, P3-2 genome specificity, P3-3 front end | Deferred by design; P3-3 is forbidden in Phase 6 |
@@ -1526,7 +1560,7 @@ All 125 commits, oldest first. The commit that adds this file follows them.
 | 28 | `e1a48c6` | 2026-10-31 | Label the stale BLAST result file as a legacy record (D7) |
 | 29 | `7a4a718` | 2026-10-31 | Add handover notes to the Phase 6 progress record |
 | 30 | `3514617` | 2026-10-31 | Do not count a guide's own site as an off-target (D9) |
-| 31 | `ca2ec39` | 2026-10-31 | Report the modelled CRISPR cut site with its source (D8) |
+| 31 | `ca2ec39` | 2026-10-31 | Report the modeled CRISPR cut site with its source (D8) (subject written in American spelling here; the commit itself uses the British double-l form) |
 | 32 | `8145556` | 2026-10-31 | Make the CRISPR config fields act; keep exports in the project (D10, D11) |
 | 33 | `e47cb85` | 2026-10-31 | Let the pipeline's ORF runner take the menu's search settings (D19) |
 | 34 | `f3a09c1` | 2026-10-31 | Label the unimplemented AI Experiment Planner as such (D15) |

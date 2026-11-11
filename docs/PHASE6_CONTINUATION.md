@@ -85,7 +85,16 @@ README capability list (Type IIS, circular ORFs). `METHODS.md` and
     report A-K with the COMPLETE / PARTIALLY COMPLETE / UNVERIFIED / BLOCKED
     matrix.
 
-## Blocked (needs the owner)
+## Approval policy since 2026-11-12
+
+The owner decided that the Master Prompt's approval rules apply (§1.3,
+§14.5); see `docs/PROJECT_SYNAPSE_COMPLETE_HANDOVER.md`, Part X. Project-local
+installs, small downloads and consulting public sources are allowed without
+asking. Approval is needed for very large downloads, system-wide changes,
+costs, uploading private data or sequences, and irreversible operations.
+Several rows below were therefore re-assessed in the handover, Part XIII.
+
+## Blocked (needs the owner, as recorded on 2026-11-11)
 
 | Item | Needs |
 |---|---|
