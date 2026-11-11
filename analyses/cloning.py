@@ -22,7 +22,10 @@
 # No wet-lab success is inferred.
 # ============================================================
 
+import copy
+from contextlib import contextmanager
 from itertools import combinations
+from typing import Any, Callable, TypeVar
 
 from data.restriction_enzymes import RESTRICTION_ENZYMES
 
@@ -32,6 +35,56 @@ from data.restriction_enzymes import RESTRICTION_ENZYMES
 from analyses.restriction import bases_match, find_recognition_site_matches
 from ui.style import major_rule, minor_rule
 from ui import style
+
+
+# ============================================================
+# STRATEGY SEARCH CACHE
+# ============================================================
+
+# The planner evaluates tens of thousands of strategies over the same two
+# molecules, and every evaluation used to re-validate both sequences and
+# re-scan them for each enzyme (P2-6). Both steps are pure functions of
+# their arguments. Inside _strategy_search_cache() each distinct result is
+# computed once and every caller receives its own deep copy, so no result
+# shares objects with another. Outside the context nothing is cached.
+_STRATEGY_SEARCH_CACHE = None
+
+
+@contextmanager
+def _strategy_search_cache():
+    global _STRATEGY_SEARCH_CACHE
+    if _STRATEGY_SEARCH_CACHE is not None:   # already inside a search
+        yield
+        return
+    _STRATEGY_SEARCH_CACHE = {}
+    try:
+        yield
+    finally:
+        _STRATEGY_SEARCH_CACHE = None
+
+
+_IMMUTABLE = (str, int, float, bool, type(None))
+_T = TypeVar("_T")
+
+
+def _copy_result(value: Any) -> Any:
+    """An independent copy of a result tree (dicts, lists, plain values)."""
+    if isinstance(value, _IMMUTABLE):
+        return value
+    if isinstance(value, dict):
+        return {key: _copy_result(item) for key, item in value.items()}
+    if isinstance(value, list):
+        return [_copy_result(item) for item in value]
+    return copy.deepcopy(value)   # anything else: no shortcut
+
+
+def _cached(key: tuple, compute: Callable[[], _T]) -> _T:
+    cache = _STRATEGY_SEARCH_CACHE
+    if cache is None:
+        return compute()
+    if key not in cache:
+        cache[key] = compute()
+    return _copy_result(cache[key])
 
 
 # ============================================================
@@ -272,6 +325,17 @@ def analyze_enzyme(
     enzyme_name,
     topology="linear",
 ):
+    return _cached(
+        ("enzyme", sequence, enzyme_name, topology),
+        lambda: _analyze_enzyme(sequence, enzyme_name, topology),
+    )
+
+
+def _analyze_enzyme(
+    sequence,
+    enzyme_name,
+    topology,
+):
     sequence = normalize_sequence(
         sequence
     )
@@ -406,6 +470,16 @@ def build_restriction_map(
 # ============================================================
 
 def _validate_sequence(
+    sequence,
+    role,
+):
+    return _cached(
+        ("validate", sequence, role),
+        lambda: _validate_sequence_uncached(sequence, role),
+    )
+
+
+def _validate_sequence_uncached(
     sequence,
     role,
 ):
@@ -2581,6 +2655,7 @@ def _strategy_identity(
     )
 
 
+@_strategy_search_cache()
 def find_best_cloning_strategies(
     vector_sequence,
     insert_sequence,
@@ -2742,6 +2817,7 @@ def find_best_cloning_strategies(
 # COMPLETE SEARCH INTERNAL
 # ============================================================
 
+@_strategy_search_cache()
 def _find_all_cloning_strategies(
     vector_sequence,
     insert_sequence,

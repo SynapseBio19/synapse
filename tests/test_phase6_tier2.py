@@ -687,8 +687,10 @@ class CloningPlannerScanReuseTests(unittest.TestCase):
         info = R._scan_recognition_sites.cache_info()
         # Two sequences x 8 enzymes x one topology each.
         self.assertEqual(info.misses, 2 * len(enzymes))
-        # The planner asked far more often than that; the rest was reused.
-        self.assertGreater(info.hits, 100 * info.misses)
+        # Since P2-6 (2026-11-11) the planner's own search cache answers the
+        # repeated questions before they reach the scan cache, so each
+        # distinct scan is requested exactly once (tests/test_planner_cache.py).
+        self.assertEqual(info.hits, 0)
 
     def test_a_cached_result_cannot_be_corrupted_by_a_caller(self):
         from analyses import restriction as R
