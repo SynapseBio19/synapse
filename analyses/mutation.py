@@ -686,6 +686,91 @@ def _nucleotide_match(
     )
 
 
+# Alignments with more cells than this try an exact banded computation first.
+BANDED_ALIGNMENT_MIN_CELLS = 1_000_000
+
+
+def _banded_align(ref, var, half_width, substitution, gap_score):
+    """Global alignment restricted to |j - i| <= half_width; None if (n, m) is outside."""
+    rows, cols = len(ref), len(var)
+    if abs(cols - rows) > half_width:
+        return None
+    width = 2 * half_width + 1
+    negative = float("-inf")
+    diagonal_step, up_step, left_step = 1, 2, 3
+    trace = []
+    previous = [negative] * width
+    row = bytearray(width)
+    for k in range(width):                     # row 0: j = k - half_width
+        j = k - half_width
+        if 0 <= j <= cols:
+            previous[k] = j * gap_score
+            row[k] = left_step if j > 0 else 0
+    trace.append(row)
+    for i in range(1, rows + 1):
+        scores = substitution[ref[i - 1]]
+        current = [negative] * width
+        row = bytearray(width)
+        for k in range(width):
+            j = i - half_width + k
+            if j < 0 or j > cols:
+                continue
+            if j == 0:
+                current[k] = i * gap_score
+                row[k] = up_step
+                continue
+            diagonal = previous[k] + scores[j - 1]
+            up = previous[k + 1] + gap_score if k + 1 < width else negative
+            left = current[k - 1] + gap_score if k > 0 else negative
+            if diagonal >= up and diagonal >= left:
+                current[k] = diagonal
+                row[k] = diagonal_step
+            elif up >= left:
+                current[k] = up
+                row[k] = up_step
+            else:
+                current[k] = left
+                row[k] = left_step
+        trace.append(row)
+        previous = current
+    score = previous[cols - rows + half_width]
+    aligned_ref, aligned_var = [], []
+    i, j = rows, cols
+    while i > 0 or j > 0:
+        direction = trace[i][j - i + half_width]
+        if direction == diagonal_step:
+            aligned_ref.append(ref[i - 1])
+            aligned_var.append(var[j - 1])
+            i -= 1
+            j -= 1
+        elif direction == up_step:
+            aligned_ref.append(ref[i - 1])
+            aligned_var.append("-")
+            i -= 1
+        elif direction == left_step:
+            aligned_ref.append("-")
+            aligned_var.append(var[j - 1])
+            j -= 1
+        else:
+            raise MutationAnalysisError("Alignment traceback failed.")
+    return "".join(reversed(aligned_ref)), "".join(reversed(aligned_var)), int(score)
+
+
+def _banded_is_exact(score, rows, cols, half_width, match_score, gap_score):
+    """True when no alignment leaving the band can reach the banded score.
+
+    Leaving |j - i| <= w and ending at offset cols - rows takes at least
+    G = 2w + 2 - |cols - rows| gap columns, and an alignment with G gap
+    columns scores at most match * (rows + cols - G) / 2 + gap * G (every other
+    column a match). That bound falls with G when gap < match / 2. A banded
+    score strictly above it means every optimal path lies in the band; the
+    traceback then makes the same tie-breaking decisions as the full matrix.
+    """
+    gaps = 2 * half_width + 2 - abs(cols - rows)
+    bound = match_score * (rows + cols - gaps) / 2 + gap_score * gaps
+    return score > bound
+
+
 def global_align(
     reference: str,
     variant: str,
@@ -700,7 +785,13 @@ def global_align(
     left (gap in the reference). The scores are kept for two rows only and the
     traceback as one byte per cell (audit P2-6), about 1 byte per cell instead
     of the ~45 of a matrix of Python objects; the recurrence and the
-    tie-breaking are unchanged, so is every alignment. Time stays O(n*m).
+    tie-breaking are unchanged, so is every alignment.
+
+    Above BANDED_ALIGNMENT_MIN_CELLS cells an exact banded computation is
+    tried first (half-width 32 or more, doubled until _banded_is_exact
+    proves that no alignment outside the band can compete); it returns the
+    same alignment as the full matrix in O(n*w) time. Dissimilar sequences
+    fall back to the full O(n*m) computation.
     """
 
     ref = normalize_iupac_sequence(
@@ -723,6 +814,16 @@ def global_align(
             match_score if _nucleotide_match(base, other) else mismatch_score
             for other in var
         ]
+
+    if ((rows + 1) * (cols + 1) > BANDED_ALIGNMENT_MIN_CELLS
+            and 2 * gap_score < match_score and mismatch_score <= match_score):
+        half_width = max(32, abs(cols - rows) + 16)
+        while 2 * half_width < max(rows, cols):
+            banded = _banded_align(ref, var, half_width, substitution, gap_score)
+            if banded is not None and _banded_is_exact(
+                    banded[2], rows, cols, half_width, match_score, gap_score):
+                return banded
+            half_width *= 2
 
     trace = [bytearray(cols + 1) for _ in range(rows + 1)]
     trace[0][1:] = bytes([left_step]) * cols
@@ -1994,8 +2095,9 @@ def compare_sequences(
             f"(recommended maximum {MAX_RECOMMENDED_ALIGNMENT_LENGTH} nt): the "
             "global alignment visits (n+1)x(m+1) cells and keeps one traceback "
             "byte per cell (about 1 byte per cell: 4 MB at 2,000 nt, 100 MB at "
-            "10,000 nt); the time grows with n x m (measured about 0.7 s at "
-            "2,000 nt and 23 s at 10,000 nt). "
+            "10,000 nt). Similar sequences are aligned in an exact band (about "
+            "0.2 s at 10,000 nt); unrelated ones take time growing with n x m "
+            "(about 23 s at 10,000 nt). "
             "For genome-scale comparisons use VCF-based variant analysis."
         )
 

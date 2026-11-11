@@ -48,5 +48,59 @@ class AlignmentMemoryTests(unittest.TestCase):
         self.assertEqual(global_align("ACGTNACGT", "ACGTAACGT"), ("ACGTNACGT", "ACGTAACGT", 18))
 
 
+class BandedAlignmentTests(unittest.TestCase):
+    """Above 1,000,000 cells an exact banded alignment is tried first (P2-6)."""
+
+    @staticmethod
+    def _mutate(rng, sequence, edits):
+        bases = list(sequence)
+        for _ in range(edits):
+            kind, position = rng.choice("sid"), rng.randrange(len(bases))
+            if kind == "s":
+                bases[position] = rng.choice("ACGT")
+            elif kind == "i":
+                bases.insert(position, rng.choice("ACGTN"))
+            elif len(bases) > 1:
+                del bases[position]
+        return "".join(bases)
+
+    def test_banded_and_full_alignments_are_identical(self):
+        from unittest import mock
+        from analyses import mutation as M
+        rng = random.Random(11)
+        for trial in range(150):
+            length = rng.randint(20, 300)
+            reference = "".join(rng.choice("ACGT") for _ in range(length))
+            if trial % 10 == 0:                                   # unrelated sequences
+                variant = "".join(rng.choice("ACGT") for _ in range(rng.randint(10, 300)))
+            else:
+                variant = self._mutate(rng, reference, rng.randint(0, length // 4 + 1))
+            with self.subTest(trial=trial):
+                with mock.patch.object(M, "BANDED_ALIGNMENT_MIN_CELLS", 10 ** 12):
+                    full = M.global_align(reference, variant)
+                with mock.patch.object(M, "BANDED_ALIGNMENT_MIN_CELLS", 0):
+                    banded = M.global_align(reference, variant)
+                self.assertEqual(banded, full)
+
+    def test_the_exactness_bound(self):
+        from analyses.mutation import _banded_is_exact
+        # 100 x 100, half-width 32: leaving the band needs >= 66 gap columns,
+        # worth at most 2 * (200 - 66) / 2 - 2 * 66 = 2 points.
+        self.assertTrue(_banded_is_exact(3, 100, 100, 32, 2, -2))
+        self.assertFalse(_banded_is_exact(2, 100, 100, 32, 2, -2))
+
+    def test_ten_kilobases_of_similar_sequence_align_quickly(self):
+        import time
+        from analyses.mutation import global_align
+        rng = random.Random(5)
+        reference = "".join(rng.choice("ACGT") for _ in range(10_000))
+        variant = self._mutate(rng, reference, 50)
+        started = time.perf_counter()
+        aligned_reference, aligned_variant, _ = global_align(reference, variant)
+        self.assertLess(time.perf_counter() - started, 10.0)     # audit target; measured ~0.2 s
+        self.assertEqual(aligned_reference.replace("-", ""), reference)
+        self.assertEqual(aligned_variant.replace("-", ""), variant)
+
+
 if __name__ == "__main__":
     unittest.main()

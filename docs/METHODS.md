@@ -359,10 +359,17 @@ Validation:
   2026-11-11): about 1 byte per cell (4 MB at 2,000 nt, 100 MB at 10,000 nt)
   instead of ~46 for the earlier matrices of Python objects, with an
   unchanged recurrence and tie-breaking (49 alignments byte-identical before
-  and after). Time remains O(n·m): measured 0.7 s at 2,000 nt, 4.8 s at
-  5,000 nt and 23 s at 10,000 nt, so the audit target of 10 kb in under
-  10 s is not met; a banded alignment would be the next step. Comparisons
-  above 2,000 nt carry a note with these figures.
+  and after). Above 1,000,000 cells an exact banded alignment is tried first:
+  half-width w ≥ 32 around the diagonal, doubled until the banded score is
+  strictly above the best score any alignment leaving the band could reach
+  (it needs at least 2w + 2 − |n − m| gap columns G, so it scores at most
+  2·(n + m − G)/2 − 2·G). Then every optimal path lies in the band and the
+  traceback makes the same choices as the full matrix; otherwise the full
+  matrix is used. 150 random pairs (similar, with indels and N, and
+  unrelated) give identical alignments with and without the band. Similar
+  sequences of 10,000 nt align in about 0.2 s (audit target: under 10 s);
+  unrelated long sequences still take O(n·m) time (about 23 s at 10,000 nt).
+  Comparisons above 2,000 nt carry a note.
 
 ## Variant analysis (`analyses/variant_analysis.py`)
 
