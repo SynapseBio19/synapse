@@ -190,6 +190,10 @@ def scenarios():
                          "1", "2", fasta, "1", "2", "1", "1", "", "", "y",
                          "6", "0", "6", "1", "7", "0"],
         lambda: blast_menu.blast_menu(DNA, "demo"), no_network)
+    # --- BLAST hit selector: a number beyond the list, a negative number, then hit 1
+    run("blast_hit_select", ["1", "2", fasta, "1", "2", "1", "1", "", "", "y",
+                             "6", "2", "6", "-1", "6", "1", "0"],
+        lambda: blast_menu.blast_menu(DNA, "demo"), no_network)
     # --- BLAST local engine: the local database list, invalid choice, cancel, no database installed
     run("blast_local", ["1", "2", fasta, "1", "1", "1", "9",
                         "1", "2", fasta, "1", "1", "1", "0", "0"],
@@ -197,8 +201,9 @@ def scenarios():
     run("blast_local_none", ["1", "2", fasta, "1", "1", "1", "0"],
         lambda: blast_menu.blast_menu(DNA, "demo"), without_databases)
     # --- BLAST query type for a sequence whose letters fit DNA and protein
-    for answer in ("1", "2", "0", "9"):
-        run(f"blast_query_type_{answer}", [answer], lambda: blast_menu._query_type_for_menu("ATGCRYATGC", None))
+    for answers in (["1"], ["2"], ["0"], ["9", "1"]):
+        run(f"blast_query_type_{answers[0]}", answers,
+            lambda: blast_menu._query_type_for_menu("ATGCRYATGC", None))
 
     # --- Restriction: analysis menu, enzyme input errors, topology, every view
     run("restriction", ["9",
@@ -342,6 +347,16 @@ def _sites_rendered_by_the_screen_tests():
 
 
 class BlastMenuTests(unittest.TestCase):
+    def test_hit_selector_accepts_only_listed_numbers(self):
+        """Before 2026-11-12: "list index out of range" for 2, and -1 showed the last hit."""
+        out = scenarios()["blast_hit_select"].output
+        detail = out[out.rfind("Hit number"):]
+        self.assertEqual(out.count(style.INVALID_SELECTION), 2)
+        self.assertNotIn("list index out of range", out)
+        # hit 1 is shown once, after the two refusals: one alignment midline
+        self.assertIn("|" * 32, detail)
+        self.assertEqual(out.count("|" * 32), 1)
+
     def test_database_manager(self):
         s = scenarios()["blast_manager"]
         main_menu = s.menus[0]
@@ -415,9 +430,11 @@ class BlastQueryTypeTests(unittest.TestCase):
         self.assertIn("cannot be determined", s.output)
         self.assertEqual(s.result, "DNA")
         self.assertEqual(scenarios()["blast_query_type_2"].result, "PROTEIN")
-        # 0 cancels; an unknown key cancels too (the caller returns to the BLAST menu)
+        # 0 cancels; an unknown key is answered and the question asked again
         self.assertIsNone(scenarios()["blast_query_type_0"].result)
-        self.assertIsNone(scenarios()["blast_query_type_9"].result)
+        unknown = scenarios()["blast_query_type_9"]
+        self.assertIn(style.INVALID_SELECTION, unknown.output)
+        self.assertEqual(unknown.result, "DNA")
 
 
 class RestrictionMenuTests(unittest.TestCase):

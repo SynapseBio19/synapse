@@ -454,8 +454,15 @@ def _query_type_for_menu(sequence: str, declared: Optional[str]) -> Optional[str
     style.menu([
         (None, [('1', 'DNA'), ('2', 'Protein')]),
     ], zero="Cancel")
-    choice = style.ask('Query type')
-    return {"1": "DNA", "2": "PROTEIN"}.get(choice)
+    # An unknown key is answered and asked again, as in every other menu;
+    # until 2026-11-12 it cancelled like 0 (TERMINAL_UI_STANDARD 9).
+    while True:
+        choice = style.ask('Query type')
+        if choice == "0":
+            return None
+        if choice in ("1", "2"):
+            return {"1": "DNA", "2": "PROTEIN"}[choice]
+        style.invalid_selection()
 
 
 def blast_menu(
@@ -838,6 +845,14 @@ def blast_menu(
 
             raw = style.ask('Hit number')
             if raw == "0":
+                continue
+
+            # Only the listed numbers select a hit. Before 2026-11-12 a
+            # larger number gave "list index out of range" and a negative
+            # one silently showed a hit from the end of the list.
+            shown = min(len(ranked), 20)
+            if not raw.isdigit() or not 1 <= int(raw) <= shown:
+                style.invalid_selection()
                 continue
 
             try:

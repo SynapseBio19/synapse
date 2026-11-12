@@ -318,14 +318,19 @@ What remains outside the shared renderers, each for a stated reason:
   them was not part of recommendation 2.
 - **Not yet covered by a rule**: about 20 hand-padded label lines
   (e.g. "Retrieved before deduplication: 0", "Input source:        Selected
-  ORF"), the prefixes "SCIENTIFIC LIMITATION:" and "RESULT:", and
-  status lines such as "Loaded 2 FASTA record(s).". The BLAST hit
-  selector answers an out-of-range number with "ERROR: list index out
-  of range" instead of "Invalid selection." (unchanged behavior).
+  ORF"), the "RESULT:" lines of the module self-tests when a module is run
+  as a script, and status lines such as "Loaded 2 FASTA record(s).".
+  Resolved on 2026-11-12: the literature limitation line is a NOTE; the
+  BLAST hit selector accepts only the listed numbers and answers any other
+  input with "Invalid selection." (it answered 2 of 1 with "ERROR: list
+  index out of range" and showed a hit from the end of the list for -1);
+  the BLAST query-type question answers an unknown key and asks again
+  instead of cancelling.
 - **Screens behind no menu test** (instrumented 2026-11-03): 46 of 101
   `header()` calls, 41 of 72 `ask()` calls and 2 of 7 `confirm()` calls
-  are executed by the suite. The rest are export paths, NCBI downloads
+  are executed by the suite (line coverage of the dialogs since 2026-11-12:
+  `docs/TEST_COVERAGE.md`). The rest are export paths, NCBI downloads
   and removals, remote submissions and similar dialogs that need files,
   tools or network; all 47 menus and all 33 `ask_choice()` calls run.
 - **BLAST query type**: the explanation of an undetermined type is the
-  exception text printed as it is, and an unknown key cancels like `0`.
+  exception text printed as it is.

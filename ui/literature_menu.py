@@ -154,7 +154,8 @@ def print_article_detail(run: LiteratureSearchRun, article_index: int) -> None:
 
     print(", ".join(_normalize_keywords(article.keywords)) or "Not available")
 
-    print("\nSCIENTIFIC LIMITATION: metadata and relevance are not an appraisal of study quality or validity.")
+    print()
+    style.note("Scientific limitation: metadata and relevance are not an appraisal of study quality or validity.")
 
 
 def _interactive_menu(context: Optional[dict[str, Any]] = None) -> None:
