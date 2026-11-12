@@ -15,6 +15,7 @@ from tests import _support  # noqa: F401
 from tests._support import PROJECT_ROOT
 
 from ui import style
+from ui import cloning_menu, literature_menu, primer_menu
 
 # Every file that draws a terminal interface.
 UI_FILES = sorted(
@@ -92,7 +93,7 @@ class SeparatorTests(unittest.TestCase):
             for number, line in enumerate(read(path).splitlines(), 1):
                 if SEPARATOR.search(line):
                     # Documented exception: a table rule spans its own table.
-                    if path.name == "orf.py" and "24 + 14 * len(candidates)" in line:
+                    if path.name == "orf_menu.py" and "24 + 14 * len(candidates)" in line:
                         continue
                     offenders.append(f"{path.name}:{number}: {line.strip()}")
         self.assertEqual(offenders, [], "separator literals must come from ui.style")
@@ -149,7 +150,7 @@ class MenuNumberingTests(unittest.TestCase):
         return "\n".join(source.split("\n")[node.lineno - 1:node.end_lineno])
 
     def test_blast_menu_is_contiguous_and_fully_dispatched(self):
-        body = self._menu_source("analyses/blast.py", "blast_menu")
+        body = self._menu_source("ui/blast_menu.py", "blast_menu")
         # Entries of the top-level menu: the first style.menu() call.
         labels = [int(key) for key in first_menu_keys(body)]
         self.assertEqual(labels, list(range(1, len(labels) + 1)),
@@ -164,7 +165,7 @@ class MenuNumberingTests(unittest.TestCase):
 
     def test_variant_menu_follows_the_order_of_the_work(self):
         """Master Prompt 5.3: input, normalization, filtering, statistics, interpretation."""
-        body = self._menu_source("analyses/variant_analysis.py", "run_variant_analysis_ui")
+        body = self._menu_source("ui/variant_analysis_menu.py", "run_variant_analysis_ui")
         menu = next(n for n in ast.walk(ast.parse(body)) if isinstance(n, ast.Call)
                     and isinstance(n.func, ast.Attribute) and n.func.attr == "menu")
         labels = {label: int(key) for _title, entries in ast.literal_eval(menu.args[0])
@@ -209,15 +210,27 @@ class MessageTests(unittest.TestCase):
 
 class LayeringTests(unittest.TestCase):
     def test_style_module_carries_no_scientific_logic(self):
+        """ui.style may take the plain-text primitives from core.textformat, nothing else (P2-2)."""
         tree = ast.parse(read(PROJECT_ROOT / "ui" / "style.py"))
         imported = set()
         for node in ast.walk(tree):
             if isinstance(node, ast.ImportFrom) and node.module:
-                imported.add(node.module.split(".")[0])
+                imported.add(node.module)
             elif isinstance(node, ast.Import):
-                imported.update(alias.name.split(".")[0] for alias in node.names)
-        self.assertEqual(imported & {"analyses", "core", "data", "fileio"}, set(),
+                imported.update(alias.name for alias in node.names)
+        forbidden = {name for name in imported - {"core.textformat"}
+                     if name.split(".")[0] in {"analyses", "core", "data", "fileio"}}
+        self.assertEqual(forbidden, set(),
                          f"ui.style must stay presentation-only, imports: {sorted(imported)}")
+
+    def test_textformat_only_builds_strings(self):
+        """core.textformat prints nothing and reads nothing: reports may use it outside the terminal."""
+        tree = ast.parse(read(PROJECT_ROOT / "core" / "textformat.py"))
+        calls = {node.func.id for node in ast.walk(tree)
+                 if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)}
+        self.assertEqual(calls & {"print", "input"}, set())
+        imports = [node for node in ast.walk(tree) if isinstance(node, (ast.Import, ast.ImportFrom))]
+        self.assertEqual([getattr(node, "module", None) for node in imports], ["typing"])
 
     def test_core_imports_ui_nowhere(self):
         """Not at module level and not inside a function: a deferred import is still a dependency."""
@@ -275,6 +288,71 @@ class LayeringTests(unittest.TestCase):
                                    capture_output=True, text=True, timeout=120)
         self.assertIn("CORE WITHOUT UI OK", completed.stdout, completed.stderr[-2000:])
 
+    def test_analysis_modules_import_ui_nowhere_outside_script_entry(self):
+        """P2-2: the science modules do not depend on the terminal interface.
+
+        An import of ui is allowed only inside an ``if __name__ == "__main__"``
+        block, which runs when a module is started as a script, never on import.
+        """
+        hits = []
+        for path in sorted((PROJECT_ROOT / "analyses").glob("*.py")):
+            tree = ast.parse(read(path))
+            script_blocks = [node for node in tree.body if isinstance(node, ast.If)
+                             and ast.unparse(node.test) in ("__name__ == '__main__'", '__name__ == "__main__"')]
+            allowed = {id(sub) for block in script_blocks for sub in ast.walk(block)}
+            for node in ast.walk(tree):
+                if id(node) in allowed:
+                    continue
+                if isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
+                    modules = [node.module]
+                elif isinstance(node, ast.Import):
+                    modules = [alias.name for alias in node.names]
+                else:
+                    continue
+                hits.extend(f"{path.name}:{node.lineno}: {m}" for m in modules
+                            if m == "ui" or m.startswith("ui."))
+        self.assertEqual(hits, [])
+
+    def test_every_analysis_runs_through_the_api_with_ui_unavailable(self):
+        """Import every analysis module and run each core.api analysis while `ui` cannot be imported."""
+        import subprocess
+        import sys
+        import textwrap
+        probe = textwrap.dedent('''
+            import importlib.abc, pkgutil, sys, tempfile, os
+
+            class BlockUi(importlib.abc.MetaPathFinder):
+                def find_spec(self, name, path, target=None):
+                    if name == "ui" or name.startswith("ui."):
+                        raise ImportError("ui is unavailable: " + name)
+
+            sys.meta_path.insert(0, BlockUi())
+            import analyses
+            for info in pkgutil.iter_modules(analyses.__path__):
+                __import__("analyses." + info.name)
+            from core import api
+            from tests._support import deterministic_dna
+            dna = deterministic_dna(600)
+            dna = dna[:300] + "GAATTC" + dna[306:]
+            api.sequence_overview(dna)
+            orfs = api.find_orfs(dna, min_length=60)
+            api.analyze_rna(dna)
+            api.analyze_protein("MKTAYIAKQRQISFVKSHFSRQ")
+            api.restriction_digest(dna, ["EcoRI"])
+            api.design_primers(dna[:400])
+            api.design_primers_for_restriction_site(dna, "EcoRI", 300, flank=200)
+            api.compare_sequences(dna[:120], dna[:60] + "T" + dna[61:120])
+            api.mutation_report(dna[:120], dna[:60] + "T" + dna[61:120])
+            api.design_crispr_guides(dna)
+            api.plan_cloning("GAATTC" + deterministic_dna(300) + "GGATCC", "GAATTC" + deterministic_dna(120) + "GGATCC",
+                             ["EcoRI", "BamHI"])
+            assert not any(n == "ui" or n.startswith("ui.") for n in sys.modules)
+            print("ANALYSES WITHOUT UI OK")
+        ''')
+        completed = subprocess.run([sys.executable, "-c", probe], cwd=PROJECT_ROOT,
+                                   capture_output=True, text=True, timeout=300)
+        self.assertIn("ANALYSES WITHOUT UI OK", completed.stdout, completed.stderr[-3000:])
+
     def test_core_smoke_test_runs_without_ui(self):
         """`python -m core.pipeline` prints the status as data, with ui unavailable."""
         import json
@@ -317,13 +395,16 @@ SHARED_UI_MODULES = ("orf", "crispr", "blast", "literature", "primer", "variant_
                      "rna", "protein", "restriction", "mutation", "menu")
 
 # Every file that draws terminal screens; all of them are routed through
-# ui.style, so the source rule applies to all.
+# ui.style, so the source rule applies to all. Since P2-2 the module dialogs
+# are in ui/<module>_menu.py; the analysis modules are kept in the list so
+# that the rules still catch a heading or message printed by science code.
+MENU_MODULES = ("orf", "crispr", "blast", "literature", "primer", "variant_analysis",
+                "rna", "protein", "restriction", "cloning", "mutation")
 INTERFACE_SOURCES = tuple(
     [PROJECT_ROOT / "main.py", PROJECT_ROOT / "core" / "pipeline.py"]
     + [PROJECT_ROOT / "ui" / name for name in ("menu.py", "report.py")]
-    + [PROJECT_ROOT / "analyses" / f"{name}.py" for name in (
-        "orf", "crispr", "blast", "literature", "primer", "variant_analysis", "sequence",
-        "rna", "protein", "restriction", "cloning", "mutation")]
+    + [PROJECT_ROOT / "ui" / f"{name}_menu.py" for name in MENU_MODULES]
+    + [PROJECT_ROOT / "analyses" / f"{name}.py" for name in MENU_MODULES + ("sequence",)]
 )
 
 # Answers that reach the menu: RNA first shows its pipeline input and
@@ -352,19 +433,19 @@ def render_first_screen(module, answers=("0",)):
         return answer
 
     calls = {
-        "orf": lambda: __import__("analyses.orf", fromlist=["x"]).run_orf_analysis_ui(dna),
-        "crispr": lambda: __import__("analyses.crispr", fromlist=["x"]).crispr_menu(dna, "demo"),
-        "blast": lambda: __import__("analyses.blast", fromlist=["x"]).blast_menu(dna, "demo"),
-        "literature": lambda: __import__("analyses.literature", fromlist=["x"])._interactive_menu(),
-        "primer": lambda: __import__("analyses.primer", fromlist=["x"]).run_primer_analysis_ui(dna, "demo"),
-        "variant_analysis": lambda: __import__("analyses.variant_analysis", fromlist=["x"]).run_variant_analysis_ui(),
-        "rna": lambda: __import__("analyses.rna", fromlist=["x"]).run_rna_analysis_ui(dna, header="demo"),
-        "protein": lambda: __import__("analyses.protein", fromlist=["x"]).run_protein_analysis_from_record(
+        "orf": lambda: __import__("ui.orf_menu", fromlist=["x"]).run_orf_analysis_ui(dna),
+        "crispr": lambda: __import__("ui.crispr_menu", fromlist=["x"]).crispr_menu(dna, "demo"),
+        "blast": lambda: __import__("ui.blast_menu", fromlist=["x"]).blast_menu(dna, "demo"),
+        "literature": lambda: __import__("ui.literature_menu", fromlist=["x"])._interactive_menu(),
+        "primer": lambda: __import__("ui.primer_menu", fromlist=["x"]).run_primer_analysis_ui(dna, "demo"),
+        "variant_analysis": lambda: __import__("ui.variant_analysis_menu", fromlist=["x"]).run_variant_analysis_ui(),
+        "rna": lambda: __import__("ui.rna_menu", fromlist=["x"]).run_rna_analysis_ui(dna, header="demo"),
+        "protein": lambda: __import__("ui.protein_menu", fromlist=["x"]).run_protein_analysis_from_record(
             "MKTAYIAKQRQISFVKSHFSRQLEERLGLIEVQAPILSRVGDGTQDNLSGAEKAVQVKVKALPDAQFEVVHSLAKWKRQTLGQHDFSAGEGLYTHMKALRPDEDRLSPLHSVYVDQWDWERVMGDGERQFSTLKSTVEAIWAGIKATEAAVSEEFGLAPFLPDQIHFVHSQELLSRYPDLDAKGRERAIAKDLGAVFLVGIGGKLSDGHRHDVRAPDYDDWUAAEERNWLGAMLGRSAL",
             name="demo"),
-        "restriction": lambda: __import__("analyses.restriction", fromlist=["x"]).run_restriction_cloning_ui(
+        "restriction": lambda: __import__("ui.restriction_menu", fromlist=["x"]).run_restriction_cloning_ui(
             dna, "demo", [{"header": "demo", "sequence": dna, "topology": "linear"}]),
-        "mutation": lambda: __import__("analyses.mutation", fromlist=["x"]).run_mutation_variant_ui(
+        "mutation": lambda: __import__("ui.mutation_menu", fromlist=["x"]).run_mutation_variant_ui(
             dna, "demo", [{"header": "demo", "sequence": dna}]),
         "menu": lambda: __import__("ui.menu", fromlist=["x"]).show_menu(),
     }
@@ -555,10 +636,11 @@ class EmptyAnswerTests(unittest.TestCase):
             seen.append(query)
             raise _Stop
 
-        with mock.patch.object(literature, "run_literature_search", stub):
+        # The dialog looks the search up in its own module (P2-2).
+        with mock.patch.object(literature_menu, "run_literature_search", stub):
             with self.assertRaises(_Stop):
                 self._run(["1", "BRCA1 DNA repair", "", "", "", "", "", ""],
-                          literature._interactive_menu)
+                          literature_menu._interactive_menu)
         query = seen[0]
         self.assertEqual((query.date_from, query.date_to, query.max_results),
                          (None, None, 30))
@@ -568,7 +650,7 @@ class EmptyAnswerTests(unittest.TestCase):
     def test_primer_conditions_accept_enter_for_the_defaults(self):
         from analyses import primer
         result = []
-        self._run(["", "", "", ""], lambda: result.append(primer._primer_ui_read_conditions()))
+        self._run(["", "", "", ""], lambda: result.append(primer_menu._primer_ui_read_conditions()))
         conditions = result[0]
         self.assertIsNotNone(conditions)
         self.assertEqual((conditions.sodium_mM, conditions.magnesium_mM, conditions.dntp_mM,
@@ -583,16 +665,16 @@ class EmptyAnswerTests(unittest.TestCase):
             seen.append(kwargs.get("top_n"))
             raise _Stop
 
-        with mock.patch.object(cloning, "automatic_cloning_planner", stub):
+        with mock.patch.object(cloning_menu, "automatic_cloning_planner", stub):
             with self.assertRaises(_Stop):
-                self._run(["2", ""], lambda: cloning._cloning_ui_automatic_planner("ACGT" * 50, "ACGT" * 20))
+                self._run(["2", ""], lambda: cloning_menu._cloning_ui_automatic_planner("ACGT" * 50, "ACGT" * 20))
         self.assertEqual(seen, [5])
 
     def test_primer_tm_model_accepts_enter_for_nearest_neighbor(self):
         """"Selection [1]" took Enter as model 1 before Stage F; the rewrite had lost that key."""
         from analyses import primer
         result = []
-        self._run([""], lambda: result.append(primer._primer_ui_select_tm_model()))
+        self._run([""], lambda: result.append(primer_menu._primer_ui_select_tm_model()))
         self.assertEqual(result, ["nearest_neighbor"])
 
     def test_modules_keep_bracket_hints_in_the_label(self):

@@ -7,6 +7,7 @@ import unittest
 
 from tests import _support  # noqa: F401
 from tests._support import PROJECT_ROOT
+from ui import blast_menu, primer_menu
 
 LOCAL_TEST_DB = PROJECT_ROOT / "data" / "local_test" / "synapse_test"
 
@@ -895,7 +896,7 @@ class BlastResumeTests(unittest.TestCase):
     def test_the_menu_offers_the_entry(self):
         import inspect
         from analyses import blast as B
-        source = inspect.getsource(B.blast_menu)
+        source = inspect.getsource(blast_menu.blast_menu)
         self.assertIn("Resume Search by Request ID", source)
         self.assertIn('choice == "2"', source)
 
@@ -1154,7 +1155,7 @@ class OutputNotationTests(unittest.TestCase):
         for answers, expected in cases.items():
             with mock.patch.object(builtins, "input", side_effect=list(answers)), \
                     contextlib.redirect_stdout(io.StringIO()):
-                self.assertEqual(P._primer_ui_read_target(sequence), expected, answers)
+                self.assertEqual(primer_menu._primer_ui_read_target(sequence), expected, answers)
 
 
 # ----------------------------------------------------------------------

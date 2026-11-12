@@ -7,6 +7,7 @@ import unittest
 from pathlib import Path
 
 from tests import _support  # noqa: F401
+from ui import cloning_menu, restriction_menu
 
 
 # ----------------------------------------------------------------------
@@ -293,9 +294,9 @@ class RestrictionCircularTopologyTests(unittest.TestCase):
         from analyses import restriction as R
         answers = iter(["2", "EcoRI", "", "", "0"])  # map, enzyme, keep topology, pause, back
         with mock.patch("builtins.input", lambda *_: next(answers)), \
-                mock.patch.object(R, "get_restriction_map", wraps=R.get_restriction_map) as spy, \
+                mock.patch.object(restriction_menu, "get_restriction_map", wraps=R.get_restriction_map) as spy, \
                 contextlib.redirect_stdout(io.StringIO()):
-            R.run_restriction_analysis_ui(self.ECORI_ACROSS, topology="circular")
+            restriction_menu.run_restriction_analysis_ui(self.ECORI_ACROSS, topology="circular")
         self.assertEqual(spy.call_args.kwargs.get("topology"), "circular")
 
 
@@ -385,9 +386,9 @@ class CloningCircularTopologyTests(unittest.TestCase):
         # cloning, insert #2, planner, best strategy, pause, back, back
         answers = iter(["2", "2", "1", "1", "", "0", "0"])
         with mock.patch("builtins.input", lambda *_: next(answers)), \
-                mock.patch.object(C, "automatic_cloning_planner", side_effect=two_enzyme_planner) as spy, \
+                mock.patch.object(cloning_menu, "automatic_cloning_planner", side_effect=two_enzyme_planner) as spy, \
                 contextlib.redirect_stdout(io.StringIO()):
-            R.run_restriction_cloning_ui(self.VECTOR, "vector", records, topology="circular")
+            restriction_menu.run_restriction_cloning_ui(self.VECTOR, "vector", records, topology="circular")
         kwargs = spy.call_args.kwargs
         self.assertEqual((kwargs["vector_topology"], kwargs["insert_topology"]), ("circular", "linear"))
 

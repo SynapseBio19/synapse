@@ -694,12 +694,16 @@ class SynapsePipeline:
 
     def select_orf(
         self,
-        interactive=True
+        chooser=None
     ):
         """
         Select an ORF from the current ORF analysis.
 
-        interactive=True uses the existing select_orf() UI.
+        ``chooser`` receives the ORF list and returns the chosen ORF, for
+        example ui.orf_menu.select_orf for an interactive choice. Without
+        it the first (highest-ranked) ORF is selected. The pipeline takes
+        the dialog as an argument instead of importing it, so core never
+        depends on the interface (P2-2).
         """
 
         if self.context.orf_analysis is None:
@@ -732,13 +736,9 @@ class SynapsePipeline:
 
             return None
 
-        if interactive:
+        if chooser is not None:
 
-            from analyses.orf import (
-                select_orf
-            )
-
-            selected = select_orf(
+            selected = chooser(
                 orfs
             )
 

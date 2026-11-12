@@ -32,10 +32,20 @@ Messages
 
 from typing import Iterable, Optional, Sequence, Tuple
 
-RULE_WIDTH = 70
-
-MAJOR = "="
-MINOR = "-"
+# The string-building primitives live in core.textformat so that reports
+# built by the analysis modules use the same layout without importing the
+# terminal interface (P2-2). They are re-exported here unchanged.
+from core.textformat import (  # noqa: F401
+    FIELD_WIDTH,
+    MAJOR,
+    MINOR,
+    RULE_WIDTH,
+    columns,
+    field_line,
+    major_rule,
+    minor_rule,
+    rule,
+)
 
 BACK_KEY = "0"
 BACK_LABEL = "Back"
@@ -51,27 +61,10 @@ CONTINUE_PROMPT = "Press Enter to continue..."
 SELECTION_PROMPT = "Selection"
 INVALID_SELECTION = "Invalid selection."
 
-# Width of the label column in a key/value line, so aligned blocks line up
-# across modules.
-FIELD_WIDTH = 22
-
 
 # ---------------------------------------------------------------------------
-# Rules and headers
+# Headers
 # ---------------------------------------------------------------------------
-
-def rule(char: str = MAJOR, width: int = RULE_WIDTH) -> str:
-    """One separator line. Prefer major_rule()/minor_rule()."""
-    return char * width
-
-
-def major_rule() -> str:
-    return rule(MAJOR)
-
-
-def minor_rule() -> str:
-    return rule(MINOR)
-
 
 def header(title: str, *, subtitle: Optional[str] = None, blank_before: bool = True) -> None:
     """Frame the top of a screen: rule, title, rule, optional subtitle."""
@@ -92,25 +85,9 @@ def section(title: str, *, blank_before: bool = True) -> None:
     print(minor_rule())
 
 
-def field_line(label: str, value: object, *, width: int = FIELD_WIDTH) -> str:
-    """One aligned key/value line as text, for reports built as strings."""
-    return f"{str(label) + ':':<{width}} {value}"
-
-
 def field(label: str, value: object, *, width: int = FIELD_WIDTH) -> None:
     """One aligned key/value line."""
     print(field_line(label, value, width=width))
-
-
-def columns(values: Sequence[object], widths: Sequence[int]) -> str:
-    """One table row: each value left-aligned in its column, the last unpadded.
-
-    Values are converted to text before padding, so a column stays aligned
-    whatever the number of digits in it.
-    """
-    cells = [str(value) for value in values]
-    padded = [f"{cell:<{width}}" for cell, width in zip(cells[:-1], widths)]
-    return " ".join(padded + cells[len(padded):])
 
 
 # ---------------------------------------------------------------------------

@@ -19,6 +19,7 @@ import unittest
 
 from tests import _support  # noqa: F401
 from tests._support import reverse_complement
+from ui import orf_menu
 
 BODY = "AAA" * 30
 # 6 + 3 + 20 + 3 + 90 = 122 bp: ATG at 29, 30 AAA codons to the end, then across
@@ -157,7 +158,7 @@ class OrfOptionsReachTheResultsTests(unittest.TestCase):
         buffer = io.StringIO()
         with mock.patch.object(builtins, "input", lambda prompt="": next(answers)), \
                 contextlib.redirect_stdout(buffer):
-            result = O._orf_settings_menu(settings)
+            result = orf_menu._orf_settings_menu(settings)
         shown = [line for line in buffer.getvalue().splitlines() if line.startswith("[5] ")]
         self.assertEqual([line.split(":", 1)[1].strip() for line in shown],
                          ["3' end (missing stop)", "5' and 3' ends", "excluded", "3' end (missing stop)"])

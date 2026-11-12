@@ -30,6 +30,7 @@ from unittest import mock
 from tests._support import PROJECT_ROOT, deterministic_dna
 from tests.test_terminal_ui import INTERFACE_SOURCES
 from ui import style
+from ui import blast_menu, cloning_menu, crispr_menu, mutation_menu, orf_menu, primer_menu, restriction_menu, variant_analysis_menu
 
 DNA = deterministic_dna(900)
 # Vector and insert with EcoRI (GAATTC) and BamHI (GGATCC) sites for the cloning dialogs.
@@ -178,7 +179,7 @@ def scenarios():
     # --- BLAST database manager: menu, type menu, NCBI catalog, status and tool views
     run("blast_manager", ["9", "4", "x.fa", "db", "9", "4", "x.fa", "db", "0", "2", "x", "2", "0",
                           "1", "7", "0"],
-        lambda: blast.blast_database_manager_menu(blast.LocalBlastDatabaseManager(manager_root)))
+        lambda: blast_menu.blast_database_manager_menu(blast.LocalBlastDatabaseManager(manager_root)))
     # --- BLAST search: query source, FASTA records, engine, program, remote database, hits
     run("blast_search", ["1", "9", "1", "0",
                          "1", "2", fasta, "9",
@@ -188,16 +189,16 @@ def scenarios():
                          "1", "2", fasta, "1", "2", "1", "0",
                          "1", "2", fasta, "1", "2", "1", "1", "", "", "y",
                          "6", "0", "6", "1", "7", "0"],
-        lambda: blast.blast_menu(DNA, "demo"), no_network)
+        lambda: blast_menu.blast_menu(DNA, "demo"), no_network)
     # --- BLAST local engine: the local database list, invalid choice, cancel, no database installed
     run("blast_local", ["1", "2", fasta, "1", "1", "1", "9",
                         "1", "2", fasta, "1", "1", "1", "0", "0"],
-        lambda: blast.blast_menu(DNA, "demo"), with_databases)
+        lambda: blast_menu.blast_menu(DNA, "demo"), with_databases)
     run("blast_local_none", ["1", "2", fasta, "1", "1", "1", "0"],
-        lambda: blast.blast_menu(DNA, "demo"), without_databases)
+        lambda: blast_menu.blast_menu(DNA, "demo"), without_databases)
     # --- BLAST query type for a sequence whose letters fit DNA and protein
     for answer in ("1", "2", "0", "9"):
-        run(f"blast_query_type_{answer}", [answer], lambda: blast._query_type_for_menu("ATGCRYATGC", None))
+        run(f"blast_query_type_{answer}", [answer], lambda: blast_menu._query_type_for_menu("ATGCRYATGC", None))
 
     # --- Restriction: analysis menu, enzyme input errors, topology, every view
     run("restriction", ["9",
@@ -208,29 +209,29 @@ def scenarios():
                         "3", "BsaI,EcoRI", "", "",
                         "4", "", "EcoRI", "", "",
                         "0"],
-        lambda: restriction.run_restriction_analysis_ui(VECTOR, header="vec"))
-    run("restriction_topology", ["x", ""], restriction._synapse_ui_select_topology)
-    run("restriction_topology_circular", ["2"], restriction._synapse_ui_select_topology)
-    run("restriction_topology_back", ["0"], restriction._synapse_ui_select_topology)
+        lambda: restriction_menu.run_restriction_analysis_ui(VECTOR, header="vec"))
+    run("restriction_topology", ["x", ""], restriction_menu._synapse_ui_select_topology)
+    run("restriction_topology_circular", ["2"], restriction_menu._synapse_ui_select_topology)
+    run("restriction_topology_back", ["0"], restriction_menu._synapse_ui_select_topology)
 
     # --- Cloning: enzyme list with and without [0], single-enzyme and two-enzyme dialogs
-    run("cloning_enzyme", ["x", "99", "0"], lambda: cloning._cloning_ui_select_enzyme("Selection"))
+    run("cloning_enzyme", ["x", "99", "0"], lambda: cloning_menu._cloning_ui_select_enzyme("Selection"))
     run("cloning_enzyme_required", ["0", "2"],
-        lambda: cloning._cloning_ui_select_enzyme("Selection", allow_back=False))
-    run("cloning_single", ["9", "1", "1", ""], lambda: cloning._cloning_ui_single_enzyme(VECTOR, INSERT))
-    run("cloning_single_back", ["0"], lambda: cloning._cloning_ui_single_enzyme(VECTOR, INSERT))
+        lambda: cloning_menu._cloning_ui_select_enzyme("Selection", allow_back=False))
+    run("cloning_single", ["9", "1", "1", ""], lambda: cloning_menu._cloning_ui_single_enzyme(VECTOR, INSERT))
+    run("cloning_single_back", ["0"], lambda: cloning_menu._cloning_ui_single_enzyme(VECTOR, INSERT))
     run("cloning_two", ["9", "1", "1", "1", "", "1", "2", "1", "2", "9", "1", ""],
-        lambda: cloning._cloning_ui_two_enzyme_strategy(VECTOR, INSERT))
+        lambda: cloning_menu._cloning_ui_two_enzyme_strategy(VECTOR, INSERT))
     run("cloning_two_cancel", ["1", "1", "2", "1", "2", "0"],
-        lambda: cloning._cloning_ui_two_enzyme_strategy(VECTOR, INSERT))
-    run("cloning_planner", ["9", "1", ""], lambda: cloning._cloning_ui_automatic_planner(VECTOR, INSERT))
-    run("cloning_planner_back", ["0"], lambda: cloning._cloning_ui_automatic_planner(VECTOR, INSERT))
+        lambda: cloning_menu._cloning_ui_two_enzyme_strategy(VECTOR, INSERT))
+    run("cloning_planner", ["9", "1", ""], lambda: cloning_menu._cloning_ui_automatic_planner(VECTOR, INSERT))
+    run("cloning_planner_back", ["0"], lambda: cloning_menu._cloning_ui_automatic_planner(VECTOR, INSERT))
     candidates = [{"header": "vector", "sequence": VECTOR}, {"header": "insert", "sequence": INSERT},
                   {"header": "empty", "sequence": ""}]
-    run("cloning_insert", ["9", "1"], lambda: cloning._cloning_ui_select_insert(candidates, vector_index=0))
-    run("cloning_insert_back", ["0"], lambda: cloning._cloning_ui_select_insert(candidates, vector_index=0))
+    run("cloning_insert", ["9", "1"], lambda: cloning_menu._cloning_ui_select_insert(candidates, vector_index=0))
+    run("cloning_insert_back", ["0"], lambda: cloning_menu._cloning_ui_select_insert(candidates, vector_index=0))
     # the cloning menu itself, reaching the single-enzyme analysis through it
-    run("cloning_menu", ["9", "2", "1", "1", "", "0"], lambda: cloning.run_cloning_analysis_ui(VECTOR, INSERT))
+    run("cloning_menu", ["9", "2", "1", "1", "", "0"], lambda: cloning_menu.run_cloning_analysis_ui(VECTOR, INSERT))
 
     # --- CRISPR: every sub-menu, the two option lists, the batch records
     run("crispr", ["5", "11",                                   # notes before any result
@@ -241,33 +242,33 @@ def scenarios():
                    "5", "9", "2", "1", "1", "0",
                    "11", "9", "1", "2", "guides.txt", "2", os.path.join(work, "guides.json"),
                    "3", os.path.join(work, "batch.csv"), "0", "0"],
-        lambda: crispr.crispr_menu(DNA, "demo"))
-    run("crispr_editor", ["x", "0"], crispr._choose_editor)
-    run("crispr_system_cancel", ["0"], crispr._choose_system)
+        lambda: crispr_menu.crispr_menu(DNA, "demo"))
+    run("crispr_editor", ["x", "0"], crispr_menu._choose_editor)
+    run("crispr_system_cancel", ["0"], crispr_menu._choose_system)
 
     # --- Mutation: sub-menu, the sequence prompt without [0], manual entry
     run("mutation", ["9", "1", "9", "1", "2", "", "0"],
-        lambda: mutation.run_mutation_analysis_ui(sequences=records))
+        lambda: mutation_menu.run_mutation_analysis_ui(sequences=records))
     # [0] at the reference prompt, and at the variant prompt after a reference was chosen
     run("mutation_cancel", ["1", "0", "1", "1", "0", "0"],
-        lambda: mutation.run_mutation_analysis_ui(sequences=records))
+        lambda: mutation_menu.run_mutation_analysis_ui(sequences=records))
 
     # --- ORF: selector and settings
-    run("orf_select", ["9", "1"], lambda: orf.select_orf(orfs))
-    run("orf_select_back", ["0"], lambda: orf.select_orf(orfs))
+    run("orf_select", ["9", "1"], lambda: orf_menu.select_orf(orfs))
+    run("orf_select_back", ["0"], lambda: orf_menu.select_orf(orfs))
     run("orf_settings", ["9", "2", "3", "4", "5", "1", "x", "1", "100", "6", "11", "0"],
-        lambda: orf._orf_settings_menu(_orf_settings()))
-    run("orf_settings_restore", ["8", "7", "0"], lambda: orf._orf_settings_menu(_orf_settings()))
+        lambda: orf_menu._orf_settings_menu(_orf_settings()))
+    run("orf_settings_restore", ["8", "7", "0"], lambda: orf_menu._orf_settings_menu(_orf_settings()))
 
     # --- Primer: Tm model
-    run("primer_tm", ["9", "2"], primer._primer_ui_select_tm_model)
-    run("primer_tm_cancel", ["0"], primer._primer_ui_select_tm_model)
+    run("primer_tm", ["9", "2"], primer_menu._primer_ui_select_tm_model)
+    run("primer_tm_cancel", ["0"], primer_menu._primer_ui_select_tm_model)
     # --- Primer: design around a restriction site (workflow 10.2)
     run("primer_site", ["ecori", "9", "1", "", "1", "", "", "", ""],
-        lambda: primer._primer_ui_restriction_site_design(VECTOR, None))
-    run("primer_site_cancel", ["EcoRI", "0"], lambda: primer._primer_ui_restriction_site_design(VECTOR, None))
-    run("primer_site_unknown", ["NoSuchI"], lambda: primer._primer_ui_restriction_site_design(VECTOR, None))
-    run("primer_site_none", ["SmaI"], lambda: primer._primer_ui_restriction_site_design(VECTOR, None))
+        lambda: primer_menu._primer_ui_restriction_site_design(VECTOR, None))
+    run("primer_site_cancel", ["EcoRI", "0"], lambda: primer_menu._primer_ui_restriction_site_design(VECTOR, None))
+    run("primer_site_unknown", ["NoSuchI"], lambda: primer_menu._primer_ui_restriction_site_design(VECTOR, None))
+    run("primer_site_none", ["SmaI"], lambda: primer_menu._primer_ui_restriction_site_design(VECTOR, None))
 
     # --- Session: type declaration, protein record, sequence selector
     ambiguous = SequenceRecord(identifier="amb", sequence="ATGCRYATGC")
@@ -675,14 +676,14 @@ class MissingFileTests(unittest.TestCase):
         from analyses import blast, crispr, variant_analysis
         manager = blast.LocalBlastDatabaseManager(str(PROJECT_ROOT / "no_such_dir"))
         cases = [
-            ("variant", ["1", self.MISSING, "0"], variant_analysis.run_variant_analysis_ui,
+            ("variant", ["1", self.MISSING, "0"], variant_analysis_menu.run_variant_analysis_ui,
              "ERROR: Could not read VCF file:"),
-            ("crispr batch", ["2", "1", self.MISSING, "0", "0"], lambda: crispr.crispr_menu(DNA, "demo"),
+            ("crispr batch", ["2", "1", self.MISSING, "0", "0"], lambda: crispr_menu.crispr_menu(DNA, "demo"),
              "ERROR: Unable to read FASTA:"),
-            ("blast query", ["1", "2", self.MISSING, "", "0"], lambda: blast.blast_menu(DNA, "demo"),
+            ("blast query", ["1", "2", self.MISSING, "", "0"], lambda: blast_menu.blast_menu(DNA, "demo"),
              "ERROR: FASTA file not found:"),
             ("blast database", ["4", self.MISSING, "db", "1", "0"],
-             lambda: blast.blast_database_manager_menu(manager), "ERROR: FASTA file not found:"),
+             lambda: blast_menu.blast_database_manager_menu(manager), "ERROR: FASTA file not found:"),
         ]
         for name, answers, call, message in cases:
             with self.subTest(menu=name):

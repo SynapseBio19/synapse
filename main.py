@@ -36,44 +36,28 @@ from analyses.sequence import (
     find_cpg_islands,
 )
 
-from analyses.rna import (
-    run_rna_analysis_ui,
-)
-
-from analyses.protein import (
-    run_protein_analysis_from_orf,
-    run_protein_analysis_from_record,
-)
-
 from analyses.orf import (
-    run_orf_analysis_ui,
     DEFAULT_MIN_ORF_LENGTH,
 )
 
-from analyses.restriction import (
-    run_restriction_cloning_ui,
-)
-
-from analyses.mutation import (
-    run_mutation_variant_ui,
-)
-
-from analyses.primer import (
-    run_primer_analysis_ui,
-)
-
-from analyses.crispr import (
-    crispr_menu,
-)
-
-from analyses.blast import (
-    blast_menu,
-)
-
 from analyses.literature import (
-    main as literature_main,
     build_sequence_literature_context,
 )
+
+# The module dialogs live in ui/ (P2-2); the analyses/ modules hold the
+# science and do not import the interface.
+from ui.rna_menu import run_rna_analysis_ui
+from ui.protein_menu import (
+    run_protein_analysis_from_orf,
+    run_protein_analysis_from_record,
+)
+from ui.orf_menu import run_orf_analysis_ui
+from ui.restriction_menu import run_restriction_cloning_ui
+from ui.mutation_menu import run_mutation_variant_ui
+from ui.primer_menu import run_primer_analysis_ui
+from ui.crispr_menu import crispr_menu
+from ui.blast_menu import blast_menu
+from ui.literature_menu import main as literature_main
 
 from ui.report import print_pipeline_status, print_results
 from ui.menu import select_gene, show_menu

@@ -1,6 +1,5 @@
 import math
-from ui.style import major_rule, minor_rule
-from ui import style
+from core.textformat import minor_rule
 
 
 # ============================================================
@@ -2465,6 +2464,7 @@ def run_sequence_self_test():
 
 
 if __name__ == "__main__":
+    from ui import style  # only when run as a script
 
     self_test = run_sequence_self_test()
 

@@ -7,6 +7,7 @@ import unittest
 from pathlib import Path
 
 from tests import _support  # noqa: F401
+from ui import blast_menu
 
 
 PROTEIN = "MKTAYIAKQRQISFVKSHFSRQLEERLGLIEVQAPILSRVGDGTQDNLSGAEKAVQ"
@@ -315,12 +316,12 @@ class BlastQueryTypeInferenceTests(unittest.TestCase):
         from unittest import mock
         from analyses import blast as B
         with mock.patch("builtins.input", return_value="2"), mock.patch("builtins.print"):
-            self.assertEqual(B._query_type_for_menu(IUPAC_LETTER_PEPTIDE, None), "PROTEIN")
+            self.assertEqual(blast_menu._query_type_for_menu(IUPAC_LETTER_PEPTIDE, None), "PROTEIN")
         with mock.patch("builtins.input", return_value="0"), mock.patch("builtins.print"):
-            self.assertIsNone(B._query_type_for_menu(IUPAC_LETTER_PEPTIDE, None))
+            self.assertIsNone(blast_menu._query_type_for_menu(IUPAC_LETTER_PEPTIDE, None))
         # A declared or determinable type is not asked for (input() would fail).
-        self.assertEqual(B._query_type_for_menu(IUPAC_LETTER_PEPTIDE, "PROTEIN"), "PROTEIN")
-        self.assertEqual(B._query_type_for_menu(DNA_SEQ, None), "DNA")
+        self.assertEqual(blast_menu._query_type_for_menu(IUPAC_LETTER_PEPTIDE, "PROTEIN"), "PROTEIN")
+        self.assertEqual(blast_menu._query_type_for_menu(DNA_SEQ, None), "DNA")
 
     @unittest.skipUnless(_blast_plus_available("makeblastdb", "blastp"),
                          "BLAST+ (makeblastdb, blastp) not installed")

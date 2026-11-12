@@ -13,7 +13,7 @@ SELF_TESTS = [
     ("analyses.sequence", "run_sequence_self_test"),
     ("analyses.restriction", "run_restriction_self_test"),
     ("analyses.cloning", "run_cloning_self_test"),
-    ("analyses.cloning", "run_cloning_ui_self_test"),
+    ("ui.cloning_menu", "run_cloning_ui_self_test"),
     ("analyses.mutation", "run_mutation_self_test"),
     ("analyses.variant_analysis", "run_variant_analysis_self_test"),
     ("analyses.primer", "run_primer_self_test"),

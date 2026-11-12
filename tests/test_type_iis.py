@@ -17,6 +17,7 @@ from __future__ import annotations
 import unittest
 
 from tests import _support  # noqa: F401
+from ui import restriction_menu, style
 
 SEQUENCE = "AAAA" + "GGTCTC" + "A" * 10 + "TTTT" + "GAGACC" + "CCCC"
 
@@ -87,13 +88,13 @@ class TypeIISSiteTests(unittest.TestCase):
         answers = iter(["BsaI", "", ""])
         buffer = io.StringIO()
         with mock.patch.object(builtins, "input", lambda prompt="": next(answers)),                 contextlib.redirect_stdout(buffer):
-            result = R._restriction_digest_gel_ui(SEQUENCE)
+            result = restriction_menu._restriction_digest_gel_ui(SEQUENCE)
         lines = buffer.getvalue().splitlines()
         self.assertIn("23. BsaI       GGTCTC(1/5)", lines)
         self.assertIn("TYPE IIS CUTS", lines)
         widths = (8, 7, 10, 10, 13)
-        self.assertIn(R.style.columns(("BsaI", "+", 5, "after 11", "after 15", "AAAA"), widths), lines)
-        self.assertIn(R.style.columns(("BsaI", "-", 25, "after 19", "after 23", "ATTT"), widths), lines)
+        self.assertIn(style.columns(("BsaI", "+", 5, "after 11", "after 15", "AAAA"), widths), lines)
+        self.assertIn(style.columns(("BsaI", "-", 25, "after 19", "after 23", "ATTT"), widths), lines)
         self.assertEqual(result["digest"]["cut_positions"], [11, 19])
 
     def test_digest_events_follow_the_map_convention(self):
