@@ -48,6 +48,13 @@ IUPAC_ALPHABET = set("ACGTRYSWKMBDHVN")
 # IUPAC complement table shared via core.seqtools.
 IUPAC_COMPLEMENT = dict(_CORE_IUPAC_COMPLEMENT)
 
+# Names of the nearest-neighbor Tm model. ProfessionalPrimerConfig accepts
+# "nearest-neighbor", so every dispatch accepts it too (it raised
+# "Unknown Tm method" in candidate generation before 2026-11-12).
+NEAREST_NEIGHBOR_TM_METHODS = frozenset(
+    {"nearest_neighbor", "nearest-neighbor", "nn", "santalucia", "santa_lucia"}
+)
+
 # SantaLucia 1998 DNA/DNA nearest-neighbor parameters.
 # Values: (delta_H kcal/mol, delta_S cal/(mol*K)).
 # Keys are written as 5'-XY-3' / 3'-X'Y'-5' dinucleotide stacks.
@@ -362,7 +369,7 @@ def calculate_tm(
         return calculate_tm_wallace(sequence)
     if method in {"salt", "salt_adjusted"}:
         return calculate_tm_salt_adjusted(sequence, salt_mM)
-    if method in {"nearest_neighbor", "nn", "santalucia", "santa_lucia"}:
+    if method in NEAREST_NEIGHBOR_TM_METHODS:
         return float(calculate_tm_nearest_neighbor(
             sequence,
             salt_mM=salt_mM,
@@ -570,7 +577,7 @@ def _candidate_thermodynamics(
         primer_concentration_nM=config.primer_concentration_nM,
         include_symmetry_correction=config.include_symmetry_correction,
         return_details=True,
-    )) if tm_method.lower() in {"nearest_neighbor", "nn", "santalucia", "santa_lucia"} else ThermodynamicResult(
+    )) if tm_method.lower() in NEAREST_NEIGHBOR_TM_METHODS else ThermodynamicResult(
         tm=calculate_tm(
             primer,
             tm_method,
@@ -862,7 +869,7 @@ def design_primers(
         target_end = len(sequence)
     validate_target_region(sequence, target_start, target_end)
     method = tm_method.lower().strip()
-    if method in {"nearest_neighbor", "nn", "santalucia", "santa_lucia"}:
+    if method in NEAREST_NEIGHBOR_TM_METHODS:
         tm_model = "nearest_neighbor"
     elif method in {"salt", "salt_adjusted"}:
         tm_model = "salt_adjusted"
@@ -1067,7 +1074,7 @@ def analyze_primer(
         primer_concentration_nM=primer_concentration_nM,
         include_symmetry_correction=include_symmetry_correction,
         return_details=True,
-    ) if tm_method.lower() in {"nearest_neighbor", "nn", "santalucia", "santa_lucia"} else None
+    ) if tm_method.lower() in NEAREST_NEIGHBOR_TM_METHODS else None
     tm = calculate_tm(
         primer,
         tm_method,
@@ -4314,8 +4321,11 @@ def _v5_candidate_quality(item) -> float:
     profile = item.thermodynamics
     candidate = item.candidate
 
-    hairpin = int(getattr(profile, "hairpin_stem", 0) or 0)
-    self_dimer = int(getattr(profile, "self_dimer_stem", 0) or 0)
+    # The stems are measured on the candidate. Before 2026-11-12 they were
+    # read from the thermodynamic profile, which has no such fields, so the
+    # structural penalty was always zero.
+    hairpin = int(candidate.hairpin.max_stem or 0)
+    self_dimer = int(candidate.self_dimer.max_stem or 0)
 
     # Prefer primers close to the configured optimum, but structure dominates.
     tm_error = abs(
@@ -4398,7 +4408,7 @@ def _v7_apply_selected_tm_model(
 ) -> AdvancedPrimerCandidate:
     """Make the selected Tm model authoritative for professional screening."""
     method = config.tm_method.lower().strip()
-    if method in {"nearest_neighbor", "nn", "santalucia", "santa_lucia"}:
+    if method in NEAREST_NEIGHBOR_TM_METHODS:
         return advanced
 
     selected_tm = float(candidate.tm)
@@ -4510,7 +4520,7 @@ def _v7_generate_professional_primer_candidates(
     return measured[:limit], len(windows)
 
 
-_V7_NEAREST_NEIGHBOR_METHODS = {"nearest_neighbor", "nn", "santalucia", "santa_lucia"}
+_V7_NEAREST_NEIGHBOR_METHODS = NEAREST_NEIGHBOR_TM_METHODS
 
 
 def _v7_screening_tm(sequence, orientation, start, end, config, relaxed):

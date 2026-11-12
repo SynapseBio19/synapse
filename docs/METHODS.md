@@ -339,6 +339,23 @@ Validation:
   shows that the equations are implemented as published, not that the model
   predicts experiments.
 
+Candidate screening score (professional workflow): 2 × thermodynamic score
++ candidate score − structural penalty − 2 × |Tm − optimum| − |GC − optimum|.
+The structural penalty is 0 up to a 3-bp hairpin stem and a 4-bp
+self-dimer stem and rises linearly to 30 points each at 8 bp and 9 bp. It
+is a heuristic weight without a published basis. Until 2026-11-12 it was
+read from fields the thermodynamic profile does not have and was therefore
+always zero (D20); the candidate score's own structure term (up to 20
+points) was the only structural influence on the candidate pool. The
+correction changes which candidates reach the pair ranking for some
+templates (for a 900-bp test template the third-ranked pair changes); the
+golden-master scenario is unchanged. `tests/test_primer_corrections.py`.
+
+Tm model names: `nearest_neighbor`, `nearest-neighbor`, `nn`, `santalucia`
+and `santa_lucia` select the nearest-neighbor model everywhere. The
+hyphenated name passed the configuration check but raised "Unknown Tm
+method" in candidate generation before 2026-11-12 (D21).
+
 Candidate search (P2-6, 2026-11-12): every window of 18–25 nt is a
 candidate, about 160,000 for a 10 kb template. The professional workflow
 orders them by Tm tier (inside the Tm range, within 2 °C of it, outside),
