@@ -165,6 +165,38 @@ class RestrictionPrimerWorkflowTests(_Quiet):
         self.assertEqual(entry["parameters"]["forward_region"], [350, 600])
         self.assertEqual((entry["parameters"]["target_start"], entry["parameters"]["target_end"]), (350, 856))
 
+    def test_menu_runs_record_their_parameters_in_the_report(self):
+        """10.7: the overview and the cloning dialogs store what they ran with (T4)."""
+        import builtins
+        from unittest import mock
+        import main
+        from analyses import sequence as S
+        from core.pipeline import SynapsePipeline
+        from core.report import build_analysis_report
+        from ui import cloning_menu
+        overview = main._overview_parameters("circular")
+        self.assertEqual(overview, {"topology": "circular", "homopolymer_min_length": 4,
+                                    "cpg_island_window": 200, "cpg_island_min_gc_percent": 50.0,
+                                    "cpg_island_min_observed_expected": 0.60})
+        dna = deterministic_dna(400) + "GAATTC" + deterministic_dna(300)[::-1] + "GGATCC" + deterministic_dna(200)
+        insert = "GAATTC" + deterministic_dna(240) + "GGATCC"
+        pipeline = SynapsePipeline(dna, "vector")
+        pipeline.context.store_sequence_analysis({"gc_content": S.calculate_gc_content(dna)}, parameters=overview)
+        pipeline.run_sequence(profile_window=50)
+        answers = iter(["1", "1", ""])  # select enzyme, first enzyme (EcoRI), pause
+        with mock.patch.object(builtins, "input", lambda prompt="": next(answers)):
+            cloning_menu._cloning_ui_single_enzyme(dna, insert, pipeline, "circular", "linear")
+        entries = {}
+        for entry in build_analysis_report(pipeline)["analyses"]:
+            entries.setdefault(entry["module"], []).append(entry)
+        self.assertEqual(entries["sequence"][0]["parameters"], overview)
+        self.assertEqual(entries["sequence"][-1]["parameters"], {"profile_window": 50})
+        cloning = entries["cloning"][-1]["parameters"]
+        self.assertEqual((cloning["mode"], cloning["vector_topology"], cloning["insert_topology"]),
+                         ("single enzyme", "circular", "linear"))
+        self.assertIn("enzyme_database_version", cloning)
+        self.assertTrue(cloning["enzyme"])
+
     def test_a_position_that_is_not_a_confirmed_site_is_refused(self):
         from analyses import primer as P
         dna = deterministic_dna(600)[:300] + "GAATTC" + deterministic_dna(600)[306:]

@@ -37,7 +37,9 @@ byte-identical comparisons, tests that fail on the previous code).
 | `bf4d096` | Approval policy of the Master Prompt adopted (owner decision); handover spelling fixed (the suite failed at `bd91a24`, 420/421) |
 | `aba3fb0` | T1: primer design 10 kb 71 s -> 10 s CPU time (same machine and load), results identical (tier screen with an exact upper bound, faster stem/hairpin/repeat screens, caches) |
 | `c6f0df9` | D20: the V5 structural penalty read missing fields and was always 0; D21: tm_method "nearest-neighbor" crashed candidate generation |
-| (this commit) | T2: primer design around a chosen restriction site (10.2) in primer.py, `core.api`, the primer menu (entry 2; Single Primer Analysis is now 3) and the pipeline parameters |
+| `99150da` | T2: primer design around a chosen restriction site (10.2) in primer.py, `core.api`, the primer menu (entry 2; Single Primer Analysis is now 3) and the pipeline parameters |
+| `50dea66` | T3/P2-2: the dialogs of eleven analysis modules moved to `ui/<module>_menu.py` (55 screens byte-identical); `core/textformat.py`; `SynapsePipeline.select_orf(chooser=...)`; no analysis module imports `ui` |
+| (this commit) | T4: the sequence overview and the three cloning dialogs record their parameters (mode, enzymes, topologies, thresholds) in the pipeline and the report |
 
 Measurement note: the owner's machine ran other programs (CPU load 74-87 %)
 during this run; compare timings only within one run.

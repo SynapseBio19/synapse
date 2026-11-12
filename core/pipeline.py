@@ -235,11 +235,12 @@ class PipelineContext:
 
     def store_sequence_analysis(
         self,
-        result: Any
+        result: Any,
+        parameters: Optional[Dict[str, Any]] = None
     ):
         self.sequence_analysis = result
         self.completed["sequence"] = True
-        self.store("sequence", result)
+        self.store("sequence", result, parameters=dict(parameters or {}))
 
     # ========================================================
     # ORF
@@ -333,12 +334,16 @@ class PipelineContext:
 
     def store_cloning_analysis(
         self,
-        result: Any
+        result: Any,
+        parameters: Optional[Dict[str, Any]] = None
     ):
+        """Store a cloning result with the inputs the caller chose (mode,
+        enzymes, topologies) and the enzyme database version."""
         self.cloning_analysis = result
         self.completed["cloning"] = True
-        self.store("cloning", result,
-                   parameters={"enzyme_database_version": ENZYME_DATABASE_VERSION})
+        recorded = dict(parameters or {})
+        recorded["enzyme_database_version"] = ENZYME_DATABASE_VERSION
+        self.store("cloning", result, parameters=recorded)
 
     def store_cloning_planner(
         self,
@@ -581,7 +586,8 @@ class SynapsePipeline:
         )
 
         self.context.store_sequence_analysis(
-            result
+            result,
+            parameters=dict(kwargs)
         )
 
         return result

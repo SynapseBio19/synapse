@@ -659,13 +659,15 @@ def _cloning_ui_select_two_distinct_enzymes():
 def _cloning_ui_store_result(
     pipeline,
     result,
+    parameters=None,
 ):
     if pipeline is None:
         return
 
     try:
         pipeline.context.store_cloning_analysis(
-            result
+            result,
+            parameters=parameters,
         )
     except AttributeError:
         pass
@@ -745,6 +747,8 @@ def _cloning_ui_automatic_planner(
     _cloning_ui_store_result(
         pipeline,
         result,
+        {"mode": "automatic planner", "top_n": top_n,
+         "vector_topology": vector_topology, "insert_topology": insert_topology},
     )
 
     print_planner_report(result)
@@ -802,6 +806,8 @@ def _cloning_ui_single_enzyme(
     _cloning_ui_store_result(
         pipeline,
         result,
+        {"mode": "single enzyme", "enzyme": enzyme,
+         "vector_topology": vector_topology, "insert_topology": insert_topology},
     )
 
     print_cloning_report(result)
@@ -941,6 +947,10 @@ def _cloning_ui_two_enzyme_strategy(
     _cloning_ui_store_result(
         pipeline,
         result,
+        {"mode": "two-enzyme strategy",
+         "vector_enzymes": [vector_left, vector_right],
+         "insert_enzymes": [insert_left, insert_right],
+         "vector_topology": vector_topology, "insert_topology": insert_topology},
     )
 
     print_cloning_report(result)

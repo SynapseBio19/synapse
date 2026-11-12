@@ -154,6 +154,22 @@ def store_blast_run(pipeline, blast_run):
     )
 
 
+def _overview_parameters(topology):
+    """The settings of the sequence overview, read from the functions it calls."""
+    import inspect
+
+    def default(function, name):
+        return inspect.signature(function).parameters[name].default
+
+    return {
+        "topology": topology,
+        "homopolymer_min_length": default(find_homopolymers, "min_length"),
+        "cpg_island_window": default(find_cpg_islands, "window_size"),
+        "cpg_island_min_gc_percent": default(find_cpg_islands, "min_gc"),
+        "cpg_island_min_observed_expected": default(find_cpg_islands, "min_oe"),
+    }
+
+
 def export_report_interactive(pipeline):
     """Ask for a path and export every stored result."""
     default_report = os.path.join(
@@ -470,7 +486,7 @@ def main():
             reverse_complement,
         )
 
-        pipeline.context.store_sequence_analysis({
+        pipeline.context.store_sequence_analysis(parameters=_overview_parameters(topology), result={
             "nucleotide_counts": nucleotide_counts,
             "nucleotide_percentages": nucleotide_percentages,
             "gc_content": gc_content,
