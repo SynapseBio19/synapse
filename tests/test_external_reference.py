@@ -29,6 +29,7 @@ import random
 import unittest
 
 from tests import _support  # noqa: F401
+from tests._support import PROJECT_ROOT
 
 HAS_BIOPYTHON = importlib.util.find_spec("Bio") is not None
 SKIP_REASON = "Biopython (reference extra) not installed"
@@ -220,6 +221,71 @@ class InstabilityIgWeightTests(unittest.TestCase):
         value = calculate_instability_index("AIGA")
         self.assertIsNotNone(value)
         self.assertAlmostEqual(float(value or 0.0), 10.0 / 4 * (1.0 + 1.0 - 7.49))
+
+
+# ----------------------------------------------------------------------
+# pUC19 (NCBI L09137.2): the real plasmid of the 2026-10-30 audit, now a
+# fixture so the comparison runs in the suite (T9, 2026-11-12).
+# ----------------------------------------------------------------------
+PUC19_PATH = PROJECT_ROOT / "tests" / "fixtures" / "pUC19_L09137.2.fasta"
+# SHA-256 of the FASTA as NCBI E-utilities returns it (LF line ends);
+# the same value was recorded at the first download on 2026-10-30.
+PUC19_SHA256 = "656a4ed4597020eb58266ddd4d65f1778abff1a74655abf25ec943dcc14c152a"
+
+
+def _puc19():
+    text = PUC19_PATH.read_bytes().replace(b"\r\n", b"\n")
+    lines = text.decode("ascii").splitlines()
+    return text, lines[0], "".join(lines[1:]).upper()
+
+
+class PUC19FixtureTests(unittest.TestCase):
+    def test_fixture_is_the_ncbi_record(self):
+        import hashlib
+        text, header, sequence = _puc19()
+        self.assertEqual(hashlib.sha256(text).hexdigest(), PUC19_SHA256)
+        self.assertTrue(header.startswith(">L09137.2 "))
+        self.assertEqual(len(sequence), 2686)
+        self.assertEqual(set(sequence), set("ACGT"))
+
+
+@unittest.skipUnless(HAS_BIOPYTHON, SKIP_REASON)
+class PUC19RestrictionReferenceTests(unittest.TestCase):
+    def setUp(self):
+        logging.disable(logging.CRITICAL)
+
+    def tearDown(self):
+        logging.disable(logging.NOTSET)
+
+    def test_digests_of_pUC19_match_biopython(self):
+        """22 enzymes, linear and circular, on pUC19 as published, rotated so an
+        EcoRI site spans the origin, and rotated so a BamHI cut falls on it."""
+        from Bio import Restriction
+        from Bio.Seq import Seq
+        from analyses.restriction import perform_digest
+        from data.restriction_enzymes import RESTRICTION_ENZYMES
+        _, _, puc19 = _puc19()
+        ecori = puc19.find("GAATTC")
+        bamhi = puc19.find("GGATCC")
+        self.assertGreater(ecori, 0)
+        self.assertGreater(bamhi, 0)
+        rotations = (0, ecori + 3, bamhi + 1)
+        differences, comparisons, cuts = [], 0, 0
+        for rotation in rotations:
+            sequence = puc19[rotation:] + puc19[:rotation]
+            for topology in ("linear", "circular"):
+                for name in RESTRICTION_ENZYMES:
+                    ours = sorted(position + 1 for position in
+                                  perform_digest(sequence, [name], topology=topology)["cut_positions"])
+                    theirs = sorted(getattr(Restriction, name).search(
+                        Seq(sequence), linear=(topology == "linear")))
+                    comparisons += 1
+                    cuts += len(theirs)
+                    if ours != theirs:
+                        differences.append((rotation, topology, name, ours, theirs))
+        self.assertEqual(comparisons, 132)
+        self.assertGreater(cuts, 0)
+        self.assertEqual(differences, [])
 
 
 if __name__ == "__main__":

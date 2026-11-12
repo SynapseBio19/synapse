@@ -10,3 +10,4 @@ Thumbs.db
 .sync/
 /logs/
 /.claude/skills/
+/.tools/
