@@ -34,8 +34,10 @@ Coordinates:
 from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
+from functools import lru_cache
+from operator import eq as _equal
 from math import log, log10, sqrt
-from typing import Optional, Sequence
+from typing import Optional, Sequence, cast
 from core.seqtools import IUPAC_COMPLEMENT as _CORE_IUPAC_COMPLEMENT
 from ui.style import major_rule, minor_rule
 from ui import style
@@ -224,6 +226,15 @@ def normalize_dna_sequence(sequence: str, allow_iupac: bool = False) -> str:
     """Normalize DNA by removing whitespace, uppercasing and converting U to T."""
     if not isinstance(sequence, str):
         raise TypeError("DNA sequence must be a string.")
+    return _normalize_dna_cached(sequence, allow_iupac)
+
+
+# Primer design normalizes the same short strings about two million times
+# for a 3 kb template (P2-6). The result depends only on the string and the
+# alphabet flag, so it is cached; an invalid input is never cached and
+# raises the same error every time.
+@lru_cache(maxsize=65536)
+def _normalize_dna_cached(sequence: str, allow_iupac: bool) -> str:
     normalized = "".join(sequence.split()).upper().replace("U", "T")
     if not normalized:
         raise ValueError("DNA sequence is empty.")
@@ -251,7 +262,12 @@ def validate_target_region(sequence: str, target_start: int, target_end: int) ->
 def reverse_complement(sequence: str) -> str:
     """Return the reverse complement."""
     sequence = normalize_dna_sequence(sequence, allow_iupac=True)
-    return "".join(IUPAC_COMPLEMENT[base] for base in reversed(sequence))
+    # Every IUPAC symbol has a complement in the table, so translating and
+    # reversing gives the same string as a per-base lookup.
+    return sequence.translate(_IUPAC_COMPLEMENT_TABLE)[::-1]
+
+
+_IUPAC_COMPLEMENT_TABLE = str.maketrans(IUPAC_COMPLEMENT)
 
 
 def gc_percent(sequence: str) -> float:
@@ -292,17 +308,15 @@ def longest_tandem_repeat(sequence: str, max_unit: int = 3) -> int:
     best = 1
     max_unit = min(max_unit, len(sequence) // 2)
     for unit_length in range(1, max_unit + 1):
-        for start in range(0, len(sequence) - 2 * unit_length + 1):
-            unit = sequence[start:start + unit_length]
-            copies = 1
-            position = start + unit_length
-            while (
-                position + unit_length <= len(sequence)
-                and sequence[position:position + unit_length] == unit
-            ):
-                copies += 1
-                position += unit_length
-            best = max(best, copies)
+        # Copy k + 1 of a unit starting at s repeats copy k exactly when
+        # sequence[p] == sequence[p + unit_length] for the unit_length
+        # positions of copy k. A run of m such matches from s therefore
+        # holds 1 + m // unit_length copies, and the longest run gives the
+        # most copies for this unit length (P2-6: the same result as
+        # comparing the copies one by one).
+        matches = bytes(map(_equal, sequence, sequence[unit_length:]))
+        longest_run = max(map(len, matches.split(b"\x00")))
+        best = max(best, 1 + longest_run // unit_length)
     return best
 
 
@@ -382,23 +396,41 @@ def _alignment_stem(left: str, right: str) -> tuple[int, Optional[int]]:
     left = normalize_dna_sequence(left)
     right = normalize_dna_sequence(right)
     right_rc = reverse_complement(right)
-    best = 0
-    best_position = None
-    for shift in range(-len(right_rc) + 1, len(left)):
-        current = 0
-        for index in range(len(left)):
-            other_index = index - shift
-            if not (0 <= other_index < len(right_rc)):
-                current = 0
-                continue
-            if left[index] == right_rc[other_index]:
-                current += 1
-                if current > best:
-                    best = current
-                    best_position = index - current + 1
-            else:
-                current = 0
-    return best, best_position
+    # The stem is the longest common substring of left and the reverse
+    # complement of right. The position is the one the original diagonal
+    # scan reported: it walked the diagonals shift = i - j in ascending
+    # order, positions within one in ascending order, and kept the first
+    # run to reach a new maximum. Among all windows of the maximal length
+    # that is the one with the smallest shift, then the smallest start i.
+    # A common window of length k implies one of every shorter length, so
+    # the maximal length is found by bisection (P2-6).
+    left_length = len(left)
+    right_length = len(right_rc)
+
+    def has_common_window(size: int) -> bool:
+        windows = {right_rc[j:j + size] for j in range(right_length - size + 1)}
+        return any(left[i:i + size] in windows for i in range(left_length - size + 1))
+
+    low, high = 0, min(left_length, right_length)
+    while low < high:
+        middle = (low + high + 1) // 2
+        if has_common_window(middle):
+            low = middle
+        else:
+            high = middle - 1
+    if low == 0:
+        return 0, None
+
+    last_start: dict[str, int] = {}
+    for j in range(right_length - low + 1):
+        last_start[right_rc[j:j + low]] = j
+    best_key: Optional[tuple[int, int]] = None
+    for i in range(left_length - low + 1):
+        j = last_start.get(left[i:i + low])
+        if j is not None and (best_key is None or (i - j, i) < best_key):
+            best_key = (i - j, i)
+    assert best_key is not None
+    return low, best_key[1]
 
 
 def _three_prime_complementarity(
@@ -411,11 +443,14 @@ def _three_prime_complementarity(
     second = first if second is None else normalize_dna_sequence(second)
     first_terminal = first[-window:]
     second_terminal = second[-window:]
+    # reverse_complement(second_terminal[:length]) is the last `length`
+    # bases of the reverse complement of second_terminal, so it is
+    # computed once.
+    second_reverse = reverse_complement(second_terminal)
     best = 0
     for length in range(1, min(len(first_terminal), len(second_terminal)) + 1):
         first_part = first_terminal[-length:]
-        second_part = second_terminal[:length]
-        if first_part == reverse_complement(second_part):
+        if first_part == second_reverse[len(second_reverse) - length:]:
             best = length
     return best
 
@@ -516,8 +551,18 @@ def _make_candidate(
 ) -> PrimerCandidate:
     template = sequence[start:end]
     primer = template if orientation == "FORWARD" else reverse_complement(template)
+    thermodynamics = _candidate_thermodynamics(primer, config, tm_method)
+    return _make_candidate_measurements(
+        sequence, orientation, start, end, config, tm_method, primer, thermodynamics,
+    )
 
-    thermodynamics = calculate_tm_nearest_neighbor(
+
+def _candidate_thermodynamics(
+    primer: str, config: PrimerDesignConfig, tm_method: str,
+) -> "NearestNeighborTmResult | ThermodynamicResult":
+    """Return the Tm record of one candidate under the selected Tm model."""
+    # return_details=True always returns the detailed record.
+    return cast("NearestNeighborTmResult", calculate_tm_nearest_neighbor(
         primer,
         salt_mM=config.salt_mM,
         mg_mM=config.mg_mM,
@@ -525,7 +570,7 @@ def _make_candidate(
         primer_concentration_nM=config.primer_concentration_nM,
         include_symmetry_correction=config.include_symmetry_correction,
         return_details=True,
-    ) if tm_method.lower() in {"nearest_neighbor", "nn", "santalucia", "santa_lucia"} else ThermodynamicResult(
+    )) if tm_method.lower() in {"nearest_neighbor", "nn", "santalucia", "santa_lucia"} else ThermodynamicResult(
         tm=calculate_tm(
             primer,
             tm_method,
@@ -547,6 +592,17 @@ def _make_candidate(
         explanation="Empirical screening model; nearest-neighbor thermodynamic details are not applicable.",
     )
 
+
+def _make_candidate_measurements(
+    sequence: str,
+    orientation: str,
+    start: int,
+    end: int,
+    config: PrimerDesignConfig,
+    tm_method: str,
+    primer: str,
+    thermodynamics,
+) -> PrimerCandidate:
     tm = float(thermodynamics.tm)
     gc = gc_percent(primer)
     gc_clamp = count_gc_clamp(primer)
@@ -596,38 +652,54 @@ def generate_primer_candidates(
     """Generate accepted primer candidates using 0-based half-open coordinates."""
     sequence = normalize_dna_sequence(sequence)
     validate_target_region(sequence, target_start, target_end)
+    orientation, windows = _candidate_windows(target_start, target_end, orientation, config)
+    candidates = []
+    evaluated = 0
+    for start, end in windows:
+        evaluated += 1
+        candidate = _make_candidate(sequence, orientation, start, end, config, tm_method)
+        if not candidate.rejection_reasons:
+            candidates.append(candidate)
+    candidates.sort(key=_generation_sort_key(config))
+    return candidates[:config.max_candidates_per_orientation], evaluated
+
+
+def _candidate_windows(
+    target_start: int,
+    target_end: int,
+    orientation: str,
+    config: PrimerDesignConfig,
+) -> tuple[str, list[tuple[int, int]]]:
+    """Return the orientation and the (start, end) windows in search order."""
     orientation = orientation.upper()
     if orientation not in {"FORWARD", "REVERSE"}:
         raise ValueError("orientation must be FORWARD or REVERSE.")
-    candidates = []
-    evaluated = 0
+    windows = []
     if orientation == "FORWARD":
         for start in range(target_start, target_end):
             for length in range(config.min_length, config.max_length + 1):
                 end = start + length
                 if end > target_end:
                     break
-                evaluated += 1
-                candidate = _make_candidate(sequence, orientation, start, end, config, tm_method)
-                if not candidate.rejection_reasons:
-                    candidates.append(candidate)
+                windows.append((start, end))
     else:
         for end in range(target_end, target_start, -1):
             for length in range(config.min_length, config.max_length + 1):
                 start = end - length
                 if start < target_start:
                     break
-                evaluated += 1
-                candidate = _make_candidate(sequence, orientation, start, end, config, tm_method)
-                if not candidate.rejection_reasons:
-                    candidates.append(candidate)
-    candidates.sort(key=lambda candidate: (
+                windows.append((start, end))
+    return orientation, windows
+
+
+def _generation_sort_key(config: PrimerDesignConfig):
+    """Order accepted candidates by score, then closeness to the optima."""
+    return lambda candidate: (
         -candidate.score,
         abs(candidate.tm - config.optimal_tm),
         abs(candidate.gc_percent - config.optimal_gc),
         abs(candidate.length - config.optimal_length),
-    ))
-    return candidates[:config.max_candidates_per_orientation], evaluated
+    )
 
 
 # ============================================================================
@@ -1611,7 +1683,17 @@ def _nearest_neighbor_sum(
     Sum nearest-neighbor ΔH and ΔS values (1 M NaCl) for one parameter set,
     including initiation, terminal and symmetry terms.
     """
+    # A primer's sum is needed for its Tm and again for its duplex profile;
+    # it depends only on the two strings, so it is cached (P2-6).
+    if isinstance(sequence, str) and isinstance(parameter_set, str):
+        return _nearest_neighbor_sum_cached(sequence, parameter_set)
+    return _nearest_neighbor_sum_uncached(sequence, parameter_set)
 
+
+def _nearest_neighbor_sum_uncached(
+    sequence: str,
+    parameter_set: str,
+) -> tuple[float, float]:
     sequence = normalize_dna_sequence(
         sequence
     )
@@ -1657,6 +1739,9 @@ def _nearest_neighbor_sum(
         delta_h,
         delta_s,
     )
+
+
+_nearest_neighbor_sum_cached = lru_cache(maxsize=65536)(_nearest_neighbor_sum_uncached)
 
 
 def calculate_duplex_concentration_term(
@@ -1870,7 +1955,23 @@ def calculate_duplex_thermodynamics(
     """
     Return the full nearest-neighbor thermodynamic profile.
     """
+    arguments = (
+        sequence, sodium_mM, magnesium_mM, dntp_mM, primer_nM,
+        dna_concentration_mode, salt_model, reference_temperature_C,
+        nn_parameter_set,
+    )
+    try:
+        hash(arguments)
+    except TypeError:
+        return _duplex_thermodynamics(*arguments)
+    return _duplex_thermodynamics_cached(*arguments)
 
+
+def _duplex_thermodynamics(
+    sequence, sodium_mM, magnesium_mM, dntp_mM, primer_nM,
+    dna_concentration_mode, salt_model, reference_temperature_C,
+    nn_parameter_set,
+) -> DuplexThermodynamics:
     conditions = ThermodynamicConfig(
         sodium_mM=sodium_mM,
         magnesium_mM=magnesium_mM,
@@ -2125,6 +2226,14 @@ def calculate_primer_thermodynamics(
             duplex.self_complementary
         ),
     )
+
+
+# Primer design asks for the same duplex profile twice per candidate (once
+# for the candidate's Tm, once for its thermodynamic profile). The result is
+# an immutable value that depends only on the arguments, so it is cached;
+# typed=True keeps 50 and 50.0 apart because the record stores the value as
+# given (P2-6). An invalid input raises every time and is never cached.
+_duplex_thermodynamics_cached = lru_cache(maxsize=65536, typed=True)(_duplex_thermodynamics)
 
 
 # ============================================================================
@@ -4330,17 +4439,165 @@ def _v7_generate_professional_primer_candidates(
     base_config = config.primer
     relaxed = _v6_relaxed_generation_config(base_config)
 
-    # The legacy generator is now used only as a candidate enumerator. All
-    # quality filters are disabled in the pool configuration.
-    candidates, evaluated = generate_primer_candidates(
-        sequence,
-        target_start,
-        target_end,
-        orientation,
-        relaxed,
-        config.tm_method,
+    limit = int(getattr(config, "max_pair_candidates", 80))
+
+    # The candidates are ordered by their Tm tier first, and only the best
+    # `limit` are kept. The tier needs only the candidate's Tm, so it is
+    # computed for every window first; the full measurement (structures,
+    # scores) then runs tier by tier and stops once the better tiers hold
+    # at least `limit` accepted candidates, because every candidate of a
+    # later tier sorts after them. The kept candidates go through the same
+    # two stable sorts in the same search order as before, so the result
+    # is identical to measuring every window (P2-6: at 10 kb most windows
+    # lie outside the Tm window).
+    sequence = normalize_dna_sequence(sequence)
+    validate_target_region(sequence, target_start, target_end)
+    orientation, windows = _candidate_windows(target_start, target_end, orientation, relaxed)
+    if len(windows) > relaxed.max_candidates_per_orientation:
+        # The generator would truncate the pool before the tier sort; keep
+        # its exact behavior by measuring every window.
+        return _v7_measure_all_candidates(
+            sequence, target_start, target_end, orientation, config, relaxed, limit,
+        )
+
+    windows_by_tier: dict[int, list[int]] = {}
+    profiles: dict[int, PrimerThermodynamicProfile] = {}
+    for index, (start, end) in enumerate(windows):
+        tm, profile = _v7_screening_tm(sequence, orientation, start, end, config, relaxed)
+        if profile is not None:
+            profiles[index] = profile
+        windows_by_tier.setdefault(_v7_tm_tier(tm, base_config), []).append(index)
+
+    # Within a tier the next sort key is the screening score. Without the
+    # hairpin and self-dimer measurements it has an upper bound (a primer
+    # without any stem, and no structural penalty). Windows are measured in
+    # descending order of that bound, and the tier is left as soon as it
+    # has filled the remaining places with candidates whose true score is
+    # strictly greater than the bound of every window not yet measured:
+    # those windows sort strictly after them.
+    accepted: list[tuple[int, PrimerCandidate]] = []
+    for tier in sorted(windows_by_tier):
+        places = limit - len(accepted)
+        bounded = sorted(
+            (
+                (-_v7_screening_upper_bound(
+                    sequence, orientation, windows[index][0], windows[index][1],
+                    config, relaxed, profiles.get(index),
+                ), index)
+                for index in windows_by_tier[tier]
+            ),
+        )
+        tier_scores: list[float] = []
+        for negative_bound, index in bounded:
+            if len(tier_scores) >= places:
+                tier_scores.sort(reverse=True)
+                if tier_scores[places - 1] > -negative_bound:
+                    break
+            start, end = windows[index]
+            candidate = _make_candidate(
+                sequence, orientation, start, end, relaxed, config.tm_method,
+            )
+            if not candidate.rejection_reasons:
+                accepted.append((index, candidate))
+                tier_scores.append(_v7_screening_score(candidate, config))
+        if len(accepted) >= limit:
+            break
+
+    accepted.sort(key=lambda item: item[0])
+    candidates = [candidate for _, candidate in accepted]
+    candidates.sort(key=_generation_sort_key(relaxed))
+    measured = _v7_measure_candidates(candidates, config)
+    return measured[:limit], len(windows)
+
+
+_V7_NEAREST_NEIGHBOR_METHODS = {"nearest_neighbor", "nn", "santalucia", "santa_lucia"}
+
+
+def _v7_screening_tm(sequence, orientation, start, end, config, relaxed):
+    """Return the Tm that decides a window's screening tier.
+
+    It is the value _v7_apply_selected_tm_model leaves in the candidate's
+    thermodynamic profile: the nearest-neighbor profile Tm, or the selected
+    model's Tm rounded as the candidate stores it. The nearest-neighbor
+    profile is returned too (None for the other models) so that it is not
+    computed again.
+    """
+    template = sequence[start:end]
+    primer = template if orientation == "FORWARD" else reverse_complement(template)
+    if config.tm_method.lower().strip() in _V7_NEAREST_NEIGHBOR_METHODS:
+        profile = calculate_primer_thermodynamics(primer, conditions=config.thermodynamics)
+        return float(profile.tm_C), profile
+    candidate_tm = round(float(_candidate_thermodynamics(primer, relaxed, config.tm_method).tm), 2)
+    return float(round(float(candidate_tm), 2)), None
+
+
+def _v7_screening_score(candidate: PrimerCandidate, config) -> float:
+    """Return the screening score _v7_measure_candidates gives a candidate."""
+    advanced = analyze_primer_candidate_thermodynamics(
+        candidate, conditions=config.thermodynamics,
+    )
+    advanced = _v7_apply_selected_tm_model(advanced, candidate, config)
+    return float(_v5_candidate_quality(advanced))
+
+
+def _v7_screening_upper_bound(sequence, orientation, start, end, config, relaxed, profile=None) -> float:
+    """Return an upper bound of a window's screening score.
+
+    It is the score of the same primer with no hairpin and no self-dimer:
+    score_primer_candidate then awards the full structure score, and the
+    structural penalty of _v5_candidate_quality is zero. Every other term
+    is computed exactly as for the measured candidate, and each step is
+    monotone, so the true score never exceeds the bound.
+    """
+    template = sequence[start:end]
+    primer = template if orientation == "FORWARD" else reverse_complement(template)
+    thermodynamics = _candidate_thermodynamics(primer, relaxed, config.tm_method)
+    tm = float(thermodynamics.tm)
+    gc = gc_percent(primer)
+    no_structure = StructureResult(
+        max_stem=0, three_prime_stem=0, best_position=None,
+        severity="LOW", explanation="",
+    )
+    score = score_primer_candidate(
+        length=len(primer), gc=gc, tm=tm, gc_clamp=count_gc_clamp(primer),
+        homopolymer=longest_homopolymer(primer),
+        repeats=longest_tandem_repeat(primer, relaxed.max_repeat_unit),
+        hairpin=no_structure, self_dimer=no_structure, config=relaxed,
+    )
+    if profile is None:
+        profile = calculate_primer_thermodynamics(primer, conditions=config.thermodynamics)
+    thermodynamic_score = score_thermodynamic_profile(profile)
+    method = config.tm_method.lower().strip()
+    if method not in _V7_NEAREST_NEIGHBOR_METHODS:
+        profile = replace(profile, method=method, tm_C=round(float(round(tm, 2)), 2))
+        thermodynamic_score = score_thermodynamic_profile(
+            profile,
+            optimal_tm=config.primer.optimal_tm,
+            min_tm=config.primer.min_tm,
+            max_tm=config.primer.max_tm,
+        )
+    tm_error = abs(float(profile.tm_C) - float(config.primer.optimal_tm))
+    gc_error = abs(float(round(gc, 2)) - float(config.primer.optimal_gc))
+    return (
+        float(thermodynamic_score) * 2.0
+        + float(score)
+        - 0.0
+        - tm_error * 2.0
+        - gc_error
     )
 
+
+def _v7_tm_tier(tm: float, base_config: PrimerDesignConfig) -> int:
+    if base_config.min_tm <= tm <= base_config.max_tm:
+        return 1
+    if (base_config.min_tm - 2.0) <= tm <= (base_config.max_tm + 2.0):
+        return 2
+    return 3
+
+
+def _v7_measure_candidates(candidates, config):
+    """Add the thermodynamic profile, tier and screening score, then order."""
+    base_config = config.primer
     measured = []
     for candidate in candidates:
         advanced = analyze_primer_candidate_thermodynamics(
@@ -4354,16 +4611,9 @@ def _v7_generate_professional_primer_candidates(
             config,
         )
 
-        tm = float(advanced.thermodynamics.tm_C)
-
-        if base_config.min_tm <= tm <= base_config.max_tm:
-            tier = 1
-        elif (base_config.min_tm - 2.0) <= tm <= (base_config.max_tm + 2.0):
-            tier = 2
-        else:
-            tier = 3
-
-        advanced.screening_tier = tier
+        advanced.screening_tier = _v7_tm_tier(
+            float(advanced.thermodynamics.tm_C), base_config,
+        )
         advanced.screening_score = _v5_candidate_quality(advanced)
         measured.append(advanced)
 
@@ -4381,8 +4631,20 @@ def _v7_generate_professional_primer_candidates(
             ),
         )
     )
+    return measured
 
-    limit = int(getattr(config, "max_pair_candidates", 80))
+
+def _v7_measure_all_candidates(sequence, target_start, target_end, orientation, config, relaxed, limit):
+    """Measure every window (the behavior before the tier screen)."""
+    candidates, evaluated = generate_primer_candidates(
+        sequence,
+        target_start,
+        target_end,
+        orientation,
+        relaxed,
+        config.tm_method,
+    )
+    measured = _v7_measure_candidates(candidates, config)
     return measured[:limit], evaluated
 
 
@@ -4470,18 +4732,19 @@ def analyze_hairpin(sequence: str, max_stem: int = 4) -> StructureResult:
     # Stems are tried from the longest down, and only the first match at
     # the longest matching stem sets best and best_position, so the
     # search ends there.
+    #
+    # A right arm starting at right_start pairs with the left arm when
+    # left == reverse[k:k + stem] with k = length - right_start - stem.
+    # right_start runs from left_start + stem + 3 to length - stem, so k
+    # runs from 0 to length - left_start - 2 * stem - 3, and any such
+    # occurrence ends before length - left_start - stem - 3. One bounded
+    # str.find replaces the loop over right_start (P2-6).
     for stem in range(max_test_stem, 2, -1):
         for left_start in range(0, length - stem - 3):
             left = sequence[left_start:left_start + stem]
-            for right_start in range(
-                left_start + stem + 3,
-                length - stem + 1,
-            ):
-                if left == reverse[length - right_start - stem:length - right_start]:
-                    best = stem
-                    best_position = left_start
-                    break
-            if best:
+            if reverse.find(left, 0, length - left_start - stem - 3) != -1:
+                best = stem
+                best_position = left_start
                 break
         if best:
             break

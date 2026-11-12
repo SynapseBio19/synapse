@@ -339,6 +339,31 @@ Validation:
   shows that the equations are implemented as published, not that the model
   predicts experiments.
 
+Candidate search (P2-6, 2026-11-12): every window of 18–25 nt is a
+candidate, about 160,000 for a 10 kb template. The professional workflow
+orders them by Tm tier (inside the Tm range, within 2 °C of it, outside),
+then by the screening score, and keeps the best `max_pair_candidates` (80)
+per orientation. The tier needs only the Tm, so it is computed for every
+window first. The full measurement (hairpin, self-dimer, scores) then runs
+tier by tier, in descending order of an upper bound of the screening score
+(the same primer without any stem and without structural penalty), and
+stops once the kept places hold candidates whose true score is strictly
+higher than the bound of every window not yet measured. The kept candidates
+pass through the same stable sorts in the same search order, so the result
+is identical to measuring every window. The dimer stem is the longest
+common substring of one primer and the reverse complement of the other,
+with the position of the first maximal run in the original diagonal scan.
+Evidence: `tests/test_primer_screen_equivalence.py` (the replaced
+algorithms as reference functions, the screen against full measurement,
+the bound never below the true score); during development, 60 complete
+designs (150–900 bp, all Tm models, narrow Tm windows, small candidate
+limits, both orientations) were compared with the previous module and were
+identical. 10 kb design: 71 s → 10 s CPU time on the same machine under the
+same background load (3 kb: 18.8 s → 1.4 s); `SYNAPSE_BENCHMARK=1` runs the
+10 kb timing test (8.3 s CPU time at the last run). The machine was heavily
+loaded by other programs during these measurements; the absolute times are
+therefore upper estimates.
+
 ## Mutation analysis (`analyses/mutation.py`)
 
 - Global alignment (Needleman–Wunsch; match 2, mismatch −1, gap −2); pure
