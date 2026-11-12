@@ -2855,7 +2855,10 @@ def orf_reference_cds(orf: Any, reference: str, variant: str) -> Tuple[str, Opti
     from core.orf_context import resolve_orf_region
 
     region = resolve_orf_region(orf, reference)
-    if not region.validated or region.start_1based is None:
+    # An ORF without a sequence gives no region (None); before 2026-11-12
+    # that raised AttributeError instead of this error (D22).
+    if (region is None or not region.validated or region.start_1based is None
+            or region.end_1based is None):
         raise MutationAnalysisError(
             "The selected ORF could not be located on the reference sequence."
         )

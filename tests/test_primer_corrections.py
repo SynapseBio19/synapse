@@ -59,6 +59,25 @@ class StructuralPenaltyTests(unittest.TestCase):
             P._v5_candidate_quality(without_stem) - P._v5_candidate_quality(advanced), expected)
 
 
+class PairAssessmentExportTests(unittest.TestCase):
+    """D23: the ranking's risk flags and warnings were attributes outside the
+    dataclass fields, so the JSON export (which serializes fields) lost them."""
+
+    def test_the_pair_assessment_reaches_the_export(self):
+        import json
+        from core import api
+        from core.report import canonical_json
+        from tests._support import deterministic_dna
+        result = api.design_primers(deterministic_dna(500))
+        exported = json.loads(canonical_json(result.data))["ranked_pairs"]
+        self.assertTrue(exported)
+        for advanced, record in zip(result.data.ranked_pairs, exported):
+            for name in ("screening_score", "high_risk", "critical_risk",
+                         "structural_warnings", "specificity_screened"):
+                self.assertEqual(record[name], getattr(advanced, name), name)
+            self.assertAlmostEqual(record["model_tm_delta"], advanced.model_tm_delta)
+
+
 class TmMethodNameTests(unittest.TestCase):
     def test_nearest_neighbor_with_a_hyphen_designs_like_the_underscore_name(self):
         template = "ATGGCTAGCAAAGGAGAAGAACTTTTCACTGGAGTTGTCCCAATTCTTGTTGAATTAGATGGTGATGTTAATGGGCACAAATTTTCTGTCAGTGGAGAGGGTGAAGGTGATGCAACATACGGAAAACTTACCCTTAAATTTATTTGCACTACTGGAAAACTACCTGTTCCATGGCCAACACTTGTCACTACTTTCTCTTATGGTGTTCAATGCTTTTCAAGATACCCAGATCATATGAAACAGCATGACTTTTTCAAGAGTGCCATGCCCGAAGGTTATGTACAGGAAAGAACTATATTTTTCAAAGATGACGGGAACTACAAGACACGTGCTGAAGTCAAGTTTGAAGGTGATACCCTTGTTAATAGAATCGAGTTAAAAGGTATTGATTTTAAAGAAGATGGAAACATTCTTGGACACAAATTGGAATACAACTATAACTCACACAATGTATACATCATGGCAGACAAACAAAAGAATGGAATCAAAGTTAACTTCAAAATTAGACACAACATTGAAGATGGAAGCGTTCAACTAGCAGACCATTATCAACAAAATACTCCAATTGGCGATGGCCCTGTCCTTTTACCAGACAACCATTACCTGTCCACACAATCTGCCCTTTCGAAAGATCCCAACGAAAAGAGAGACCACATGGTCCTTCTTGAGTTTGTAACAGCTGCTGGGATTACACATGGCATGGATGAACTATACAAATAA"

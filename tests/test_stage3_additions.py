@@ -87,6 +87,12 @@ class MutationFrameTests(unittest.TestCase):
         _, var_none, _ = M.orf_reference_cds(orf, reference, reference + "A")
         self.assertIsNone(var_none)
 
+    def test_orf_without_sequence_gives_the_mutation_error(self):
+        """D22 (2026-11-12): it raised AttributeError, which the mutation menu does not catch."""
+        from analyses import mutation as M
+        with self.assertRaisesRegex(M.MutationAnalysisError, "could not be located"):
+            M.orf_reference_cds({"rank": 1, "strand": "+", "start": 0, "stop": 11}, "ATGAAACCCTAA", "ATGAAACCCTAA")
+
     def test_long_alignment_note(self):
         from analyses import mutation as M
         short = M.compare_sequences("ACGT" * 10, "ACGA" + "ACGT" * 9)

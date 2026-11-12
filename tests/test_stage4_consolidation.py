@@ -29,7 +29,10 @@ class SharedTableTests(unittest.TestCase):
     def test_primer_has_single_live_definition_per_name(self):
         import ast
         tree = ast.parse((PROJECT_ROOT / "analyses" / "primer.py").read_text(encoding="utf-8"))
-        names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)]
+        # typing.overload stubs declare signatures only; the one undecorated
+        # definition is the live one (2026-11-12, calculate_tm_nearest_neighbor).
+        names = [n.name for n in tree.body if isinstance(n, ast.FunctionDef)
+                 and not any(getattr(d, "id", None) == "overload" for d in n.decorator_list)]
         duplicates = {n for n in names if names.count(n) > 1}
         # Phase 6 (audit D16): the v3 model used to carry the public name and
         # was then shadowed by the backward-compatible adapter, so this test

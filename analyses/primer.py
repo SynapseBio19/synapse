@@ -37,7 +37,7 @@ from dataclasses import dataclass, field, replace
 from functools import lru_cache
 from operator import eq as _equal
 from math import log, log10, sqrt
-from typing import Optional, Sequence, cast
+from typing import Literal, Optional, Sequence, cast, overload
 from core.seqtools import IUPAC_COMPLEMENT as _CORE_IUPAC_COMPLEMENT
 from core.textformat import field_line, major_rule
 
@@ -1249,7 +1249,7 @@ if __name__ == "__main__":
 
 from dataclasses import dataclass, field
 from math import exp, log, log10
-from typing import Optional, Sequence
+from typing import Literal, Optional, Sequence, overload
 
 
 # ============================================================================
@@ -2291,6 +2291,11 @@ class AdvancedPrimerCandidate:
     thermodynamics: PrimerThermodynamicProfile
     terminal_stability: dict
     thermodynamic_score: float
+    # Set by the candidate screen. They were attributes outside the
+    # dataclass fields before 2026-11-12 and so never reached an export
+    # (D23).
+    screening_tier: Optional[int] = None
+    screening_score: Optional[float] = None
 
 
 @dataclass
@@ -2306,6 +2311,16 @@ class AdvancedPrimerPair:
 
     thermodynamic_tm_delta: float
     thermodynamic_pair_score: float
+    # The pair assessment of the ranking step (D23: attributes outside the
+    # dataclass fields until 2026-11-12, so exports lost the risk flags and
+    # the structural warnings). The defaults are the values the ranking
+    # assumed for a pair it had not assessed.
+    screening_score: float = 0.0
+    high_risk: bool = False
+    critical_risk: bool = False
+    structural_warnings: list[str] = field(default_factory=list)
+    model_tm_delta: float = 999.0
+    specificity_screened: bool = False
 
 
 # ============================================================================
@@ -3644,6 +3659,64 @@ class NearestNeighborTmResult:
     @property
     def mg_mM(self) -> float:
         return self.magnesium_mM
+
+
+# The return type follows return_details (typing only; one implementation).
+@overload
+def calculate_tm_nearest_neighbor(
+    sequence: str,
+    *,
+    sodium_mM: float = 50.0,
+    magnesium_mM: float = 1.5,
+    dntp_mM: float = 0.2,
+    primer_nM: float = 250.0,
+    dna_concentration_mode: str = "duplex",
+    salt_model: str = "monovalent_equivalent",
+    salt_mM: Optional[float] = None,
+    mg_mM: Optional[float] = None,
+    primer_concentration_nM: Optional[float] = None,
+    include_symmetry_correction: bool = True,
+    return_details: Literal[False] = False,
+    nn_parameter_set: str = DEFAULT_NN_PARAMETER_SET,
+) -> float: ...
+
+
+@overload
+def calculate_tm_nearest_neighbor(
+    sequence: str,
+    *,
+    sodium_mM: float = 50.0,
+    magnesium_mM: float = 1.5,
+    dntp_mM: float = 0.2,
+    primer_nM: float = 250.0,
+    dna_concentration_mode: str = "duplex",
+    salt_model: str = "monovalent_equivalent",
+    salt_mM: Optional[float] = None,
+    mg_mM: Optional[float] = None,
+    primer_concentration_nM: Optional[float] = None,
+    include_symmetry_correction: bool = True,
+    return_details: Literal[True],
+    nn_parameter_set: str = DEFAULT_NN_PARAMETER_SET,
+) -> NearestNeighborTmResult: ...
+
+
+@overload
+def calculate_tm_nearest_neighbor(
+    sequence: str,
+    *,
+    sodium_mM: float = 50.0,
+    magnesium_mM: float = 1.5,
+    dntp_mM: float = 0.2,
+    primer_nM: float = 250.0,
+    dna_concentration_mode: str = "duplex",
+    salt_model: str = "monovalent_equivalent",
+    salt_mM: Optional[float] = None,
+    mg_mM: Optional[float] = None,
+    primer_concentration_nM: Optional[float] = None,
+    include_symmetry_correction: bool = True,
+    return_details: bool = False,
+    nn_parameter_set: str = DEFAULT_NN_PARAMETER_SET,
+) -> float | NearestNeighborTmResult: ...
 
 
 def calculate_tm_nearest_neighbor(

@@ -644,7 +644,7 @@ def format_info_field(info: Mapping[str, Any]) -> str:
 
 
 def parse_genotype(
-    genotype: str,
+    genotype: Optional[str],
 ) -> Tuple[Optional[List[Optional[int]]], bool]:
     """Parse a GT value and return allele indexes plus phased state."""
     if genotype in (None, "", "."):
