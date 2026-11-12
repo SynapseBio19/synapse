@@ -2753,9 +2753,11 @@ class LocalBlastEngine:
             query_file = temp / "query.fasta"
             output_file = temp / "result.xml"
 
+            # CRLF as written, not CR CR LF (D24).
             query_file.write_text(
                 f">{query.name}\r\n{query.sequence}\r\n",
                 encoding="utf-8",
+                newline="",
             )
 
             if _needs_runtime_blast_alias(database):
@@ -3746,7 +3748,9 @@ def build_text_report(run: BlastRun) -> str:
 def export_text(run: BlastRun, path: str | Path) -> str:
     path = _resolve_synapse_user_path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(build_text_report(run), encoding="utf-8")
+    # The report already ends its lines with CRLF; newline="" writes them as
+    # they are (text mode turned each into CR CR LF before 2026-11-12, D24).
+    path.write_text(build_text_report(run), encoding="utf-8", newline="")
     return str(path)
 
 
