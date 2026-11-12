@@ -127,6 +127,54 @@ class RestrictionPrimerWorkflowTests(_Quiet):
                           entries["primer"]["parameters"]["target_end"]), (150, 350))
         self.assertEqual(entries["primer"]["warnings"], list(design.data.warnings))
 
+    def test_primers_designed_around_a_chosen_site_flank_it_and_cut_it(self):
+        """10.2 as written: restriction analysis -> site selection -> primer design."""
+        from analyses import primer as P
+        from analyses.restriction import analyze_restriction
+        from core import api
+        from core.pipeline import SynapsePipeline
+        from core.report import build_analysis_report
+        base = deterministic_dna(900)
+        dna = base[:300] + "GAATTC" + base[306:600] + "GAATTC" + base[606:]
+        pipeline = SynapsePipeline(dna, "workflow")
+        restriction = analyze_restriction(dna, ["EcoRI"], "linear")
+        pipeline.context.store_restriction_analysis(restriction)
+        self.assertEqual(restriction["digest"]["cut_positions"], [301, 601])
+        sites = P.restriction_site_choices(dna, "EcoRI")
+        self.assertEqual([(s["site_start"], s["site_end"], s["top_cut"], s["bottom_cut"]) for s in sites],
+                         [(300, 306, 301, 305), (600, 606, 601, 605)])
+        result = api.design_primers_for_restriction_site(dna, "EcoRI", 600, flank=250)
+        design = result.data
+        self.assertEqual((design.forward_region, design.reverse_region), ((350, 600), (606, 856)))
+        self.assertTrue(design.report.ranked_pairs)
+        for advanced, digest in zip(design.report.ranked_pairs, design.amplicon_digests):
+            pair = advanced.pair
+            self.assertLessEqual(pair.forward.end, 600)
+            self.assertGreaterEqual(pair.reverse.start, 606)
+            self.assertEqual(dna[pair.forward.start:pair.forward.end], pair.forward.sequence)
+            self.assertEqual(_revcomp(dna[pair.reverse.start:pair.reverse.end]), pair.reverse.sequence)
+            # G^AATTC: the amplicon is cut one base after the site start.
+            self.assertEqual(digest["sites_in_amplicon"], 1)
+            self.assertEqual(digest["fragment_lengths"],
+                             [601 - pair.forward.start, pair.reverse.end - 601])
+        self.assertEqual(result.parameters["enzyme"], "EcoRI")
+        self.assertEqual((result.parameters["site_start"], result.parameters["site_end"]), (600, 606))
+        pipeline.context.store_primer_analysis(design)
+        entry = {e["module"]: e for e in build_analysis_report(pipeline)["analyses"]}["primer"]
+        self.assertEqual(entry["parameters"]["enzyme"], "EcoRI")
+        self.assertEqual(entry["parameters"]["forward_region"], [350, 600])
+        self.assertEqual((entry["parameters"]["target_start"], entry["parameters"]["target_end"]), (350, 856))
+
+    def test_a_position_that_is_not_a_confirmed_site_is_refused(self):
+        from analyses import primer as P
+        dna = deterministic_dna(600)[:300] + "GAATTC" + deterministic_dna(600)[306:]
+        with self.assertRaisesRegex(ValueError, "No confirmed EcoRI site starts at position 300"):
+            P.design_primers_for_restriction_site(dna, "EcoRI", 299)
+        with self.assertRaisesRegex(ValueError, "Unknown restriction enzyme"):
+            P.restriction_site_choices(dna, "NoSuchI")
+        with self.assertRaisesRegex(ValueError, "upstream of the site"):
+            P.design_primers_for_restriction_site("GAATTC" + deterministic_dna(400), "EcoRI", 0)
+
 
 # ----------------------------------------------------------------------
 # 10.3 DNA -> ORF selection -> CRISPR design restricted to the ORF

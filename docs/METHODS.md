@@ -339,6 +339,23 @@ Validation:
   shows that the equations are implemented as published, not that the model
   predicts experiments.
 
+Primers around a restriction site (Master Prompt 10.2, 2026-11-12):
+`design_primers_for_restriction_site` takes one CONFIRMED site of an enzyme
+(0-based start of the recognition sequence on a linear template). The
+protected interval spans the recognition sequence and both strand cuts
+(for a Type IIS enzyme the cuts lie outside the site). Forward primers are
+searched in the `flank` bases (default 300) upstream of it, reverse primers
+in the `flank` bases downstream, with the same candidate screen, ranking and
+amplicon limits as the ordinary design. Every amplicon therefore contains
+the site; each pair is reported with the predicted digest of its amplicon
+by the same enzyme (fragment lengths from `perform_digest`, the number of
+sites in the amplicon). This supports a diagnostic digest of the PCR
+product, for example to tell an intact site from a mutated one. The digest
+is a sequence prediction: methylation, star activity and incomplete
+digestion are not modeled, and very short fragments may not be resolvable
+on a gel. A site that matches only through an ambiguity code is not
+offered. The menu entry is Primer design → 2.
+
 Candidate screening score (professional workflow): 2 × thermodynamic score
 + candidate score − structural penalty − 2 × |Tm − optimum| − |GC − optimum|.
 The structural penalty is 0 up to a 3-bp hairpin stem and a 4-bp

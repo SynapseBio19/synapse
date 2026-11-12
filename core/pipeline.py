@@ -357,18 +357,28 @@ class PipelineContext:
         self,
         result: Any
     ):
+        # A design around a restriction site (workflow 10.2) wraps the
+        # primer report; its site and search regions are recorded too.
+        site_design = hasattr(result, "enzyme") and hasattr(result, "report")
+        source = result.report if site_design else result
         parameters = {}
         for name in ("tm_method", "target_start", "target_end"):
-            if hasattr(result, name):
-                parameters[name] = getattr(result, name)
-        conditions = getattr(result, "thermodynamic_conditions", None)
+            if hasattr(source, name):
+                parameters[name] = getattr(source, name)
+        conditions = getattr(source, "thermodynamic_conditions", None)
         if conditions is not None:
             try:
                 from dataclasses import asdict as _asdict
                 parameters["thermodynamic_conditions"] = _asdict(conditions)
             except TypeError:
                 parameters["thermodynamic_conditions"] = conditions
-        warnings = list(getattr(result, "warnings", []) or [])
+        warnings = list(getattr(source, "warnings", []) or [])
+        if site_design:
+            for name in ("enzyme", "site_start", "site_end", "flank"):
+                parameters[name] = getattr(result, name)
+            parameters["forward_region"] = list(result.forward_region)
+            parameters["reverse_region"] = list(result.reverse_region)
+            warnings += [w for w in result.warnings if w not in warnings]
         self.store("primer", result, parameters=parameters, warnings=warnings)
 
     # ========================================================

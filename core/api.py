@@ -254,6 +254,40 @@ def design_primers(record_or_sequence: Any, target_start: int = 0,
                    ])
 
 
+def design_primers_for_restriction_site(record_or_sequence: Any, enzyme: str, site_start: int, *,
+                                        flank: int = 300, config: Any = None,
+                                        sequence_type: Optional[str] = None) -> AnalysisResult:
+    """Primer pairs whose amplicon contains one confirmed restriction site (workflow 10.2).
+
+    ``site_start`` is the 0-based start of the recognition site, as in the
+    restriction results' ``site_position_0based``. Forward primers are
+    searched in the ``flank`` bases upstream of the site and its cuts,
+    reverse primers in the ``flank`` bases downstream; each pair carries the
+    predicted digest of its amplicon by the same enzyme.
+    """
+    from analyses import primer as P
+
+    sequence, description, _, warnings = _sequence_of(
+        record_or_sequence, sequence_type=sequence_type, context="Primer design")
+    config = config if config is not None else P.ProfessionalPrimerConfig()
+    data = P.design_primers_for_restriction_site(sequence, enzyme, site_start, flank=flank, config=config)
+    return _result("primer", data, sequence, description,
+                   parameters={"enzyme": enzyme, "site_start": data.site_start,
+                               "site_end": data.site_end, "flank": data.flank,
+                               "forward_region": list(data.forward_region),
+                               "reverse_region": list(data.reverse_region),
+                               "topology": "linear", "config": config,
+                               "enzyme_database_version": _enzyme_database_version()},
+                   warnings=warnings + list(data.warnings),
+                   limitations=[
+                       "Tm values are nearest-neighbor model predictions; annealing "
+                       "temperatures must be determined experimentally.",
+                       "The amplicon digest is predicted from the sequence on a linear "
+                       "template; methylation, star activity and incomplete digestion "
+                       "are not modeled.",
+                   ])
+
+
 def compare_sequences(reference: str, variant: str, *, reference_name: str = "Reference",
                       variant_name: str = "Variant",
                       sequence_type: Optional[str] = None) -> AnalysisResult:
@@ -559,4 +593,5 @@ __all__ = [
     "analyze_protein", "restriction_digest", "design_primers", "compare_sequences", "analyze_vcf",
     "design_crispr_guides", "plan_cloning", "filter_variants", "mutation_report", "blast_search",
     "blast_resume", "literature_search", "cross_check_variants",
+    "design_primers_for_restriction_site",
 ]

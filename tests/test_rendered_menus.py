@@ -262,6 +262,12 @@ def scenarios():
     # --- Primer: Tm model
     run("primer_tm", ["9", "2"], primer._primer_ui_select_tm_model)
     run("primer_tm_cancel", ["0"], primer._primer_ui_select_tm_model)
+    # --- Primer: design around a restriction site (workflow 10.2)
+    run("primer_site", ["ecori", "9", "1", "", "1", "", "", "", ""],
+        lambda: primer._primer_ui_restriction_site_design(VECTOR, None))
+    run("primer_site_cancel", ["EcoRI", "0"], lambda: primer._primer_ui_restriction_site_design(VECTOR, None))
+    run("primer_site_unknown", ["NoSuchI"], lambda: primer._primer_ui_restriction_site_design(VECTOR, None))
+    run("primer_site_none", ["SmaI"], lambda: primer._primer_ui_restriction_site_design(VECTOR, None))
 
     # --- Session: type declaration, protein record, sequence selector
     ambiguous = SequenceRecord(identifier="amb", sequence="ATGCRYATGC")
@@ -600,6 +606,18 @@ class PrimerMenuTests(unittest.TestCase):
         self.assertIn(style.INVALID_SELECTION, s.output)
         self.assertEqual(s.result, "wallace")
         self.assertIsNone(scenarios()["primer_tm_cancel"].result)
+
+    def test_design_around_a_restriction_site(self):
+        s = scenarios()["primer_site"]
+        self.assertEqual(s.menus[0]["entries"], [("1", "Position 401-406  GAATTC  (cut after 401)")])
+        self.assertEqual(s.menus[0]["zero"], style.CANCEL_LABEL)
+        self.assertIn(style.INVALID_SELECTION, s.output)
+        self.assertEqual((s.result.enzyme, s.result.site_start), ("EcoRI", 400))
+        self.assertIn("RESTRICTION SITE AND DIAGNOSTIC DIGEST", s.output)
+        self.assertIn("Fragments (bp)", s.output)
+        self.assertIsNone(scenarios()["primer_site_cancel"].result)
+        self.assertIn("ERROR: Unknown restriction enzyme: NoSuchI.", scenarios()["primer_site_unknown"].output)
+        self.assertIn("ERROR: SmaI has no confirmed site in this sequence.", scenarios()["primer_site_none"].output)
 
 
 class SessionMenuTests(unittest.TestCase):

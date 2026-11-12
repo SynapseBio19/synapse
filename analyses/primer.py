@@ -4165,8 +4165,9 @@ def _primer_ui_design_menu_v4(dna, header, pipeline):
         style.field('Input', f"{header}")
         style.field('Length', f"{len(sequence)} bp")
         style.menu([
-            ("Design", [('1', 'Design Primers')]),
-            ("Analysis", [('2', 'Single Primer Analysis')]),
+            ("Design", [('1', 'Design Primers'),
+                        ('2', 'Design Primers Around a Restriction Site')]),
+            ("Analysis", [('3', 'Single Primer Analysis')]),
         ])
 
         choice = style.ask_choice()
@@ -4188,8 +4189,14 @@ def _primer_ui_design_menu_v4(dna, header, pipeline):
                 return result
             continue
 
-        if choice == "2":
+        if choice == "3":
             result = _primer_ui_single_analysis(pipeline)
+            if result is not None:
+                return result
+            continue
+
+        if choice == "2":
+            result = _primer_ui_restriction_site_design(sequence, pipeline)
             if result is not None:
                 return result
             continue
@@ -5273,7 +5280,24 @@ def design_primers_professional(
     reverse_candidates, reverse_evaluated = generate_professional_primer_candidates(
         sequence, target_start, target_end, "REVERSE", config=config
     )
+    return _professional_primer_report(
+        sequence, target_start, target_end, config, reference_sequences,
+        forward_candidates, forward_evaluated, reverse_candidates, reverse_evaluated,
+    )
 
+
+def _professional_primer_report(
+    sequence: str,
+    target_start: int,
+    target_end: int,
+    config: ProfessionalPrimerConfig,
+    reference_sequences,
+    forward_candidates,
+    forward_evaluated: int,
+    reverse_candidates,
+    reverse_evaluated: int,
+) -> ProfessionalPrimerDesignReport:
+    """Pair, rank and report forward and reverse candidates."""
     ranked_pairs, pairs_evaluated = rank_professional_primer_pairs(
         sequence,
         forward_candidates,
@@ -5329,3 +5353,256 @@ def design_primers_professional(
         failure_reasons=failure_reasons,
         warnings=warnings,
     )
+
+
+# ============================================================================
+# PRIMERS AROUND A RESTRICTION SITE (Master Prompt 10.2)
+# ============================================================================
+# Workflow: restriction analysis -> choice of one confirmed site -> primer
+# design on both sides of it -> thermodynamic evaluation and ranking ->
+# specificity -> report. The forward primers are placed upstream of the
+# site and the reverse primers downstream, so every amplicon contains the
+# site and both cuts; each pair is reported with the predicted digest of
+# its amplicon by the same enzyme (a diagnostic digest, for example to
+# tell an intact site from a mutated one).
+# ============================================================================
+
+
+@dataclass
+class RestrictionSitePrimerDesign:
+    """Primer pairs that flank one confirmed restriction site."""
+
+    enzyme: str
+    site_start: int
+    site_end: int
+    protected_start: int
+    protected_end: int
+    forward_region: tuple[int, int]
+    reverse_region: tuple[int, int]
+    flank: int
+    report: ProfessionalPrimerDesignReport
+    amplicon_digests: list[dict]
+    warnings: list[str]
+
+
+def restriction_site_choices(sequence: str, enzyme_name: str) -> list[dict]:
+    """Return the confirmed sites of one enzyme with their cut boundaries.
+
+    Positions are 0-based: ``site_start``/``site_end`` delimit the
+    recognition sequence (half-open), ``top_cut``/``bottom_cut`` are the cut
+    boundaries on the two strands, and ``protected_start``/``protected_end``
+    span the site and both cuts (for a Type IIS enzyme the cuts lie outside
+    the site). Only CONFIRMED sites are listed: a site that matches only
+    through an ambiguity code is not evidence of a cut.
+    """
+    from analyses import restriction as R
+
+    sequence = normalize_dna_sequence(sequence, allow_iupac=True)
+    type_iis = R.get_type_iis_enzyme(enzyme_name)
+    if type_iis is None and R.get_restriction_enzyme(enzyme_name) is None:
+        raise ValueError(f"Unknown restriction enzyme: {enzyme_name}.")
+    recognition = (type_iis or R.get_restriction_enzyme(enzyme_name) or {})["recognition_sequence"]
+    choices = []
+    for cut in R.get_cut_positions(sequence, [enzyme_name], topology="linear"):
+        if cut.get("status") != "CONFIRMED" or cut.get("wraps_origin"):
+            continue
+        site_start = int(cut["site_position_0based"])
+        site_end = site_start + len(recognition)
+        top_cut = int(cut["top_cut_0based"])
+        bottom_cut = int(cut["bottom_cut_0based"])
+        choices.append({
+            "enzyme": enzyme_name,
+            "site_start": site_start,
+            "site_end": site_end,
+            "site_sequence": sequence[site_start:site_end],
+            "strand": cut.get("strand", "+"),
+            "top_cut": top_cut,
+            "bottom_cut": bottom_cut,
+            "protected_start": min(site_start, top_cut, bottom_cut),
+            "protected_end": max(site_end, top_cut, bottom_cut),
+        })
+    return choices
+
+
+def design_primers_for_restriction_site(
+    sequence: str,
+    enzyme_name: str,
+    site_start: int,
+    *,
+    flank: int = 300,
+    config: ProfessionalPrimerConfig = ProfessionalPrimerConfig(),
+    reference_sequences: Optional[dict[str, str] | Sequence[tuple[str, str]]] = None,
+) -> RestrictionSitePrimerDesign:
+    """Design primer pairs whose amplicon contains one restriction site.
+
+    ``site_start`` is the 0-based start of a CONFIRMED recognition site of
+    ``enzyme_name`` on the linear template. Forward primers are searched in
+    the ``flank`` bases upstream of the site and its cuts, reverse primers
+    in the ``flank`` bases downstream.
+    """
+    from analyses import restriction as R
+
+    config.validate()
+    sequence = normalize_dna_sequence(sequence)
+    if int(flank) < config.primer.min_length:
+        raise ValueError(
+            f"The flank must be at least the minimum primer length ({config.primer.min_length} nt)."
+        )
+    flank = int(flank)
+    choice = next(
+        (item for item in restriction_site_choices(sequence, enzyme_name)
+         if item["site_start"] == int(site_start)),
+        None,
+    )
+    if choice is None:
+        raise ValueError(
+            f"No confirmed {enzyme_name} site starts at position {int(site_start) + 1} (1-based)."
+        )
+    protected_start = choice["protected_start"]
+    protected_end = choice["protected_end"]
+    forward_region = (max(0, protected_start - flank), protected_start)
+    reverse_region = (protected_end, min(len(sequence), protected_end + flank))
+    for name, (start, end) in (("upstream", forward_region), ("downstream", reverse_region)):
+        if end - start < config.primer.min_length:
+            raise ValueError(
+                f"Only {end - start} bases lie {name} of the site; a primer needs "
+                f"at least {config.primer.min_length}."
+            )
+
+    forward_candidates, forward_evaluated = generate_professional_primer_candidates(
+        sequence, forward_region[0], forward_region[1], "FORWARD", config=config
+    )
+    reverse_candidates, reverse_evaluated = generate_professional_primer_candidates(
+        sequence, reverse_region[0], reverse_region[1], "REVERSE", config=config
+    )
+    report = _professional_primer_report(
+        sequence, forward_region[0], reverse_region[1], config, reference_sequences,
+        forward_candidates, forward_evaluated, reverse_candidates, reverse_evaluated,
+    )
+
+    digests = []
+    for rank, advanced in enumerate(report.ranked_pairs, 1):
+        forward = advanced.pair.forward
+        reverse = advanced.pair.reverse
+        amplicon = sequence[forward.start:reverse.end]
+        digest = R.perform_digest(amplicon, [enzyme_name], "linear")
+        digests.append({
+            "rank": rank,
+            "amplicon_start": forward.start,
+            "amplicon_end": reverse.end,
+            "amplicon_length": len(amplicon),
+            "site_offset": choice["site_start"] - forward.start,
+            "sites_in_amplicon": int(digest["cut_count"]),
+            "fragment_lengths": [int(fragment["length"]) for fragment in digest["fragments"]],
+        })
+
+    warnings = [
+        "The digest is predicted from the sequence; incomplete digestion, "
+        "methylation and star activity are not modeled.",
+    ]
+    extra = sorted({item["sites_in_amplicon"] for item in digests if item["sites_in_amplicon"] > 1})
+    if extra:
+        warnings.append(
+            f"Some amplicons contain more than one {enzyme_name} site "
+            f"({', '.join(str(n) for n in extra)}); their digest gives more than two fragments."
+        )
+    if not report.ranked_pairs:
+        warnings.append("No primer pair flanks the site under the current constraints; "
+                        "a larger flank or a wider Tm range may help.")
+
+    return RestrictionSitePrimerDesign(
+        enzyme=enzyme_name,
+        site_start=choice["site_start"],
+        site_end=choice["site_end"],
+        protected_start=protected_start,
+        protected_end=protected_end,
+        forward_region=forward_region,
+        reverse_region=reverse_region,
+        flank=flank,
+        report=report,
+        amplicon_digests=digests,
+        warnings=warnings,
+    )
+
+
+def _primer_ui_restriction_site_design(sequence, pipeline):
+    """Design primers around one confirmed restriction site (workflow 10.2)."""
+    from data.restriction_enzymes import RESTRICTION_ENZYMES, TYPE_IIS_ENZYMES
+
+    style.section("RESTRICTION SITE")
+    known = {name.upper(): name for name in list(RESTRICTION_ENZYMES) + list(TYPE_IIS_ENZYMES)}
+    answer = style.ask("Enzyme (for example EcoRI or BsaI)").strip()
+    enzyme = known.get(answer.upper())
+    if enzyme is None:
+        style.error(f"Unknown restriction enzyme: {answer or '(none)'}.")
+        return None
+
+    choices = restriction_site_choices(sequence, enzyme)
+    if not choices:
+        style.error(f"{enzyme} has no confirmed site in this sequence.")
+        return None
+
+    while True:
+        style.section(f"CONFIRMED {enzyme.upper()} SITES")
+        style.menu([(None, [
+            (str(number), f"Position {item['site_start'] + 1}-{item['site_end']}  "
+                          f"{item['site_sequence']}  (cut after {item['top_cut']})")
+            for number, item in enumerate(choices, 1)
+        ])], zero=style.CANCEL_LABEL)
+        selection = style.ask_choice()
+        if selection == "0":
+            return None
+        if selection.isdigit() and 1 <= int(selection) <= len(choices):
+            chosen = choices[int(selection) - 1]
+            break
+        style.invalid_selection()
+
+    flank_input = style.ask("Bases searched on each side [300]")
+    try:
+        flank = 300 if not flank_input else int(flank_input)
+    except ValueError:
+        style.error("The flank must be a whole number of bases.")
+        return None
+
+    tm_method = _primer_ui_select_tm_model()
+    if tm_method is None:
+        return None
+    conditions = _primer_ui_read_conditions()
+    if conditions is None:
+        return None
+
+    try:
+        config = ProfessionalPrimerConfig(thermodynamics=conditions, tm_method=tm_method)
+        design = design_primers_for_restriction_site(
+            sequence, enzyme, chosen["site_start"], flank=flank, config=config,
+        )
+    except (TypeError, ValueError, ZeroDivisionError) as exc:
+        style.error(f"{exc}")
+        return None
+
+    print_professional_primer_report(design.report)
+    print_restriction_site_design(design)
+    _primer_ui_store_result(pipeline, design)
+    return design
+
+
+def print_restriction_site_design(design: RestrictionSitePrimerDesign) -> None:
+    """Print the site, the search regions and each amplicon's digest."""
+    style.section("RESTRICTION SITE AND DIAGNOSTIC DIGEST")
+    style.field("Enzyme", design.enzyme)
+    style.field("Site", f"{design.site_start + 1}-{design.site_end} (1-based)")
+    style.field("Forward primers in", f"{design.forward_region[0] + 1}-{design.forward_region[1]}")
+    style.field("Reverse primers in", f"{design.reverse_region[0] + 1}-{design.reverse_region[1]}")
+    print()
+    widths = [6, 18, 10, 7]
+    print(style.columns(["Rank", "Amplicon", "Length", "Sites", "Fragments (bp)"], widths))
+    for item in design.amplicon_digests:
+        print(style.columns([
+            item["rank"],
+            f"{item['amplicon_start'] + 1}-{item['amplicon_end']}",
+            f"{item['amplicon_length']} bp",
+            item["sites_in_amplicon"],
+            " + ".join(str(length) for length in item["fragment_lengths"]),
+        ], widths))
+    print()
+    style.notes(design.warnings, prefix=style.WARNING_PREFIX)
