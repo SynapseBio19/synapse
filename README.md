@@ -22,12 +22,12 @@ tools. Where a module has been compared with an independent reference,
 | Menu | Module | What it does |
 |---|---|---|
 | [1] | Sequence overview | Composition, GC/AT content and skew, ambiguity codes, homopolymers, CpG, molecular mass |
-| [2] | ORF analysis | ORF search on both strands with a selectable NCBI genetic code, start-codon policy and minimum length; candidate comparison and selection |
-| [3] | RNA analysis | Transcription of the selected ORF or sequence, codon view, sequence motifs |
+| [2] | ORF analysis | ORF search on both strands with a selectable NCBI genetic code, start-codon policy and minimum length; ORFs across the origin of circular sequences and optional 5'-partial ORFs; candidate comparison and selection |
+| [3] | RNA analysis | Transcription of the selected ORF or sequence, codon view with the ORF's genetic code, hairpin screen (Watson-Crick, G·U counted separately), sequence motifs |
 | [4] | Protein analysis | Translation and sequence-derived protein descriptors; protein records open this module directly |
-| [5] | Restriction and cloning | Restriction map and digest (linear or circular), enzyme pairs, restriction-cloning strategies |
-| [6] | Primer design | Primer pairs with nearest-neighbor Tm and salt correction, structural screens, ranking |
-| [7] | Mutation and variant analysis | Sequence comparison with coding consequences; VCF parsing, reference checks, normalization, filtering |
+| [5] | Restriction and cloning | Restriction map and digest (linear or circular) with 22 palindromic and 4 Type IIS enzymes, enzyme pairs, restriction-cloning strategies and an automatic planner |
+| [6] | Primer design | Primer pairs with nearest-neighbor Tm and salt correction, structural screens, ranking; primers around a chosen restriction site with the predicted digest of each amplicon |
+| [7] | Mutation and variant analysis | Sequence comparison with coding consequences in HGVS-style notation; VCF parsing, reference checks, normalization, filtering |
 | [8] | CRISPR guide design | Guides for SpCas9, SpCas9-NG, SaCas9 and Cas12a, modeled cut sites, base and prime editing candidates, off-target search in supplied sequences |
 | [9] | BLAST search | Local BLAST+ or NCBI BLAST, with resumable request IDs and an evidence summary per hit |
 | [10] | Literature search | PubMed, Europe PMC, OpenAlex and Crossref, deduplicated |
@@ -117,14 +117,19 @@ The environment variables below configure the session:
 
 ```
 main.py      session: file loading, record selection, main menu
-analyses/    one module per analysis, each with its terminal menu
-core/        data model, sequence types, pipeline state, report, API
+analyses/    one module per analysis: the science, without any terminal code
+core/        data model, sequence types, pipeline state, report, API, text layout
 fileio/      FASTA and GenBank reading
-ui/          shared terminal presentation (ui/style.py), main menu, report screens
-data/        enzyme definitions, genetic codes, amino-acid data, BLAST test database
+ui/          terminal interface: shared presentation (ui/style.py), main menu,
+             report screens and one dialog module per analysis (ui/<module>_menu.py)
+data/        enzyme definitions, genetic codes, amino-acid data
 tests/       unit, golden-master, integration and end-to-end tests
 docs/        methods, changes, audit and feature status, interface and style standards
 ```
+
+No analysis module imports `ui/`: every analysis runs through `core.api`
+without the terminal interface, which a test checks with `ui` made
+unimportable.
 
 `core/pipeline.py` keeps the session's sequence, the selected ORF and
 every stored result, and invalidates RNA and protein results when the
@@ -142,6 +147,10 @@ packaging and type checking.
 python -m unittest discover -s tests -t .
 ```
 
+The suite has run on Python 3.14 and on Python 3.10.11, the oldest
+supported version (`docs/TOOL_AND_DATA_LEDGER.md`). Line coverage is
+recorded in `docs/TEST_COVERAGE.md`.
+
 The suite blocks all network access, so no test can depend on an external
 service. Golden-master snapshots in `tests/golden/` protect every
 module's output and change only with a documented reason
@@ -157,14 +166,16 @@ The full list, per module, is in `docs/METHODS.md`. The most important:
   scores, signal-peptide and structure screens are model predictions or
   heuristics, and are labeled as such.
 - Off-target search covers only the sequences supplied, never a genome.
-- ORF search does not report 5'-partial ORFs or ORFs spanning the origin
-  of a circular sequence.
-- Restriction analysis searches the forward strand, which is complete for
-  the palindromic enzymes in the database; it holds no Type IIS enzyme.
-  Methylation blocking and star activity are not modeled.
-- The global sequence alignment in the mutation module needs memory in
-  proportion to the product of the two lengths (about 4.5 GB for two
-  10 kb sequences).
+- ORF search has no comparison with NCBI ORFfinder (not available on
+  this platform).
+- Restriction analysis covers 22 palindromic and 4 Type IIS enzymes;
+  methylation blocking and star activity are not modeled. Golden Gate
+  assembly is not planned.
+- The global alignment of the mutation module keeps one byte per matrix
+  cell; similar sequences are aligned in an exact band (10 kb in well
+  under a second), unrelated long sequences still take time proportional
+  to the product of the lengths.
+- Remote BLAST offers `nt` but not NCBI's newer default `core_nt`.
 - Remote BLAST and literature search depend on external services, their
   availability and their rate limits.
 
@@ -177,5 +188,8 @@ The full list, per module, is in `docs/METHODS.md`. The most important:
 - `docs/AUDIT_STATUS.md`: the status of every audit recommendation
 - `docs/STYLE_GUIDE.md` and `docs/TERMINAL_UI_STANDARD.md`: communication
   and interface standards
+- `docs/TEST_COVERAGE.md` and `docs/TOOL_AND_DATA_LEDGER.md`: test
+  coverage, and every external tool and dataset with source, version and
+  checksum
 - `docs/PHASE6_FINAL_REPORT.md`: what Phase 6 changed, what was verified
   and what remains

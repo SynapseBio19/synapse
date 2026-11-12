@@ -563,7 +563,9 @@ def literature_search(query: str, *, sources: Optional[Sequence[str]] = None,
     """Search the configured literature providers (audit S14).
 
     This always makes external requests: the query text is sent to the
-    selected providers. The caller must pass ``send_to_providers=True`` to
+    selected providers. ``max_results`` applies to each provider; the
+    merged result can therefore hold up to that many records per provider
+    before deduplication. The caller must pass ``send_to_providers=True`` to
     confirm, mirroring the privacy gate the BLAST menu applies.
     """
     from analyses.literature import LiteratureQuery, run_literature_search

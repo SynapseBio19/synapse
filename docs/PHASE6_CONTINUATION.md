@@ -39,7 +39,35 @@ byte-identical comparisons, tests that fail on the previous code).
 | `c6f0df9` | D20: the V5 structural penalty read missing fields and was always 0; D21: tm_method "nearest-neighbor" crashed candidate generation |
 | `99150da` | T2: primer design around a chosen restriction site (10.2) in primer.py, `core.api`, the primer menu (entry 2; Single Primer Analysis is now 3) and the pipeline parameters |
 | `50dea66` | T3/P2-2: the dialogs of eleven analysis modules moved to `ui/<module>_menu.py` (55 screens byte-identical); `core/textformat.py`; `SynapsePipeline.select_orf(chooser=...)`; no analysis module imports `ui` |
-| (this commit) | T4: the sequence overview and the three cloning dialogs record their parameters (mode, enzymes, topologies, thresholds) in the pipeline and the report |
+| `b1a012f` | T4: the sequence overview and the three cloning dialogs record their parameters (mode, enzymes, topologies, thresholds) in the pipeline and the report |
+| `757958f` | T6: pyright 108 -> 58; D22 (orf_reference_cds AttributeError), D23 (pair risk assessment missing from exports) |
+| `ae87adb` | T7: coverage 68 % -> 70.9 % (`docs/TEST_COVERAGE.md`); D24 (BLAST text export and query file written with CR CR LF) |
+| `bf4b9ee` | T9: `docs/TOOL_AND_DATA_LEDGER.md`; suite on Python 3.10.11 (452 OK); pUC19 L09137.2 fixture with Biopython comparison in the suite |
+| `dabc2f1` | T11: BLAST hit selector accepts only listed numbers; query-type question re-asks |
+| (this commit) | README brought up to date; live literature check recorded in METHODS; `max_results` per provider documented in `core.api` |
+
+## Paused here on 2026-11-12 (owner asked to stop)
+
+- **D25, found, not yet fixed:** a live NCBI BLAST search (public pUC19
+  fragment 401-700, database `nt`) was submitted and got an RID, then one
+  status poll failed with a transient DNS error (`getaddrinfo failed`) and
+  the whole search aborted. `NCBIBlastClient.await_ready` does not retry
+  connection errors while polling, and the error message does not contain
+  the RID, so the user cannot resume a search that is still running at
+  NCBI. Fix: retry transient connection errors in `await_ready` (bounded,
+  with back-off) and name the RID and the resume entry in the final error;
+  test with a client whose `_request` fails once. Then repeat the live run
+  (script idea: read `tests/fixtures/pUC19_L09137.2.fasta` directly, do not
+  import `tests._support`, which blocks the network on purpose).
+- Remote BLAST does not offer NCBI's `core_nt` (NCBI's default since 2024);
+  decide after the live run whether to add it.
+- P2-1 decision: keep the v5-v11 names (one live implementation per role;
+  renaming changes no behavior). Record as PARTIALLY COMPLETE with reason.
+- Still open: T12 (P2-4 in the menus), T13 (document), T8 documentation
+  reconciliation for all commits since 2026-11-03 (CHANGES, FEATURE_STATUS
+  incl. new file locations ui/*_menu.py, AUDIT_STATUS, PHASE6_PROGRESS,
+  FINAL_REPORT J), T10 final verification, independent audit and final
+  report A-K.
 
 Measurement note: the owner's machine ran other programs (CPU load 74-87 %)
 during this run; compare timings only within one run.

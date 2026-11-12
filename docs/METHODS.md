@@ -553,6 +553,20 @@ therefore upper estimates.
 - Requests are throttled per host (NCBI 3/s, 10/s with an API key) and
   retried on HTTP 429/5xx (max. 3 attempts, `Retry-After` honored).
 - Relevance scores measure text matching only, not evidence quality.
+- `max_results` is a limit per provider; the merged list holds up to that
+  many records per provider before deduplication.
+- Publication dates are kept as each provider reports them (PubMed
+  `YYYY Mon DD`, ISO dates elsewhere) and may be different date types
+  (journal issue date vs. electronic publication). The date filter reads
+  all of these forms; partial dates are treated as intervals.
+- Live check (2026-11-12, approval policy of the same day): `core.api.literature_search`
+  with the neutral query "CRISPR base editing", `max_results=10`, default
+  sources (PubMed, Europe PMC, OpenAlex): 29 unique records, no provider
+  error, every record with a title, no duplicate DOI. Two records were
+  compared with the PubMed record (PMID 30587106, 33449100): title and
+  DOI identical; for PMID 30587106 Synapse reported 2018-12-01 (enriched
+  date) where PubMed gives 2018-12-27, an example of the date-type
+  difference above.
 
 ## Reproducibility
 
