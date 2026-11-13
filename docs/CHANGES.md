@@ -2190,3 +2190,15 @@ Prompt of 2026-11-13. History and binding decisions:
   returns `data["reference_only_records"]`, and the variant menu prints a
   NOTE after loading (Master Prompt 10.8, no silent loss).
 - Tests: `tests/test_bcftools_norm_reference.py` (7).
+
+### ORF search compared with NCBI ORFfinder
+
+- Comparison (no behavior change): ORFfinder's web service on pUC19
+  (L09137.2), genetic code 11, four settings; all 69 ORFfinder ORFs are
+  reported by Synapse with identical strand, start, stop, length and
+  partial status. The result tables are stored as a fixture.
+- Correction of a documentation claim: METHODS said the 75 nt default
+  "follows ORFfinder". ORFfinder's minimal length excludes the stop codon
+  and Synapse's includes it, so Synapse also reports ORFs of exactly 75 nt;
+  `min_length=78` reproduces ORFfinder's 75. The default is unchanged.
+- Tests: `tests/test_orffinder_reference.py` (4).

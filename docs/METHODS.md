@@ -127,7 +127,11 @@ use 0-based inclusive `start <= stop` on the forward strand.
 | Genetic code | NCBI table 1 | tables 2, 4, 11 |
 
 - Defaults follow the conventions of NCBI ORFfinder (minimal length 75 nt,
-  ATG only, outermost start per stop). They are screening conventions:
+  ATG only, outermost start per stop), with one difference in counting:
+  ORFfinder's minimal length does not include the stop codon, Synapse's
+  does. Synapse therefore also reports ORFs of exactly 75 nt including the
+  stop (24 codons), which ORFfinder omits; `min_length=78` reproduces
+  ORFfinder's 75 nt exactly (comparison below). They are screening conventions:
   short ORFs, non-ATG starts and nested ORFs exist and can be enabled.
 - `LEGACY_ORF_SETTINGS` reproduces the pre-2026-10-29 behavior (10 nt,
   ATG/GTG/TTG, all starts, heuristic ranking); a test proves equivalence.
@@ -169,8 +173,19 @@ use 0-based inclusive `start <= stop` on the forward strand.
 - Validation: known-answer tests for frames, strands, coordinates and the
   table-2 read-through of TGA; for circles, an ORF across the origin on both
   strands and rotation invariance (the same ORFs for four origin positions of
-  a 900 bp circle); not compared against ORFfinder output (no ORFfinder
-  binary; its web service would need an external request).
+  a 900 bp circle).
+- Comparison with NCBI ORFfinder (web service, 2026-11-13,
+  `tests/test_orffinder_reference.py`): pUC19 L09137.2 entered as an
+  accession, genetic code 11, four settings (ATG only at 300, 150 and 75 nt;
+  ATG and the table-11 alternative starts at 75 nt). All 69 ORFs ORFfinder
+  reports are reported by Synapse with the same strand, start, stop, length
+  and partial status, including the alternative starts CTG, ATT, ATC and ATA
+  and two 3′-partial ORFs at the sequence end. With `min_length = L + 3`
+  the sets are identical; with `min_length = L` Synapse adds only ORFs of
+  exactly L nt (the counting difference above). The result table is stored
+  as `tests/fixtures/orffinder/pUC19_L09137.2_orffinder.json`. Not covered:
+  ORFs across the origin (ORFfinder's web form treats the sequence as
+  linear) and 5′-partial ORFs (none on pUC19 at these settings).
 - Organism mode (P1-9) is not implemented as a separate switch: the genetic
   code and the start-codon policy cover the cases (e.g. table 11 with
   `table_starts` for bacteria), and a preset would only bundle them.

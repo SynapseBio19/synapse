@@ -42,7 +42,7 @@ named.
 | P1-6 | File selection (FASTA/GenBank), topology, SHA-256 | IMPLEMENTED+TESTED | Own files load; hashes recorded in every result. |
 | P1-7 | BLAST: effective parameters, version, DB date, privacy notice, RID resume | PARTIAL | Reported parameters, database provenance and the privacy confirmation are implemented. RID resume is implemented (Phase 6, P1-7): `NCBIBlastClient.resume()`, a menu entry and `core.api.blast_resume()`, tested against a stubbed client rather than the live service. Phase 6: local BLAST+ runs are tested against the bundled `data/local_test` database and small `makeblastdb` databases (blastn, blastp), including the programmatic database-path entry (D6, S7). |
 | P1-8 | Literature: date formats, throttling, backoff, optional API key | IMPLEMENTED+TESTED | Fixtures for all date formats; retry test with a simulated HTTP 503 and `Retry-After`. |
-| P1-9 | ORF: genetic codes, start policy, organism mode, 5′-partial, circular | COMPLETE (not externally validated) | Genetic codes 1, 2, 4, 11 and the start policies; the initiator set follows the genetic code (D1, D2); the RNA codon view uses the ORF's code (2026-10-31). Since 2026-11-11 (`f020a1d`): ORFs across the origin of circular sequences and optional 5′-partial ORFs, with a rotation-invariance test. Organism mode is covered by genetic code plus start policy, without a separate switch. Open validation: no ORFfinder comparison (no native Windows build; needs WSL or Linux). |
+| P1-9 | ORF: genetic codes, start policy, organism mode, 5′-partial, circular | COMPLETE (not externally validated) | Genetic codes 1, 2, 4, 11 and the start policies; the initiator set follows the genetic code (D1, D2); the RNA codon view uses the ORF's code (2026-10-31). Since 2026-11-11 (`f020a1d`): ORFs across the origin of circular sequences and optional 5′-partial ORFs, with a rotation-invariance test. Organism mode is covered by genetic code plus start policy, without a separate switch. Compared with NCBI ORFfinder (web service, 2026-11-13): all 69 ORFfinder ORFs on pUC19 under code 11 and four settings identical, including alternative starts and 3′-partial ORFs; ORFfinder's minimal length excludes the stop codon (`tests/test_orffinder_reference.py`). Origin-spanning ORFs are not covered by that comparison. |
 | P1-10 | Mutation: CDS start/frame from ORF, frame warning, length warning | IMPLEMENTED+TESTED | CDS from the selected ORF (both strands), plausibility warnings, 2 kb note, "HGVS-like" labeling. |
 | P1-11 | `pyproject.toml`, Python version, Git, logging, README with methods | IMPLEMENTED+TESTED | Git history from a Stage 0 baseline; rotating log file; `docs/METHODS.md`. |
 | P1-12 | Reproducible analysis report | IMPLEMENTED+TESTED | Menu `[R]`; JSON (complete) and Markdown; input hash, parameters, versions, limitations; end-to-end menu test. |
@@ -79,7 +79,8 @@ recommended next steps:
    Done 2026-11-02 with primer3-py 2.4.0: 2,916 comparisons over Mg²⁺
    0-3 mM, max |ΔTm| 0.0032 °C (`docs/METHODS.md`).
 3. NEBcutter comparison for a circular plasmid digest (P1-4).
-4. ORFfinder comparison on reference sequences (P1-9).
+4. ~~ORFfinder comparison on reference sequences (P1-9).~~ Done
+   2026-11-13 with the ORFfinder web service on pUC19 (69 ORFs identical).
 5. ~~A systematic REBASE re-check of all enzyme entries (P0-4).~~ Done
    2026-11-13 against REBASE version 611 (`emboss_e.611`): 26 of 26
    definitions identical (`docs/METHODS.md`).

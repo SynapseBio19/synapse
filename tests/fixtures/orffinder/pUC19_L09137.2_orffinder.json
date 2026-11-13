@@ -1,0 +1,659 @@
+{
+ "source": "NCBI ORFfinder web service, https://www.ncbi.nlm.nih.gov/orffinder/",
+ "accessed": "2026-11-13",
+ "query": "L09137.2 (pUC19, entered as accession; ORFfinder retrieved the sequence itself)",
+ "settings": "genetic code 11; 'Ignore nested ORFs' unchecked; no subrange; minimal ORF length as named (the form's option labels in nt)",
+ "columns": "label, strand, frame, start, stop (1-based; stop > start on '+', start > stop on '-'; '>' marks an ORF without a stop before the sequence end), length nt | aa",
+ "note": "Copied from the ORFfinder result table; ORFfinder's length includes the stop codon, its minimal-length filter does not (see tests/test_orffinder_reference.py).",
+ "runs": {
+  "atg_only_min300": {
+   "start_codons": "'ATG' only",
+   "synapse_policy": "atg_only",
+   "minimal_length_nt": 300,
+   "orfs": [
+    {
+     "label": "ORF3",
+     "strand": "-",
+     "frame": 3,
+     "start": "2486",
+     "stop": "1626",
+     "length_nt": 861,
+     "length_aa": 286
+    },
+    {
+     "label": "ORF1",
+     "strand": "+",
+     "frame": 3,
+     "start": "186",
+     "stop": "542",
+     "length_nt": 357,
+     "length_aa": 118
+    },
+    {
+     "label": "ORF2",
+     "strand": "-",
+     "frame": 1,
+     "start": "469",
+     "stop": "146",
+     "length_nt": 324,
+     "length_aa": 107
+    }
+   ]
+  },
+  "atg_only_min150": {
+   "start_codons": "'ATG' only",
+   "synapse_policy": "atg_only",
+   "minimal_length_nt": 150,
+   "orfs": [
+    {
+     "label": "ORF7",
+     "strand": "-",
+     "frame": 3,
+     "start": "2486",
+     "stop": "1626",
+     "length_nt": 861,
+     "length_aa": 286
+    },
+    {
+     "label": "ORF5",
+     "strand": "+",
+     "frame": 3,
+     "start": "186",
+     "stop": "542",
+     "length_nt": 357,
+     "length_aa": 118
+    },
+    {
+     "label": "ORF6",
+     "strand": "-",
+     "frame": 1,
+     "start": "469",
+     "stop": "146",
+     "length_nt": 324,
+     "length_aa": 107
+    },
+    {
+     "label": "ORF2",
+     "strand": "+",
+     "frame": 1,
+     "start": "1756",
+     "stop": "2022",
+     "length_nt": 267,
+     "length_aa": 88
+    },
+    {
+     "label": "ORF4",
+     "strand": "+",
+     "frame": 2,
+     "start": "209",
+     "stop": "382",
+     "length_nt": 174,
+     "length_aa": 57
+    },
+    {
+     "label": "ORF3",
+     "strand": "+",
+     "frame": 1,
+     "start": "2029",
+     "stop": "2199",
+     "length_nt": 171,
+     "length_aa": 56
+    },
+    {
+     "label": "ORF1",
+     "strand": "+",
+     "frame": 1,
+     "start": "16",
+     "stop": "174",
+     "length_nt": 159,
+     "length_aa": 52
+    }
+   ]
+  },
+  "atg_only_min75": {
+   "start_codons": "'ATG' only",
+   "synapse_policy": "atg_only",
+   "minimal_length_nt": 75,
+   "orfs": [
+    {
+     "label": "ORF14",
+     "strand": "-",
+     "frame": 3,
+     "start": "2486",
+     "stop": "1626",
+     "length_nt": 861,
+     "length_aa": 286
+    },
+    {
+     "label": "ORF7",
+     "strand": "+",
+     "frame": 3,
+     "start": "186",
+     "stop": "542",
+     "length_nt": 357,
+     "length_aa": 118
+    },
+    {
+     "label": "ORF11",
+     "strand": "-",
+     "frame": 1,
+     "start": "469",
+     "stop": "146",
+     "length_nt": 324,
+     "length_aa": 107
+    },
+    {
+     "label": "ORF2",
+     "strand": "+",
+     "frame": 1,
+     "start": "1756",
+     "stop": "2022",
+     "length_nt": 267,
+     "length_aa": 88
+    },
+    {
+     "label": "ORF5",
+     "strand": "+",
+     "frame": 2,
+     "start": "209",
+     "stop": "382",
+     "length_nt": 174,
+     "length_aa": 57
+    },
+    {
+     "label": "ORF3",
+     "strand": "+",
+     "frame": 1,
+     "start": "2029",
+     "stop": "2199",
+     "length_nt": 171,
+     "length_aa": 56
+    },
+    {
+     "label": "ORF1",
+     "strand": "+",
+     "frame": 1,
+     "start": "16",
+     "stop": "174",
+     "length_nt": 159,
+     "length_aa": 52
+    },
+    {
+     "label": "ORF4",
+     "strand": "+",
+     "frame": 1,
+     "start": "2209",
+     "stop": "2358",
+     "length_nt": 150,
+     "length_aa": 49
+    },
+    {
+     "label": "ORF8",
+     "strand": "+",
+     "frame": 3,
+     "start": "558",
+     "stop": "707",
+     "length_nt": 150,
+     "length_aa": 49
+    },
+    {
+     "label": "ORF12",
+     "strand": "-",
+     "frame": 2,
+     "start": "1062",
+     "stop": "943",
+     "length_nt": 120,
+     "length_aa": 39
+    },
+    {
+     "label": "ORF13",
+     "strand": "-",
+     "frame": 2,
+     "start": "897",
+     "stop": "784",
+     "length_nt": 114,
+     "length_aa": 37
+    },
+    {
+     "label": "ORF10",
+     "strand": "-",
+     "frame": 1,
+     "start": "2389",
+     "stop": "2288",
+     "length_nt": 102,
+     "length_aa": 33
+    },
+    {
+     "label": "ORF6",
+     "strand": "+",
+     "frame": 2,
+     "start": "443",
+     "stop": "535",
+     "length_nt": 93,
+     "length_aa": 30
+    },
+    {
+     "label": "ORF15",
+     "strand": "-",
+     "frame": 3,
+     "start": "242",
+     "stop": "156",
+     "length_nt": 87,
+     "length_aa": 28
+    },
+    {
+     "label": "ORF9",
+     "strand": "+",
+     "frame": 3,
+     "start": "2472",
+     "stop": "2555",
+     "length_nt": 84,
+     "length_aa": 27
+    }
+   ]
+  },
+  "alternative_min75": {
+   "start_codons": "'ATG' and alternative initiation codons",
+   "synapse_policy": "atg_and_alternative",
+   "minimal_length_nt": 75,
+   "orfs": [
+    {
+     "label": "ORF40",
+     "strand": "-",
+     "frame": 3,
+     "start": "2486",
+     "stop": "1626",
+     "length_nt": 861,
+     "length_aa": 286
+    },
+    {
+     "label": "ORF15",
+     "strand": "+",
+     "frame": 2,
+     "start": "791",
+     "stop": "1192",
+     "length_nt": 402,
+     "length_aa": 133
+    },
+    {
+     "label": "ORF20",
+     "strand": "+",
+     "frame": 3,
+     "start": "165",
+     "stop": "542",
+     "length_nt": 378,
+     "length_aa": 125
+    },
+    {
+     "label": "ORF32",
+     "strand": "-",
+     "frame": 1,
+     "start": "469",
+     "stop": "146",
+     "length_nt": 324,
+     "length_aa": 107
+    },
+    {
+     "label": "ORF8",
+     "strand": "+",
+     "frame": 1,
+     "start": "1711",
+     "stop": "2022",
+     "length_nt": 312,
+     "length_aa": 103
+    },
+    {
+     "label": "ORF35",
+     "strand": "-",
+     "frame": 2,
+     "start": "1494",
+     "stop": "1201",
+     "length_nt": 294,
+     "length_aa": 97
+    },
+    {
+     "label": "ORF6",
+     "strand": "+",
+     "frame": 1,
+     "start": "1111",
+     "stop": "1374",
+     "length_nt": 264,
+     "length_aa": 87
+    },
+    {
+     "label": "ORF31",
+     "strand": "-",
+     "frame": 1,
+     "start": "952",
+     "stop": "701",
+     "length_nt": 252,
+     "length_aa": 83
+    },
+    {
+     "label": "ORF17",
+     "strand": "+",
+     "frame": 2,
+     "start": "1913",
+     "stop": "2155",
+     "length_nt": 243,
+     "length_aa": 80
+    },
+    {
+     "label": "ORF25",
+     "strand": "+",
+     "frame": 3,
+     "start": "2343",
+     "stop": "2555",
+     "length_nt": 213,
+     "length_aa": 70
+    },
+    {
+     "label": "ORF24",
+     "strand": "+",
+     "frame": 3,
+     "start": "1665",
+     "stop": "1874",
+     "length_nt": 210,
+     "length_aa": 69
+    },
+    {
+     "label": "ORF34",
+     "strand": "-",
+     "frame": 2,
+     "start": "2577",
+     "stop": "2383",
+     "length_nt": 195,
+     "length_aa": 64
+    },
+    {
+     "label": "ORF14",
+     "strand": "+",
+     "frame": 2,
+     "start": "581",
+     "stop": "766",
+     "length_nt": 186,
+     "length_aa": 61
+    },
+    {
+     "label": "ORF12",
+     "strand": "+",
+     "frame": 2,
+     "start": "209",
+     "stop": "382",
+     "length_nt": 174,
+     "length_aa": 57
+    },
+    {
+     "label": "ORF3",
+     "strand": "+",
+     "frame": 1,
+     "start": "643",
+     "stop": "813",
+     "length_nt": 171,
+     "length_aa": 56
+    },
+    {
+     "label": "ORF38",
+     "strand": "-",
+     "frame": 2,
+     "start": "420",
+     "stop": "250",
+     "length_nt": 171,
+     "length_aa": 56
+    },
+    {
+     "label": "ORF9",
+     "strand": "+",
+     "frame": 1,
+     "start": "2029",
+     "stop": "2199",
+     "length_nt": 171,
+     "length_aa": 56
+    },
+    {
+     "label": "ORF1",
+     "strand": "+",
+     "frame": 1,
+     "start": "13",
+     "stop": "174",
+     "length_nt": 162,
+     "length_aa": 53
+    },
+    {
+     "label": "ORF21",
+     "strand": "+",
+     "frame": 3,
+     "start": "546",
+     "stop": "707",
+     "length_nt": 162,
+     "length_aa": 53
+    },
+    {
+     "label": "ORF10",
+     "strand": "+",
+     "frame": 1,
+     "start": "2209",
+     "stop": "2358",
+     "length_nt": 150,
+     "length_aa": 49
+    },
+    {
+     "label": "ORF41",
+     "strand": "-",
+     "frame": 3,
+     "start": "1439",
+     "stop": "1296",
+     "length_nt": 144,
+     "length_aa": 47
+    },
+    {
+     "label": "ORF22",
+     "strand": "+",
+     "frame": 3,
+     "start": "924",
+     "stop": "1064",
+     "length_nt": 141,
+     "length_aa": 46
+    },
+    {
+     "label": "ORF30",
+     "strand": "-",
+     "frame": 1,
+     "start": "1219",
+     "stop": "1082",
+     "length_nt": 138,
+     "length_aa": 45
+    },
+    {
+     "label": "ORF29",
+     "strand": "-",
+     "frame": 1,
+     "start": "1852",
+     "stop": "1715",
+     "length_nt": 138,
+     "length_aa": 45
+    },
+    {
+     "label": "ORF37",
+     "strand": "-",
+     "frame": 2,
+     "start": "906",
+     "stop": "784",
+     "length_nt": 123,
+     "length_aa": 40
+    },
+    {
+     "label": "ORF28",
+     "strand": "-",
+     "frame": 1,
+     "start": "2263",
+     "stop": "2141",
+     "length_nt": 123,
+     "length_aa": 40
+    },
+    {
+     "label": "ORF36",
+     "strand": "-",
+     "frame": 2,
+     "start": "1062",
+     "stop": "943",
+     "length_nt": 120,
+     "length_aa": 39
+    },
+    {
+     "label": "ORF5",
+     "strand": "+",
+     "frame": 1,
+     "start": "982",
+     "stop": "1095",
+     "length_nt": 114,
+     "length_aa": 37
+    },
+    {
+     "label": "ORF11",
+     "strand": "+",
+     "frame": 2,
+     "start": "32",
+     "stop": "145",
+     "length_nt": 114,
+     "length_aa": 37
+    },
+    {
+     "label": "ORF18",
+     "strand": "+",
+     "frame": 2,
+     "start": "2171",
+     "stop": "2278",
+     "length_nt": 108,
+     "length_aa": 35
+    },
+    {
+     "label": "ORF16",
+     "strand": "+",
+     "frame": 2,
+     "start": "1361",
+     "stop": "1468",
+     "length_nt": 108,
+     "length_aa": 35
+    },
+    {
+     "label": "ORF44",
+     "strand": "-",
+     "frame": 3,
+     "start": "104",
+     "stop": ">3",
+     "length_nt": 102,
+     "length_aa": 33
+    },
+    {
+     "label": "ORF2",
+     "strand": "+",
+     "frame": 1,
+     "start": "241",
+     "stop": "342",
+     "length_nt": 102,
+     "length_aa": 33
+    },
+    {
+     "label": "ORF27",
+     "strand": "-",
+     "frame": 1,
+     "start": "2389",
+     "stop": "2288",
+     "length_nt": 102,
+     "length_aa": 33
+    },
+    {
+     "label": "ORF23",
+     "strand": "+",
+     "frame": 3,
+     "start": "1494",
+     "stop": "1586",
+     "length_nt": 93,
+     "length_aa": 30
+    },
+    {
+     "label": "ORF19",
+     "strand": "+",
+     "frame": 2,
+     "start": "2366",
+     "stop": "2458",
+     "length_nt": 93,
+     "length_aa": 30
+    },
+    {
+     "label": "ORF13",
+     "strand": "+",
+     "frame": 2,
+     "start": "443",
+     "stop": "535",
+     "length_nt": 93,
+     "length_aa": 30
+    },
+    {
+     "label": "ORF4",
+     "strand": "+",
+     "frame": 1,
+     "start": "856",
+     "stop": "948",
+     "length_nt": 93,
+     "length_aa": 30
+    },
+    {
+     "label": "ORF33",
+     "strand": "-",
+     "frame": 1,
+     "start": "91",
+     "stop": ">2",
+     "length_nt": 90,
+     "length_aa": 29
+    },
+    {
+     "label": "ORF7",
+     "strand": "+",
+     "frame": 1,
+     "start": "1429",
+     "stop": "1515",
+     "length_nt": 87,
+     "length_aa": 28
+    },
+    {
+     "label": "ORF42",
+     "strand": "-",
+     "frame": 3,
+     "start": "836",
+     "stop": "750",
+     "length_nt": 87,
+     "length_aa": 28
+    },
+    {
+     "label": "ORF43",
+     "strand": "-",
+     "frame": 3,
+     "start": "242",
+     "stop": "156",
+     "length_nt": 87,
+     "length_aa": 28
+    },
+    {
+     "label": "ORF39",
+     "strand": "-",
+     "frame": 2,
+     "start": "225",
+     "stop": "142",
+     "length_nt": 84,
+     "length_aa": 27
+    },
+    {
+     "label": "ORF26",
+     "strand": "-",
+     "frame": 1,
+     "start": "2614",
+     "stop": "2534",
+     "length_nt": 81,
+     "length_aa": 26
+    }
+   ]
+  }
+ }
+}

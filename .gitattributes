@@ -4,3 +4,6 @@ tests/fixtures/pUC19_L09137.2.fasta -whitespace -text
 
 # Verbatim bcftools 1.25 test vectors (SHA-256 checked in tests/test_bcftools_norm_reference.py).
 tests/fixtures/bcftools_norm/* -whitespace -text
+
+# ORFfinder result table stored verbatim as JSON (SHA-256 checked in tests/test_orffinder_reference.py).
+tests/fixtures/orffinder/* -text

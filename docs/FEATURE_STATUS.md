@@ -108,7 +108,7 @@ relative to its use (every session runs it).
 
 | Menu | Feature | Function | Implementation | Execution | Validation | Notes |
 |---|---|---|---|---|---|---|
-| 1 | ORF Discovery | `find_orfs`, `analyze_orfs`, `analyze_orfs_enhanced` | Implemented | Execution-tested | Independently validated (codes, coordinates) | Both strands, 3 frames each. |
+| 1 | ORF Discovery | `find_orfs`, `analyze_orfs`, `analyze_orfs_enhanced` | Implemented | Execution-tested | Independently validated (codes, coordinates; NCBI ORFfinder 2026-11-13) | Both strands, 3 frames each. All 69 ORFfinder ORFs on pUC19 (code 11, four settings) identical; ORFfinder's minimal length excludes the stop codon (`test_orffinder_reference`). |
 | 2 | ORF Candidates | `print_orf_candidates`, `print_orf_candidate_details` | Implemented | Reachable | Not applicable | |
 | 3 | Compare ORFs | `compare_orf_candidates`, `print_orf_comparison_table` | Implemented | Execution-tested | Not applicable | Rows carry `heuristic_score` and `heuristic_classification` (**D18 corrected 2026-11-02**). |
 | 4 | ORF Relationships | `analyze_orf_relationships` | Implemented | Execution-tested | Not applicable | Overlap/nesting by coordinates only, correctly disclaimed. |
@@ -489,7 +489,6 @@ explicitly not implemented.
 
 | Validation | Blocker | Route |
 |---|---|---|
-| ORFfinder comparison | No local binary | NCBI ORFfinder standalone, or a curated RefSeq CDS set |
 | NEBcutter comparison | Web service | Substantively superseded by validation 2 |
 | Live remote NCBI BLAST | Not run by choice | One confirmed run recording RID and provenance |
 | Local BLAST on a real database | `nt` is ~100 GB+ | `swissprot` (~0.5 GB) as a proportionate step |

@@ -31,6 +31,7 @@ under 3.14.6 skips only the benchmark.
 
 | Resource | Version | Source | Obtained | Licence | Checksum | Used by |
 |---|---|---|---|---|---|---|
+| NCBI ORFfinder result tables (4 runs, 69 ORFs) | ORFfinder web service as of 2026-11-13 (no version shown on the page) | <https://www.ncbi.nlm.nih.gov/orffinder/>, query L09137.2, code 11 | 2026-11-13 (live, built-in browser) | US government work (NCBI), public | SHA-256 `2053f818059ad16849b2444aceaa7b9f21cf18b0bacb6337f6176cdacf599e11` of `tests/fixtures/orffinder/pUC19_L09137.2_orffinder.json` | `tests/test_orffinder_reference.py` |
 | bcftools `norm` test vectors (10 files) | bcftools 1.25 (tag `1.25`, released 2026-10-27) | <https://github.com/samtools/bcftools/tree/1.25/test> | 2026-11-13 | MIT/Expat (bcftools dual licence MIT/Expat or GPL) | SHA-256 per file in `tests/fixtures/bcftools_norm/SOURCE.md`, checked by the test | `tests/test_bcftools_norm_reference.py` |
 
 ## Python packages (project `.venv`, from PyPI)
