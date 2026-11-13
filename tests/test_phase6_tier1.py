@@ -374,7 +374,7 @@ class CloningCircularTopologyTests(unittest.TestCase):
         import contextlib
         import io
         from unittest import mock
-        from analyses import cloning as C, restriction as R
+        from analyses import cloning as C
         real_planner = C.automatic_cloning_planner
 
         def two_enzyme_planner(vector, insert, **kwargs):

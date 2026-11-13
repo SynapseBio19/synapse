@@ -2,7 +2,6 @@ import math
 from itertools import product
 
 from data.genetic_code import CODON_TABLE
-from data.amino_acids import AMINO_ACIDS
 
 
 # ============================================================

@@ -214,10 +214,7 @@ def print_rna_report(
         except (TypeError, ValueError):
             input_name = str(rank)
 
-        print(
-            f"Input source:        "
-            f"Selected ORF"
-        )
+        style.field('Input source', "Selected ORF")
 
         style.field('Input', f"{input_name}")
 

@@ -61,7 +61,7 @@ from ui.literature_menu import main as literature_main
 
 from ui.report import print_pipeline_status, print_results
 from ui.menu import select_gene, show_menu
-from ui.style import major_rule, minor_rule
+from ui.style import major_rule
 from ui import style
 
 

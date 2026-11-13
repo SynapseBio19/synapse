@@ -2,9 +2,8 @@ from analyses.sequence import (
     calculate_gc_content_profile,
     calculate_complexity_profile,
     calculate_profile_statistics,
-    calculate_average_dna_molecular_weight,
 )
-from ui.style import major_rule, minor_rule
+from ui.style import major_rule
 from ui import style
 
 

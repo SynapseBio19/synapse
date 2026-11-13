@@ -84,7 +84,6 @@ class TypeIISSiteTests(unittest.TestCase):
         import contextlib
         import io
         from unittest import mock
-        from analyses import restriction as R
         answers = iter(["BsaI", "", ""])
         buffer = io.StringIO()
         with mock.patch.object(builtins, "input", lambda prompt="": next(answers)),                 contextlib.redirect_stdout(buffer):

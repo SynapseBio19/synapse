@@ -57,7 +57,7 @@ from typing import (
     Set,
     Tuple,
 )
-from core.textformat import columns, field_line, major_rule, minor_rule
+from core.textformat import field_line, major_rule, minor_rule
 
 
 # ============================================================================

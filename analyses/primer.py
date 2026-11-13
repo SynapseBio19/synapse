@@ -1248,8 +1248,6 @@ if __name__ == "__main__":
 # ============================================================================
 
 from dataclasses import dataclass, field
-from math import exp, log, log10
-from typing import Literal, Optional, Sequence, overload
 
 
 # ============================================================================
@@ -3914,8 +3912,6 @@ def primer_pair_binding_sites(pair, three_prime_window: int = 5) -> list[dict]:
 # - Existing legacy generate_primer_candidates() behavior is untouched.
 # ============================================================================
 
-from dataclasses import replace as _dataclass_replace
-from collections import Counter as _Counter
 
 
 # Superseded definition of generate_professional_primer_candidates() removed in Stage 4 (never reachable;

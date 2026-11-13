@@ -314,7 +314,6 @@ class BlastQueryTypeInferenceTests(unittest.TestCase):
 
     def test_menu_asks_for_an_undetermined_type(self):
         from unittest import mock
-        from analyses import blast as B
         with mock.patch("builtins.input", return_value="2"), mock.patch("builtins.print"):
             self.assertEqual(blast_menu._query_type_for_menu(IUPAC_LETTER_PEPTIDE, None), "PROTEIN")
         with mock.patch("builtins.input", return_value="0"), mock.patch("builtins.print"):

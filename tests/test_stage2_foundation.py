@@ -128,14 +128,12 @@ class PipelineStoreTests(unittest.TestCase):
 
     def test_primer_store_path(self):
         from core.pipeline import SynapsePipeline
-        from analyses import primer as P
         pipeline = SynapsePipeline("ACGT" * 50, "test")
         primer_menu._primer_ui_store_result(pipeline, object())
         self.assertIsNotNone(pipeline.latest("primer"))
 
     def test_mutation_and_variant_store_paths(self):
         from core.pipeline import SynapsePipeline
-        from analyses import mutation as M, variant_analysis as V
         pipeline = SynapsePipeline("ACGT" * 50, "test")
         mutation_menu._store_pipeline_result(pipeline, "mutation", {"a": 1})
         variant_analysis_menu._store_variant_pipeline_result(pipeline, "variant", {"b": 2})

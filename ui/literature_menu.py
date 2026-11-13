@@ -32,7 +32,7 @@ def print_results(run: LiteratureSearchRun, limit: int = 10) -> None:
 
     style.field('Sources', f"{', '.join(run.query.sources)}")
 
-    print(f"Retrieved before deduplication: {run.total_results_before_deduplication}")
+    style.field('Retrieved before deduplication', f"{run.total_results_before_deduplication}")
 
     style.field('Unique articles', f"{len(run.articles)}")
 

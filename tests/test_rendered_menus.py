@@ -20,7 +20,6 @@ import functools
 import io
 import logging
 import os
-import re
 import sys
 import tempfile
 import unittest
@@ -151,7 +150,7 @@ def _orf_settings():
 @functools.lru_cache(maxsize=None)
 def scenarios():
     """Run every scenario once; the tests below read the recorded sessions."""
-    from analyses import blast, cloning, crispr, mutation, orf, primer, restriction
+    from analyses import blast, orf
     from core.models import SequenceRecord
     import main
     from ui import menu as ui_menu
@@ -690,7 +689,7 @@ class MissingFileTests(unittest.TestCase):
                 self.assertIn(text, str(raised.exception))
 
     def test_menus_report_the_missing_file_and_continue(self):
-        from analyses import blast, crispr, variant_analysis
+        from analyses import blast
         manager = blast.LocalBlastDatabaseManager(str(PROJECT_ROOT / "no_such_dir"))
         cases = [
             ("variant", ["1", self.MISSING, "0"], variant_analysis_menu.run_variant_analysis_ui,

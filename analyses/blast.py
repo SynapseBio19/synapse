@@ -83,7 +83,7 @@ from core.alphabets import (
     classify_sequence,
     declared_type_from_molecule,
 )
-from core.textformat import header_text, columns, field_line, major_rule, minor_rule
+from core.textformat import header_text, field_line, major_rule, minor_rule
 
 
 # ============================================================================

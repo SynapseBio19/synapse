@@ -895,7 +895,6 @@ class BlastResumeTests(unittest.TestCase):
 
     def test_the_menu_offers_the_entry(self):
         import inspect
-        from analyses import blast as B
         source = inspect.getsource(blast_menu.blast_menu)
         self.assertIn("Resume Search by Request ID", source)
         self.assertIn('choice == "2"', source)
@@ -1148,7 +1147,6 @@ class OutputNotationTests(unittest.TestCase):
         import contextlib
         import io
         from unittest import mock
-        from analyses import primer as P
         sequence = "A" * 200
         cases = {("11", "60"): (10, 60), ("", ""): (0, 200), ("1", "200"): (0, 200),
                  ("0", "60"): None, ("61", "60"): None, ("1", "201"): None}

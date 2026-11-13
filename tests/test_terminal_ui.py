@@ -629,7 +629,6 @@ class EmptyAnswerTests(unittest.TestCase):
 
     def test_literature_search_accepts_enter_for_every_option(self):
         from unittest import mock
-        from analyses import literature
         seen = []
 
         def stub(query):
@@ -648,7 +647,6 @@ class EmptyAnswerTests(unittest.TestCase):
         self.assertEqual(query.sort_by, "relevance")
 
     def test_primer_conditions_accept_enter_for_the_defaults(self):
-        from analyses import primer
         result = []
         self._run(["", "", "", ""], lambda: result.append(primer_menu._primer_ui_read_conditions()))
         conditions = result[0]
@@ -658,7 +656,6 @@ class EmptyAnswerTests(unittest.TestCase):
 
     def test_cloning_planner_accepts_enter_for_the_strategy_count(self):
         from unittest import mock
-        from analyses import cloning
         seen = []
 
         def stub(*args, **kwargs):
@@ -672,7 +669,6 @@ class EmptyAnswerTests(unittest.TestCase):
 
     def test_primer_tm_model_accepts_enter_for_nearest_neighbor(self):
         """"Selection [1]" took Enter as model 1 before Stage F; the rewrite had lost that key."""
-        from analyses import primer
         result = []
         self._run([""], lambda: result.append(primer_menu._primer_ui_select_tm_model()))
         self.assertEqual(result, ["nearest_neighbor"])

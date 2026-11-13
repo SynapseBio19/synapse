@@ -151,7 +151,6 @@ class OrfOptionsReachTheResultsTests(unittest.TestCase):
         import contextlib
         import io
         from unittest import mock
-        from analyses import orf as O
         answers = iter(["5", "5", "5", "0"])
         settings = {"min_length": 75, "start_codon_policy": "atg_only", "nested": False,
                     "ranking": "length", "include_partial": True, "genetic_code": 1}

@@ -40,7 +40,7 @@ import math
 import re
 import statistics
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Set, Tuple
-from core.textformat import columns, field_line, major_rule, minor_rule
+from core.textformat import field_line, major_rule, minor_rule
 
 
 # ============================================================================

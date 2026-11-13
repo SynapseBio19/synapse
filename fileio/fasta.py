@@ -1,4 +1,3 @@
-import os
 
 
 def load_fasta(filename):

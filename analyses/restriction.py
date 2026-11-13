@@ -6,7 +6,6 @@ from data.restriction_enzymes import (
     RESTRICTION_ENZYMES,
     get_restriction_enzyme,
     get_type_iis_enzyme,
-    TYPE_IIS_ENZYMES,
 )
 
 

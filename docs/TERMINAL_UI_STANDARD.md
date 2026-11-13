@@ -316,10 +316,12 @@ What remains outside the shared renderers, each for a stated reason:
 - **Prompts of the converted option lists** keep their own label
   (`Database:`, `Program:`, `Record number:`), not `Selection:`; changing
   them was not part of recommendation 2.
-- **Not yet covered by a rule**: about 20 hand-padded label lines
-  (e.g. "Retrieved before deduplication: 0", "Input source:        Selected
-  ORF"), the "RESULT:" lines of the module self-tests when a module is run
-  as a script, and status lines such as "Loaded 2 FASTA record(s).".
+- **Not yet covered by a rule**: the "RESULT:" lines of the module
+  self-tests when a module is run as a script, and plain status lines such
+  as "Loaded 2 FASTA record(s).".
+  Resolved on 2026-11-13: the last two hand-padded label lines
+  ("Retrieved before deduplication", the RNA "Input source") are drawn
+  with `style.field()`; a search on 2026-11-13 found no other.
   Resolved on 2026-11-12: the literature limitation line is a NOTE; the
   BLAST hit selector accepts only the listed numbers and answers any other
   input with "Invalid selection." (it answered 2 of 1 with "ERROR: list
