@@ -1,476 +1,404 @@
 # Phase 6 final report
 
-Project Synapse, Phase 6 (2026-10-30 to 2026-11-02). Working copy
+Project Synapse, Phase 6, 2026-10-30 to 2026-11-13. Working copy
 `Project Snyapse - Kopie`; the original project was not modified.
-Governing specification: the integrated Phase 6 Master Prompt. Work by
-Claude Opus 5 and Claude Opus 5.5. 58 of the 63 Phase 6 commits carry a
-model attribution; the first five (`824ca5f`, `d4544ad`, `5c098e3`,
-`47146b0`, `7334296`) carry none.
+Governing specification: the Phase 6 Master Prompt (authoritative over
+every report). Work by Claude Opus 5 and Claude Opus 5.5.
 
-Corrected on 2026-11-02 after the closing review
-(`docs/PHASE6_INDEPENDENT_REVIEW.md`): figures in sections A and G, the
-evidence wording for the IG weight and the Python 3.10 finding, and
-the open items in section J.
+This report replaces the version of 2026-11-02/03 (in the Git history at
+`12949f3`), which a later review found to overstate completion and which
+the completion run of 2026-11-11 to 2026-11-13 superseded. Status labels:
+**COMPLETE**, **PARTIALLY COMPLETE**, **UNVERIFIED**, **BLOCKED**. The word
+COMPLETE is used for a requirement only when everything it demands is done
+and checked.
 
-The detailed records behind this report are `docs/PHASE6_INITIAL_AUDIT.md`
-(the findings), `docs/PHASE6_PROGRESS.md` (one row per work package, with
-commit and evidence), `docs/CHANGES.md` (every change with before, after
-and reason), `docs/FEATURE_STATUS.md` (every feature), `docs/METHODS.md`
-(methods, defaults, validation) and `docs/PHASE6_HANDOVER.md` (the
-execution history, including pauses and a restricted assignment).
+Detailed records: `docs/PHASE6_INITIAL_AUDIT.md` (findings D1-D19, S1-S24),
+`docs/PHASE6_PROGRESS.md` (one row per work package), `docs/CHANGES.md`
+(every change with before, after and reason), `docs/FEATURE_STATUS.md`
+(every feature), `docs/AUDIT_STATUS.md` (every audit recommendation),
+`docs/METHODS.md` (methods and validation), `docs/TEST_COVERAGE.md`,
+`docs/TOOL_AND_DATA_LEDGER.md`, `docs/PHASE6_CONTINUATION.md`.
 
 ---
 
 ## A. Executive summary
 
-**Outcome.** The Phase 6 audit recorded 19 confirmed defects (D1-D19)
-and, as the work went on, 24 suspected or unverified concerns (S1-S24).
-All 19 defects are corrected, and every S item is assessed. Most
-confirmed ones are corrected; S9 (alignment memory) is quantified and
-documented but not corrected, S14 is resolved for the API while the
-menus remain in the modules (P2-2), and S5 is addressed by naming and
-sourcing the rule. Two were shown not to be defects, one (S24) is
-measured with its residual risk documented, and one (S11) is blocked on
-the owner's approval for external requests. Stages F (terminal
-interface), G (scientific output), H (language and documentation) and
-I (final verification) are complete. Three further defects that no
-earlier test had caught were found and corrected (section B, items
-25-27): the primer coordinates in Stage G, the IG weight and the
-Python 3.10 blocker in Stage I.
+**Outcome.** Synapse is a coherent terminal application whose science no
+longer depends on its interface. Every analysis runs through `core.api`
+with `ui` unimportable; the eleven module dialogs live in `ui/` and share
+one renderer. The defects confirmed during Phase 6 (D1-D25, the IG
+instability weight and the Stage F faults: the single-enzyme crash, two
+Enter regressions, the BLAST hit selector and query-type question) are
+corrected, each with a regression test. The Master Prompt's open scientific items
+(P1-9, P2-2, P2-4, P2-6, P2-7) are done; the 10 kb performance target is
+met for every module.
 
-**Main improvements.**
+**Readiness.** Research and teaching software. Its calculations agree with
+established implementations where compared (Biopython, primer3-py,
+REBASE, NCBI BLAST); none of its results is experimentally validated.
 
-- Scientific: initiator codons, ORF translation and start-codon scoring
-  follow the genetic code; restriction, cloning and the circular map
-  honor topology and ignore ambiguous sites; CRISPR guides report a
-  modeled cut site with its source and no longer count their own site as
-  an off-target; the instability index uses the reference dipeptide
-  weights; heuristic scores are no longer called "confidence".
-- Input: a central sequence-type layer (`core/alphabets.py`) classifies
-  every record as DNA, RNA or protein with an evidence level and asks the
-  user when the letters cannot decide, instead of loading a peptide as
-  DNA.
-- Architecture: one input contract for menu and API; `core/api.py`
-  covers every analysis without keyboard input; one shared presentation
-  module (`ui/style.py`); the superseded primer generations are gone.
-- Interface and language: Stage F first standardized the rules, the `[0]`
-  meanings and the message prefixes only (partial standardization). The
-  two completion rounds then put all sixteen interface files on the
-  shared renderers in `ui/style.py`. The closing review
-  (`docs/STAGE_F_FINAL_REVIEW.md`) still found 59 direct prints: 31
-  messages, 19 headings and 9 dynamic option lists. It also found that
-  rendered tests reach 17 of the 38 menus, and that the behavior of the
-  converted dialogs was not preserved until `1516339`: Enter on
-  bracketed prompts returned the hint. Recommendations 1-3 of that
-  review then converted the 59 prints, plus 13 more messages found on
-  the way, and added a rule that catches them
-  (`docs/STAGE_F_FINAL_REVIEW.md` §9). Recommendations 4 and 5 then
-  removed core's dependency on `ui` (core hands the status to a
-  renderer; a test runs core with `ui` refused) and rendered all 47
-  menus with their invalid input, cancel, error states and results
-  (§10). That found the single-enzyme cloning crash present since the
-  audit, and a second Enter regression. The analyses still import
-  `ui` because their menus live in them (P2-2). One message prefix per category, one
-  notation per unit, 1-based positions everywhere a user sees them, and a
-  style guide whose mechanical rules the test suite enforces.
-- Evidence: 356 tests (109 at the end of the previous cycle), including
-  external reference comparisons with Biopython 1.88 and primer3-py
-  2.4.0, BLAST+ 2.17.0 executions, and cross-module workflow tests.
+**Main improvements of the final run (2026-11-11 to 2026-11-13).**
+- Primer design at 10 kb: 135.6 s -> 9.6 s CPU time, identical results.
+- Primers designed around a chosen restriction site (workflow 10.2).
+- Menus out of the analysis modules (P2-2), 55 screens byte-identical.
+- Type IIS enzymes; circular and 5'-partial ORFs; HGVS-style notation;
+  variant cross-check of primers and guides in the menus.
+- Six further defects (D20-D25), among them a structural penalty that
+  never applied, a primer risk assessment missing from every export, and
+  a network error that lost a submitted BLAST search.
+- Suite on Python 3.10.11 and 3.14.6; coverage measured (71 %); every
+  enzyme definition checked against REBASE itself; live checks of BLAST
+  and the literature providers.
 
-**Actual readiness.** Synapse is a coherent, transparent research and
-teaching workbench whose calculations agree with established reference
-implementations wherever a comparison was possible. It is **not**
-experimentally validated, has not been run on a Python 3.10
-interpreter, and several modules remain heuristic by design (guide
-ranking, primer structure screens, signal-peptide and transmembrane
-screens). It should be used where its stated limitations are acceptable
-and its results checked with established tools before experimental
-decisions.
+**Verdict.** Phase 6 is **not declared COMPLETE**. All safely executable
+work is done and verified. Open are: 10 items **BLOCKED** (they need the
+owner's approval, system-wide tools, very large data, a licensed data
+file or a specification), 7 **PARTIALLY COMPLETE** items with a recorded
+reason, and 3 **UNVERIFIED** validations (section J, Appendix 1).
 
-**Important remaining risks.** No run on the minimum supported Python
-(only a static check); no live test of the four literature services or
-of a remote NCBI BLAST run; enzyme definitions checked against
-Biopython's REBASE data but not systematically against REBASE itself;
-the mutation alignment needs ~4.5 GB for two 10-kb sequences; the
-analysis menus still live inside the analysis modules.
+**Important remaining risks.**
+- No experimental validation; heuristics (primer structure severity,
+  guide ranking, hairpin screen) are labeled but remain heuristics.
+- Variant normalization is not compared with `bcftools norm`, ORF calls
+  not with ORFfinder.
+- Remote services (NCBI, literature providers) can change; the live checks
+  are snapshots of 2026-11-12/13.
+- Dialogs behind files and network (exports, downloads) are rendered but
+  only partly driven (ui line coverage 53 %).
 
 ---
 
 ## B. Scientific improvements
 
-Every row: previous behavior -> corrected behavior. The reasoning,
-references and test names are in `docs/CHANGES.md` under the ID. Levels:
-**R** external reference comparison, **X** external tool execution,
-**K** known-answer test, **I** internal test only.
+The P0 defects of the previous cycle (1-9) were re-inspected and keep 22
+known-answer tests (`tests/test_p0_regressions.py`). Phase 6 corrections:
 
-| # | ID | Module | Previous | Corrected | Evidence |
-|---|---|---|---|---|---|
-| 1 | D1 | ORF | Initiator Met for any GTG/TTG start, whatever the code | Met only for initiation codons of the ORF's genetic code | R (Biopython, tables 1/2/4/11) |
-| 2 | D2 | ORF, protein, API | Translation fell back to table 1 | Each ORF is translated with its own table; a conflicting table is an error | R, K |
-| 3 | D3 | Restriction | Map and sites ignored circular topology | Origin-spanning sites found in every site-based result | R (pUC19, 132/132) |
-| 4 | D4 | Cloning | Ambiguous (POSSIBLE) sites could define cloning ends | One shared matcher; only CONFIRMED sites define ends | K, R |
-| 5 | D5 | Cloning | No circular support for vector or insert | Topology of both molecules honored | K |
-| 6 | D6, S7 | BLAST | Local database by path always failed; provenance empty | Path prefix scanned; title/date/count via `blastdbcmd -info` | X (BLAST+ 2.17.0) |
-| 7 | D7 | BLAST | A scientifically wrong result file shipped unlabeled | Labeled as a legacy record (deletion is the owner's decision) | I |
-| 8 | D8 | CRISPR | No cut site anywhere | Modeled cut per system, with citation, in model, display and exports | K (cited conventions) |
-| 9 | D9 | CRISPR | The guide's own site counted as an off-target | On-target excluded from the local specificity screen | K |
-| 10 | D10 | CRISPR | Five configuration fields were never read | Each field acts; defaults keep previous results | I |
-| 11 | D12 | Variant | Contig-name mismatch skipped variants silently | Flagged; opt-in `chr` prefix matching | K |
-| 12 | D13, D14 | Input, all modules | A peptide whose letters are all IUPAC nucleotide codes loaded as DNA; two `normalize_dna` contracts | Central classifier with evidence levels; declared type from GenBank/FASTA; the user declares undecidable records; one input contract | R (`Bio.Data.IUPACData`), X (blastp) |
-| 13 | D14-F6 | Protein | B/Z/J/X/U/O lost or shifted | Every position kept; masses and ranges defined | R |
-| 14 | D18 | ORF, protein, cloning, primer, classifier | Heuristic scores and type outcomes called "confidence" | `heuristic_score`, `evidence`; golden key renamed with values proven identical | I (golden master) |
-| 15 | S3 | CRISPR prime editing | `edit_in_rtt` checked only the RTT length | Checks that the RTT contains the edit | K |
-| 16 | S4, S5 | CRISPR | Thresholds uncited; poly-T flag unexplained | Sourced or labeled Synapse conventions; Pol III/U6 consideration named and cited | literature |
-| 17 | S15, S16 | Variant | Variant-to-mutation bridge never worked; REF_MISMATCH leaked into input | Bridge works; flag kept in the result | K |
-| 18 | S17 | Cloning | Digest cut at the site start | Cut at the enzyme's top-strand cut | K, R |
-| 19 | S19 | ORF | Start classification and scores used a fixed ATG/GTG/TTG set | Initiation codons of the genetic code | K |
-| 20 | S20, S22 | BLAST, variant | J/U/O refused; any reference alphabet accepted | J/U/O accepted for protein; the variant reference must be DNA | X, K |
-| 21 | S21, S10, S8 | GenBank, report | ORIGIN, unsupported locations and failing serialization dropped data silently | Each loss is reported in a note or the log | K |
-| 22 | S23 | CRISPR | Seed always taken at the guide's 3' end, which is PAM-distal for Cas12a (5' PAM) | PAM-proximal seed for 3'- and 5'-PAM systems | K |
-| 23 | S9 | Mutation | Memory cost of the alignment unstated | Measured (~45 bytes per cell) and stated in the note | measurement |
-| 24 | P2-5 | Sequence overview | "Complexity" not defined | Defined as normalized composition entropy with its limit (repeats score 1.0) | K |
-| 25 | IG weight | Protein | Instability weight for IG was -7.49 | 1.0, the value in Biopython's table (`ProtParamData.DIWV`, which cites Guruprasad et al. 1990); the paper's table was not consulted | R (Biopython ProtParam, 31 proteins; one secondary source) |
-| 26 | Py 3.10 | CRISPR | `f"{'#':>3}"` made the module unimportable on 3.10/3.11 | Literal header, same output | static 3.10 check; the import failure follows from the pre-3.12 grammar and was not observed on a 3.10 interpreter |
-| 27 | Primer coordinates | Primer menu | Positions printed 0-based half-open unlabeled; target read half-open | 1-based inclusive in display and input; API unchanged | K |
+| Item | Module | Previous behavior | Corrected behavior | Reference / reasoning | Test evidence | Independent validation |
+|---|---|---|---|---|---|---|
+| D1 | ORF/protein | Initiator Met for GTG/TTG under any code | Only initiation codons of the selected NCBI table | NCBI genetic codes | tier 1 tests | Biopython translation |
+| D2 | ORF/protein/RNA | Translation fell back to table 1 | ORF carries its own code | NCBI tables | tier 1 | Biopython |
+| D3, D5 | Restriction/cloning | Circular topology ignored | Origin-spanning sites, circular vector/insert | – | tier 1 | Biopython digests, pUC19 |
+| D4, P0-5 | Restriction/cloning | Ambiguous sites could cut / define ends | Only CONFIRMED sites cut | IUPAC | tier 1 | – |
+| D8-D10, S23, S3-S5 | CRISPR | No cut site; own site counted as off-target; config ignored; Cas12a seed wrong | Modeled cut with source; own site excluded; config honored; PAM-proximal seed | Cas9/Cas12a literature (METHODS) | tier 1/2 | – |
+| D12 | Variants | Contig mismatch skipped silently | Flagged | VCF 4.x | tier 1 | – |
+| D13/D14 | Input | Peptide in IUPAC letters loaded as DNA | Classifier with evidence levels; user declares ambiguous records | IUPAC | sequence-type tests | Biopython IUPAC sets |
+| D14-F6 | Protein | B/Z/J/X/U/O lost or shifted | Kept in place | – | stage 5 tests | ProtParam (31 proteins) |
+| D16 | Primer | Shadowed generations | Removed after reachability review, bytecode-identical survivors | – | stage 4 | – |
+| D18 | All | Heuristic scores called "confidence" | `heuristic_score`, evidence levels | – | golden (documented change) | – |
+| S15-S19 | Variants/cloning/ORF | Bridge broken; digest cut at site start; fixed start set | Fixed | – | tier 2 | – |
+| IG weight | Protein | Instability weight IG −7.49 | 1.0 | Biopython DIWV (secondary source) | reference test | Biopython |
+| P1-9 | ORF | No origin-spanning or 5'-partial ORFs | Both, with rotation invariance | ORFfinder conventions | `test_orf_partial_circular` | not compared with ORFfinder |
+| P2-5 | RNA | G·U pairs ignored | Counted separately | – | `test_rna_wobble` | – |
+| P2-7 | Restriction | No Type IIS; forward strand only | BsaI, BsmBI, BbsI, SapI on both strands | REBASE | `test_type_iis` | Biopython 140 cuts; REBASE 611 |
+| HGVS | Mutation | `p.R2C`, "Ter" in one-letter code | `p.(R2C)`, `p.(W24*)`, `p.(M1?)`, `p.(*110Qext*?)` | den Dunnen et al. 2016 | `test_hgvs_notation` | no HGVS validator |
+| D20 | Primer | Structural penalty of the candidate screen always 0 (read missing fields) | Stems read from the candidate | documented intent of the screen | `test_primer_corrections` | – |
+| D21 | Primer | `nearest-neighbor` passed validation, then crashed | One alias set | – | same | – |
+| D22 | Mutation | ORF without sequence -> AttributeError | MutationAnalysisError | – | stage 3 test | – |
+| D23 | Primer export | Pair risk flags and warnings never exported | Dataclass fields | Master Prompt 6.4 | export test | – |
+| D24 | BLAST | Text export and query file written with CR CR LF | Written as built | – | export test | – |
+| D25 | BLAST | One network error during polling lost a submitted search and its RID | Bounded retries; RID in the error | found in a live search | `test_blast_polling` | live search succeeded afterwards |
 
-Independent scientific validation (experiments, curated benchmarks)
-exists for none of these; see section K.
+Validation against external references (all reproducible from the suite
+unless noted): enzyme definitions 26/26 against REBASE 611 (2026-11-13,
+one-off) and against Biopython 1.88; 132 pUC19 digests and 132
+pseudo-random digests, 0 differences; end compatibility 484/484; primer Tm
+against primer3-py 2.4.0, 2,916 conditions, max |ΔTm| 0.0032 °C; primer
+structure screens vs primer3-py ΔG (ρ −0.78/−0.74/−0.51, heuristic);
+protein descriptors vs ProtParam (31 proteins) and ExPASy (ubiquitin);
+genetic codes vs Biopython; Primer3 manual worked example.
 
 ---
 
 ## C. Functional completeness
 
-`docs/FEATURE_STATUS.md` is the complete inventory: every module, menu,
-submenu, function and capability with an implementation status, a test
-status and a validation status, updated to the end of Phase 6.
-
-- **Implemented and accounted for**: all eleven main-menu modules and the
-  session functions (`[P]`, `[R]`, `[S]`). No original feature was lost.
-- **Corrected**: the rows in section B.
-- **Implemented in Phase 6**: CRISPR cut sites; CRISPR configuration
-  fields; on-target exclusion; RID resume (`NCBIBlastClient.resume`,
-  BLAST menu `[2]`, `core.api.blast_resume`); API entry points for
-  cloning, variant filtering, mutation reports, BLAST and literature;
-  protein-record route; sequence-type declaration.
-- **Tested**: every module is execution-tested; the DNA-to-protein,
-  restriction-and-primer, CRISPR, variant and reporting workflows are
-  integration-tested (section H).
-- **Independently compared**: genetic codes, translation, protein
-  descriptors, enzyme definitions, digests, the circular map, end
-  compatibility, Tm, local BLAST.
-- **Not implemented, stated as such**: the experiment planner (the menu
-  says so), 5'-partial and origin-spanning ORFs, Type IIS enzymes, CFD
-  scoring, genome-wide off-target search, restriction-site-driven primer
-  design, an organism mode for ORF search.
+- **Inventory.** `docs/FEATURE_STATUS.md` lists every module, menu entry,
+  function group and export with implementation, execution, integration
+  and validation status. Every feature of the initial inventory is still
+  present; none disappeared.
+- **Implemented in Phase 6.** Type IIS digests; circular and 5'-partial
+  ORFs; primers around a restriction site with diagnostic digest; variant
+  check in primer and CRISPR menus; BLAST RID resume; API entry points for
+  every analysis; G·U hairpin count; pipeline parameters for every stored
+  result.
+- **Corrected.** D1-D25 and the Stage F faults (single-enzyme crash, Enter
+  regressions, BLAST hit selector, BLAST query-type question).
+- **Tested.** Every menu is rendered and driven (rendered scenarios); the
+  protein and RNA views, the export functions and the variant helpers are
+  executed with output checks (`test_execution_coverage`).
+- **Independently validated.** Restriction definitions and digests,
+  primer Tm, protein descriptors, genetic codes (section B).
+- **Limitations.** AI Experiment Planner not implemented (labeled);
+  off-target search only in supplied sequences; no CFD score; no Golden
+  Gate planning; remote BLAST without `core_nt`.
 
 ---
 
 ## D. Architecture
 
-**Before Phase 6.** Analysis modules combined science and menus; each
-module checked its own input with its own rules (two `normalize_dna`
-functions with different contracts); no layer decided what kind of
-sequence a record was; the primer module carried generations of
-superseded definitions behind shadowing aliases; the API lacked several
-analyses; each module drew its own screens.
-
-**After Phase 6.**
-
-| Component | Role |
-|---|---|
-| `core/alphabets.py` (new) | Alphabets, normalization and the DNA/RNA/protein classifier with evidence levels. One contract for every entry point. |
-| `core/models.py` | `SequenceRecord` carries declared type, molecule type and the classification; `AnalysisResult` lifts a payload's warnings into its summary. |
-| `core/api.py` | Every analysis without keyboard input, with the same type checks as the menus. |
-| `core/pipeline.py` | Session state; `run_orf` takes the menu's search settings; ORF-dependent results are invalidated on reselection; restriction and cloning results record parameters and the enzyme data version. |
-| `ui/style.py` (new) | All presentation: rules, headers, fields, prompts, message prefixes. Imports nothing scientific. |
-| `analyses/restriction.py` | One recognition-site matcher shared with cloning; cached scans. |
-
-**Removed duplication.** D16: the primer module's shadowed definitions
-and superseded generations (1,326 lines in part 2, after a reachability
-review with `sys.settrace`; every survivor bytecode-identical). D13: one
-normalization contract. D17: 389 separator literals replaced by two
-helpers.
-
-**API changes.** New: `plan_cloning`, `filter_variants`,
-`mutation_report`, `blast_search`, `blast_resume`, `literature_search`.
-Renamed data keys (D18): `heuristic_score`, `heuristic_classification`,
-`*_heuristic_score`, `evidence`, `type_evidence`,
-`sequence_type_evidence`; `calculate_orf_confidence` remains as an alias.
-Restriction and cloning results gain `enzyme_database_version`.
-
-**Pipeline changes.** D19 parity with the menu; fixed status shape;
-stale-result removal verified end to end.
-
-**Modified files.** 50 files over Phase 6 (11,892 insertions, 3,516
-deletions). Added: `core/alphabets.py`, `ui/style.py`, six test modules
-(`test_phase6_tier1`, `test_phase6_tier2`, `test_phase6_sequence_types`,
-`test_terminal_ui`, `test_external_reference`,
-`test_integration_workflows`), `docs/FEATURE_STATUS.md`,
-`docs/PHASE6_*.md`, `docs/TERMINAL_UI_STANDARD.md`, `docs/STYLE_GUIDE.md`
-and `blast_results/README.md`.
+- **Before.** Twelve analysis modules each held their menus and imported
+  `ui.style`; `core.pipeline` imported the interface at call time; the
+  pipeline's ORF selection called a dialog.
+- **After.**
+  ```
+  main.py          session; imports dialogs from ui/
+  ui/              style.py (renderers), menu.py, report.py,
+                   <module>_menu.py (11 dialog modules), variant_check.py
+  core/            api.py (every analysis), pipeline.py, models.py,
+                   alphabets.py, seqtools.py, orf_context.py, report.py,
+                   textformat.py (plain-text layout)
+  analyses/        science only; no ui import outside script blocks
+  fileio/, data/   readers, enzyme and code tables
+  ```
+- **Shared components.** `core.textformat` (rules, field lines, columns,
+  header text) used by reports and re-exported by `ui.style`; one input
+  contract (`_sequence_of`); central alphabets; one restriction matcher;
+  one Tm-model alias set; `core.api.binding_features`.
+- **Removed duplication.** Superseded primer generations (D16); duplicated
+  string layout between reports and screens.
+- **API changes.** New: `design_primers_for_restriction_site`,
+  `cross_check_variants`, `binding_features`, `blast_resume`. Changed: the
+  dialog functions are imported from `ui.<module>_menu`;
+  `SynapsePipeline.select_orf(chooser=...)` replaces `interactive=True`;
+  `PipelineContext.print_status(render)` takes a renderer.
+- **Pipeline changes.** Parameters recorded for every module, including
+  the sequence overview, cloning and the restriction-site primer design;
+  mapped VCF variants kept per sequence (SHA-256 checked).
+- **Data model changes.** `AdvancedPrimerPair` and
+  `AdvancedPrimerCandidate` carry their assessment as fields (D23).
+- **Modified files.** 42 application files changed since the baseline
+  `e4395ed` (18,820 insertions, 16,678 deletions, most of it the P2-2 move).
+- **Not done.** Large modules remain large (`analyses/blast.py` about
+  4,600 lines, `mutation.py`, `primer.py`); splitting them was not
+  required for correctness and was not started.
 
 ---
 
 ## E. Terminal UI standardization
 
-Measured before Stage F (`docs/TERMINAL_UI_STANDARD.md`, section 1): 11
-separator widths across 389 sites; 7 meanings of `[0]`; three error
-prefixes. After: one width (70) from `ui.style`; `[0]` = Back, Cancel or
-Exit (main menu only); `ERROR:`/`WARNING:`/`NOTE:`/`OK:`; `Invalid
-selection.` for every unknown key.
+All eleven module dialogs, the session screens and the pipeline status use
+`ui/style.py`: one rule width (70), one meaning of `[0]` (Back/Cancel/
+Exit), one prefix per message category, aligned fields, one menu layout
+with module-specific groups (Master Prompt 5.3). Per-module history and
+the before/after structure are in `docs/STAGE_F_UI_REVIEW.md` and
+`docs/STAGE_F_FINAL_REVIEW.md`; the standard and its enforcement rules are
+in `docs/TERMINAL_UI_STANDARD.md` (§7 rules run in the suite).
 
-| Module | Before | After |
-|---|---|---|
-| Main menu, session | 60/68-column rules; `[0]` "Choose another sequence" in the type dialog | 70 columns, groups in work order, `[0] Exit`; the type dialog's `[0]` is `Cancel` with its effect named |
-| Sequence overview | 70/45 rules | shared rules and fields |
-| ORF | own frames; `[0]` "Apply and return" in the settings | shared frames; `[0] Back` (settings apply as entered); the comparison table rule grows with its columns (documented exception) |
-| RNA, protein | own frames | shared frames, prompts and messages |
-| Restriction, cloning | own frames | shared frames; `[0]` Back or Cancel |
-| Primer | 0-based unlabeled positions | 1-based positions, labeled |
-| Mutation, variant | `[0]` "Enter sequence manually" | `[M]` for manual entry |
-| CRISPR | 78-column frames | 70 columns |
-| BLAST | 90-column frames; SEARCH block 1, 2, 3, 14 | 70 columns; menu 1-14 in work order |
-| Literature | 88-column frames | 70 columns |
+Final-run changes: the dialogs moved to `ui/` with byte-identical
+screens; the BLAST hit selector and query-type question follow the
+navigation rules; the last hand-padded labels use `style.field`; the
+literature limitation is a NOTE.
 
-Enforced by `tests/test_terminal_ui.py` (12 checks, verified against
-deliberate violations). The Stage F re-examination
-(`docs/STAGE_F_UI_REVIEW.md`) found that these checks covered rules,
-`[0]` and prefixes only and that no module used the shared renderers;
-the six modules named there were then converted and are checked as
-rendered screens (`RenderedScreenTests`); a second round converted the
-remaining ten interface files, so all sixteen use them and the first
-screens of all eleven menus are tested as rendered.
-
-The closing review (`docs/STAGE_F_FINAL_REVIEW.md`) corrected the claim
-that every screen, menu and message went through `ui/style.py`. It also
-corrected the claim that the dialogs behaved as before:
-
-- 59 direct prints remained, none of them documented: 31 messages, 19
-  headings and 9 dynamic option lists.
-- Rendered tests reach 17 of the 38 `style.menu` call sites.
-- From round 1 to `1516339`, Enter on 15 bracketed prompts returned the
-  hint text instead of an empty answer.
-
-Recommendations 1-3 were carried out on 2026-11-03 (`46710cd` to
-`163c54d`):
-
-- the claims were corrected;
-- 44 messages, 18 headings and the 9 lists were converted;
-- `DirectOutputTests` was added;
-- the `FEATURE_STATUS.md` numbers were corrected.
-
-Recommendations 4 and 5 followed the same day (`b25e800` to
-`a39c39f`, `docs/STAGE_F_FINAL_REVIEW.md` §10).
-
-**Remaining exceptions**, each with its
-reason in `TERMINAL_UI_STANDARD.md` section 9: raw line input, two
-CRISPR numeric helpers, closing rules, analysis result lines; the mutation
-module's sequence prompt offers no `[0]` (a cancel needs a control-flow
-change in four callers); the menus still live inside the analysis
-modules, which therefore import `ui` (P2-2). `core/` no longer imports
-`ui` (recommendation 4).
+Remaining inconsistencies (TERMINAL_UI_STANDARD §9): the "RESULT:" lines
+of module self-tests run as scripts; plain status lines such as "Loaded 2
+FASTA record(s)."; option lists that keep their own prompt label; the
+undetermined BLAST query type explained by the raw exception text.
 
 ---
 
 ## F. Scientific output standardization
 
-- **Result structures**: every stored result is an `AnalysisResult` with
-  parameters, input SHA-256, warnings and limitations; warnings a payload
-  carries now reach the summary on every path.
-- **Units** (one notation each, enforced): `52.38%`, `60.12 °C`,
-  `kcal/mol`, `cal/(mol·K)`, `Da`, `nt`/`bp`/`aa`.
-- **Precision**: 2 decimals for percentages, Tm and thermodynamics; E-values
-  3 significant figures everywhere (`n/a` when absent).
-- **Coordinates**: users see 1-based inclusive positions; internal
-  conventions are documented per structure. One naming inconsistency is
-  recorded, not changed: `site_position` is 1-based in the restriction map
-  and 0-based in digest records (both stored in the golden master).
-- **Interpretation**: the measured / calculated / predicted / inferred
-  distinction and the interpretation structure are in the style guide;
-  heuristic values are named heuristic.
-- **Exports**: JSON (complete) and Markdown (summary) with software
-  version, input provenance, per-result parameters, warnings,
-  limitations and a payload hash. Restriction and cloning record the
-  enzyme data version. Menu-path sequence-overview and cloning results
-  still record no input parameters (recorded).
+Results carry module, data, parameters, warnings, limitations and the
+input's SHA-256 (`AnalysisResult`); exports (JSON, Markdown) include
+parameters, warnings, provenance and version information (Stage G, 6.4),
+and since D23 the primer pair assessment. Units have one notation;
+positions shown to users are 1-based and inclusive, API coordinates are
+documented per structure; heuristic scores are named as such (D18);
+evidence levels for sequence types. Restriction records use one coordinate
+convention (`1ae2833`). Remaining: literature dates are kept as each
+provider reports them (documented); BLAST E-values are printed with three
+significant figures.
 
 ---
 
 ## G. Language and editorial improvements
 
-All meaningful changes are tabulated with original and revised wording,
-reason and category in `docs/CHANGES.md` (Stage H sections, Stage G
-D18). In summary:
-
-- **Terminology**: "confidence" removed from data keys and messages;
-  "evidence level" for the type classifier; "heuristic evidence" for the
-  signal-peptide screen; the primer warning names what was observed
-  ("Every reported primer pair is rated MARGINAL or POOR ...").
-- **Spelling**: American English throughout (86 words in 8 documents,
-  9 text sites in 4 source files and 6 in tests), matching the
-  identifiers; enforced by a test.
-- **Recurring messages**: one wording per situation (`Invalid
-  selection.`, `No DNA sequence selected.`).
-- **Precision**: the mutation frame warning names the reading frame and
-  states the inference as a likelihood; the complexity interpretation
-  states what the value measures and where it fails.
-- **Tone**: no exclamations in messages.
-- **Documents**: README rewritten to section 15.1; METHODS gained a
-  sequence-overview section and four references and lost a
-  self-contradiction; AUDIT_STATUS and FEATURE_STATUS brought to the end
-  state; broken Markdown tables repaired.
-- **Shared conventions**: message prefixes and helpers in `ui/style.py`;
-  terminology, units, writing, messages and code rules in
-  `docs/STYLE_GUIDE.md`, whose enforcement table is itself tested.
-
-An inventory of every interface string found no German text and no claim
-stronger than the evidence: each "prove" and "guarantee" is a negation.
+The editorial pass of Stage H (2026-11-02) is documented in
+`docs/CHANGES.md` (original wording, revised wording, reason, category)
+and enforced by `SpellingStandardTests` (American spelling across code,
+tests and documentation) and the message-prefix rules. `docs/STYLE_GUIDE.md`
+holds terminology, writing, message and code conventions. Text written in
+the final run follows it (checked by the same tests). Shared warning and
+error conventions: `ERROR:`, `WARNING:`, `NOTE:`, `OK:` through
+`ui.style`.
 
 ---
 
 ## H. Testing
 
-Final run at `db74504` plus the documentation commit that adds this
-report, on the development machine:
-
-| Measure | Value |
+| Item | Result (2026-11-13, HEAD before this report) |
 |---|---|
-| Tests run | 356 (2026-11-03) |
-| Passed | 356 |
-| Failed | 0 |
-| Skipped | 0 (BLAST+, Biopython and primer3-py all present) |
-| Golden-master snapshots | 13, all matching; one intentional change in Phase 6 (D18, key rename, values proven identical) |
-| Built-in module self-tests | all passing (run by the suite) |
-| Integration workflows | 7 tests (10.1-10.4, 10.7), all passing |
-| pyright 1.1.414, `--pythonversion 3.10` | 111 diagnostics against the Phase 6 baseline of 134; no new diagnostic in any package |
+| Total tests | 463 (451 test methods + 12 generated golden-master scenarios) |
+| Passed / failed | 463 passed, 0 failed on Python 3.14.6 (1 skipped: the opt-in 10 kb benchmark) |
+| Python 3.10.11 | 463 run, 0 failed, 17 skipped (Biopython and primer3-py comparisons, packages not installed for 3.10; one 3.12-tokenizer test; the benchmark) |
+| Golden master | 12/12 unchanged in the final run; one documented change in Stage G (D18) |
+| Integration tests | `test_integration_workflows` (10.1-10.4, 10.7; 10.2 with restriction-site primers and parameter recording) |
+| Rendered interface | `test_rendered_menus` and `test_terminal_ui`: 64 tests, every menu call site rendered |
+| Architecture | `LayeringTests`: core imports no ui; every analysis runs with ui unimportable |
+| Self-tests | all module self-tests pass inside the suite |
+| Reference comparisons | section B; skipped with the reason when a reference package cannot be loaded (Windows application control blocked primer3-py temporarily on 2026-11-13) |
+| Benchmark | 10 kb primer design 9.62 s CPU time (machine under background load) |
+| Coverage | 71 % combined line/branch (coverage.py 7.10.7; `docs/TEST_COVERAGE.md`) |
+| Static analysis | pyright 1.1.414 at Python 3.10: 58 errors; baseline `ab4bd2a` 134; 0 new, 76 removed. Ruff 0.14.4 pyflakes rules: all checks pass after removing 40 unused or duplicated imports; no undefined name was found |
+| Environment | Windows 11 Home 10.0.26200; CPython 3.14.6 (`.venv`), CPython 3.10.11 embeddable (`.tools/`); biopython 1.88, primer3-py 2.4.0, numpy 2.5.4, coverage 7.10.7; BLAST+ 2.17.0 (`docs/TOOL_AND_DATA_LEDGER.md`) |
 
-**Scientific reference comparisons** (external, not experimental):
-
-| Comparison | Reference | Result |
-|---|---|---|
-| Melting temperature | primer3-py 2.4.0 | 2,916 comparisons over Mg²⁺ 0-3 mM, max 0.0032 °C |
-| Enzyme definitions | Biopython 1.88 `Bio.Restriction` | 22/22 |
-| Digests, two topologies, three rotations | Biopython 1.88 | 132/132 (6-kb test sequence; pUC19 in the audit, 132/132) |
-| End compatibility | Biopython 1.88 | 484/484 pairs |
-| Protein descriptors | Biopython 1.88 `ProtParam` | pI, GRAVY, aromaticity, extinction identical or within 1e-4; instability within 2e-4 after the IG fix; mass within 2e-5 relative |
-| Genetic codes and translation | `Bio.Data.CodonTable` | tables 1, 2, 4, 11 identical |
-| Alphabets | `Bio.Data.IUPACData` | identical letter sets |
-| Local BLAST | BLAST+ 2.17.0 | real runs, provenance complete |
-
-**Environment**: Windows 11; Python 3.14.6 (`.venv`); Biopython 1.88,
-primer3-py 2.4.0 (test-only); NCBI BLAST+ 2.17.0; Expat 2.8.1; pyright
-1.1.414. The suite blocks all network access. Not run: a Python 3.10
-interpreter (not installed), live remote services.
-
-One minor observation: a literature retry test leaves a simulated
-`HTTPError` for the garbage collector, which prints a `ResourceWarning`;
-it does not affect results.
+No test was counted as passed without running. Python 3.11-3.13 and
+non-Windows platforms were not run.
 
 ---
 
 ## I. Git history
 
-62 commits in Phase 6 before this report, from `824ca5f` (initial audit)
-to `db74504`, each one logical package with tests and documentation; the
-report and the final handover are committed after them.
-No history was rewritten.
-
-| Stage | Commits | Content |
-|---|---|---|
-| Audit | `824ca5f` | Initial audit and feature matrix |
-| Tier 1 | `d4544ad` ... `ab4bd2a` | D12, D4, D3, D5, D1, D2 |
-| Sequence types | `b8f5ea8` ... `d40d328` | D14, D13 |
-| Tier 2 | `5b120ec` ... `6f7987b` | D6/S7, D7, D9, D8, D10/D11, D19, D15, S15-S17, S19, S23/S3-S5 |
-| Architecture | `c52f9bb` ... `7008cd8` | D16, S8/S10/S21/S22, S1/S2/S9/S11/S12, P1-9, S18, S14, S6, S13 |
-| Stage F | `5db21ab` ... `f803577` | D17, BLAST menu, S24 |
-| Stage G | `317097d` ... `81ccc55`, `4e5dbdc` | D18, units, coordinates, exports |
-| Stage H | `1a8f2bc` ... `1269335` | editorial review, style guide, README, complexity |
-| Stage I | `2851e11` ... `db74504` | reference comparisons, IG fix, workflows, status documents, Python 3.10 |
-| Records | `02d2899`, `7a4a718`, `642f31b`, `bff3c7d`, `edbc28f`, `692cb20`, `aa5703b`, `4c31602` | progress and handover |
-
-Working tree: clean after the final commit; no uncommitted changes. The
-Windows ReadOnly attribute is set on exactly the 15 files that carried it
-at the start. Not committed by design: `exports/`, `logs/`,
-`data/blast_db/`, caches and local skill files (`.gitignore`).
+- 140 commits; 131 in Phase 6 (from `824ca5f`), 124 of them with a
+  `Co-Authored-By` line. No history rewrite, no reset, no force-push, no
+  remote push.
+- By stage: baseline and audit (`e4395ed`-`824ca5f`); Stage B-E corrections
+  (2026-10-31); Stage F (2026-11-01 to 11-03); Stages G-I (2026-11-02);
+  completion run packages A/B (2026-11-11, `68e59d1`-`15e2ff1`); second
+  part (2026-11-12/13, `bf4d096`-the commit adding this report). The full
+  list with subjects is Appendix A of
+  `docs/PROJECT_SYNAPSE_COMPLETE_HANDOVER.md` and `git log`.
+- Since the previous final report (`12949f3`): 30 commits, 68 files,
+  16,050 insertions, 9,531 deletions.
+- Working tree: clean after the commit of this report; no uncommitted
+  changes.
 
 ---
 
 ## J. Remaining work
 
-| Issue | Module | Why unresolved | Needs | Next action | Kind |
-|---|---|---|---|---|---|
-| Live literature services (S11) | literature | external requests need approval | owner's approval | one controlled run per provider | environmental |
-| Remote NCBI BLAST run and live RID resume | BLAST | external request with a query sequence | owner's approval | one confirmed run recording RID and provenance | environmental |
-| Python 3.10 suite run | all | no 3.10 interpreter | installation approval | install 3.10, run the suite | environmental |
-| REBASE re-check of all 22 enzymes (P0-4) | restriction | external data source | approval for REBASE access | compare every entry with REBASE | environmental |
-| Instability table against Guruprasad et al. 1990 | protein | primary table not consulted | the paper | confirm IG and FY | scientific |
-| `bcftools norm`, ORFfinder comparisons | variant, ORF | no native Windows build / no local binary | WSL or Linux host | run both on reference sets | environmental |
-| Primer hairpin/dimer vs Primer3 | primer | heuristic by design, not compared | none (primer3-py is installed) | compare with `calc_hairpin`/`calc_heterodimer` | scientific |
-| CFD off-target scoring (P2-3) | CRISPR | needs the published matrix as cited data | the matrix | add as a data file with citation | scientific |
-| Primer/guide vs variant cross-checks (P2-4) | primer, CRISPR, variant | not implemented | none | implement | technical |
-| Mutation alignment memory (P2-6) | mutation | algorithmic change | none | banded or linear-space alignment | technical |
-| Type IIS enzymes (P2-7) | restriction | feature absent | none | add with both-strand search | technical |
-| Menus inside analysis modules (P2-2) | all | structural change of its own | none | move menus to `ui/` | technical |
-| Organism mode, 5'-partial, origin-spanning ORFs (P1-9) | ORF | not implemented | none | implement | technical |
-| Experiment planner (P3-1), genome specificity (P3-2) | planner, primer, CRISPR | deferred | genome data for P3-2 | design first | technical |
-| HGVS parentheses for predicted consequences | mutation | convention not applied | none | write `p.(R12C)` and test | scientific |
-| `site_position` 1-based in map, 0-based in digests | restriction | changes stored values | none | rename with a documented snapshot change | technical |
-| Menu-path parameters for sequence overview and cloning | pipeline | which inputs to record is a per-module choice | none | name them explicitly | technical |
-| `[0]` in the mutation sequence prompt | mutation | needs a cancel contract in four callers | none | add and test | technical |
-| Restriction-site-driven primer design | primer, restriction | no wiring | none | pass a chosen site as the target | technical |
-| `blast_results/TEST_8_REFERENCE_blast.json` | BLAST | deletion is the owner's decision | owner | delete or keep as labeled | environmental |
-| License (`pyproject.toml`: "decision pending") | project | owner's decision | owner | choose a license | environmental |
-| G·U pairing, optional RNAfold (P2-5) | RNA | not implemented; RNAfold is an external tool | dependency decision (1.3.1) | implement G·U; decide on RNAfold | scientific |
-| Merging the surviving primer generations (P2-1) | primer | behavior-preserving refactoring of its own | none | merge with bytecode and golden checks | technical |
-| NEBcutter comparison of a circular digest (P1-4) | restriction | web service; largely covered by the Biopython pUC19 comparison | approval | decide whether still needed | environmental |
-| Local BLAST on a real database | BLAST | `nt` is too large; only test databases used | approval for a ~0.5 GB download | swissprot as a proportionate step | environmental |
-| HGVS conformance against a validator | mutation | no validator installed | `hgvs` package or Mutalyzer (approval) | compare a variant set | scientific |
-| Analysis modules import `ui` (their menus, P2-2) | all analyses | ~8,900 lines of menu code in 133 definitions; core itself is free of `ui` since recommendation 4 | none | move the menus out of the modules | technical |
-| "complexity" field names | sequence, RNA, CRISPR, mutation | kept for compatibility; meaning documented | none | rename with a documented snapshot change, if wanted | technical |
-| 111 pyright errors (standard mode, Python 3.10) | primer, CRISPR, mutation, tests | reduced from 134, not cleared | none | triage for reachable `None` paths | technical |
-| Tool and data ledger (1.3.1, 11.8) | project | versions recorded; source, access date, license and checksum are not | none | write the ledger | environmental |
-| Line coverage | tests | no coverage tool installed | approval to install `coverage` | measure and report | technical |
-| Missing-file and runtime invalid-selection tests (11.4) | input, menus | not written | none | add both | technical |
-| Four references in `METHODS.md` not verified at the source | documentation | written in Stage H/I without access | approval (PubMed) | verify or keep the mark | scientific |
-| `ResourceWarning` in a literature retry test | tests | a simulated `HTTPError` is not closed | none | close it in the test | technical |
+| Issue | Module | Why unresolved | Needed | Next action | Kind | Status |
+|---|---|---|---|---|---|---|
+| `bcftools norm` comparison | variants | No native Windows build | WSL or a Linux host (system-wide: owner approval) | Run the normalization corpus through both | environmental | BLOCKED |
+| ORFfinder comparison | ORF | Same | WSL or Linux | Compare ORF calls on reference sequences | environmental | BLOCKED |
+| NEBcutter comparison | restriction | Web application without a programmatic interface | Manual use by the owner | Substance covered by REBASE 611 and Biopython | environmental | BLOCKED (substance covered) |
+| CFD off-target score | CRISPR | The published matrix is not in the project; its redistribution terms are not established | Matrix file with citation and licence | Implement only with the cited matrix (P2-3) | scientific | BLOCKED |
+| Genome-wide specificity | CRISPR, primer | Needs genome-scale data and indexes | Very large downloads: owner approval | P3-2 | environmental | BLOCKED |
+| Guruprasad 1990 primary table | protein | The table is in the paper, not machine-readable | The paper | Check the 400 weights against it | scientific | BLOCKED |
+| RNAfold | RNA | External binary not installed (system install) | ViennaRNA and owner approval | Optional energy model (P2-5) | technical | BLOCKED |
+| Local BLAST on a real database | BLAST | swissprot about 0.5 GB | Owner approval | Run blastp against swissprot | environmental | BLOCKED |
+| AI Experiment Planner | main menu [11] | No specification of what it should do; P3-1 deferred | Owner's specification | Labeled "not implemented" | scope | BLOCKED |
+| Licence, legacy BLAST result file | project | Owner decisions | Owner | Choose a licence; keep or delete `blast_results/TEST_8_REFERENCE_blast.json` | administrative | BLOCKED |
+| Primer generation names (P2-1) | primer | Decided against renaming (no behavior gain) | – | Revisit if the module is split | technical | PARTIALLY COMPLETE |
+| `complexity` field name, RNAfold (P2-5) | sequence, RNA | Field kept for compatibility | – | Rename with a deprecation path | technical | PARTIALLY COMPLETE |
+| Large modules (7.5) | blast, mutation, primer | Not required for correctness | – | Split by responsibility | technical | PARTIALLY COMPLETE |
+| UI §9 remainders | ui | Minor | – | Self-test RESULT lines, status lines | technical | PARTIALLY COMPLETE |
+| Dialogs behind files and network | ui | Need files, tools or network | – | Drive export and download dialogs with temporary folders and mocks | technical | PARTIALLY COMPLETE |
+| `core_nt` remote database | BLAST | Not in the database list | One live check | Add and verify | technical | PARTIALLY COMPLETE |
+| Unrelated long alignments O(n·m) | mutation | Inherent to global alignment | – | Document (done) | scientific | PARTIALLY COMPLETE |
+| HGVS validator | mutation, variants | No validator run | Mutalyzer or `hgvs` with its data | Validate a notation corpus | scientific | UNVERIFIED |
+| Python 3.11-3.13, Linux, macOS | all | Not run | Interpreters or hosts | CI matrix | environmental | UNVERIFIED |
+| Experimental validation | all | Out of scope for software | Laboratory work | – | scientific | UNVERIFIED |
 
 ---
 
 ## K. Final quality assessment
 
-- **Scientific reliability**: good for what is implemented. Every
-  calculation that has a reference implementation agrees with it
-  (translation, restriction, compatibility, Tm, protein descriptors), and
-  Phase 6 corrected the errors those comparisons and the audit found.
-  Heuristic modules are labeled as heuristics. Nothing is validated
-  against experiments, and three comparisons that need external access
-  are open.
-- **Functional completeness**: every advertised feature works or is
-  stated as not implemented; the larger absent features (planner, CFD,
-  Type IIS, genome-wide specificity, 5'-partial ORFs) are listed, not
-  hidden.
-- **Architecture**: much improved and consistent at the boundaries (one
-  input contract, a complete API, one presentation layer). The analysis
-  modules are still large files that mix menus and science.
-- **Maintainability**: improved by the removal of the primer generations,
-  the shared helpers, enforcement tests and documentation that matches
-  the code. The size of individual modules (up to ~5,600 lines) remains a
-  cost.
-- **Terminal interface consistency**: high and enforced; three remaining
-  deviations are documented.
-- **Language quality**: consistent terminology, spelling and message
-  conventions, enforced where mechanical; the remaining judgment lies in
-  long scientific explanations, which were reviewed by inventory and
-  sampling rather than line by line.
-- **Reproducibility**: strong within the environment: hashed inputs and
-  outputs, versioned reports, recorded parameters, a network-free suite.
-  Weak across environments: one Python version and one operating system.
-- **Testing maturity**: broad (unit, golden master, reference,
-  integration, interface and style enforcement). Passing tests show that
-  the implementation matches its specification and its references; they
-  are not independent scientific validation.
+- **Scientific reliability: good for a screening tool.** Core
+  calculations agree with established implementations where compared;
+  heuristics are labeled; six defects found in the final run show that
+  the test-driven reviews still find real faults, and all six are fixed.
+  Not validated experimentally.
+- **Functional completeness: high.** Every advertised feature is
+  implemented or labeled as not implemented; every menu is rendered and
+  driven; workflows 10.1-10.4 and 10.7 are integration-tested, 10.5 and
+  10.6 checked live once.
+- **Architecture: clean layering.** Science, API, pipeline and interface
+  are separated and the separation is tested. Large modules remain.
+- **Maintainability: moderate to good.** 463 tests, golden master,
+  documented conventions; pyright errors more than halved; long modules
+  and historical names (`_v5`-`_v11`) remain.
+- **Terminal interface consistency: high.** One renderer and navigation
+  model, enforced by tests; minor remainders listed in E.
+- **Language quality: consistent.** Style guide enforced by tests.
+- **Reproducibility: good.** Parameters, hashes and versions in every
+  result; tool and data ledger with checksums; two Python versions.
+- **Testing maturity: good.** Unit, regression, golden, integration,
+  rendered-interface, architecture and external-reference tests; 71 %
+  coverage with the uncovered parts named.
 
-Synapse is not finished software and is not presented as such. It is a
-coherent, honest and well-tested basis whose remaining gaps are known,
-listed, and in most cases a matter of external resources or the owner's
-decisions rather than of undiscovered defects.
+### Independent final audit
+
+The final audit (2026-11-13) re-read the Master Prompt section by section
+and checked each requirement against the code, the tests and this
+repository's documents (Appendix 1). It re-ran: the full suite on Python
+3.14.6 and 3.10.11, the golden master, the self-tests, the rendered and
+layering tests, pyright against the baseline, `git diff --check` over every
+change since `12949f3`, coverage, the 10 kb benchmark, the REBASE
+comparison, and a Ruff pyflakes pass. Findings of the audit itself, all
+resolved before this report: two hand-padded labels converted; the pUC19
+fixture's trailing blank line kept verbatim (its checksum is tested) and
+marked in `.gitattributes`; the REBASE re-check closed open validation 5
+of AUDIT_STATUS; the tool evaluation of Master Prompt 7.4 had not been
+recorded and was done (Ruff found no undefined name; 40 unused or
+duplicated imports, three of them left by the P2-2 move tool, were
+removed with screens and suite unchanged).
+
+**Verdict: Phase 6 is PARTIALLY COMPLETE.** Every requirement that could
+be completed with the resources and permissions available is COMPLETE and
+verified; the items in section J are open for the reasons stated, and none
+of them is presented as done.
+
+---
+
+## Appendix 1. Requirement matrix (Master Prompt §0-§18)
+
+| § | Requirement | Status | Evidence |
+|---|---|---|---|
+| 0 | Coherent, scientifically reliable application; no frontend | COMPLETE | Architecture (D), boundaries (§14) |
+| 1.1 | Work only in the copy; inspect before changing | COMPLETE | Appendix 2; initial audit §1 |
+| 1.2 | BLAST database policy | COMPLETE | `data/blast_db/` excluded; local tests on small databases; live remote run |
+| 1.3 | External research, downloads, traceability | COMPLETE | `docs/TOOL_AND_DATA_LEDGER.md` |
+| 1.3.1 | Skills and MCP: availability vs use recorded | COMPLETE | Initial audit; ledger (PubMed tool used once, no skill workflow executed in the final run) |
+| 1.4 | Preserve work, history, tests | COMPLETE | No rewrite; golden master; history intact |
+| 2.1-2.5 | Full audit and audit report | COMPLETE | `docs/PHASE6_INITIAL_AUDIT.md` |
+| 3.1 | P0 re-inspection with reproduction tests | COMPLETE | `test_p0_regressions` |
+| 3.2 | ORF analysis | COMPLETE (ORFfinder comparison BLOCKED) | P1-9, D1, D2, D19, S19 |
+| 3.3 | RNA: selected ORF vs whole sequence, no silent switch | COMPLETE | pipeline rules, workflow 10.1 test, G·U count |
+| 3.4 | Protein translation and analysis | COMPLETE (Guruprasad primary table BLOCKED) | D14-F6, IG weight, ProtParam |
+| 3.5 | Primer design, Primer3 comparison | COMPLETE | Tm vs primer3-py; D20, D21, D23; restriction-site design |
+| 3.6 | Restriction incl. Type IIS, REBASE check | COMPLETE (NEBcutter BLOCKED, substance covered) | REBASE 611, Biopython, pUC19 |
+| 3.7 | Mutation analysis, HGVS distinction | COMPLETE (validator UNVERIFIED) | HGVS-style notation labeled; D22 |
+| 3.8 | Variant analysis, bcftools comparison | PARTIALLY COMPLETE (bcftools BLOCKED) | VCF tests, D12, S15/S16 |
+| 3.9 | CRISPR incl. P2 items and CFD | PARTIALLY COMPLETE (CFD, genome-wide BLOCKED) | D8-D10, S3-S5, S23, variant check |
+| 3.10 | BLAST | COMPLETE (large local database BLOCKED) | coverage P0-1, RID resume, D24, D25, live run |
+| 3.11 | Literature | COMPLETE | throttling, retries, live check |
+| 3.12-3.13 | Remaining modules; completion requirements | COMPLETE | FEATURE_STATUS |
+| 4.1-4.3 | Feature inventory; execution testing; no disguised placeholders | COMPLETE | FEATURE_STATUS; planner labeled |
+| 5.1-5.6 | Unified terminal UI and standard | COMPLETE (minor remainders, E) | TERMINAL_UI_STANDARD; rendered tests |
+| 6.1-6.4 | Output standardization | COMPLETE | Stage G; D23 |
+| 7.1-7.3 | Core architecture, separation, shared functions | COMPLETE | P2-2; LayeringTests |
+| 7.4 | Engineering standards, static analysis | COMPLETE | pyright 134 -> 58; Ruff pyflakes pass clean; Black, mypy, pytest evaluated (`docs/TOOL_AND_DATA_LEDGER.md`) |
+| 7.5 | Maintainability (no giant modules) | PARTIALLY COMPLETE | large modules remain |
+| 8 | Language and editorial standardization | COMPLETE | Stage H; spelling tests |
+| 9 | STYLE_GUIDE | COMPLETE | `docs/STYLE_GUIDE.md` |
+| 10.1-10.4, 10.7 | Workflows | COMPLETE | integration tests |
+| 10.5, 10.6 | BLAST and literature workflows | COMPLETE | parsing tests, live checks |
+| 10.8 | Integration requirements | COMPLETE | stale-result invalidation, parameter recording, SHA-256 checks |
+| 11.1-11.7 | Test levels, golden protection | COMPLETE | section H |
+| 11.8 | Reproducibility across Python versions | PARTIALLY COMPLETE | 3.10 and 3.14 run; 3.11-3.13 UNVERIFIED |
+| 11.9 | Full suite after each stage | COMPLETE | each commit message |
+| 12 | Feature matrix kept current | COMPLETE | FEATURE_STATUS (2026-11-13) |
+| 13 | Staged, controlled implementation | COMPLETE | PHASE6_PROGRESS rows 1-60 |
+| 14.1-14.6 | Boundaries | COMPLETE | no frontend, no fabrication, approvals respected |
+| 15 | Documentation | COMPLETE | README, CHANGES, METHODS, AUDIT_STATUS, FEATURE_STATUS, standards |
+| 16 | Final criteria | PARTIALLY COMPLETE | section J |
+| 17 | Final report A-K | COMPLETE | this document |
+| 18 | Final directive | PARTIALLY COMPLETE | open items stated, not hidden |
+
+## Appendix 2. Project integrity
+
+- Work only in `C:\Users\bayra\OneDrive\Desktop\Project Snyapse - Kopie`.
+  The original folder `Project Synapse` was only read (the Master Prompt
+  PDF); nothing was written there.
+- ReadOnly attribute: 15 of 15 protected files set at every commit of the
+  final run (`main.py`, ten analysis modules, `core/pipeline.py`, two data
+  modules, `ui/menu.py`); cleared only for the files a package edited.
+- Git: no history rewrite, reset, force-push or remote push; every package
+  committed separately; working tree clean.
+- Approvals: installations and downloads followed the policy the owner
+  adopted on 2026-11-12 (project-local packages and interpreters, small
+  public datasets); no project file, private sequence or personal data was
+  sent to an external service; a Windows application-control block of a
+  compiled test dependency was not bypassed.
+- No scientific data, citation or validation result was invented; every
+  comparison named here was run, and the ones not run are listed in J.

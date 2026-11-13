@@ -78,7 +78,9 @@ recommended next steps:
    0-3 mM, max |ΔTm| 0.0032 °C (`docs/METHODS.md`).
 3. NEBcutter comparison for a circular plasmid digest (P1-4).
 4. ORFfinder comparison on reference sequences (P1-9).
-5. A systematic REBASE re-check of all enzyme entries (P0-4).
+5. ~~A systematic REBASE re-check of all enzyme entries (P0-4).~~ Done
+   2026-11-13 against REBASE version 611 (`emboss_e.611`): 26 of 26
+   definitions identical (`docs/METHODS.md`).
 6. ~~Local BLAST+ runs~~ done in Phase 6 (BLAST+ 2.17.0 on the bundled
    database and on `makeblastdb` databases, blastn and blastp).
    ~~One live remote NCBI run~~ done 2026-11-13 (pUC19 L09137.2 bases

@@ -1,5 +1,13 @@
 # Phase 6 completion run – continuation record
 
+**Final state (2026-11-13).** The completion run ended with the final
+verification, the independent audit and the new final report
+(`docs/PHASE6_FINAL_REPORT.md`). Verdict: Phase 6 is PARTIALLY COMPLETE;
+every safely executable requirement is done and verified, and the open
+items are listed there in section J with what each needs (owner approval,
+system-wide tools, large data, a licensed data file, or a specification).
+The sections below are the history of the run.
+
 Session of 2026-11-11, stopped by the owner after work packages A and B so
 that the next session starts with full context. **Phase 6 is not
 complete.** Start the next session from this file.
@@ -46,7 +54,16 @@ byte-identical comparisons, tests that fail on the previous code).
 | `dabc2f1` | T11: BLAST hit selector accepts only listed numbers; query-type question re-asks |
 | (this commit) | README brought up to date; live literature check recorded in METHODS; `max_results` per provider documented in `core.api` |
 
-## Paused here on 2026-11-12 (owner asked to stop)
+## Resumed on 2026-11-13 and finished
+
+| Commit | Item |
+|---|---|
+| `a5e5a94` | D25: BLAST polling survives brief network failures and names the RID; primer3-py comparisons skip when Windows application control blocks the package |
+| `cdbf69c` | T12: variant check in the primer and CRISPR menus |
+| `f58d866` | T8: CHANGES, FEATURE_STATUS, AUDIT_STATUS, progress record |
+| final commits | Last padded labels; Ruff pyflakes pass (40 unused imports removed); REBASE 611 comparison 26/26; tool evaluation (7.4); final report A-K with requirement matrix and independent audit |
+
+## Paused here on 2026-11-12 (owner asked to stop, historical)
 
 - **D25, found, not yet fixed:** a live NCBI BLAST search (public pUC19
   fragment 401-700, database `nt`) was submitted and got an RID, then one

@@ -7,6 +7,11 @@ true now, and what to do next.
 
 **Phase 6 is NOT complete.** Continue it; do not restart it.
 
+> Update 2026-11-13: the work this handover planned (T1-T13) has been done
+> or decided; the current status, the verdict and the remaining items are
+> in `docs/PHASE6_FINAL_REPORT.md` and `docs/PHASE6_CONTINUATION.md`. The
+> figures below are those of 2026-11-11.
+
 ## How to read this document
 
 The document separates four kinds of information:

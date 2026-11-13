@@ -278,7 +278,14 @@ use 0-based inclusive `start <= stop` on the forward strand.
   Type IIS (2026-11-11, `tests/test_external_reference.py`): definitions
   4/4 and 32 digests of a 3,000 bp sequence with sites in both orientations
   and at both ends (linear and circular, four origin rotations), 140 cut
-  positions, 0 differences. Not compared against NEBcutter.
+  positions, 0 differences. Not compared against NEBcutter (a web
+  application without a programmatic interface).
+  Primary source (2026-11-13): all 26 definitions (22 palindromic, 4 Type
+  IIS) were compared with REBASE version 611 (`emboss_e.611`, "REBASE enzyme
+  patterns for EMBOSS", dated Oct 29 2026, from rebase.neb.com): recognition
+  sequence, top- and bottom-strand cut positions and blunt ends identical
+  for every enzyme, 0 differences. The REBASE file is copyrighted and is not
+  stored in the repository (`docs/TOOL_AND_DATA_LEDGER.md`).
 
 ## Primer design (`analyses/primer.py`)
 

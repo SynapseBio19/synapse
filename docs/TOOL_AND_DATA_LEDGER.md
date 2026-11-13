@@ -37,6 +37,27 @@ under 3.14.6 skips only the benchmark.
 | pyright | 1.1.414 | MIT | 2026-10-30 | Static analysis (`python -m pyright --pythonversion 3.10`) |
 | nodejs-wheel-binaries | 24.19.0 | MIT | Dependency of pyright | – |
 | coverage | 7.10.7 | Apache-2.0 | 2026-11-12 | `docs/TEST_COVERAGE.md` |
+| ruff | 0.14.4 | MIT | 2026-11-13 | One lint pass (below) |
+
+## Static analysis and formatting tools (Master Prompt 7.4)
+
+Evaluated on 2026-11-13:
+
+- **pyright** (in use): type checking at Python 3.10 on every package;
+  134 errors at the `ab4bd2a` baseline, 58 now, none new.
+- **Ruff** (used once): `ruff check --select F` (the pyflakes rules) over
+  the application and the tests found no undefined name and 41 unused or
+  duplicated imports (three of them added by the P2-2 move tool); 40 were
+  removed with `--fix`, the last disappeared with them; "All checks
+  passed". Rendered screens and the suite were unchanged. Not adopted as a
+  permanent gate: the project has no Ruff configuration yet, and its
+  style rules would flag the hand-formatted tables of the older modules.
+- **Black**: not adopted. Reformatting every file would rewrite most lines
+  (CRLF files, aligned tables) without any change of behavior, which the
+  Master Prompt rules out as an uncontrolled rewrite (1.4, 14.2).
+- **mypy**: not adopted; pyright already checks the types.
+- **pytest**: not adopted; the `unittest` suite runs on Python 3.10 and
+  3.14 without any dependency (`pytest` stays in the `dev` extra).
 
 ## Command-line tools
 
@@ -51,11 +72,19 @@ under 3.14.6 skips only the benchmark.
 |---|---|---|---|---|---|---|
 | pUC19 cloning vector, complete sequence (2,686 bp, circular) | NCBI E-utilities, `efetch.fcgi?db=nuccore&id=L09137.2&rettype=fasta&retmode=text` | L09137.2 | 2026-10-30 (audit) and again 2026-11-12; both files identical | NCBI places no restrictions on the use of GenBank data; submitters may hold rights in some records | SHA-256 `656a4ed4597020eb58266ddd4d65f1778abff1a74655abf25ec943dcc14c152a` (LF line ends) | `tests/fixtures/pUC19_L09137.2.fasta`; `PUC19FixtureTests`, `PUC19RestrictionReferenceTests` (132 digests vs Biopython, 0 differences); audit §3.2 |
 | REBASE-derived enzyme data bundled with Biopython | Biopython 1.88 `Bio.Restriction` | release as bundled; the API does not expose the REBASE release number | with Biopython | Biopython licence; REBASE data are freely available | – | Enzyme definitions 22/22, Type IIS 4/4, digests, end compatibility |
+| REBASE enzyme patterns for EMBOSS | <http://rebase.neb.com/rebase/link_emboss_e> | REBASE version 611 (`emboss_e.611`, dated Oct 29 2026) | 2026-11-13 | Copyright Dr. Richard J. Roberts, all rights reserved; used for comparison only, not stored in the repository | SHA-256 `1253823900d5d7f27383f9f53edaa4330a10a8df4c2bd484791b257cbb57d4a2` (32,393 bytes) | One-off comparison of all 26 enzyme definitions, 0 differences (`docs/METHODS.md`) |
 | Primer3 manual worked example | Primer3 manual (CGTGACGTGACGGACT, 50 mM Na+, 50 nM) | as printed in the manual | Previous cycle | – | – | `tests/test_primer_thermodynamics.py` |
 
 No MCP research provider and no project-local skill workflow was executed
 in the 2026-11-12 run; the NCBI request above and the python.org downloads
-were the only network requests, and they sent no project data.
+were the only network requests, and they sent no project data. On
+2026-11-12 and 2026-11-13 the following further requests were made under
+the same policy, again without project data: one live literature search
+("CRISPR base editing") through `core.api`, two PubMed metadata look-ups
+through the connected PubMed tool (PMID 30587106, 33449100), the REBASE
+download above, and one remote NCBI BLAST search of the public pUC19
+fragment L09137.2:401-700 against `nt` (plus a first attempt that ended
+on a DNS error, see D25).
 
 ## Project data and fixtures
 
