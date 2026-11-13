@@ -2157,3 +2157,21 @@ Prompt of 2026-11-13. History and binding decisions:
   wording keeps D15's requirement that the entry must not suggest a
   working feature.
 - Tests: `PlannerPlaceholderTests` drives `main.py` and checks the entry.
+
+### Optional energy-based RNA structure with ViennaRNA (P2-5)
+
+- New: `analyses/rna_structure.py`, `core.api.rna_secondary_structure`,
+  RNA menu entry `[6] Secondary Structure (ViennaRNA, optional)`. With the
+  ViennaRNA package (2.8.0, installed project-locally as a wheel; no
+  system install) Synapse computes the MFE structure (Turner 2004, 37 °C)
+  and annotates each hairpin-screen candidate with its free energy alone
+  and its support in the MFE structure. Without the package the view and
+  the API say "not available" with the reason.
+- Previous: RNAfold was recorded as BLOCKED (assumed to need a
+  system-wide binary).
+- Comparison: the hairpin screen finds 64 of 74 MFE hairpins (86 %), but
+  only 35 % of its 3,307 candidates are favorable on their own
+  (`docs/METHODS.md`). No existing result changes: the screen, the RNA
+  analysis output and the golden master are untouched.
+- Tests: `tests/test_rna_secondary_structure.py` (12; the ViennaRNA tests
+  skip without the package).

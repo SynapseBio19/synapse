@@ -23,7 +23,7 @@ tools. Where a module has been compared with an independent reference,
 |---|---|---|
 | [1] | Sequence overview | Composition, GC/AT content and skew, ambiguity codes, homopolymers, CpG, molecular mass |
 | [2] | ORF analysis | ORF search on both strands with a selectable NCBI genetic code, start-codon policy and minimum length; ORFs across the origin of circular sequences and optional 5'-partial ORFs; candidate comparison and selection |
-| [3] | RNA analysis | Transcription of the selected ORF or sequence, codon view with the ORF's genetic code, hairpin screen (Watson-Crick, G·U counted separately), sequence motifs |
+| [3] | RNA analysis | Transcription of the selected ORF or sequence, codon view with the ORF's genetic code, hairpin screen (Watson-Crick, G·U counted separately), sequence motifs; optional MFE secondary structure with ViennaRNA |
 | [4] | Protein analysis | Translation and sequence-derived protein descriptors; protein records open this module directly |
 | [5] | Restriction and cloning | Restriction map and digest (linear or circular) with 22 palindromic and 4 Type IIS enzymes, enzyme pairs, restriction-cloning strategies and an automatic planner |
 | [6] | Primer design | Primer pairs with nearest-neighbor Tm and salt correction, structural screens, ranking; primers around a chosen restriction site with the predicted digest of each amplicon |
@@ -53,12 +53,19 @@ Optional, for the reference comparisons in the test suite:
 python -m pip install -e ".[reference]"
 ```
 
+Optional, for the energy-based RNA secondary structure (RNA menu entry 6):
+
+```bash
+python -m pip install -e ".[structure]"
+```
+
 ## Dependencies
 
 | Kind | What | Needed for |
 |---|---|---|
 | Runtime | Python 3.10+ standard library | everything |
 | Optional tool | NCBI BLAST+ (`blastn`, `blastp`, `makeblastdb`, `blastdbcmd`) | local BLAST searches |
+| Optional package | ViennaRNA (`[structure]` extra) | MFE secondary structure in the RNA module; without it the view says it is not available |
 | Optional network | NCBI BLAST and the four literature services | remote BLAST and literature search, only when the user starts one |
 | Test reference | Biopython, primer3-py (`[reference]` extra) | independent cross-checks in the tests |
 | Development | pyright (`[dev]` extra) | type checking against Python 3.10 |

@@ -892,6 +892,61 @@ def print_rna_sequence_view(analysis):
     print(minor_rule())
 
 
+def print_rna_secondary_structure(analysis):
+    """Energy-based MFE structure (ViennaRNA, optional) beside the hairpin screen."""
+
+    from analyses.rna_structure import predict_secondary_structure
+
+    rna = analysis.get("rna", "")
+    candidates = analysis.get("structure", {}).get("hairpins")
+    result = predict_secondary_structure(rna, hairpin_candidates=candidates)
+
+    style.header('RNA SECONDARY STRUCTURE (MFE)')
+    style.field('Tool', f"ViennaRNA {result['version']}" if result["version"] else "ViennaRNA")
+    style.field('Energy model', result["energy_model"])
+    style.field('Temperature', f"{result['temperature_c']:.1f} °C")
+    style.field('Length', f"{result['length']} nt")
+
+    if not result["available"]:
+        print()
+        style.note(result["reason"])
+        style.note("The energy model is optional: install the ViennaRNA package "
+                   "(pip install ViennaRNA) to compute it.")
+        return result
+
+    style.field('MFE', f"{result['mfe_kcal_per_mol']:.2f} kcal/mol")
+    style.field('Paired positions', f"{result['paired_fraction'] * 100:.1f}%")
+    style.field('MFE hairpins', f"{len(result['mfe_hairpins'])}")
+    if "hairpin_candidates" in result:
+        total = len(result["hairpin_candidates"])
+        style.field('Screen candidates', f"{total}")
+        style.field('Favorable alone', f"{result['candidates_favorable']} of {total} (ΔG < 0)")
+        style.field('Supported by MFE', f"{result['candidates_in_mfe']} of {total}")
+
+    style.section('MFE STRUCTURE')
+    print("5' -> 3'")
+    line_width = 60
+    for start in range(0, len(rna), line_width):
+        end = min(start + line_width, len(rna))
+        print(f"{start + 1:>6}-{end:<6} {rna[start:end].upper().replace('T', 'U')}")
+        print(f"{'':13} {result['structure'][start:end]}")
+
+    if result["mfe_hairpins"]:
+        style.section('MFE HAIRPINS')
+        for hairpin in result["mfe_hairpins"][:10]:
+            style.field('Position', f"{hairpin['start']}-{hairpin['end']} "
+                        f"(stem {hairpin['stem_length']} bp, loop {hairpin['loop_length']} nt)")
+
+    print()
+    for message in result["warnings"]:
+        style.warning(message)
+    for message in result["limitations"]:
+        style.note(message)
+    style.note("The hairpin screen in RNA Features is a sequence screen without energies; "
+               "use this view to judge which of its candidates are thermodynamically plausible.")
+    return result
+
+
 def _pause_rna_ui():
     style.pause()
 
@@ -948,6 +1003,7 @@ def run_rna_analysis_ui(
             ("Analysis", [('2', 'Translation & Codon Analysis'), ('3', 'RNA Features')]),
             ("Report", [('4', 'Complete RNA Report')]),
             ("Sequence", [('5', 'RNA Sequence')]),
+            ("Structure", [('6', 'Secondary Structure (ViennaRNA, optional)')]),
         ])
 
         choice = style.ask_choice().lower()
@@ -990,6 +1046,14 @@ def run_rna_analysis_ui(
         elif choice == "5":
 
             print_rna_sequence_view(
+                analysis
+            )
+
+            _pause_rna_ui()
+
+        elif choice == "6":
+
+            print_rna_secondary_structure(
                 analysis
             )
 

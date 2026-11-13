@@ -210,12 +210,35 @@ use 0-based inclusive `start <= stop` on the forward strand.
   Kyte–Doolittle scale, not predictions from TMHMM/Phobius or SignalP.
 - RNA hairpin screen: stems of 4-7 nt around loops of 3-12 nt are reported
   when at least 75 % of the stem positions form Watson-Crick pairs. It is a
-  sequence screen without free energies (no Turner parameters, no RNAfold).
+  sequence screen without free energies; the optional MFE view below adds them.
   G·U wobble pairs (P2-5, 2026-11-11) are counted in a second figure,
   "Including G-U pairs" (`hairpin_count_with_gu`, `allow_gu=True`), not in
   the screen itself: treating G·U like G·C without an energy model raises
   the candidates on the golden-master reference from 58 to 260 rather than
   finding stronger stems.
+- RNA secondary structure (P2-5, 2026-11-13; `analyses/rna_structure.py`,
+  `core.api.rna_secondary_structure`, RNA menu entry 6). Optional: when
+  the ViennaRNA package is installed, the minimum free energy (MFE)
+  structure is computed with its default model (Turner 2004
+  nearest-neighbor parameters, 37 °C; Lorenz et al. 2011), and every
+  hairpin-screen candidate is annotated with the free energy of its
+  stem-loop evaluated alone and with the number of its pairs that the MFE
+  structure contains. Without ViennaRNA the view says so and nothing is
+  computed. Folding is limited to 3,000 nt by default (cubic run time:
+  about 2 s at 2,000 nt, 14 s at 4,000 nt on the development machine).
+  An MFE structure is a prediction for one molecule in isolation.
+- Hairpin screen compared with RNAfold (ViennaRNA 2.8.0, 2026-11-13;
+  `tests/test_rna_secondary_structure.py`). Corpus: eight 300-nt windows of
+  pUC19 L09137.2 (1-2400) transcribed, and eight seeded random 300-nt
+  sequences. Of 74 MFE hairpins with stems of at least 3 bp, 64 (86 %)
+  overlap a screen candidate by at least half of the candidate's pairs.
+  Of 3,307 screen candidates, 448 (14 %) are supported by the MFE
+  structure and 1,164 (35 %) have a negative free energy on their own
+  (median +1.2 kcal/mol). The screen is therefore sensitive but not
+  specific: it finds most hairpins the energy model predicts, and most of
+  its candidates are not thermodynamically favorable. Read its count as a
+  list of complementary regions to inspect, and use the MFE view to judge
+  them.
 - RNA codon view (P1-9): the three-frame preview uses the genetic code of
   the selected ORF, taken from the ORF itself; without a selected ORF it
   uses table 1. The +1 frame therefore agrees with the ORF's own

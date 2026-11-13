@@ -153,6 +153,38 @@ def analyze_rna(record_or_sequence: Any, *, profile_window: int = 100,
                    warnings=warnings)
 
 
+def rna_secondary_structure(record_or_sequence: Any, *, temperature: float = 37.0,
+                            max_length: Optional[int] = None, include_hairpin_screen: bool = True,
+                            sequence_type: Optional[str] = None) -> AnalysisResult:
+    """MFE secondary structure with ViennaRNA when it is installed (optional, P2-5).
+
+    The data say ``available: False`` with the reason when ViennaRNA cannot
+    be loaded or the sequence exceeds ``max_length`` (``None`` means the
+    module default, ``analyses.rna_structure.DEFAULT_MAX_LENGTH``). With
+    ``include_hairpin_screen`` the RNA module's hairpin candidates are
+    annotated with their isolated free energy and MFE support.
+    """
+    from analyses.rna import find_rna_hairpins
+    from analyses import rna_structure
+
+    sequence, description, _, warnings = _sequence_of(
+        record_or_sequence, sequence_type=sequence_type, context="RNA secondary structure")
+    rna = sequence.replace("T", "U")
+    # The structure is computed in the RNA alphabet, so the DNA-alphabet note does not apply.
+    warnings = [warning for warning in warnings if warning != _RNA_AS_DNA]
+    limit = rna_structure.DEFAULT_MAX_LENGTH if max_length is None else max_length
+    candidates = find_rna_hairpins(rna) if include_hairpin_screen and len(rna) <= limit else None
+    data = rna_structure.predict_secondary_structure(rna, temperature=temperature, max_length=limit,
+                                                     hairpin_candidates=candidates)
+    return _result("rna_structure", data, sequence, description,
+                   parameters={"temperature_c": temperature, "max_length": limit,
+                               "include_hairpin_screen": include_hairpin_screen,
+                               "tool": "ViennaRNA", "tool_version": data.get("version"),
+                               "energy_model": rna_structure.ENERGY_MODEL},
+                   warnings=list(warnings) + list(data.get("warnings", [])),
+                   limitations=list(data.get("limitations", [])))
+
+
 def analyze_protein_from_cds(cds: Any, *, initiator_start: bool = True,
                              genetic_code: Optional[int] = None,
                              description: str = "CDS",
@@ -609,5 +641,5 @@ __all__ = [
     "analyze_protein", "restriction_digest", "design_primers", "compare_sequences", "analyze_vcf",
     "design_crispr_guides", "plan_cloning", "filter_variants", "mutation_report", "blast_search",
     "blast_resume", "literature_search", "cross_check_variants",
-    "design_primers_for_restriction_site", "binding_features",
+    "design_primers_for_restriction_site", "binding_features", "rna_secondary_structure",
 ]

@@ -38,6 +38,7 @@ under 3.14.6 skips only the benchmark.
 | nodejs-wheel-binaries | 24.19.0 | MIT | Dependency of pyright | – |
 | coverage | 7.10.7 | Apache-2.0 | 2026-11-12 | `docs/TEST_COVERAGE.md` |
 | ruff | 0.14.4 | MIT | 2026-11-13 | One lint pass (below) |
+| ViennaRNA | 2.8.0 (wheel `viennarna-2.8.0-cp314-cp314-win_amd64.whl`, SHA-256 `0e68680eff9c1c7865aaa2cfbd313ea3e569e961496f7710e9852651046c252a`) | ViennaRNA Package licence: research, educational and commercial use and modification permitted if the package is not redistributed for a fee and its authors are credited; not redistributed with Synapse | 2026-11-13 | Optional MFE view (`analyses/rna_structure.py`) and the hairpin-screen comparison in `tests/test_rna_secondary_structure.py` (skipped without it). Citation: Lorenz R. et al. (2011) Algorithms Mol Biol 6:26 |
 
 ## Static analysis and formatting tools (Master Prompt 7.4)
 
