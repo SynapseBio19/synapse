@@ -351,8 +351,13 @@ def analyze_vcf(path: str, *, contig_references: Optional[Dict[str, str]] = None
     from analyses import variant_analysis as V
 
     V.validate_contig_matching(contig_matching)
-    variants, metadata, samples = V.parse_vcf_file(path, split_multiallelic=split_multiallelic)
+    reference_only: List[str] = []
+    variants, metadata, samples = V.parse_vcf_file(path, split_multiallelic=split_multiallelic,
+                                                   skipped=reference_only)
     warnings: List[str] = []
+    if reference_only:
+        warnings.append(f"{len(reference_only)} record(s) without an ALT allele (ALT '.', "
+                        "reference-only sites) are not variants and were not counted.")
     reference_check = None
     normalization: Dict[str, Any] = {
         "reference_supplied": bool(contig_references),
@@ -393,7 +398,7 @@ def analyze_vcf(path: str, *, contig_references: Optional[Dict[str, str]] = None
     statistics = V.calculate_variant_statistics(variants)
     data = {"variants": variants, "samples": samples, "statistics": statistics,
             "reference_check": reference_check, "normalization": normalization,
-            "header_line_count": len(metadata)}
+            "header_line_count": len(metadata), "reference_only_records": reference_only}
     from core.models import sha256_file
     result = _result("variant", data, "", path,
                      parameters={"split_multiallelic": split_multiallelic,

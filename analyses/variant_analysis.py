@@ -703,12 +703,19 @@ def parse_vcf(
     text: str,
     *,
     split_multiallelic: bool = True,
+    skipped: Optional[List[str]] = None,
 ) -> Tuple[List[Variant], List[str], List[str]]:
     """
     Parse VCF text.
 
     Returns:
         variants, metadata_lines, sample_names
+
+    A record without an ALT allele (ALT ".", a reference-only site such as a
+    gVCF reference block) is not a variant and yields no Variant when
+    records are split. Pass a list as ``skipped`` to receive one
+    "CHROM:POS REF>." entry per such record, so that callers can report
+    them instead of losing them silently (Master Prompt 10.8).
     """
     variants: List[Variant] = []
     metadata: List[str] = []
@@ -777,7 +784,10 @@ def parse_vcf(
         )
 
         if split_multiallelic:
-            variants.extend(record.split())
+            split_variants = record.split()
+            if not split_variants and skipped is not None:
+                skipped.append(f"{chrom}:{position} {ref}>{alt_text}")
+            variants.extend(split_variants)
         else:
             variants.append(
                 Variant(
@@ -797,17 +807,21 @@ def parse_vcf(
     return variants, metadata, sample_names
 
 
-def parse_vcf_file(path: str, *, split_multiallelic: bool = True):
-    """Parse a VCF file; ``.gz``/BGZF-compressed files are read transparently."""
+def parse_vcf_file(path: str, *, split_multiallelic: bool = True,
+                   skipped: Optional[List[str]] = None):
+    """Parse a VCF file; ``.gz``/BGZF-compressed files are read transparently.
+
+    ``skipped`` collects the reference-only records, as in parse_vcf().
+    """
     import gzip
 
     with open(path, "rb") as probe:
         magic = probe.read(2)
     if magic == b"\x1f\x8b":
         with gzip.open(path, "rt", encoding="utf-8") as handle:
-            return parse_vcf(handle.read(), split_multiallelic=split_multiallelic)
+            return parse_vcf(handle.read(), split_multiallelic=split_multiallelic, skipped=skipped)
     with open(path, "r", encoding="utf-8") as handle:
-        return parse_vcf(handle.read(), split_multiallelic=split_multiallelic)
+        return parse_vcf(handle.read(), split_multiallelic=split_multiallelic, skipped=skipped)
 
 
 # ============================================================================

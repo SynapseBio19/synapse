@@ -68,7 +68,7 @@ simulated keystrokes (see audit §11.5).
 | — | Protein record menu | `main.run_protein_record`, `analyses.protein.run_protein_analysis_from_record` | Implemented | Execution-tested | Integration-tested | Not applicable | Protein FASTA/GenPept records: protein analysis, BLAST (protein query), report (D14, 2026-10-31). X/B/Z/J/U/O keep their positions (**D14-F6** corrected 2026-10-31). |
 | 5 | Restriction & Cloning | `analyses.restriction.run_restriction_cloning_ui` | Implemented | Execution-tested | Integration-tested | Independently validated (digests, circular map) | D3/D4/D5 corrected 2026-10-31. Open: **S17**, **S18**. |
 | 6 | Primer Design | `analyses.primer.run_primer_analysis_ui` | Implemented | Execution-tested | Integration-tested | Independently validated (primer3-py) | **D16 corrected 2026-10-31**: one definition per name; superseded generations removed after a reachability review. Tm agrees with primer3-py within 0.0032 °C over 2,916 comparisons. |
-| 7 | Mutation & Variant Analysis | `analyses.mutation.run_mutation_variant_ui` | Implemented | Execution-tested | Integration-tested | Partially (algorithm checked, no bcftools) | **D12** in the variant branch — corrected 2026-10-31 (Phase 6 Tier 1). |
+| 7 | Mutation & Variant Analysis | `analyses.mutation.run_mutation_variant_ui` | Implemented | Execution-tested | Integration-tested | Normalization compared with bcftools' published outputs (2026-11-13) | **D12** in the variant branch — corrected 2026-10-31 (Phase 6 Tier 1). |
 | 8 | CRISPR Guide Design | `analyses.crispr.crispr_menu` | Partially implemented | Execution-tested | Integration-tested | Not applicable | **D8, D9, D10 corrected 2026-10-31** (cut site, on-target exclusion, configuration fields). Partial because CFD scoring and genome-wide off-target search are absent by design. |
 | 9 | BLAST Search | `analyses.blast.blast_menu` | Implemented | Execution-tested | Integration-tested | Independently validated (real BLAST+ run) | **D6, D7 corrected 2026-10-31**: programmatic local BLAST by database path; the stale artifact is labeled legacy. |
 | 10 | Literature Search | `analyses.literature.main` | Implemented | Execution-tested (offline) | Integration-tested | Blocked by external dependency (no live call made) | **S11**: a live check needs the owner's approval for external requests. |
@@ -302,7 +302,7 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 | — | Genotype parsing, phasing, categories | `parse_genotype`, `genotype_category` | Implemented | Execution-tested | Not applicable | |
 | — | FILTER semantics | `_normalize_filter_status` | Implemented | Execution-tested | Not applicable | `.` = not applied, not failed. |
 | 2 | Add Variant Manually | `_prompt_variant` | Implemented | Reachable | Not applicable | |
-| 3 | Normalize Variants | `left_normalize_variant`, `normalize_variants`, `trim_common_bases` | Implemented | Execution-tested | **Partially validated** | Algorithm hand-verified against Tan et al. 2015 on 5 constructed cases (audit §3.7). **No bcftools comparison** — blocked on Windows. |
+| 3 | Normalize Variants | `left_normalize_variant`, `normalize_variants`, `trim_common_bases` | Implemented | Execution-tested | **Independently validated** (against bcftools' published outputs) | Algorithm hand-verified against Tan et al. 2015 (audit §3.7); 29/29 alleles identical to `bcftools norm -m-` on the bcftools 1.25 test vectors, REF mismatch handling as `-cx` (2026-11-13, `test_bcftools_norm_reference`). Reference-only records (ALT `.`) are reported, not counted. |
 | — | REF validation | `check_reference_alleles`, `_reference_allele_matches` | Implemented | Execution-tested | Not applicable | **D12 corrected 2026-10-31**: a contig without a reference is flagged `REFERENCE_CONTIG_NOT_FOUND` and listed in `contigs_not_found`; `not_checked` is split by reason. Previously it was skipped silently. Tests: `tests/test_phase6_tier1.py::VariantContigMatchingTests`. |
 | — | Contig-name matching | `resolve_contig_names`, `ContigResolution`, `contig_matching=` | Implemented | Execution-tested | Not applicable | Exact by default; opt-in `chr_prefix` pairs `1`/`chr1` (flag `CONTIG_NAME_ALIASED`, CHROM unchanged). Mitochondrial names never paired; case variants not folded. **Not covered**: contig-length checks against `##contig`, RefSeq/GenBank accession names. |
 | 4 | Filter Variants | `variant_passes_filter`, `filter_variants`, `VariantFilter` | Implemented | Execution-tested | Not applicable | Missing-value filtering covered by a self-test. |
@@ -489,7 +489,6 @@ explicitly not implemented.
 
 | Validation | Blocker | Route |
 |---|---|---|
-| `bcftools norm` comparison | No native Windows build | WSL or a Linux host |
 | ORFfinder comparison | No local binary | NCBI ORFfinder standalone, or a curated RefSeq CDS set |
 | NEBcutter comparison | Web service | Substantively superseded by validation 2 |
 | Live remote NCBI BLAST | Not run by choice | One confirmed run recording RID and provenance |

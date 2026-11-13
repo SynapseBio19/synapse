@@ -2175,3 +2175,18 @@ Prompt of 2026-11-13. History and binding decisions:
   analysis output and the golden master are untouched.
 - Tests: `tests/test_rna_secondary_structure.py` (12; the ViennaRNA tests
   skip without the package).
+
+### Variant normalization compared with `bcftools norm`; reference-only records reported
+
+- Comparison (no behavior change): Synapse's split-and-normalize result
+  equals `bcftools norm -m-` on the bcftools 1.25 test vectors for 29 of
+  29 alleles; the REF mismatch that `-cx` excludes is the one Synapse
+  flags. Fixtures with SHA-256 and licence in
+  `tests/fixtures/bcftools_norm/`.
+- Previous: a VCF record without an ALT allele (ALT `.`) produced no
+  variant and was dropped without notice.
+- Now: it still produces no variant (it is a reference-only site), but
+  `parse_vcf(..., skipped=[])` lists it, `core.api.analyze_vcf` warns and
+  returns `data["reference_only_records"]`, and the variant menu prints a
+  NOTE after loading (Master Prompt 10.8, no silent loss).
+- Tests: `tests/test_bcftools_norm_reference.py` (7).

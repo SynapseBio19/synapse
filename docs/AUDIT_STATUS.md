@@ -26,7 +26,7 @@ named.
 | P0-4 | Enzyme data (ClaI, NdeI) with source and date | PARTIAL | ClaI corrected (AT^CGAT, 2 nt 5′ CG), NdeI overhang TA confirmed, `ENZYME_DATABASE_VERSION` added. A systematic re-check of all 22 entries against REBASE was not possible (no access from this environment); the entries carry a reviewed-date comment instead. |
 | P0-5 | Ambiguity-dependent (POSSIBLE) sites excluded from digests | IMPLEMENTED+TESTED | `include_possible=False` by default, reported separately; test: 110 bp with 10 N → 0 cuts, 1 fragment. Phase 6 (audit D4, 2026-10-31): the cloning module had its own matcher without this distinction; it now uses the restriction matcher, counts only CONFIRMED sites, and does not treat an enzyme with POSSIBLE sites as a unique cutter (`tests/test_phase6_tier1.py::CloningAmbiguousSiteTests`). |
 | P0-6 | Start-loss only for codon 1 | IMPLEMENTED+TESTED | Internal ATG→ATA = 1 missense, 0 start-loss. |
-| P0-7 | Variant normalization per Tan et al. 2015, REF check | IMPLEMENTED (not independently validated) | Algorithm, REF check and `REF_MISMATCH` flag implemented and unit tested. The acceptance criterion "result equals `bcftools norm`" could not be run (tool not installable here). Recommended as the next validation step. |
+| P0-7 | Variant normalization per Tan et al. 2015, REF check | IMPLEMENTED, compared with `bcftools norm` | Algorithm, REF check and `REF_MISMATCH` flag implemented and unit tested. Compared on 2026-11-13 with the published outputs of the bcftools 1.25 test suite: 29/29 split-and-normalized alleles identical, the same REF mismatch flagged (`tests/test_bcftools_norm_reference.py`). bcftools itself was not run (no Windows build). |
 | P0-8 | Initiator methionine at an ORF's first codon | IMPLEMENTED+TESTED | GTG-ORF → "MKF"; configurable, bound to the genetic code. Phase 6 (audit D1, 2026-10-31): the initiator set now comes from the genetic code (NCBI starts, plus table-1 GTG policy), so CTG (table 1) is also decoded as Met, and the protein/API path no longer turns a non-initiation first codon into Met; checked against Biopython for tables 1, 2, 4, 11. |
 | P0-9 | ORF defaults: ATG only, 75 nt, longest per stop, length ranking | IMPLEMENTED+TESTED | Approved by the user before the change. Legacy settings selectable and proven equivalent to the old behavior by a golden-master test. |
 
@@ -72,7 +72,9 @@ named.
 These were not possible in the development environment and are the
 recommended next steps:
 
-1. `bcftools norm` comparison for variant normalization (P0-7).
+1. ~~`bcftools norm` comparison for variant normalization (P0-7).~~
+   Done 2026-11-13 against the bcftools 1.25 test vectors: 29/29
+   split-and-normalized alleles identical (`docs/METHODS.md`).
 2. ~~Primer3 / Biopython Tm comparison at several Mg²⁺ levels (P1-3).~~
    Done 2026-11-02 with primer3-py 2.4.0: 2,916 comparisons over Mg²⁺
    0-3 mM, max |ΔTm| 0.0032 °C (`docs/METHODS.md`).

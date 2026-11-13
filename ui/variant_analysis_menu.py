@@ -113,12 +113,16 @@ def _print_filter_result(result: VariantFilterResult) -> None:
                 print(f"  - {reason}")
 
 
+# Reference-only records (ALT ".") of the last load, reported after loading.
+_REFERENCE_ONLY: List[str] = []
+
+
 def _load_vcf_text_interactive() -> Tuple[List[Variant], List[str], List[str]]:
     print()
     path = style.ask('VCF file path (.vcf or .vcf.gz; Enter to paste text instead)').strip('"')
     if path:
         try:
-            return parse_vcf_file(path)
+            return parse_vcf_file(path, skipped=_REFERENCE_ONLY)
         except OSError as error:
             raise VariantAnalysisError(f"Could not read VCF file: {error}") from error
     print("Paste VCF text. Enter an empty line to finish.")
@@ -130,7 +134,7 @@ def _load_vcf_text_interactive() -> Tuple[List[Variant], List[str], List[str]]:
         lines.append(line)
     if not lines:
         raise VariantAnalysisError("No VCF text supplied.")
-    return parse_vcf("\n".join(lines))
+    return parse_vcf("\n".join(lines), skipped=_REFERENCE_ONLY)
 
 
 def _prompt_contig_reference(pipeline, variants: Sequence[Variant]) -> Dict[str, str]:
@@ -209,6 +213,7 @@ def run_variant_analysis_ui(
 
         if choice == "1":
             try:
+                _REFERENCE_ONLY.clear()
                 parsed, parsed_metadata, parsed_samples = _load_vcf_text_interactive()
                 working = synchronize_variant_fields(parsed)
                 metadata = parsed_metadata
@@ -217,6 +222,9 @@ def run_variant_analysis_ui(
                 last_filter_result = None
                 refresh_result()
                 print(f"Loaded {len(working)} variant(s).")
+                if _REFERENCE_ONLY:
+                    style.note(f"{len(_REFERENCE_ONLY)} record(s) without an ALT allele (ALT '.', "
+                               "reference-only sites) are not variants and were not loaded.")
             except (VariantAnalysisError, ValueError) as error:
                 style.error(f"{error}")
 

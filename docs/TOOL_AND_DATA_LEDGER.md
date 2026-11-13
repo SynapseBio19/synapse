@@ -27,6 +27,12 @@ comparisons, because those packages are not installed for 3.10; one test
 that needs the 3.12 tokenizer; and the opt-in benchmark). The same suite
 under 3.14.6 skips only the benchmark.
 
+## Reference data added in the continuation run (2026-11-13)
+
+| Resource | Version | Source | Obtained | Licence | Checksum | Used by |
+|---|---|---|---|---|---|---|
+| bcftools `norm` test vectors (10 files) | bcftools 1.25 (tag `1.25`, released 2026-10-27) | <https://github.com/samtools/bcftools/tree/1.25/test> | 2026-11-13 | MIT/Expat (bcftools dual licence MIT/Expat or GPL) | SHA-256 per file in `tests/fixtures/bcftools_norm/SOURCE.md`, checked by the test | `tests/test_bcftools_norm_reference.py` |
+
 ## Python packages (project `.venv`, from PyPI)
 
 | Package | Version | Licence | Obtained | Used by |

@@ -481,9 +481,23 @@ therefore upper estimates.
 - FILTER `.` counts as "not filtered", not as failed.
 - Validation: known-answer tests; the left-alignment algorithm was checked
   by hand against Tan et al. (2015) on constructed repeat cases
-  (`docs/PHASE6_INITIAL_AUDIT.md` §3.7); not compared against
-  `bcftools norm` (no native Windows build; recommended next validation
-  step).
+  (`docs/PHASE6_INITIAL_AUDIT.md` §3.7).
+- Comparison with `bcftools norm` (2026-11-13,
+  `tests/test_bcftools_norm_reference.py`): the input, reference and
+  expected-output files of the bcftools 1.25 test suite
+  (`tests/fixtures/bcftools_norm/SOURCE.md`). bcftools itself was not run
+  (no native Windows build); its published outputs are the reference.
+  Split-then-normalize (`-m-`, the like-for-like case, since Synapse always
+  splits): 29 of 29 alleles identical, covering homopolymer and
+  dinucleotide repeats, MNP trimming, an insertion at position 1 and a
+  200-nt deletion; the telomeric N repeat and already left-aligned records
+  identical; the one record `-cx` excludes for a REF mismatch is the one
+  Synapse flags `REF_MISMATCH`. The only difference: bcftools keeps the
+  reference-only record `20:59 AG>.`, which Synapse does not count as a
+  variant. Since 2026-11-13 such records are reported (API warning and
+  `data["reference_only_records"]`, a NOTE in the variant menu) instead of
+  disappearing silently. Joint normalization of unsplit multi-allelic
+  records is not compared because Synapse does not offer it.
 - Primers and guides against variants (P2-4, 2026-11-11,
   `core.api.cross_check_variants`): a variant overlaps a binding site when
   any base of its REF allele lies in it. Primer sites are the primer's
