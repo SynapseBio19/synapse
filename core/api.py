@@ -403,20 +403,34 @@ def cross_check_variants(result: AnalysisResult, variants: Sequence[Any], *,
     """
     from analyses.variant_analysis import check_features_against_variants
 
+    features = binding_features(result.module, result.data, top_n=top_n,
+                                three_prime_window=three_prime_window, seed_length=seed_length)
+    return check_features_against_variants(features, variants, chromosome=chromosome)
+
+
+def binding_features(module: str, data: Any, *, top_n: int = 5, three_prime_window: int = 5,
+                     seed_length: Optional[int] = None) -> List[Dict[str, Any]]:
+    """Binding sites of the top primer pairs or guides, 1-based on the design's sequence.
+
+    ``data`` is a primer design report (``module="primer"``; a design around
+    a restriction site is accepted too) or a CRISPR design result
+    (``module="crispr"``).
+    """
     features: List[Dict[str, Any]] = []
-    if result.module == "primer":
+    if module == "primer":
         from analyses.primer import primer_pair_binding_sites
-        for rank, pair in enumerate(list(result.data.ranked_pairs)[:top_n], start=1):
+        report = getattr(data, "report", data)
+        for rank, pair in enumerate(list(report.ranked_pairs)[:top_n], start=1):
             for site in primer_pair_binding_sites(pair, three_prime_window):
                 site["name"] = f"pair {rank} {site['name']}"
                 features.append(site)
-    elif result.module == "crispr":
+    elif module == "crispr":
         from analyses.crispr import DEFAULT_SEED_LENGTH, guide_binding_site
-        for candidate in list(result.data.candidates)[:top_n]:
+        for candidate in list(data.candidates)[:top_n]:
             features.append(guide_binding_site(candidate, seed_length or DEFAULT_SEED_LENGTH))
     else:
         raise ValueError("cross_check_variants needs a primer or CRISPR design result.")
-    return check_features_against_variants(features, variants, chromosome=chromosome)
+    return features
 
 
 def plan_cloning(vector: Any, insert: Any, enzymes: Optional[Sequence[str]] = None, *,
@@ -595,5 +609,5 @@ __all__ = [
     "analyze_protein", "restriction_digest", "design_primers", "compare_sequences", "analyze_vcf",
     "design_crispr_guides", "plan_cloning", "filter_variants", "mutation_report", "blast_search",
     "blast_resume", "literature_search", "cross_check_variants",
-    "design_primers_for_restriction_site",
+    "design_primers_for_restriction_site", "binding_features",
 ]

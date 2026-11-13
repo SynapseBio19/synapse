@@ -787,6 +787,7 @@ def main():
                         sequence=dna,
                         sequence_name=header,
                         selected_orf=selected_orf,
+                        pipeline=pipeline,
                     )
 
                     if crispr_result is not None:

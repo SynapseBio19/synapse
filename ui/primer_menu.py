@@ -25,6 +25,7 @@ from analyses.primer import (  # noqa: F401
     validate_target_region,
 )
 from ui import style
+from ui.variant_check import print_variant_check
 from ui.style import major_rule
 
 
@@ -434,6 +435,7 @@ def _v7_primer_ui_design(sequence, target_start, target_end, pipeline):
         )
 
         print_professional_primer_report(report)
+        print_variant_check(pipeline, sequence, "primer", report)
         _primer_ui_store_result(pipeline, report)
         return report
 
@@ -502,6 +504,7 @@ def _primer_ui_restriction_site_design(sequence, pipeline):
 
     print_professional_primer_report(design.report)
     print_restriction_site_design(design)
+    print_variant_check(pipeline, sequence, "primer", design)
     _primer_ui_store_result(pipeline, design)
     return design
 

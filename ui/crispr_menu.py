@@ -55,6 +55,7 @@ from analyses.crispr import (  # noqa: F401
     run_self_test,
 )
 from ui import style
+from ui.variant_check import print_variant_check
 from ui.style import minor_rule
 
 
@@ -238,8 +239,12 @@ def crispr_menu(
     sequence: Optional[str] = None,
     sequence_name: str = "Selected Sequence",
     selected_orf: Optional[Any] = None,
+    pipeline: Optional[Any] = None,
 ) -> Optional[DesignResult]:
     """Interactive Synapse CRISPR menu. Returns the last design result (or None).
+
+    With ``pipeline``, guides designed on the pipeline's sequence are checked
+    against the variants mapped onto it in the variant dialog (T12).
 
     The analysis engine remains fully featured, while the user interface groups
     closely related operations into a smaller set of professional workflows.
@@ -569,6 +574,7 @@ def crispr_menu(
                 )
                 print(f"Found {last_result.candidate_count} candidate(s).")
                 _print_candidate_table(last_result.candidates)
+                print_variant_check(pipeline, base_sequence, "crispr", last_result)
             except CRISPRAnalysisError as exc:
                 style.error(f"{exc}")
 

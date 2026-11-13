@@ -351,6 +351,12 @@ def run_variant_analysis_ui(
                     )
                 working = normalize_variants(working, contig_references=contig_map or {})
                 working = synchronize_variant_fields(working)
+                context = getattr(pipeline, "context", None)
+                if contig_map and context is not None and hasattr(context, "set_mapped_variants"):
+                    contig = next(iter(contig_map))
+                    context.set_mapped_variants(contig, working)
+                    style.note(f"The variants of {contig} are kept for this sequence; later primer "
+                               "and guide designs on it are checked against them.")
                 filtered_view = None
                 last_filter_result = None
                 refresh_result()

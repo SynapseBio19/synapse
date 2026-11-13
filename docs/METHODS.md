@@ -463,10 +463,15 @@ therefore upper estimates.
   it are the critical part, taken as the guide bases adjacent to the PAM so
   that strand and PAM side need no separate rule. Overlaps in the critical
   part are HIGH, elsewhere MODERATE. The variants must be mapped to the
-  analyzed sequence (1-based positions; `chromosome` selects a contig); the
-  check is available through `core.api` and is not wired into the menus,
-  because the pipeline does not record which VCF contig was mapped to the
-  loaded sequence.
+  analyzed sequence (1-based positions; `chromosome` selects a contig).
+  Menus (T12, 2026-11-12): when the variant dialog normalizes with a VCF
+  contig mapped onto the loaded sequence, the pipeline keeps that contig's
+  variants with the sequence's SHA-256
+  (`PipelineContext.set_mapped_variants`). The primer dialogs (ordinary
+  design and design around a restriction site) and the CRISPR guide design
+  then show "Variants in binding sites" for the top five designs. A design
+  on another sequence, for example a manually entered one, is not checked,
+  because its positions are not those of the VCF.
 
 ## CRISPR guide design (`analyses/crispr.py`)
 
@@ -543,9 +548,22 @@ therefore upper estimates.
   or protein, the programmatic entry points refuse it. RNA is searched as
   DNA with U read as T, recorded in the query's notes. The protein
   alphabet includes J, U and O, which BLAST+ accepts.
+- A submitted remote search keeps polling through a connection error, a
+  timeout or an HTTP 429/5xx answer (up to 3 in a row, within the maximum
+  wait); if it still fails, the error names the RID so the search can be
+  collected later (D25, 2026-11-12).
+- Remote databases: `nt`, `refseq_rna`, `refseq_genomic`, `nr`,
+  `refseq_protein`, `swissprot`. NCBI's `core_nt`, its default nucleotide
+  database since 2024, is not offered.
 - Tested: parsing and scoring with synthetic XML; local blastp against
   small protein databases built with `makeblastdb` when BLAST+ is
-  installed. Not tested: live remote searches and large local databases.
+  installed; status polling with simulated network failures. Live remote
+  search (2026-11-13, approval policy of 2026-11-12): blastn of pUC19
+  L09137.2 bases 401-700 (public) against `nt`; top hits plasmid vectors
+  (pK19mob LC257598, pUChTNFR75f LT727529 and others) at 100 % identity,
+  100 % query coverage (300/300), E = 1.6e-149. A first attempt on
+  2026-11-12 lost the search to a DNS error during polling, which is how
+  D25 was found. Not tested: large local databases.
 
 ## Literature (`analyses/literature.py`)
 

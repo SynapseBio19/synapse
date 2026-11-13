@@ -109,3 +109,98 @@ class GuideCrossCheckTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class MenuIntegrationTests(unittest.TestCase):
+    """T12: the dialogs check designs against the variants mapped onto the sequence."""
+
+    def _drive(self, answers, call):
+        import builtins
+        import contextlib
+        import io
+        from unittest import mock
+        pending = list(answers)
+        buffer = io.StringIO()
+        with mock.patch.object(builtins, "input", lambda prompt="": pending.pop(0)), \
+                contextlib.redirect_stdout(buffer):
+            result = call()
+        return result, buffer.getvalue()
+
+    def test_primer_dialog_reports_a_variant_at_a_3_prime_end(self):
+        from core import api
+        from core.pipeline import SynapsePipeline
+        from ui import primer_menu
+        forward = api.design_primers(DNA).data.ranked_pairs[0].pair.forward
+        pipeline = SynapsePipeline(DNA, "seq")
+        last_base = forward.end            # 1-based position of the forward primer's 3' base
+        pipeline.context.set_mapped_variants("seq", [
+            _variant(last_base, DNA[last_base - 1], "A" if DNA[last_base - 1] != "A" else "C"),
+            _variant(5, DNA[4], "G", chromosome="other"),   # another contig: ignored
+        ])
+        _, output = self._drive(["", "", "", "", ""],      # Tm model, four conditions: defaults
+                                lambda: primer_menu._v7_primer_ui_design(DNA, 0, len(DNA), pipeline))
+        self.assertIn("VARIANTS IN BINDING SITES", output)
+        self.assertIn("Variants on the contig:", output)
+        line = next(l for l in output.splitlines() if l.startswith("pair 1 forward primer"))
+        self.assertIn(f"{last_base} ", line)
+        self.assertIn("HIGH", line)
+        self.assertIn("3' end", line)
+
+    def test_no_check_without_variants_or_on_another_sequence(self):
+        from core.pipeline import SynapsePipeline
+        from ui import primer_menu
+        pipeline = SynapsePipeline(DNA, "seq")
+        _, output = self._drive(["", "", "", "", ""],
+                                lambda: primer_menu._v7_primer_ui_design(DNA, 0, len(DNA), pipeline))
+        self.assertNotIn("VARIANTS IN BINDING SITES", output)
+        pipeline.context.set_mapped_variants("seq", [_variant(100, DNA[99])])
+        other = deterministic_dna(900, seed=5)
+        self.assertIsNone(pipeline.context.variants_for_sequence(other))
+        self.assertIsNotNone(pipeline.context.variants_for_sequence(DNA.lower()))
+
+    def test_guide_design_is_checked_through_the_shared_section(self):
+        import contextlib
+        import io
+        from analyses.crispr import design_guides
+        from core.pipeline import SynapsePipeline
+        from ui.variant_check import print_variant_check
+        result = design_guides(DNA)
+        guide = result.candidates[0]
+        pipeline = SynapsePipeline(DNA, "seq")
+        pipeline.context.set_mapped_variants("seq", [_variant(guide.pam_start, DNA[guide.pam_start - 1])])
+        buffer = io.StringIO()
+        with contextlib.redirect_stdout(buffer):
+            findings = print_variant_check(pipeline, DNA, "crispr", result)
+        self.assertTrue(findings)
+        assert findings is not None
+        self.assertEqual(findings[0]["severity"], "HIGH")
+        self.assertIn("VARIANTS IN BINDING SITES", buffer.getvalue())
+
+    def test_crispr_menu_accepts_the_pipeline(self):
+        import inspect
+        from ui import crispr_menu
+        self.assertIn("pipeline", inspect.signature(crispr_menu.crispr_menu).parameters)
+
+
+class VariantDialogMappingTests(unittest.TestCase):
+    def test_normalizing_with_a_mapped_contig_keeps_the_variants_for_the_sequence(self):
+        import builtins
+        import contextlib
+        import io
+        from unittest import mock
+        from core.pipeline import SynapsePipeline
+        from ui import variant_analysis_menu
+        pipeline = SynapsePipeline(DNA, "seq")
+        records = [f"seq\t{p}\t.\t{DNA[p - 1]}\t{'A' if DNA[p - 1] != 'A' else 'C'}\t50\tPASS\t." for p in (50, 400)]
+        vcf = ["##fileformat=VCFv4.2", "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO"] + records
+        # load: paste text, empty line ends it; normalize, map "seq"; leave
+        answers = ["1", ""] + vcf + ["", "3", "seq", "0"]
+        with mock.patch.object(builtins, "input", lambda prompt="": answers.pop(0)), \
+                contextlib.redirect_stdout(io.StringIO()) as out:
+            variant_analysis_menu.run_variant_analysis_ui(pipeline=pipeline)
+        mapping = pipeline.context.variants_for_sequence(DNA)
+        self.assertIsNotNone(mapping, out.getvalue()[-1500:])
+        assert mapping is not None
+        self.assertEqual(mapping["contig"], "seq")
+        self.assertEqual(sorted(v.position for v in mapping["variants"]), [50, 400])
+        self.assertIn("later primer and guide designs on it are checked", out.getvalue())

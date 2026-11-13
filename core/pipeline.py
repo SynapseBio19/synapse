@@ -79,6 +79,11 @@ class PipelineContext:
     # Generic result store: module key -> list of AnalysisResult (newest last).
     results: Dict[str, List[AnalysisResult]] = field(default_factory=dict)
 
+    # Variants of one VCF contig that the user mapped onto this sequence
+    # (T12): {"contig", "sequence_sha256", "variants"}. Primer and CRISPR
+    # designs on the same sequence are checked against them.
+    mapped_variants: Optional[Dict[str, Any]] = None
+
     # --------------------------------------------------------
     # ANALYSIS RESULTS
     # --------------------------------------------------------
@@ -232,6 +237,28 @@ class PipelineContext:
     # ========================================================
     # SEQUENCE
     # ========================================================
+
+    def set_mapped_variants(self, contig: str, variants: List[Any]) -> None:
+        """Record the variants of ``contig``, mapped onto this sequence (T12).
+
+        VCF positions are 1-based on the mapped sequence. The sequence's
+        SHA-256 is kept, so a design on another sequence is never checked
+        against these variants.
+        """
+        self.mapped_variants = {
+            "contig": str(contig),
+            "sequence_sha256": sha256_text(self.sequence.upper()),
+            "variants": [v for v in variants if getattr(v, "chromosome", None) == contig],
+        }
+
+    def variants_for_sequence(self, sequence: str) -> Optional[Dict[str, Any]]:
+        """The mapped variants if ``sequence`` is the sequence they were mapped onto."""
+        mapping = self.mapped_variants
+        if not mapping or not sequence:
+            return None
+        if sha256_text(str(sequence).upper()) != mapping["sequence_sha256"]:
+            return None
+        return mapping
 
     def store_sequence_analysis(
         self,
