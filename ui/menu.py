@@ -20,7 +20,7 @@ def show_menu():
         ("Search and planning", [
             (9, "BLAST Search"),
             (10, "Literature Search"),
-            (11, "AI Experiment Planner (not implemented)"),
+            (11, "AI Experiment Planner (Coming Soon)"),
         ]),
         ("Session", [
             ("P", "Pipeline Status & Stored Results"),

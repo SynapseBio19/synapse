@@ -50,7 +50,7 @@ simulated keystrokes (see audit §11.5).
 | Confirmed defects | 19 (D1–D19), all corrected by the end of Phase 6 (`docs/PHASE6_FINAL_REPORT.md`, section A; D16 finished with the removal of the superseded primer generations). The first 16 corrections are dated 2026-10-31 in the rows below. |
 | Suspected / unverified concerns | 14 at the audit (S1–S14); S15–S24 recorded since |
 | External validations performed in this audit | 8 (audit §3, §6) |
-| Features advertised but not implemented | 1 (`[11] AI Experiment Planner`, labeled "not implemented" since D15) |
+| Features advertised but not implemented | 1 (`[11] AI Experiment Planner`, labeled "Coming Soon": planned, not available, runs nothing; owner decision 2026-11-13) |
 
 ---
 
@@ -72,7 +72,7 @@ simulated keystrokes (see audit §11.5).
 | 8 | CRISPR Guide Design | `analyses.crispr.crispr_menu` | Partially implemented | Execution-tested | Integration-tested | Not applicable | **D8, D9, D10 corrected 2026-10-31** (cut site, on-target exclusion, configuration fields). Partial because CFD scoring and genome-wide off-target search are absent by design. |
 | 9 | BLAST Search | `analyses.blast.blast_menu` | Implemented | Execution-tested | Integration-tested | Independently validated (real BLAST+ run) | **D6, D7 corrected 2026-10-31**: programmatic local BLAST by database path; the stale artifact is labeled legacy. |
 | 10 | Literature Search | `analyses.literature.main` | Implemented | Execution-tested (offline) | Integration-tested | Blocked by external dependency (no live call made) | **S11**: a live check needs the owner's approval for external requests. |
-| 11 | **AI Experiment Planner** | — | **Not implemented** | Not applicable | Not applicable | Not applicable | **D15 corrected 2026-10-31**: the entry says "not implemented" instead of "coming soon". The planner itself is P3-1, deferred. |
+| 11 | **AI Experiment Planner** | — | **Not implemented (COMING SOON)** | Not applicable | Not applicable | Not applicable | Intentionally deferred (P3-1). D15 (2026-10-31) relabeled the entry "not implemented"; on 2026-11-13 the owner decided it stays **Coming Soon**. The entry says the feature is planned, not yet available, and that nothing is run or stored (`PlannerPlaceholderTests`). Not counted as a completed module. |
 | P | Pipeline Status & Stored Results | `core.pipeline.PipelineContext.status_report`, `ui.report.print_pipeline_status` | Implemented | Execution-tested | Integration-tested | Not applicable | **D19 corrected 2026-10-31**: `completed` has a fixed shape. |
 | R | Export Analysis Report (JSON/Markdown) | `core.report.export_analysis_report` | Implemented | Execution-tested | Integration-tested | Not applicable | Rejects suffixes other than `.json`/`.md`. **S8 corrected 2026-10-31**: a failing `to_dict()` is logged. Since 2026-11-02 a result's own warnings reach the summary. |
 | S | Select Another Sequence | `main.py` loop | Implemented | Execution-tested | Not applicable | Not applicable | |
@@ -447,7 +447,7 @@ As found by the audit, with the outcome of Phase 6 in each row.
 
 | Advertised where | Feature | Status |
 |---|---|---|
-| `main.py` menu `[11]` | AI Experiment Planner | **Not implemented**, and since 2026-10-31 (**D15**) the menu says so instead of "coming soon". P3-1. |
+| `main.py` menu `[11]` | AI Experiment Planner | **Not implemented: COMING SOON** (owner decision 2026-11-13). The entry states that the feature is planned and not yet available and runs nothing. P3-1. |
 | `crispr.DesignConfig` | `include_low_quality`, `rank_by_gc`, `editing_window_start`, `editing_window_end`, `base_editor` | Implemented 2026-10-31 (**D10**): each field acts (`CrisprConfigurationTests`). |
 | CRISPR menu `[4]`/`[5]` | Cut position for the chosen system | Implemented 2026-10-31 (**D8**), with the source per system. |
 | CRISPR menu `[9]`/`[10]` | On-target exclusion from off-target counts | Implemented 2026-10-31 (**D9**). |

@@ -63,7 +63,7 @@ named.
 
 | ID | Subject | Status |
 |---|---|---|
-| P3-1 | Evidence-bound experiment planner | DEFERRED (depends on P1-2, P1-12, both now in place). The menu entry says "not implemented" (Phase 6, D15). |
+| P3-1 | Evidence-bound experiment planner | DEFERRED, intentionally not implemented: **COMING SOON** (owner decision 2026-11-13). The menu entry says the feature is planned, not yet available, and runs nothing (D15 honesty requirement kept). |
 | P3-2 | Primer/guide specificity against genomes (BLAST, Cas-OFFinder) | DEFERRED (needs local databases) |
 | P3-3 | Web or desktop front end | DEFERRED (depends on P2-2; `core/api.py` is the entry layer for it) |
 

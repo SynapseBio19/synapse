@@ -246,10 +246,12 @@ class PipelineOrfRunnerTests(unittest.TestCase):
 
 
 # ----------------------------------------------------------------------
-# D15: the unimplemented planner is labeled as such
+# D15 and the owner decision of 2026-11-13: the planner is COMING SOON.
+# The entry stays, says that the feature is planned but not available,
+# and runs nothing (docs/PROJECT_HISTORY_AND_DECISIONS.md, section 6).
 # ----------------------------------------------------------------------
 class PlannerPlaceholderTests(unittest.TestCase):
-    def test_menu_says_not_implemented(self):
+    def test_menu_says_coming_soon_and_runs_nothing(self):
         import os
         import subprocess
         import sys
@@ -260,9 +262,15 @@ class PlannerPlaceholderTests(unittest.TestCase):
                                        capture_output=True, text=True, encoding="utf-8", timeout=120, env=env)
         output = completed.stdout + completed.stderr
         self.assertEqual(completed.returncode, 0, output[-2000:])
-        self.assertIn("[11] AI Experiment Planner (not implemented)", output)
-        self.assertIn("AI Experiment Planner: not implemented. Nothing is run or stored.", output)
-        self.assertNotIn("coming soon", output)
+        self.assertIn("[11] AI Experiment Planner (Coming Soon)", output)
+        self.assertIn("AI Experiment Planner: COMING SOON.", output)
+        self.assertIn("planned but not yet available. Nothing is run or stored.", output)
+
+    def test_main_menu_entry_text(self):
+        from ui import menu
+        import inspect
+        source = inspect.getsource(menu)
+        self.assertIn('(11, "AI Experiment Planner (Coming Soon)")', source)
 
 
 # ----------------------------------------------------------------------

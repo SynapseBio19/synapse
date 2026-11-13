@@ -31,7 +31,7 @@ tools. Where a module has been compared with an independent reference,
 | [8] | CRISPR guide design | Guides for SpCas9, SpCas9-NG, SaCas9 and Cas12a, modeled cut sites, base and prime editing candidates, off-target search in supplied sequences |
 | [9] | BLAST search | Local BLAST+ or NCBI BLAST, with resumable request IDs and an evidence summary per hit |
 | [10] | Literature search | PubMed, Europe PMC, OpenAlex and Crossref, deduplicated |
-| [11] | Experiment planner | **Not implemented.** The entry says so. |
+| [11] | AI Experiment Planner | **Coming Soon.** Planned, not yet available; the entry runs nothing. |
 
 `[P]` lists the stored results, `[R]` exports the session report (JSON or
 Markdown), `[S]` selects another sequence. `docs/FEATURE_STATUS.md` lists

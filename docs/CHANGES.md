@@ -2138,3 +2138,22 @@ previous code.
 Golden master unchanged throughout; suite 463 tests, all passing (the
 opt-in benchmark skipped); pyright 58 errors, nothing new against the
 `ab4bd2a` baseline.
+
+## Continuation run (Master Execution Prompt, from 2026-11-13)
+
+Governed by the Phase 6 Master Prompt and the owner's Master Execution
+Prompt of 2026-11-13. History and binding decisions:
+`docs/PROJECT_HISTORY_AND_DECISIONS.md`.
+
+### AI Experiment Planner: COMING SOON (`main.py`, `ui/menu.py`)
+
+- Previous: `[11] AI Experiment Planner (not implemented)`; selecting it
+  printed "not implemented ... deferred" (D15, 2026-10-31).
+- Now: `[11] AI Experiment Planner (Coming Soon)`; selecting it prints
+  "AI Experiment Planner: COMING SOON. This feature is planned but not yet
+  available. Nothing is run or stored." Nothing is implemented behind the
+  entry; the numbering is unchanged.
+- Reason: owner decision of 2026-11-13 (Master Execution Prompt §3). The
+  wording keeps D15's requirement that the entry must not suggest a
+  working feature.
+- Tests: `PlannerPlaceholderTests` drives `main.py` and checks the entry.

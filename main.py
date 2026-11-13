@@ -864,14 +864,15 @@ def main():
 
             elif choice == "11":
 
-                # Audit D15: advertised but not implemented (P3-1, deferred).
+                # COMING SOON (owner decision 2026-11-13; audit D15, P3-1):
+                # the entry is kept, nothing is implemented behind it.
                 print(
-                    "\nAI Experiment Planner: not implemented. "
-                    "Nothing is run or stored."
+                    "\nAI Experiment Planner: COMING SOON. This feature is "
+                    "planned but not yet available. Nothing is run or stored."
                 )
                 print(
-                    "It is planned as an evidence-bound planner (P3-1, "
-                    "docs/AUDIT_STATUS.md) and is deferred."
+                    "It is intentionally not implemented in this phase "
+                    "(P3-1, docs/AUDIT_STATUS.md)."
                 )
 
                 style.pause()
