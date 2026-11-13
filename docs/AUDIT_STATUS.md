@@ -1,4 +1,4 @@
-# Status of every audit recommendation (as of 2026-11-02)
+# Status of every audit recommendation (as of 2026-11-13)
 
 Assessment categories:
 
@@ -42,7 +42,7 @@ named.
 | P1-6 | File selection (FASTA/GenBank), topology, SHA-256 | IMPLEMENTED+TESTED | Own files load; hashes recorded in every result. |
 | P1-7 | BLAST: effective parameters, version, DB date, privacy notice, RID resume | PARTIAL | Reported parameters, database provenance and the privacy confirmation are implemented. RID resume is implemented (Phase 6, P1-7): `NCBIBlastClient.resume()`, a menu entry and `core.api.blast_resume()`, tested against a stubbed client rather than the live service. Phase 6: local BLAST+ runs are tested against the bundled `data/local_test` database and small `makeblastdb` databases (blastn, blastp), including the programmatic database-path entry (D6, S7). |
 | P1-8 | Literature: date formats, throttling, backoff, optional API key | IMPLEMENTED+TESTED | Fixtures for all date formats; retry test with a simulated HTTP 503 and `Retry-After`. |
-| P1-9 | ORF: genetic codes, start policy, organism mode, 5′-partial, circular | PARTIAL | Genetic codes (1, 2, 4, 11) and the start policies are implemented and tested; since Phase 6 (audits D1, D2, 2026-10-31) the initiator set follows the genetic code and an ORF is translated with its own table in the ORF and protein/API paths (and since Phase 6 the RNA module's codon view uses the selected ORF's table too). **Organism mode, 5′-partial ORFs and ORFs across the origin are deferred.** The criterion "comparison with ORFfinder on reference sequences" was not run (no access). |
+| P1-9 | ORF: genetic codes, start policy, organism mode, 5′-partial, circular | COMPLETE (not externally validated) | Genetic codes 1, 2, 4, 11 and the start policies; the initiator set follows the genetic code (D1, D2); the RNA codon view uses the ORF's code (2026-10-31). Since 2026-11-11 (`f020a1d`): ORFs across the origin of circular sequences and optional 5′-partial ORFs, with a rotation-invariance test. Organism mode is covered by genetic code plus start policy, without a separate switch. Open validation: no ORFfinder comparison (no native Windows build; needs WSL or Linux). |
 | P1-10 | Mutation: CDS start/frame from ORF, frame warning, length warning | IMPLEMENTED+TESTED | CDS from the selected ORF (both strands), plausibility warnings, 2 kb note, "HGVS-like" labeling. |
 | P1-11 | `pyproject.toml`, Python version, Git, logging, README with methods | IMPLEMENTED+TESTED | Git history from a Stage 0 baseline; rotating log file; `docs/METHODS.md`. |
 | P1-12 | Reproducible analysis report | IMPLEMENTED+TESTED | Menu `[R]`; JSON (complete) and Markdown; input hash, parameters, versions, limitations; end-to-end menu test. |
@@ -51,13 +51,13 @@ named.
 
 | ID | Subject | Status | Evidence / open points |
 |---|---|---|---|
-| P2-1 | Consolidate the primer patch chain behavior-preserving | PARTIAL | 13 unreachable superseded definitions (1,014 lines) removed; equivalence shown by comparing the compiled bytecode of all live functions and classes before and after, plus the golden master. The live v5–v11 wrapper chain for ranking was **kept**: flattening it would change executed code and needs its own stage. Phase 6 (audit D16, 2026-10-31): the last duplicated module-level name was removed by defining the Tm model under its private name instead of shadowing the public one; equivalence shown again by bytecode fingerprinting of all 129 module-level callables. Phase 6 part 2: the reachability review recorded as open validation item 7 was carried out (AST binding order, project-wide reference scan, `sys.settrace` on a real design run). It showed that only the last binding of each public name was ever reachable, so the 7 superseded aliases and the 24 private definitions they alone kept alive were removed; 129 -> 105 module-level callables with every survivor bytecode-identical. Merging the surviving generations is deliberately not done. |
-| P2-2 | Separate UI from compute modules; `core/seqtools.py` against duplication | PARTIAL | `core/api.py` offers every analysis without `input()`; genetic-code and IUPAC tables are shared via `core/seqtools.py`. The existing menus still live inside the analysis modules, so the criterion "core modules without `input()`" is met by the new API layer but not by the modules themselves. |
+| P2-1 | Consolidate the primer patch chain behavior-preserving | PARTIAL (by decision) | 13 unreachable superseded definitions removed in the previous cycle; in Phase 6 (D16) only the last binding of each name was found reachable and the 24 private definitions kept alive by superseded aliases were removed (129 -> 105 module-level callables, every survivor bytecode-identical). Since then each role has exactly one live implementation; the remaining `_v5`–`_v11` prefixes are historical names, not a wrapper chain. Renaming them would change about 40 references without changing behavior, so it was not done (decision of 2026-11-12). The primer candidate screen was rebuilt for speed with proven identical results (2026-11-12, `aba3fb0`). |
+| P2-2 | Separate UI from compute modules; `core/seqtools.py` against duplication | COMPLETE | `core/api.py` offers every analysis without `input()`; genetic-code and IUPAC tables are shared via `core/seqtools.py`. Since 2026-11-12 (`50dea66`) the dialogs of all eleven analysis modules are in `ui/<module>_menu.py` and no analysis module imports `ui` (outside `if __name__ == "__main__"` script blocks); string layout comes from `core/textformat.py`. Evidence: 55 rendered screens byte-identical before and after; `LayeringTests` runs every `core.api` analysis with `ui` unimportable. |
 | P2-3 | CRISPR: cut position, U6 rules, local CFD scoring, exclude the on-target site | DEFERRED / partly REJECTED | Phase 6: the modeled cut site is reported with its source (audit D8) and the on-target site is excluded from the local specificity screen (audit D9, 2026-10-31). The rest was not implemented in this session. **CFD scoring is rejected** for now: it requires the published mismatch weight matrix, and reconstructing those numbers from memory would mean inventing scientific data. It can be added once the matrix is supplied as a data file with a citation. |
-| P2-4 | Cross-checks (primer/guide against variants, REF vs. sequence) | PARTIAL | REF vs. reference sequence is implemented (`check_reference_alleles`, P0-7). Primer/guide-versus-variant consistency checks are deferred. |
-| P2-5 | Honest labels; preserve "?" positions; G·U / RNAfold; rename complexity | PARTIAL | Unresolved residues keep their position in all position-dependent protein analyses (Stage 5, tested); labels and validation status are documented in `docs/METHODS.md`; the ORF "Confidence" label is now "Heuristic score", and since 2026-11-02 (D18) the data model and exports say `heuristic_score` as well. G·U pairing and optional RNAfold are deferred. Complexity (2026-11-02): the four modules that report it compute one measure, the normalized Shannon entropy of A/C/G/T composition; `METHODS.md` now defines it and states that it does not detect repeats (`ACGT` x 100 scores 1.000), and the sequence-overview interpretation says so. The field names keep "complexity" for compatibility, so the rename itself is not done. |
-| P2-6 | Performance (banded alignment, sliding CpG count, primer pre-filter) | PARTIAL | Phase 6 (S18): the cloning planner no longer rescans identical sites, 10 enzymes 100-110 s -> 0.57 s. The mutation alignment is still quadratic in time and memory; S9 measured ~45 bytes per matrix cell (about 4.5 GB for 10 kb x 10 kb), and the note now states the figures. The criterion "10 kb in < 10 s per module" is not met for the mutation module; a banded or linear-space alignment is the remaining work. |
-| P2-7 | Type IIS enzymes on both strands, methylation flags | PARTIAL | Methylation notes are implemented (ClaI, XbaI, DpnI, HpaII). **Type IIS support is deferred**; the forward-strand-only search remains correct for the palindromic enzymes in the database, and no Type IIS enzyme was added, so no wrong result can arise from this today. |
+| P2-4 | Cross-checks (primer/guide against variants, REF vs. sequence) | COMPLETE | REF vs. reference sequence: `check_reference_alleles` (P0-7). Primer and guide binding sites against variants: `core.api.cross_check_variants` (2026-11-11, `2c68e61`; 3′ end of primers, seed and PAM of guides as critical parts) and, since 2026-11-13 (`cdbf69c`), in the primer and CRISPR menus for the variants of a VCF contig mapped onto the loaded sequence. |
+| P2-5 | Honest labels; preserve "?" positions; G·U / RNAfold; rename complexity | PARTIAL | Unresolved residues keep their position (Stage 5); labels and validation status are documented in `docs/METHODS.md`; heuristic scores are no longer called confidence (D18); "complexity" is documented as normalized Shannon entropy that does not detect repeats (2026-11-02). G·U pairs are counted separately in the RNA hairpin screen since 2026-11-11 (`fedb750`). Open: RNAfold (an external binary, not installed) and the rename of the `complexity` field (kept for compatibility). |
+| P2-6 | Performance (banded alignment, sliding CpG count, primer pre-filter) | COMPLETE for the 10 kb target | Recognition-site scan cache (S18); cloning planner 21.7 s -> 3.2 s (`b4b16bb`); mutation alignment one byte per cell and an exact band for similar sequences (10 kb 23 s -> 0.18 s); banded Levenshtein similarity (10 kb 0.10 s); primer design 10 kb 135.6 s -> 25.6 s (`15e2ff1`) -> about 10 s CPU time under heavy background load, 71 s for the previous code under the same load (`aba3fb0`). Every change has identical results by construction and by comparison. Remaining: unrelated long sequences still align in O(n·m) time (about 23 s at 10 kb). |
+| P2-7 | Type IIS enzymes on both strands, methylation flags | COMPLETE (definitions and digests) | Methylation notes (ClaI, XbaI, DpnI, HpaII). Since 2026-11-11 (`4939688`): BsaI, BsmBI, BbsI, SapI on both strands, cutting outside their sites; definitions 4/4 and 140 cuts vs Biopython 1.88, 0 differences. Not part of the cloning planner; Golden Gate planning not implemented. |
 
 ## P3 – long-term
 
@@ -80,16 +80,15 @@ recommended next steps:
 4. ORFfinder comparison on reference sequences (P1-9).
 5. A systematic REBASE re-check of all enzyme entries (P0-4).
 6. ~~Local BLAST+ runs~~ done in Phase 6 (BLAST+ 2.17.0 on the bundled
-   database and on `makeblastdb` databases, blastn and blastp). One live
-   remote NCBI run is still open and needs the owner's approval (P1-7).
+   database and on `makeblastdb` databases, blastn and blastp).
+   ~~One live remote NCBI run~~ done 2026-11-13 (pUC19 L09137.2 bases
+   401-700 against `nt`; `docs/METHODS.md`); the first attempt found D25.
 7. ~~An independent review of the primer ranking chain~~ done in Phase 6
-   (D16 part 2, reachability review; P2-1). Merging the surviving
-   generations is still not done.
-8. A Python 3.10 suite run: only Python 3.14 is installed; installing a
-   3.10 interpreter needs the owner's approval. `pyright` runs at
-   `pythonVersion = 3.10` on every change, and a static 3.10 check in the
-   suite found one f-string that made the CRISPR module unimportable on
-   3.10 and 3.11 (fixed).
+   (D16 part 2, reachability review; P2-1). Renaming the surviving
+   `_v5`–`_v11` functions was decided against (2026-11-12, P2-1 above).
+8. ~~A Python 3.10 suite run~~ done 2026-11-12 with the official embeddable
+   CPython 3.10.11 in a project-local folder: 452 tests, all passing
+   (`docs/TOOL_AND_DATA_LEDGER.md`).
 9. The instability-index weights against the Guruprasad et al. (1990)
    table itself; Phase 6 corrected the IG weight against Biopython's
    table (`ProtParamData.DIWV`, which cites Guruprasad et al. 1990),
@@ -106,10 +105,19 @@ end of Phase 6:
   with a documented golden-master change.
 - **S1-S24**: all assessed. Confirmed ones are corrected; S1, S2 are not
   defects (verified by execution); S24 is measured with its residual risk
-  recorded; **S11** (live literature providers) is blocked on the owner's
-  approval for external requests.
+  recorded; **S11** (live literature providers) was checked live on
+  2026-11-12 under the approval policy adopted that day (`docs/METHODS.md`).
 - One further defect was found in Stage I by the new reference tests: the
   instability weight for IG (corrected; `docs/CHANGES.md`).
+- The completion run of 2026-11-12/13 found and corrected six more, each
+  with a test that fails on the previous code (`docs/CHANGES.md`): D20 the
+  primer structural penalty was always zero; D21 `tm_method`
+  "nearest-neighbor" crashed candidate generation; D22 an ORF without a
+  sequence crashed `orf_reference_cds`; D23 the primer pair risk assessment
+  never reached exports; D24 the BLAST text export and query file were
+  written with CR CR LF; D25 a brief network error while polling lost a
+  submitted NCBI search and its RID. Two BLAST dialog faults (hit
+  selector, query-type question) were corrected as Stage F items.
 
 Each item's evidence, commit and validation level is in
 `docs/PHASE6_PROGRESS.md`; the per-feature status is in

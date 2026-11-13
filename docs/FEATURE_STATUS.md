@@ -1,7 +1,10 @@
 # Feature verification matrix
 
 State as of the Phase 6 initial audit, 2026-10-30, commit `0dad3bb`,
-updated through the end of Phase 6 (2026-11-02). A finding marked
+updated through 2026-11-13 (the completion run; `docs/CHANGES.md`). Since
+P2-2 (2026-11-12) the dialog functions named in this matrix live in
+`ui/<module>_menu.py`; the science functions stay in `analyses/<module>.py`.
+Function names did not change. A finding marked
 corrected names the date; the evidence is in `docs/CHANGES.md` and
 `docs/PHASE6_PROGRESS.md`.
 Menu numbers are those of the code at the end of Stage F (2026-11-03);
@@ -36,12 +39,12 @@ simulated keystrokes (see audit §11.5).
 |---|---|
 | Analysis modules | 12 |
 | Core modules | 9 (`core/alphabets.py` added in Phase 6) |
-| Shared UI module | 1 (`ui/style.py`, added in Stage F) |
+| Shared UI module | 1 (`ui/style.py`, added in Stage F), plus 11 dialog modules `ui/<module>_menu.py` and `ui/variant_check.py` (P2-2, T12) |
 | Support modules (`fileio`, `ui`, `data`) | 8 |
 | Functions and classes inventoried | ~1,100 |
 | Main-menu entries | 15 |
 | Sub-menu entries inventoried | 78 |
-| Automated tests | 356, all passing (2026-11-03). The count at the end of Stage 4 was 283: (109 at the audit + 9 D12 + 7 D4 + 7 D3 + 7 D5 + 7 D1 + 5 D2 + 5 D14-F2 + 11 sequence-type classifier + 6 D14-F3/F11 + 7 D14-F1 + 9 D13/D14-F4/F5/F7 + 5 D14-F6 + 3 D14-F8–F10 + 3 D6 + 3 D9 + 3 D8 + 4 D10/D11 + 2 D19 + 1 D15 + 2 S15/S16 + 2 S17 + 2 S19 + 9 S23/S3/S4/S5 + 1 D16 + 7 S8/S10/S21/S22 + 4 S1/S2/S9 + 5 P1-9 + 3 S18 + 8 S14 + 9 P1-7 + 2 S13 + 12 Stage F + 4 S24) |
+| Automated tests | 463, all passing (2026-11-13; the opt-in benchmark is skipped). 356 at the end of Stage F (2026-11-03), 421 on 2026-11-11. The suite also passes on Python 3.10.11 (452 tests on 2026-11-12, `docs/TOOL_AND_DATA_LEDGER.md`). Line coverage: `docs/TEST_COVERAGE.md`. The count at the end of Stage 4 was 283. |
 | Module self-tests | 12 suites, all passing (literature 64, mutation 44, BLAST 33, CRISPR 28, variant 27, others aggregated) |
 | Golden-master scenarios | 12 |
 | Confirmed defects | 19 (D1–D19), all corrected by the end of Phase 6 (`docs/PHASE6_FINAL_REPORT.md`, section A; D16 finished with the removal of the superseded primer generations). The first 16 corrections are dated 2026-10-31 in the rows below. |
@@ -114,7 +117,7 @@ relative to its use (every session runs it).
 | 6.2 | Start-codon policy | `start_codons_for`, `resolve_start_codons` | Implemented | Execution-tested | Independently validated | `atg_only`, `atg_and_alternative`, `table_starts`. |
 | 6.3 | Nested ORFs | `_keep_longest_per_stop` | Implemented | Execution-tested | Not applicable | **S2 not a defect** (verified by execution 2026-10-31): nested minus-strand ORFs share frame and 3' end and collapse correctly. |
 | 6.4 | Ranking | `_orf_sort_key`, `rank_orf_candidates` | Implemented | Execution-tested | Not applicable | `length` (default) or `heuristic`. |
-| 6.5 | Partial ORFs | `find_orfs(include_partial=)` | Partially implemented | Execution-tested | Not applicable | 3′-partial (missing stop) only. **5′-partial not implemented** (METHODS states this). |
+| 6.5 | Partial ORFs | `find_orfs(include_partial=, include_5prime_partial=)` | Implemented | Execution-tested | Not applicable | 3′-partial (missing stop) by default; 5′-partial (missing start, and missing both) on request since 2026-11-11 (P1-9). The first codon of a 5′-partial ORF is never read as initiator Met. `test_orf_partial_circular.py`. |
 | 6.6 | Genetic code | `codon_table_for` | Implemented | Execution-tested | Independently validated | NCBI 1, 2, 4, 11 verified against `Bio.Data.CodonTable`. |
 | 6.7/6.8 | Restore Synapse / legacy settings | `LEGACY_ORF_SETTINGS` | Implemented | Execution-tested | Not applicable | Golden-master proves legacy equivalence. |
 | — | Start-codon classification | `classify_start_codon` | Implemented | Execution-tested | Not applicable | |
@@ -126,7 +129,7 @@ relative to its use (every session runs it).
 | — | ORF density, frame statistics | `calculate_orf_density`, `calculate_frame_statistics` | Implemented | Execution-tested | Not applicable | |
 | — | ORF translation | `translate_orf_sequence`, `initiation_codons`, `is_initiation_codon` | Implemented | Execution-tested | **Independently validated** (Biopython, tables 1/2/4/11) | **D1 corrected 2026-10-31**: initiator Met only for initiation codons of the genetic code (table 1: ATG/CTG/GTG/TTG); internal codons use the elongation code. **D2 corrected 2026-10-31**: accepts the ORF dict and uses its `genetic_code`; a conflicting table raises; a bare string defaults to table 1. Agrees with `core.api` for every ORF found in tables 1/2/4/11. |
 | — | Start-codon classification and scores | `classify_start_codon`, `calculate_cds_quality`, `calculate_orf_heuristic_score` | Implemented | Execution-tested | Not applicable | **S19 corrected 2026-10-31**: all three use the initiation codons of the ORF's genetic code, so a CTG ORF found with `table_starts` is classified and scored like an equivalent GTG ORF. |
-| — | Circular / origin-spanning ORFs | — | **Not implemented** | Not applicable | Not applicable | `core.api.find_orfs` adds a limitation note for circular records. |
+| — | Circular / origin-spanning ORFs | `find_orfs(topology="circular")`, `_origin_spanning_orfs` | Implemented | Execution-tested | Not applicable | Since 2026-11-11 (P1-9): `wraps_origin`, unrolled `stop`, `stop_on_circle`; rotation-invariance test. No ORFfinder comparison (not available on this platform). |
 
 Test coverage: 19 test references — the best-covered module.
 
@@ -140,9 +143,9 @@ Test coverage: 19 test references — the best-covered module.
 | — | Transcription | `transcribe_rna` | Implemented | Execution-tested | Not applicable | T→U on the given strand. |
 | 1 | RNA Overview | `print_rna_overview`, `analyze_rna` | Implemented | Execution-tested | Not applicable | |
 | 2 | Translation & Codon Analysis | `translate_rna_frame`, `analyze_rna_three_frames`, `analyze_rna_codon_usage` | Partially implemented | Execution-tested | Not applicable | **Always NCBI table 1**, even for a table-2/4/11 ORF (documented P1-9 limitation; `main.py` warns). Not part of D1/D2; the remaining place where a selected ORF is not translated with its own genetic code. |
-| 3 | RNA Features | `find_rna_hairpins`, `summarize_rna_structure`, `find_rna_start_stop_landscape`, `find_rna_homopolymers` | Implemented | Execution-tested | Not applicable | Hairpins are a complementarity proxy, **not** a folding model. P2-5 G·U pairing and optional RNAfold deferred. |
-| 4 | Complete RNA Report | `print_rna_report` | Implemented | Reachable | Not applicable | |
-| 5 | RNA Sequence view | `print_rna_sequence_view` | Implemented | Reachable | Not applicable | |
+| 3 | RNA Features | `find_rna_hairpins`, `summarize_rna_structure`, `find_rna_start_stop_landscape`, `find_rna_homopolymers` | Implemented | Execution-tested | Not applicable | Hairpins are a complementarity proxy, **not** a folding model. G·U pairs are counted as a separate figure since 2026-11-11 (P2-5); RNAfold is not used. |
+| 4 | Complete RNA Report | `print_rna_report` | Implemented | Execution-tested | Not applicable | Every RNA view is drawn and checked by `test_execution_coverage.py` (2026-11-12). |
+| 5 | RNA Sequence view | `print_rna_sequence_view` | Implemented | Execution-tested | Not applicable | |
 | — | Base counts, GC/AU content, skew, profiles | `count_rna_bases`, `calculate_rna_gc_content`, `calculate_rna_gc_profile`, … | Implemented | Execution-tested | Not applicable | |
 | — | Molecular weight, complexity | `calculate_rna_molecular_weight`, `calculate_rna_complexity` | Implemented | Execution-tested | Not applicable | |
 | — | Ambiguity, quality | `analyze_rna_ambiguity`, `analyze_rna_quality` | Implemented | Execution-tested | Not applicable | |
@@ -160,8 +163,8 @@ Test coverage: 2 test references.
 |---|---|---|---|---|---|---|
 | — | Translation | `translate_protein`, `analyze_translation`, `resolve_codon` | Implemented | Execution-tested | Independently validated | GTG-ORF initiator → M matches `Bio.Seq.translate(table=11, cds=True)`. **D1 corrected 2026-10-31**: with `initiator_start=True` only an initiation codon of the genetic code becomes Met (previously any resolved first codon); same rule as the ORF translator. |
 | — | Unresolved-residue handling | `get_positional_protein`, `get_resolved_protein` | Implemented | Execution-tested | Not applicable | Stage 5: `?` keeps its position; windows containing it are skipped, not shifted. |
-| 1 | Protein Overview | `_print_protein_overview` | Implemented | Reachable | Not applicable | |
-| 2 | Translation & Sequence | `_print_translation_and_sequence` | Implemented | Reachable | Not applicable | |
+| 1 | Protein Overview | `_print_protein_overview` | Implemented | Execution-tested | Not applicable | Every protein view is drawn and checked by `test_execution_coverage.py` (2026-11-12). |
+| 2 | Translation & Sequence | `_print_translation_and_sequence` | Implemented | Execution-tested | Not applicable | |
 | 3 | Amino Acid Composition | `analyze_protein`, `calculate_amino_acid_percentages` | Implemented | Execution-tested | Not applicable | |
 | 4 | Physicochemical & Structural Properties | see below | Implemented | Execution-tested | **Independently validated** | |
 | — | Molecular weight | `calculate_protein_molecular_weight` | Implemented | Execution-tested | Independently validated | Ubiquitin 8564.84 Da = ExPASy. Returns a dict with min/max/ambiguity flags. |
@@ -177,7 +180,7 @@ Test coverage: 2 test references.
 | — | Flexibility profile | `calculate_flexibility_profile` | Implemented | Execution-tested | Not applicable | |
 | — | Secondary-structure propensity | `calculate_secondary_structure_propensity`, `…_fraction` | Implemented | Execution-tested | Not applicable | Propensity scales, not a predictor. |
 | — | Aliphatic index | `calculate_aliphatic_index` | Implemented | Execution-tested | Not applicable | |
-| 5 | Complete Protein Report | `_print_complete_protein_report` | Implemented | Reachable | Not applicable | |
+| 5 | Complete Protein Report | `_print_complete_protein_report` | Implemented | Execution-tested | Not applicable | |
 | — | Quality assessment | `analyze_protein_quality`, `validate_protein_sequence` | Implemented | Execution-tested | Not applicable | |
 
 Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
@@ -206,7 +209,7 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 | — | Methylation notes | enzyme `methylation_note` | Implemented | Execution-tested | Not applicable | Display only; blocking and star activity not modeled. |
 | 4 | Complete Restriction Report | `print_restriction_report` | Implemented | Reachable | Not applicable | |
 | — | Topology selection UI | `_synapse_ui_select_topology` | Implemented | Reachable | Not applicable | |
-| — | Type IIS enzymes | — | **Not implemented** | Not applicable | Not applicable | P2-7. No Type IIS enzyme is in the database, so no wrong result arises today; a reverse-strand search is required before one is added. |
+| — | Type IIS enzymes | `TYPE_IIS_ENZYMES`, `find_type_iis_sites`, `perform_digest` | Implemented | Execution-tested | **Independently validated** | Since 2026-11-11 (P2-7): BsaI, BsmBI, BbsI, SapI on both strands; definitions 4/4 and 140 cuts vs Biopython 1.88, 0 differences. Not used by the cloning planner; Golden Gate planning not implemented. |
 | — | Self-test | `run_restriction_self_test` | Implemented | Execution-tested | Not applicable | |
 
 ---
@@ -229,7 +232,7 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 | — | Enzyme suitability / compatible enzymes | `assess_enzyme_suitability`, `find_compatible_enzymes` | Implemented | Execution-tested | Not applicable | |
 | — | Diagnostics when no strategy exists | `_site_diagnostics`, `_no_strategy_diagnostics` | Implemented | Execution-tested | Not applicable | Good failure reporting. |
 | — | Design reasons, ASCII orientation view | `get_design_reasons`, `ascii_orientation_visualization` | Implemented | Reachable | Not applicable | |
-| — | Reports | `print_cloning_report`, `_print_single_strategy_report`, `print_planner_report` | Implemented | Reachable | Not applicable | |
+| — | Reports | `print_cloning_report`, `_print_single_strategy_report`, `print_planner_report` | Implemented | Execution-tested | Not applicable | Drawn by the rendered cloning scenarios; `run_cloning_ui_self_test` checks they exist (in `ui/cloning_menu.py` since P2-2). |
 | — | Self-tests | `run_cloning_self_test`, `run_cloning_ui_self_test` | Implemented | Execution-tested | Not applicable | |
 
 ---
@@ -272,11 +275,11 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 | — | CDS from the selected ORF | `orf_reference_cds`, `assess_coding_frame` | Implemented | Integration-tested | Not applicable | Both strands; variant CDS derived only at equal length. |
 | 2 | Mutation Statistics | `calculate_mutation_statistics` | Implemented | Execution-tested | Not applicable | |
 | — | Mutation spectrum, hotspots | `build_mutation_spectrum`, `find_mutation_hotspots` | Implemented | Execution-tested | Not applicable | |
-| — | HGVS-*like* notation | `mutation_hgvs_c`, `mutation_hgvs_p`, `_mutation_notation` | Partially implemented | Execution-tested | **Not validated** | Explicitly labeled HGVS-like; not checked against den Dunnen et al. 2016. |
+| — | HGVS-style notation | `mutation_hgvs_c`, `mutation_hgvs_p`, `_mutation_notation` | Implemented | Execution-tested | **Not validated** | Predicted protein changes written `p.(R12C)`, `p.(R12=)`, `p.(W24*)`, `p.(M1?)`, `p.(*110Qext*?)` since 2026-11-11 (`test_hgvs_notation.py`); not checked with an HGVS validator. |
 | — | Indel left-normalization | `normalize_indel_left` | Implemented | Execution-tested | Not applicable | Separate from the variant module's implementation — duplication. |
 | — | Context extraction | `extract_mutation_context` | Implemented | Execution-tested | Not applicable | |
 | — | Restriction-site impact | `restriction_site_impact` | Implemented | Execution-tested | Not applicable | Cross-module check. |
-| — | Primer / CRISPR overlap | `primer_mutation_overlap`, `crispr_mutation_overlap` | Implemented | Execution-tested | Not applicable | P2-4's cross-check, partially realized. |
+| — | Primer / CRISPR overlap with variants | `check_features_against_variants`, `core.api.cross_check_variants`, `binding_features`, `ui/variant_check.py` | Implemented | **Integration-tested** | Not applicable | P2-4: API since 2026-11-11; in the primer and CRISPR menus since 2026-11-13 (T12) for variants of a VCF contig mapped onto the loaded sequence. `test_variant_crosscheck.py`. |
 | — | Protein comparison | `compare_proteins` | Implemented | Execution-tested | Not applicable | |
 | 3 | Coding Consequence Analysis (UI) | `run_mutation_analysis_ui` branch 3 | Implemented | Reachable | Not applicable | |
 | 4 | Mutation Report | `build_mutation_report`, `print_mutation_report`, `advanced_mutation_report`, `mutation_map` | Implemented | Reachable | Not applicable | |
@@ -308,7 +311,7 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 | 8 | Cohort / Sample Analysis | `sample_variant_summary`, `calculate_cohort_summary` | Implemented | Execution-tested | Not applicable | |
 | 9 | Export VCF | `variants_to_vcf`, `write_vcf` | Implemented | Execution-tested | Not applicable | Round-trip self-tested. |
 | 10 | Export TSV | `variants_to_tsv` | Implemented | Execution-tested | Not applicable | |
-| 11 | Full Variant Report | `build_variant_report`, `print_variant_report` | Implemented | Reachable | Not applicable | |
+| 11 | Full Variant Report | `build_variant_report`, `print_variant_report` | Implemented | Execution-tested | Not applicable | `build_variant_report` checked by `test_execution_coverage.py`. |
 | — | Prioritization, intervals, grouping | `prioritize_variants`, `variants_in_interval`, `interval_variant_density`, `variants_by_*` | Implemented | Execution-tested | Not applicable | |
 | — | Evidence container | `VariantEvidence`, `attach_evidence` | Implemented | Execution-tested | Not applicable | |
 | — | Mutation-module bridge | `annotate_from_mutation_analysis` | Implemented | Execution-tested | Not applicable | |
@@ -448,11 +451,11 @@ As found by the audit, with the outcome of Phase 6 in each row.
 | `crispr.DesignConfig` | `include_low_quality`, `rank_by_gc`, `editing_window_start`, `editing_window_end`, `base_editor` | Implemented 2026-10-31 (**D10**): each field acts (`CrisprConfigurationTests`). |
 | CRISPR menu `[4]`/`[5]` | Cut position for the chosen system | Implemented 2026-10-31 (**D8**), with the source per system. |
 | CRISPR menu `[9]`/`[10]` | On-target exclusion from off-target counts | Implemented 2026-10-31 (**D9**). |
-| `restriction` docs / P2-7 | Type IIS enzymes, reverse-strand site search | **Not implemented** — no Type IIS enzyme in the database, so no wrong output today. |
+| `restriction` docs / P2-7 | Type IIS enzymes, reverse-strand site search | **Implemented 2026-11-11** (see the restriction section). |
 | `variant` P1-5 | Contig-name unification (`chr1` vs `1`) | **Implemented 2026-10-31** (**D12**): opt-in `contig_matching="chr_prefix"`; unmatched contigs are flagged, not skipped. |
 | BLAST P1-7 | RID resume | Implemented 2026-10-31: `resume()`, menu [2] (numbered [14] until the Stage F renumbering), `core.api.blast_resume()`. Tested against a stub; a live resume was not run. |
-| ORF METHODS | 5′-partial ORFs; ORFs across a circular origin | **Not implemented** (documented). |
-| Brief §10.2 | Restriction-site-driven primer design | **Not implemented** as a feature: no menu passes a chosen site to primer design. The two modules share one coordinate frame (integration test 10.2). |
+| ORF METHODS | 5′-partial ORFs; ORFs across a circular origin | **Implemented 2026-11-11** (P1-9). |
+| Brief §10.2 | Restriction-site-driven primer design | **Implemented 2026-11-12**: primer menu entry 2, `core.api.design_primers_for_restriction_site`, workflow test 10.2. |
 | P2-3 | CFD off-target scoring | **Not implemented** — deliberately deferred pending a citable matrix. Correct call. |
 
 **No original feature was lost.** Every capability listed in

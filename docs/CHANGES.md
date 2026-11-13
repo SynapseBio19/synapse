@@ -2026,3 +2026,115 @@ Suite 328/328, golden master 12/12, pyright 112 with no new diagnostic.
 
 Golden master unchanged; suite 356/356; pyright 111 with no new
 diagnostic.
+
+## Phase 6 completion run, packages A and B (2026-11-11)
+
+Each commit message holds the measurements and the tests that fail on the
+previous code.
+
+- **HTTP error responses (`68e59d1`).** The literature and BLAST clients
+  left the response an `HTTPError` carries open (the ResourceWarning in a
+  retry test); they close it now.
+- **Mutation prompt and messages (`8379ac2`).** The sequence prompt has
+  `[0] Cancel` (`SequencePromptCancelled`); ten messages that were drawn as
+  fields are ERROR/NOTE lines, with a rule that finds them; `MissingFileTests`
+  (Master Prompt 11.4).
+- **Cloning planner (`b4b16bb`, P2-6).** Each enzyme analysis is computed
+  once per search: 21.7 s -> 3.2 s, results byte-identical.
+- **Type IIS (`4939688`, P2-7).** BsaI, BsmBI, BbsI and SapI are searched on
+  both strands and cut outside their sites; 140 cuts against Biopython 1.88,
+  0 differences. Not used in cloning; Golden Gate planning not implemented.
+- **HGVS-style notation (`b7eb1de`).** Predicted protein changes are written
+  `p.(R12C)`, `p.(R12=)`, `p.(W24*)`, `p.(M1?)`, `p.(*110Qext*?)`; used in the
+  mutation report and in the variant field `protein_change` (it held the
+  consequence class). Not checked with an HGVS validator.
+- **Restriction coordinates (`1ae2833`).** Unsuffixed `site_position`,
+  `top_cut`, `bottom_cut` are 1-based in every record; `*_0based` keys give
+  0-based values (maps used 1-based, digests 0-based before).
+- **RNA hairpins (`fedb750`, P2-5).** G·U pairs are counted as a separate
+  figure (golden reference: 58 Watson-Crick, 260 with G·U).
+- **ORFs (`f020a1d`, P1-9).** ORFs across the origin of circular sequences
+  and optional 5'-partial ORFs; rotation-invariance test.
+- **Primer structure screens (`27255df`).** Compared with primer3-py ΔG:
+  Spearman ρ −0.78 / −0.74 / −0.51; classes overlap (METHODS).
+- **Variant cross-check (`2c68e61`, P2-4).** `core.api.cross_check_variants`.
+- **Alignment (`f9d4356`, `e5bb456`, `15e2ff1`, P2-6).** One traceback byte
+  per cell (46 -> 1.1 bytes); exact banded alignment of similar sequences
+  (10 kb 23 s -> 0.18 s); banded Levenshtein similarity (10 kb 0.10 s);
+  faster hairpin screen (primer design 10 kb 135.6 s -> 25.6 s). Results
+  identical.
+- **Records (`b8e92d8`, `690c9e8`, `bd91a24`).** Continuation record and the
+  complete handover.
+
+## Phase 6 completion run, second part (2026-11-12 and 2026-11-13)
+
+- **Approval policy (`bf4d096`).** The owner adopted the Master Prompt's
+  approval rules (1.3, 14.5). The handover quoted a commit subject with
+  British spelling, which made the suite fail at `bd91a24` (420/421); fixed.
+- **Primer design 10 kb (`aba3fb0`, P2-6).** 71 s -> 10 s CPU time on the
+  same machine under the same load, results identical: a Tm-tier screen
+  with an exact upper bound of the screening score decides which windows
+  are measured in full; the dimer stem is a longest common substring; the
+  hairpin, repeat and 3' screens use string operations; pure functions are
+  cached. Evidence: `tests/test_primer_screen_equivalence.py` (the replaced
+  algorithms as references, screen vs. full measurement, the bound).
+- **D20, D21 (`c6f0df9`).**
+  - D20, previous: `_v5_candidate_quality` read hairpin and self-dimer
+    stems from fields the thermodynamic profile does not have, so its
+    documented structural penalty was always 0. Corrected: the stems come
+    from the candidate. Some designs change (third pair of a 900-bp
+    template); golden master unchanged.
+  - D21, previous: `tm_method="nearest-neighbor"` passed validation and
+    then raised "Unknown Tm method". Corrected: one alias set.
+- **Primers around a restriction site (`99150da`, Master Prompt 10.2).**
+  `restriction_site_choices`, `design_primers_for_restriction_site`,
+  `core.api.design_primers_for_restriction_site`, primer menu entry 2
+  (Single Primer Analysis moved to 3), pipeline parameters. Each pair
+  carries the predicted digest of its amplicon.
+- **P2-2 (`50dea66`).** The dialogs of eleven analysis modules (130
+  definitions, 7 aliases) moved byte for byte to `ui/<module>_menu.py`;
+  `core/textformat.py` holds the string builders, re-exported by
+  `ui.style`; `SynapsePipeline.select_orf(chooser=...)` replaces
+  `interactive=True` (no caller). API change: the dialog functions are
+  imported from `ui.<module>_menu`, no longer from `analyses.<module>`.
+  Evidence: 55 rendered screens byte-identical; no analysis module imports
+  `ui`, checked in a subprocess with `ui` unimportable.
+- **Pipeline parameters (`b1a012f`, T4).** The sequence overview and the
+  three cloning dialogs record their parameters.
+- **D22, D23, typing (`757958f`).**
+  - D22, previous: `mutation.orf_reference_cds` raised AttributeError for
+    an ORF without a sequence. Corrected: MutationAnalysisError.
+  - D23, previous: the ranking's risk flags, structural warnings,
+    screening scores and model Tm difference were attributes outside the
+    dataclass fields and never reached JSON or Markdown exports. Corrected:
+    dataclass fields with the defaults the ranking assumed.
+  - `calculate_tm_nearest_neighbor` overloads; pyright 108 -> 58.
+- **Coverage, D24 (`ae87adb`).** coverage.py measured 68 % -> 70.9 %
+  (`docs/TEST_COVERAGE.md`); the protein and RNA views and eleven
+  never-called functions are executed with output checks.
+  D24, previous: the BLAST text export and the local query FASTA were
+  written with CR CR LF line ends. Corrected: `newline=""`.
+- **Ledger, Python 3.10, pUC19 (`bf4b9ee`).** `docs/TOOL_AND_DATA_LEDGER.md`;
+  the suite runs on Python 3.10.11 (project-local embeddable package);
+  pUC19 L09137.2 is a fixture and its 132-digest comparison with Biopython
+  runs in the suite.
+- **BLAST dialogs (`dabc2f1`, T11).** Previous: the hit selector answered
+  2 of 1 with "list index out of range" and showed a hit from the end of
+  the list for −1; the query-type question cancelled on an unknown key.
+  Corrected: only listed numbers; unknown keys are answered and re-asked.
+  The literature limitation line is a NOTE.
+- **README and records (`a65cb04`).**
+- **D25 (`a5e5a94`).** Previous: one network error while polling a
+  submitted NCBI search ended it, and the message did not name the RID.
+  Corrected: up to 3 consecutive transient errors are retried; a failed
+  submitted search names its RID. Found in a live search; the repeated
+  live search (pUC19 401-700 against `nt`) succeeded. The primer3-py
+  comparisons are skipped with the reason when Windows application
+  control blocks its compiled module (observed on 2026-11-13, temporarily).
+- **Variant check in the menus (`cdbf69c`, T12, P2-4).** The variant
+  dialog keeps the variants of the contig mapped onto the loaded sequence;
+  the primer and CRISPR designs show "Variants in binding sites".
+
+Golden master unchanged throughout; suite 463 tests, all passing (the
+opt-in benchmark skipped); pyright 58 errors, nothing new against the
+`ab4bd2a` baseline.

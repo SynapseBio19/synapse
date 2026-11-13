@@ -101,6 +101,14 @@ IUPAC, gapped and invalid input (D14):
 | 50 | Stage F closing review: 59 undocumented direct prints, core/ui dependency deferred to call time, stale FEATURE_STATUS numbers, 17 of 38 menus rendered by tests; the Enter regression (`1516339`) shows the workflow was not preserved until then; overstated claims corrected | `docs/STAGE_F_FINAL_REVIEW.md` | suite twice, golden master, self-tests, pyright, coverage instrumentation | Report; recommendations 1-3 released |
 | 51 | Stage F closing review, recommendations 1-3: claims corrected; 44 messages, 18 headings and 9 dynamic option lists on the shared renderers; FEATURE_STATUS menu numbers as in the code | `46710cd`, `4e2cace`, `e559255`, `b9ec344`, `73a1d93`, `ccc987b`, `163c54d` + this package | DirectOutputTests (68 sites on 1516339, 0 now); dialogs rendered with scripted input; suite 328, golden master, pyright 112 | Done; recommendations 4 and 5 deferred |
 | 52 | Stage F closing review, recommendations 4 and 5: core hands the status to a renderer and imports ui nowhere; all 47 menus rendered and driven; found and corrected the single-enzyme cloning crash (since the audit), the Tm-model Enter regression and three plain messages | `b25e800`, `b4e5a53`, `c78800e`, `61d0d38`, `8eddc72`, `a39c39f` + this package | LayeringTests with ui refused; test_rendered_menus (39 scenarios, 185 menus, 47/47 sites); suite 356, golden master, self-tests, pyright 111 | Done; analyses' ui import is P2-2 |
+| 53 | Completion run, package A: HTTPError responses closed in the literature and BLAST clients; mutation prompt `[0] Cancel`; ten field-messages as ERROR/NOTE lines; missing-file tests | `68e59d1`, `8379ac2` | Tests fail on the old code; rendered scenario | Done |
+| 54 | Package B: cloning planner cache (P2-6), Type IIS on both strands (P2-7), HGVS-style `p.(...)`, one restriction coordinate convention, G·U count (P2-5), origin-spanning and 5'-partial ORFs (P1-9), primer3-py structure comparison, variant cross-check API (P2-4), alignment memory and banding, banded similarity, faster hairpin screen | `b4b16bb` .. `15e2ff1` | Biopython 140 cuts 0 differences; byte-identical outputs; suite 421 | Done; owner stopped the run to save context |
+| 55 | Approval policy of the Master Prompt adopted by the owner; handover spelling defect (suite 420/421 at `bd91a24`) fixed | `bf4d096` | Suite 421 | Done |
+| 56 | T1 primer design 10 kb (P2-6): 71 s -> 10 s CPU time, identical results; D20 structural penalty always zero; D21 hyphenated Tm model crashed | `aba3fb0`, `c6f0df9` | Reference algorithms in the suite; 60 designs vs the previous module; tests fail on old code | Done |
+| 57 | T2 primer design around a restriction site (10.2); T3/P2-2 dialogs moved to `ui/`; T4 overview and cloning parameters recorded | `99150da`, `50dea66`, `b1a012f` | Workflow tests; 55 screens byte-identical; analyses run with ui unimportable | Done |
+| 58 | T6 pyright triage (108 -> 58) with D22 and D23; T7 coverage 68 % -> 70.9 % with D24; T9 tool and data ledger, Python 3.10.11 suite run, pUC19 fixture; T11 BLAST dialog faults | `757958f`, `ae87adb`, `bf4b9ee`, `dabc2f1` | Tests fail on old code; 452 tests on Python 3.10; 132 pUC19 digests 0 differences | Done |
+| 59 | Live checks (approval policy): literature providers (S11) and NCBI BLAST; D25 found in the first live BLAST and corrected; T12 variant check in the primer and CRISPR menus (P2-4) | `a65cb04`, `a5e5a94`, `cdbf69c` | Live runs recorded in METHODS; polling tests without network; driven dialogs | Done |
+| 60 | T8 documentation reconciled for all commits since 2026-11-03 (CHANGES, FEATURE_STATUS, AUDIT_STATUS, this record, README, METHODS, final report) | this package | Spelling and table checks in the suite | Done |
 
 ## Paused (2026-10-31, historical)
 
@@ -151,8 +159,8 @@ reason it stands where it does. None is silently closed.
 - `pyright.exe` is blocked by a Windows application control policy
   (WinError 4551) since 2026-10-31; run it as
   `python -m pyright --pythonversion 3.10` instead. The baseline for
-  comparison remains the 134 diagnostics of `ab4bd2a`; the current count is
-  112 (22 of them removed with the dead primer code in D16 part 2).
+  comparison remains the 134 diagnostics of `ab4bd2a`; the count was 112
+  after D16 part 2 and is 58 on 2026-11-13.
 - Check: `python -m unittest discover -s tests -t .`;
   `git -c core.whitespace=cr-at-eol diff --check`; pyright 1.1.414 with
   `--pythonversion 3.10` compared against the 134-diagnostic baseline of
@@ -160,5 +168,6 @@ reason it stands where it does. None is silently closed.
 - Commit messages end with a `Co-Authored-By:` line naming the model that
   actually produced the work, not a fixed model name.
 - Biopython and primer3-py are test-only; comparison tests skip without
-  them. BLAST+ 2.17.0 is installed (external-tool tests skip without it);
+  them, and the primer3-py ones also when Windows application control
+  blocks its compiled module (seen temporarily on 2026-11-13). BLAST+ 2.17.0 is installed (external-tool tests skip without it);
   bcftools is not.
