@@ -212,9 +212,18 @@ use 0-based inclusive `start <= stop` on the forward strand.
   dipeptide weights. The weight for the dipeptide IG was −7.49 in Synapse
   and 1.0 in Biopython's table (`ProtParamData.DIWV`, which cites
   Guruprasad et al. 1990); it is now 1.0 (2026-11-02). The only remaining
-  difference is FY, 33.6 here and 33.601 there. The primary table was not consulted for this correction
-  (no external access in this session), so the reference is one
-  secondary source, not the paper; confirming it is open work.
+  difference to Biopython is FY, 33.6 here and 33.601 there.
+- All 400 weights compared with ExPASy ProtParam (2026-11-13,
+  `tests/test_instability_expasy_reference.py`). ProtParam was queried with
+  420 synthetic probes (`X*5` and `X*4+Y`); since II = (10/L) * sum of the
+  dipeptide weights, every weight it uses follows from those measurements,
+  so none of its table is copied. 399 of 400 agree with Synapse's table.
+  The one difference is KQ: ProtParam 24.68, Synapse 24.64 (the value
+  Biopython's `DIWV` also carries). Which is the value of the 1990 paper
+  cannot be decided without the paper, so the table is unchanged and the
+  difference is recorded; one KQ shifts the index of a 100-residue protein
+  by 0.004. The primary table remains unread, so the reference for the
+  correction above is still a secondary source.
 - Unresolved residues ("?", from ambiguous codons) keep their position.
   Sliding windows (hydropathy, flexibility, transmembrane screen, signal
   peptide) and the instability index skip the windows or dipeptides that

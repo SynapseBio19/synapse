@@ -2222,3 +2222,13 @@ Prompt of 2026-11-13. History and binding decisions:
 - Tests: `tests/test_hgvs_mutalyzer_reference.py` (5).
 - Record: the test totals in the commit messages of `70ff2b0` (484) and
   `a1e3520` (488) are one too high; the suites had 483 and 487 tests.
+
+### Instability-index weights compared with ExPASy ProtParam
+
+- Comparison (no behavior change): all 400 dipeptide weights were
+  recovered from 420 ProtParam measurements on synthetic probes and
+  compared with Synapse's table. 399 agree; KQ differs (ProtParam 24.68,
+  Synapse and Biopython 24.64). The table is unchanged because the 1990
+  paper is needed to decide which value is the published one.
+- Tests: `tests/test_instability_expasy_reference.py` (3), with the
+  measurements as a fixture.

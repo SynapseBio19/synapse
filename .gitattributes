@@ -7,3 +7,6 @@ tests/fixtures/bcftools_norm/* -whitespace -text
 
 # ORFfinder result table stored verbatim as JSON (SHA-256 checked in tests/test_orffinder_reference.py).
 tests/fixtures/orffinder/* -text
+
+# ExPASy ProtParam measurements stored verbatim as JSON (SHA-256 checked in tests/test_instability_expasy_reference.py).
+tests/fixtures/expasy/* -text

@@ -79,6 +79,7 @@ recommended next steps:
    Done 2026-11-02 with primer3-py 2.4.0: 2,916 comparisons over Mg²⁺
    0-3 mM, max |ΔTm| 0.0032 °C (`docs/METHODS.md`).
 3. NEBcutter comparison for a circular plasmid digest (P1-4).
+   (Substance covered by the REBASE 611 and Biopython comparisons.)
 4. ~~ORFfinder comparison on reference sequences (P1-9).~~ Done
    2026-11-13 with the ORFfinder web service on pUC19 (69 ORFs identical).
 5. ~~A systematic REBASE re-check of all enzyme entries (P0-4).~~ Done
