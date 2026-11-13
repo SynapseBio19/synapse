@@ -70,6 +70,7 @@ import tempfile
 import time
 from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple
 from urllib.error import HTTPError, URLError
+import logging
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 import xml.etree.ElementTree as ET
@@ -259,6 +260,21 @@ def check_program_query_type(program: str, query: "BlastQuery") -> None:
             f"{name} expects a {expected} query, "
             f"but the query is {query.sequence_type}."
         )
+
+
+logger = logging.getLogger("synapse.blast")
+
+# Consecutive failed status requests that are retried while a submitted
+# search is polled (D25).
+STATUS_RETRIES = 3
+
+
+def _is_transient_ncbi_error(error: BaseException) -> bool:
+    """True for a connection error, a timeout or an HTTP 429/5xx answer."""
+    cause = error.__cause__
+    if isinstance(cause, HTTPError):
+        return cause.code == 429 or 500 <= cause.code < 600
+    return isinstance(cause, (URLError, TimeoutError, OSError))
 
 
 DATABASES = {
@@ -1093,14 +1109,23 @@ class NCBIBlastClient:
         if wait_time:
             time.sleep(min(wait_time, max_wait))
 
-        run = self.resume(
-            rid,
-            query=query,
-            parameters=params,
-            poll_interval=poll_interval,
-            max_wait=max_wait,
-            submitted_at=submitted_at,
-        )
+        try:
+            run = self.resume(
+                rid,
+                query=query,
+                parameters=params,
+                poll_interval=poll_interval,
+                max_wait=max_wait,
+                submitted_at=submitted_at,
+            )
+        except BlastAnalysisError as exc:
+            # The search exists at NCBI once it has an RID; name it, so that it
+            # can be collected later instead of being submitted again (D25).
+            raise BlastAnalysisError(
+                f"{exc} The search was submitted to NCBI as request ID {rid}; "
+                "collect it later with Resume Search by Request ID (BLAST menu [2]) "
+                "or core.api.blast_resume while NCBI keeps the RID."
+            ) from exc
 
         if email_warning:
             run.metadata.warnings.append(email_warning)
@@ -1114,11 +1139,29 @@ class NCBIBlastClient:
         poll_interval: float = DEFAULT_POLL_INTERVAL_SECONDS,
         max_wait: float = DEFAULT_MAX_WAIT_SECONDS,
     ) -> None:
-        """Poll a request ID until NCBI reports READY, or raise."""
+        """Poll a request ID until NCBI reports READY, or raise.
+
+        A connection error, a timeout or an HTTP 429/5xx answer to a status
+        request is retried up to ``STATUS_RETRIES`` times in a row, within
+        ``max_wait``; the search keeps running at NCBI meanwhile. Before
+        2026-11-12 the first such error ended the search (D25).
+        """
         start = time.monotonic()
+        failures = 0
 
         while True:
-            status, _status_response = self.status(rid)
+            try:
+                status, _status_response = self.status(rid)
+                failures = 0
+            except BlastAnalysisError as exc:
+                if not _is_transient_ncbi_error(exc) or failures >= STATUS_RETRIES \
+                        or time.monotonic() - start >= max_wait:
+                    raise
+                failures += 1
+                logger.warning("NCBI status request for %s failed (%s); retry %d of %d.",
+                               rid, exc, failures, STATUS_RETRIES)
+                time.sleep(max(self.min_poll_interval, poll_interval))
+                continue
 
             if status == "READY":
                 return

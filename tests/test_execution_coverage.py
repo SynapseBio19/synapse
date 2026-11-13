@@ -153,7 +153,7 @@ class VariantHelperTests(unittest.TestCase):
     def test_grouping_density_report_and_consequence(self):
         from analyses import variant_analysis as V
         result = V.analyze_vcf_text(VCF, name="demo")
-        variants = result.variants if hasattr(result, "variants") else result.original_variants
+        variants = result.variants
         self.assertEqual(len(variants), 3)
         self.assertEqual(len(V.variant_key_set(variants)), 3)
         self.assertEqual({k: len(v) for k, v in V.variants_by_chromosome(variants).items()}, {"chr1": 2, "chr2": 1})

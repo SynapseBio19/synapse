@@ -119,3 +119,22 @@ def write_golden(name: str, data) -> None:
         json.dumps(normalize_for_json(data), indent=1, sort_keys=True, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
+
+
+def primer3_unavailable() -> str | None:
+    """Why the primer3-py reference cannot be used here, or None if it can.
+
+    A package that is installed but whose compiled module cannot be loaded
+    (for example because Windows application control blocks the DLL, as
+    observed on 2026-11-13) is reported as unavailable, so the comparison
+    is skipped with the reason instead of failing with AttributeError.
+    """
+    try:
+        import primer3
+        primer3.calc_tm  # noqa: B018 - the attribute exists only when the native module loaded
+        from primer3 import bindings  # noqa: F401
+    except ImportError as error:
+        return f"primer3-py (reference extra) cannot be loaded: {error}"
+    except AttributeError:
+        return "primer3-py (reference extra) is installed but its compiled module did not load"
+    return None

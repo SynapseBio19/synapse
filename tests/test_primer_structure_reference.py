@@ -24,14 +24,16 @@ test keeps the measured relationship reproducible. No network is used.
 
 from __future__ import annotations
 
-import importlib.util
+
 import random
 import statistics
 import unittest
 
 from tests import _support  # noqa: F401
 
-HAS_PRIMER3 = importlib.util.find_spec("primer3") is not None
+from tests._support import primer3_unavailable
+
+PRIMER3_UNAVAILABLE = primer3_unavailable()
 CONDITIONS = dict(mv_conc=50.0, dv_conc=1.5, dntp_conc=0.2, dna_conc=250.0)
 
 
@@ -77,7 +79,7 @@ def _spearman(x, y):
     return covariance / ((sum((a - mx) ** 2 for a in rx) * sum((b - my) ** 2 for b in ry)) ** 0.5)
 
 
-@unittest.skipUnless(HAS_PRIMER3, "primer3-py (reference extra) not installed")
+@unittest.skipIf(PRIMER3_UNAVAILABLE, PRIMER3_UNAVAILABLE or "")
 class PrimerStructureReferenceTests(unittest.TestCase):
     def _measure(self, synapse, primer3_call, items):
         stems, energies, by_class = [], [], {}

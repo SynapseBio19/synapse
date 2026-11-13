@@ -17,6 +17,7 @@ import math
 import unittest
 
 from tests import _support  # noqa: F401
+from tests._support import primer3_unavailable
 
 # SantaLucia (1998) Table 1, written independently of analyses/primer.py.
 UNIFIED_1998 = {
@@ -135,8 +136,7 @@ class Primer3ReferenceComparison(unittest.TestCase):
     constant (Synapse R = 1.98720 cal/(mol K), Primer3 1.987).
     """
 
-    @unittest.skipUnless(__import__("importlib").util.find_spec("primer3"),
-                         "primer3-py (reference extra) not installed")
+    @unittest.skipIf(primer3_unavailable(), primer3_unavailable() or "")
     def test_tm_agrees_with_primer3_across_salt_conditions(self):
         import primer3
         from analyses import primer as P
