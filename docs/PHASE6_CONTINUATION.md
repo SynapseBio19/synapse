@@ -1,5 +1,72 @@
 # Phase 6 completion run – continuation record
 
+## Continuation run under the Master Execution Prompt (2026-11-13, in progress)
+
+Governing documents: the Phase 6 Master Prompt
+(`Project_Synapse_Phase_6_Master_Prompt_Skills_Integrated.txt`, SHA-256
+`c4a38c83…07346`, in the owner's Downloads folder) and the owner's Master
+Execution Prompt of 2026-11-13 (historical chat analysis, Phase 6
+completion, final audit; **AI Experiment Planner stays COMING SOON**).
+Recovered history and binding decisions:
+`docs/PROJECT_HISTORY_AND_DECISIONS.md`.
+
+**State at this entry.** `main` at `b928fef`, working tree clean; suite
+495 tests, all passing on CPython 3.14.6 (1 skipped: the opt-in 10 kb
+benchmark); golden master 12/12 unchanged; pyright 58 errors (baseline
+`ab4bd2a`: 134, nothing new); ReadOnly set on all 15 protected files.
+
+### Done in this run
+
+| Commit | Item |
+|---|---|
+| `224f7d2` | `docs/PROJECT_HISTORY_AND_DECISIONS.md`: history reconstructed from the two Claude Code sessions (every owner message read from the exported transcripts), the Git history and the repository records; binding decisions, contradictions and their resolution, and what was not accessible (the claude.ai Project chats and the pre-Phase-6 "Claude Cowork" cycle) |
+| `a2f671b` | AI Experiment Planner kept as **Coming Soon** (owner decision): menu entry `[11] AI Experiment Planner (Coming Soon)`, message "planned but not yet available. Nothing is run or stored", nothing implemented behind it; D15's honesty requirement preserved |
+| `c5ee3b2` | **RNAfold is no longer blocked**: ViennaRNA 2.8.0 installs as a wheel into the project `.venv`, so no system-wide install is needed. New `analyses/rna_structure.py`, `core.api.rna_secondary_structure`, RNA menu entry 6: MFE structure (Turner 2004, 37 °C) and, per hairpin-screen candidate, its free energy alone and its support in the MFE structure. Without the package everything reports "not available" with the reason; optional extra `structure`. Comparison on 16 sequences: the screen finds 64 of 74 MFE hairpins (86 %), but only 35 % of its 3,307 candidates are favorable alone |
+| `70ff2b0` | **bcftools norm comparison** without bcftools: the published input/reference/expected files of the bcftools 1.25 test suite (MIT/Expat, SHA-256 checked) are the reference. Split-then-normalize: 29 of 29 alleles identical; the record `-cx` excludes for a REF mismatch is the one Synapse flags. The only difference was a reference-only record (ALT `.`), which Synapse dropped silently; it is now reported (`parse_vcf(skipped=)`, API warning, NOTE in the variant menu) |
+| `a1e3520` | **ORFfinder comparison** (web service, live): pUC19 L09137.2, code 11, four settings; all 69 ORFs identical in strand, start, stop, length and partial status, including CTG/ATT/ATC/ATA starts and two 3′-partial ORFs. Found and corrected a documentation claim: ORFfinder's minimal length excludes the stop codon, Synapse's includes it, so `min_length = L + 3` reproduces ORFfinder's `L` |
+| `f6f12ed` | **HGVS DNA descriptions** (checked with Mutalyzer 3): the report wrote Synapse's own notation behind a "c." prefix (`11insTT`, `18delA`, `20_21GT>CC`). `mutation_hgvs_c` now writes HGVS syntax and, with the reference, applies the 3′ rule and recognizes duplications; `hgvs_c_allele` gives one allele description and merges touching changes into a delins. 11 of 11 synthetic cases identical to Mutalyzer's `description_extract`; the `p.(...)` forms parse there as predicted changes |
+| `b928fef` | **Instability-index weights vs ExPASy ProtParam**: all 400 weights recovered from 420 probe measurements (no table copied). 399 agree; KQ differs (ProtParam 24.68, Synapse and Biopython 24.64). Table unchanged, difference recorded; effect bounded (0.004 per KQ in a 100-residue protein) |
+
+Every commit carries its evidence; `docs/CHANGES.md` has one entry per
+item with before, after and reason.
+
+### Blocked items resolved in this run
+
+- RNAfold (P2-5): **resolved**, project-local wheel, no system install.
+- `bcftools norm` (§3.8): **resolved** against the published test vectors;
+  running bcftools itself still needs WSL or Linux.
+- ORFfinder (§3.2, §3.13): **resolved** live.
+- HGVS validator (§3.7): **resolved** against Mutalyzer for the
+  descriptions Synapse produces; not checked against RefSeq transcripts.
+- Guruprasad 1990 primary table (§3.4): **partly**. All 400 weights are
+  now compared with ExPASy; the paper is still needed to decide the one
+  difference (KQ).
+
+### Still open (unchanged)
+
+CFD off-target matrix (needs a source whose licence permits the use),
+genome-scale specificity (very large downloads), local BLAST against a
+real database (swissprot, about 0.5 GB), NEBcutter (web application,
+substance covered by REBASE and Biopython), the project licence and the
+legacy BLAST result file (owner decisions), Python 3.11-3.13 and
+non-Windows platforms, and the partially complete items of section J of
+the final report (large modules, legacy primer names, `complexity` field,
+UI §9 remainders, file and network dialogs, `core_nt`).
+
+### Next steps
+
+1. Remaining partial items that need no approval: `core_nt` in the BLAST
+   database list; more automated export, download and network dialogs
+   (ui line coverage 53 %); pyright triage below 58.
+2. Reconcile FEATURE_STATUS, AUDIT_STATUS, the progress record and the
+   final report (sections D, I, J and the requirement matrix) with this
+   run.
+3. Independent final audit and final verification, then rewrite
+   `docs/PHASE6_FINAL_REPORT.md` (A-L as the Master Execution Prompt asks,
+   with the historical analysis as section B).
+
+---
+
 **Final state (2026-11-13).** The completion run ended with the final
 verification, the independent audit and the new final report
 (`docs/PHASE6_FINAL_REPORT.md`). Verdict: Phase 6 is PARTIALLY COMPLETE;
