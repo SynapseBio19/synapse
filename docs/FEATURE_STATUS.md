@@ -276,7 +276,7 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 | — | CDS from the selected ORF | `orf_reference_cds`, `assess_coding_frame` | Implemented | Integration-tested | Not applicable | Both strands; variant CDS derived only at equal length. |
 | 2 | Mutation Statistics | `calculate_mutation_statistics` | Implemented | Execution-tested | Not applicable | |
 | — | Mutation spectrum, hotspots | `build_mutation_spectrum`, `find_mutation_hotspots` | Implemented | Execution-tested | Not applicable | |
-| — | HGVS-style notation | `mutation_hgvs_c`, `mutation_hgvs_p`, `_mutation_notation` | Implemented | Execution-tested | **Not validated** | Predicted protein changes written `p.(R12C)`, `p.(R12=)`, `p.(W24*)`, `p.(M1?)`, `p.(*110Qext*?)` since 2026-11-11 (`test_hgvs_notation.py`); not checked with an HGVS validator. |
+| — | HGVS-style notation | `mutation_hgvs_c`, `mutation_hgvs_p`, `_mutation_notation` | Implemented | Execution-tested | **Independently validated** (Mutalyzer 3, synthetic sequences) | Predicted protein changes `p.(R12C)`, `p.(R12=)`, `p.(W24*)`, `p.(M1?)`, `p.(*110Qext*?)` since 2026-11-11, parsed by Mutalyzer without error. DNA changes in HGVS syntax with the 3′ rule, dup and delins since 2026-11-13 (`hgvs_c_allele`); 11/11 identical to Mutalyzer's `description_extract` (`test_hgvs_mutalyzer_reference.py`). Not checked against RefSeq transcripts. |
 | — | Indel left-normalization | `normalize_indel_left` | Implemented | Execution-tested | Not applicable | Separate from the variant module's implementation — duplication. |
 | — | Context extraction | `extract_mutation_context` | Implemented | Execution-tested | Not applicable | |
 | — | Restriction-site impact | `restriction_site_impact` | Implemented | Execution-tested | Not applicable | Cross-module check. |
@@ -493,7 +493,6 @@ explicitly not implemented.
 | Live remote NCBI BLAST | Not run by choice | One confirmed run recording RID and provenance |
 | Local BLAST on a real database | `nt` is ~100 GB+ | `swissprot` (~0.5 GB) as a proportionate step |
 | Python 3.10 suite | 3.10 not installed (only 3.14.6); installing an interpreter needs the owner's approval | Install 3.10 and run the suite. Meanwhile `pyright --pythonversion 3.10` (112 diagnostics, baseline 134) and `Python310CompatibilityTests` (3.10 grammar, pre-3.12 f-string rules) run; the latter found and fixed one CRISPR import failure on 3.10/3.11 |
-| HGVS conformance | No validator | `hgvs` package or Mutalyzer; currently labeled "HGVS-like" |
 | Primer hairpin/dimer screens | Heuristic by design | `primer3.calc_hairpin` / `calc_heterodimer` are available and would be a direct comparison |
 
 ---

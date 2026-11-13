@@ -450,8 +450,25 @@ therefore upper estimates.
 - Coding consequences assume that position 1 is the first base of codon 1.
   A CDS can be taken from the selected ORF; plausibility warnings are given
   when that assumption looks wrong. Start-loss is reported only for codon 1.
-- Notation is HGVS-style (den Dunnen et al. 2016), not checked against an
-  HGVS validator. `c.` positions count bases of the supplied sequence and
+- Notation follows the HGVS recommendations (den Dunnen et al. 2016).
+  DNA changes (since 2026-11-13, `mutation_hgvs_c`, `hgvs_c_allele`, shown
+  in the mutation report): `c.7C>T`, `c.16del`, `c.10_12del`,
+  `c.10_11insTT` (both flanking positions), `c.6dup` / `c.12_13dup`, and
+  `c.11_12delinsCCC`; deletions and insertions are moved to their most 3′
+  position in a repeat (3′ rule), and changes that touch are one
+  deletion-insertion in the allele description `c.[7C>T;20_21delinsCC]`.
+  Previously the report used Synapse's own notation (`11insTT` for an
+  insertion before base 11, `18delA`, `20_21GT>CC`), which is not HGVS.
+  Checked against Mutalyzer 3 (`description_extract`, Mutalyzer
+  3.2.0.dev0, API 2.2, 2026-11-13) on 11 synthetic sequence pairs
+  (substitution, deletions in and outside repeats, five duplications,
+  adjacent substitutions, unequal replacement): 11 of 11 identical;
+  Mutalyzer writes the duplicated pair TT as the repeat `9_10T[4]`, which
+  describes the same sequence as Synapse's `9_10dup`
+  (`tests/test_hgvs_mutalyzer_reference.py`). The protein forms below were
+  parsed by Mutalyzer's `description_to_model` without error and flagged as
+  predicted. Not checked: descriptions against real RefSeq transcripts
+  (Synapse numbers the supplied sequence). `c.` positions count bases of the supplied sequence and
   equal HGVS c. numbering only if that sequence is the CDS. Protein changes
   are predicted from the DNA and therefore written in parentheses, with
   one-letter codes: `p.(R12C)` missense, `p.(R12=)` synonymous, `p.(W24*)`

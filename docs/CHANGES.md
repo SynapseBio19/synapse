@@ -2202,3 +2202,23 @@ Prompt of 2026-11-13. History and binding decisions:
   and Synapse's includes it, so Synapse also reports ORFs of exactly 75 nt;
   `min_length=78` reproduces ORFfinder's 75. The default is unchanged.
 - Tests: `tests/test_orffinder_reference.py` (4).
+
+### HGVS DNA descriptions in the mutation report (checked with Mutalyzer)
+
+- Previous: `mutation_hgvs_c` prefixed Synapse's own notation with "c.",
+  and the report printed that notation: an insertion before base 11 was
+  `11insTT` (HGVS needs both flanking positions, and here the change is a
+  duplication), deletions repeated the deleted bases, replacements were
+  `20_21GT>CC`, and no 3′ rule was applied.
+- Now: `mutation_hgvs_c(mutation, reference_sequence)` writes HGVS syntax
+  (`c.7C>T`, `c.16del`, `c.10_11insTT`, `c.9_10dup`, `c.11_12delinsCCC`)
+  and, with the reference, applies the 3′ rule and recognizes
+  duplications; `hgvs_c_allele` describes all changes as one allele and
+  merges changes that touch into one delins. The report shows both.
+- Evidence: Mutalyzer 3 `description_extract` on 11 synthetic sequence
+  pairs, 11/11 identical (one in the equivalent dup form); the p. forms
+  parse in Mutalyzer. Mutation positions, types, effects and the golden
+  master are unchanged; only the printed notation changed.
+- Tests: `tests/test_hgvs_mutalyzer_reference.py` (5).
+- Record: the test totals in the commit messages of `70ff2b0` (484) and
+  `a1e3520` (488) are one too high; the suites had 483 and 487 tests.
