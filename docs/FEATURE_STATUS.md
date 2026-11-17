@@ -37,19 +37,19 @@ simulated keystrokes (see audit §11.5).
 
 | | Count |
 |---|---|
-| Analysis modules | 12 |
-| Core modules | 9 (`core/alphabets.py` added in Phase 6) |
+| Analysis modules | 13 (`analyses/rna_structure.py` added 2026-11-13) |
+| Core modules | 10 (`core/alphabets.py` and `core/textformat.py` added in Phase 6) |
 | Shared UI module | 1 (`ui/style.py`, added in Stage F), plus 11 dialog modules `ui/<module>_menu.py` and `ui/variant_check.py` (P2-2, T12) |
 | Support modules (`fileio`, `ui`, `data`) | 8 |
-| Functions and classes inventoried | ~1,100 |
+| Functions and classes | 1,244 in `analyses/`, `core/`, `ui/`, `fileio/`, `data/` (all nesting levels, counted 2026-11-17); this table inventories them by feature, 271 rows |
 | Main-menu entries | 15 |
 | Sub-menu entries inventoried | 78 |
 | Automated tests | 516, all passing (2026-11-17; skipped: the opt-in benchmark, and four primer3-py comparisons while Windows application control blocks its compiled module). 356 at the end of Stage F (2026-11-03), 421 on 2026-11-11, 463 on 2026-11-13. The suite also passes on Python 3.10.11 (452 tests on 2026-11-12, `docs/TOOL_AND_DATA_LEDGER.md`). Line coverage: `docs/TEST_COVERAGE.md`. The count at the end of Stage 4 was 283. |
 | Module self-tests | 12 suites, all passing (literature 64, mutation 44, BLAST 33, CRISPR 28, variant 27, others aggregated) |
 | Golden-master scenarios | 12 |
-| Confirmed defects | 19 (D1–D19), all corrected by the end of Phase 6 (`docs/PHASE6_FINAL_REPORT.md`, section A; D16 finished with the removal of the superseded primer generations). The first 16 corrections are dated 2026-10-31 in the rows below. |
+| Confirmed defects | 25 (D1–D25), all corrected with a regression test (D1–D19 by 2026-11-03, D20–D25 in the completion run 2026-11-12/13; `docs/PHASE6_FINAL_REPORT.md`, section D) |
 | Suspected / unverified concerns | 14 at the audit (S1–S14); S15–S24 recorded since |
-| External validations performed in this audit | 8 (audit §3, §6) |
+| External validations | 24 recorded in §17 (8 in the initial audit, the rest from 2026-11-02 to 2026-11-17) |
 | Features advertised but not implemented | 1 (`[11] AI Experiment Planner`, labeled "Coming Soon": planned, not available, runs nothing; owner decision 2026-11-13) |
 
 ---
@@ -64,14 +64,14 @@ simulated keystrokes (see audit §11.5).
 | 1 | Sequence Overview | `analyses.sequence.*` (15 functions called from `main.py`) | Implemented | Execution-tested | Integration-tested | Not applicable | Self-test passes. Stored in the pipeline. |
 | 2 | ORF Analysis | `analyses.orf.run_orf_analysis_ui` | Implemented | Execution-tested | Integration-tested | Independently validated (genetic codes, coordinates) | See §3. |
 | 3 | RNA Analysis | `analyses.rna.run_rna_analysis_ui` | Implemented | Execution-tested | Integration-tested | Not applicable | Selected-ORF vs whole-sequence rule confirmed intact. |
-| 4 | Protein Analysis | `analyses.protein.run_protein_analysis_from_orf` | Implemented | Execution-tested | Integration-tested | Independently validated (ProtParam) | Requires a selected ORF by design; no silent whole-sequence fallback. |
+| 4 | Protein Analysis | `ui.protein_menu.run_protein_analysis_from_orf` | Implemented | Execution-tested (`main.py` smoke test, in a subprocess that line coverage does not follow) | Integration-tested | Independently validated (ProtParam) | Requires a selected ORF by design; no silent whole-sequence fallback. The dialog moved to `ui/` in P2-2. |
 | — | Protein record menu | `main.run_protein_record`, `analyses.protein.run_protein_analysis_from_record` | Implemented | Execution-tested | Integration-tested | Not applicable | Protein FASTA/GenPept records: protein analysis, BLAST (protein query), report (D14, 2026-10-31). X/B/Z/J/U/O keep their positions (**D14-F6** corrected 2026-10-31). |
 | 5 | Restriction & Cloning | `analyses.restriction.run_restriction_cloning_ui` | Implemented | Execution-tested | Integration-tested | Independently validated (digests, circular map) | D3/D4/D5 corrected 2026-10-31. Open: **S17**, **S18**. |
 | 6 | Primer Design | `analyses.primer.run_primer_analysis_ui` | Implemented | Execution-tested | Integration-tested | Independently validated (primer3-py) | **D16 corrected 2026-10-31**: one definition per name; superseded generations removed after a reachability review. Tm agrees with primer3-py within 0.0032 °C over 2,916 comparisons. |
 | 7 | Mutation & Variant Analysis | `analyses.mutation.run_mutation_variant_ui` | Implemented | Execution-tested | Integration-tested | Normalization compared with bcftools' published outputs (2026-11-13) | **D12** in the variant branch — corrected 2026-10-31 (Phase 6 Tier 1). |
 | 8 | CRISPR Guide Design | `analyses.crispr.crispr_menu` | Partially implemented | Execution-tested | Integration-tested | Not applicable | **D8, D9, D10 corrected 2026-10-31** (cut site, on-target exclusion, configuration fields). Partial because CFD scoring and genome-wide off-target search are absent by design. |
 | 9 | BLAST Search | `analyses.blast.blast_menu` | Implemented | Execution-tested | Integration-tested | Independently validated (real BLAST+ run) | **D6, D7 corrected 2026-10-31**: programmatic local BLAST by database path; the stale artifact is labeled legacy. |
-| 10 | Literature Search | `analyses.literature.main` | Implemented | Execution-tested (offline) | Integration-tested | Blocked by external dependency (no live call made) | **S11**: a live check needs the owner's approval for external requests. |
+| 10 | Literature Search | `ui.literature_menu.main`, `_interactive_menu` | Implemented | Execution-tested (dialog with stubbed providers, `test_dialog_paths`) | Integration-tested | Live-checked once (2026-11-12, neutral query) | **S11** resolved by the live check (verified 2026-11-17, Phase 7). |
 | 11 | **AI Experiment Planner** | — | **Not implemented (COMING SOON)** | Not applicable | Not applicable | Not applicable | Intentionally deferred (P3-1). D15 (2026-10-31) relabeled the entry "not implemented"; on 2026-11-13 the owner decided it stays **Coming Soon**. The entry says the feature is planned, not yet available, and that nothing is run or stored (`PlannerPlaceholderTests`). Not counted as a completed module. |
 | P | Pipeline Status & Stored Results | `core.pipeline.PipelineContext.status_report`, `ui.report.print_pipeline_status` | Implemented | Execution-tested | Integration-tested | Not applicable | **D19 corrected 2026-10-31**: `completed` has a fixed shape. |
 | R | Export Analysis Report (JSON/Markdown) | `core.report.export_analysis_report` | Implemented | Execution-tested | Integration-tested | Not applicable | Rejects suffixes other than `.json`/`.md`. **S8 corrected 2026-10-31**: a failing `to_dict()` is logged. Since 2026-11-02 a result's own warnings reach the summary. |
@@ -80,7 +80,7 @@ simulated keystrokes (see audit §11.5).
 
 ---
 
-## 2. Sequence analysis — `analyses/sequence.py` (1,768 lines, 35 functions)
+## 2. Sequence analysis — `analyses/sequence.py`
 
 | Feature | Function | Implementation | Execution | Validation | Notes |
 |---|---|---|---|---|---|
@@ -104,12 +104,12 @@ relative to its use (every session runs it).
 
 ---
 
-## 3. ORF analysis — `analyses/orf.py` (2,587 lines, 46 functions)
+## 3. ORF analysis — `analyses/orf.py`
 
 | Menu | Feature | Function | Implementation | Execution | Validation | Notes |
 |---|---|---|---|---|---|---|
 | 1 | ORF Discovery | `find_orfs`, `analyze_orfs`, `analyze_orfs_enhanced` | Implemented | Execution-tested | Independently validated (codes, coordinates; NCBI ORFfinder 2026-11-13) | Both strands, 3 frames each. All 69 ORFfinder ORFs on pUC19 (code 11, four settings) identical; ORFfinder's minimal length excludes the stop codon (`test_orffinder_reference`). |
-| 2 | ORF Candidates | `print_orf_candidates`, `print_orf_candidate_details` | Implemented | Reachable | Not applicable | |
+| 2 | ORF Candidates | `print_orf_candidates`, `print_orf_candidate_details` | Implemented | Execution-tested (`test_dialog_paths`) | Not applicable | (verified 2026-11-17, Phase 7) |
 | 3 | Compare ORFs | `compare_orf_candidates`, `print_orf_comparison_table` | Implemented | Execution-tested | Not applicable | Rows carry `heuristic_score` and `heuristic_classification` (**D18 corrected 2026-11-02**). |
 | 4 | ORF Relationships | `analyze_orf_relationships` | Implemented | Execution-tested | Not applicable | Overlap/nesting by coordinates only, correctly disclaimed. |
 | 5 | Select ORF | `select_orf`, `analyze_selected_orf` | Implemented | Integration-tested | Not applicable | Hands over to RNA, protein, CRISPR, BLAST. |
@@ -135,14 +135,14 @@ Test coverage: 19 test references — the best-covered module.
 
 ---
 
-## 4. RNA analysis — `analyses/rna.py` (2,617 lines, 47 functions)
+## 4. RNA analysis — `analyses/rna.py`, `analyses/rna_structure.py`
 
 | Menu | Feature | Function | Implementation | Execution | Validation | Notes |
 |---|---|---|---|---|---|---|
 | — | Source resolution (ORF vs whole sequence) | `resolve_rna_source` | Implemented | Integration-tested | Not applicable | **Confirmed intact**: `mode="orf"`/label "Selected ORF" with a selection, whole sequence and "Selected DNA" without. |
 | — | Transcription | `transcribe_rna` | Implemented | Execution-tested | Not applicable | T→U on the given strand. |
 | 1 | RNA Overview | `print_rna_overview`, `analyze_rna` | Implemented | Execution-tested | Not applicable | |
-| 2 | Translation & Codon Analysis | `translate_rna_frame`, `analyze_rna_three_frames`, `analyze_rna_codon_usage` | Partially implemented | Execution-tested | Not applicable | **Always NCBI table 1**, even for a table-2/4/11 ORF (documented P1-9 limitation; `main.py` warns). Not part of D1/D2; the remaining place where a selected ORF is not translated with its own genetic code. |
+| 2 | Translation & Codon Analysis | `translate_rna_frame`, `analyze_rna_three_frames`, `analyze_rna_codon_usage` | Implemented | Execution-tested | Biopython (genetic codes) | Since P1-9 (`8d28586`, 2026-10-31) the three-frame view uses the selected ORF's genetic code (`ui/rna_menu.py` passes `genetic_code`; test in `test_phase6_tier2`); without a selected ORF it uses table 1. The row said "Always NCBI table 1" until 2026-11-17 (verified 2026-11-17, Phase 7). |
 | 3 | RNA Features | `find_rna_hairpins`, `summarize_rna_structure`, `find_rna_start_stop_landscape`, `find_rna_homopolymers` | Implemented | Execution-tested | Not applicable | Hairpins are a complementarity proxy, **not** a folding model. G·U pairs are counted as a separate figure since 2026-11-11 (P2-5). Compared with RNAfold MFE structures on 2026-11-13: sensitive (86 % of MFE hairpins found), not specific (35 % of candidates favorable alone). |
 | 6 | Secondary Structure (ViennaRNA, optional) | `analyses.rna_structure.predict_secondary_structure`, `ui.rna_menu.print_rna_secondary_structure`, `core.api.rna_secondary_structure` | Implemented (optional dependency) | Execution-tested | Not applicable | Independently validated against ViennaRNA's own known values (GGGGAAAACCCC, −5.4 kcal/mol) | MFE prediction with ViennaRNA 2.8.0 when installed; reports "not available" otherwise. 3,000 nt default limit. Not stored in the pipeline report. `tests/test_rna_secondary_structure.py`. |
 | 4 | Complete RNA Report | `print_rna_report` | Implemented | Execution-tested | Not applicable | Every RNA view is drawn and checked by `test_execution_coverage.py` (2026-11-12). |
@@ -158,7 +158,7 @@ Test coverage: 2 test references.
 
 ---
 
-## 5. Protein analysis — `analyses/protein.py` (3,777 lines, 55 functions)
+## 5. Protein analysis — `analyses/protein.py`
 
 | Menu | Feature | Function | Implementation | Execution | Validation | Notes |
 |---|---|---|---|---|---|---|
@@ -188,7 +188,7 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 
 ---
 
-## 6. Restriction analysis — `analyses/restriction.py` (2,230 lines, 57 functions)
+## 6. Restriction analysis — `analyses/restriction.py`
 
 | Menu | Feature | Function | Implementation | Execution | Validation | Notes |
 |---|---|---|---|---|---|---|
@@ -209,13 +209,13 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 | — | Database validation | `validate_enzyme_database` | Implemented | Execution-tested | Not applicable | |
 | — | Methylation notes | enzyme `methylation_note` | Implemented | Execution-tested | Not applicable | Display only; blocking and star activity not modeled. |
 | 4 | Complete Restriction Report | `print_restriction_report` | Implemented | Reachable | Not applicable | |
-| — | Topology selection UI | `_synapse_ui_select_topology` | Implemented | Reachable | Not applicable | |
+| — | Topology selection UI | `_synapse_ui_select_topology` | Implemented | Execution-tested (called by name in the tests) | Not applicable | (verified 2026-11-17, Phase 7) |
 | — | Type IIS enzymes | `TYPE_IIS_ENZYMES`, `find_type_iis_sites`, `perform_digest` | Implemented | Execution-tested | **Independently validated** | Since 2026-11-11 (P2-7): BsaI, BsmBI, BbsI, SapI on both strands; definitions 4/4 and 140 cuts vs Biopython 1.88, 0 differences. Not used by the cloning planner; Golden Gate planning not implemented. |
 | — | Self-test | `run_restriction_self_test` | Implemented | Execution-tested | Not applicable | |
 
 ---
 
-## 7. Cloning — `analyses/cloning.py` (4,351 lines, 71 functions)
+## 7. Cloning — `analyses/cloning.py`
 
 | Menu | Feature | Function | Implementation | Execution | Validation | Notes |
 |---|---|---|---|---|---|---|
@@ -229,7 +229,7 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 | 2 | Single-Enzyme Analysis | `_cloning_ui_single_enzyme`, `_print_single_enzyme_report` | Implemented | Execution-tested | Not applicable | **Corrected 2026-11-03**: the report raised `KeyError: 'left'` for every enzyme (since at least the audit); found by `tests/test_rendered_menus.py`. |
 | 3 | Two-Enzyme Strategy Analysis | `analyze_enzyme_pair`, `analyze_directional_strategy`, `_cloning_ui_two_enzyme_strategy` | Implemented | Execution-tested | Not applicable | Directional-cloning logic incl. internal-site checks. |
 | — | Strategy scoring / ranking | `_score_strategy`, `score_cloning_strategy`, `rank_cloning_strategy`, `compare_cloning_strategies` | Implemented | Execution-tested | Not applicable | Heuristic. **D4 corrected 2026-10-31**: only CONFIRMED sites define cloning ends. |
-| — | Digest fragments | `_digest_fragments`, `_selected_digest` | **Partially implemented** | Execution-tested | Not applicable | D5 corrected: sites and fragments follow the molecule's topology. **S17**: cut positions are taken as the recognition start, so fragment lengths are off by the cut offset (e.g. PstI by 4 nt). |
+| — | Digest fragments | `_digest_fragments`, `_selected_digest` | Implemented | Execution-tested | Not applicable | D5 corrected: sites and fragments follow the molecule's topology. **S17 corrected** (`docs/CHANGES.md` §S17, "The cloning digest cuts where the enzyme cuts"; test in `test_phase6_tier2`). The row still described S17 as open until 2026-11-17 (verified 2026-11-17, Phase 7). |
 | — | Enzyme suitability / compatible enzymes | `assess_enzyme_suitability`, `find_compatible_enzymes` | Implemented | Execution-tested | Not applicable | |
 | — | Diagnostics when no strategy exists | `_site_diagnostics`, `_no_strategy_diagnostics` | Implemented | Execution-tested | Not applicable | Good failure reporting. |
 | — | Design reasons, ASCII orientation view | `get_design_reasons`, `ascii_orientation_visualization` | Implemented | Reachable | Not applicable | |
@@ -238,13 +238,13 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 
 ---
 
-## 8. Primer design — `analyses/primer.py` (5,412 lines, 126 definitions)
+## 8. Primer design — `analyses/primer.py`
 
 | Menu | Feature | Function | Implementation | Execution | Validation | Notes |
 |---|---|---|---|---|---|---|
 | — | Nearest-neighbor Tm | `calculate_tm_nearest_neighbor` (one definition since **D16**), `calculate_duplex_thermodynamics` | Implemented | Execution-tested | **Independently validated** | **40/40 comparisons vs primer3-py in the audit, max difference 0.003 °C; extended in Stage I to 2,916 comparisons over Mg²⁺ 0-3 mM, max 0.0032 °C, kept in the suite.** |
 | — | SantaLucia 1998 / 2004 / legacy parameter sets | `_nn_parameter_set`, `_nearest_neighbor_sum` | Implemented | Execution-tested | Independently validated | Default 1998 unified set. |
-| — | Salt correction, Mg²⁺ model | `calculate_salt_correction`, `calculate_effective_ionic_strength`, `_effective_monovalent_salt_mM` | Implemented | Execution-tested | Independently validated | von Ahsen 2001 monovalent-equivalent; `na_only` and legacy 4× selectable. |
+| — | Salt correction, Mg²⁺ model | `calculate_salt_correction`, `calculate_effective_ionic_strength` | Implemented | Execution-tested | Independently validated | von Ahsen 2001 monovalent-equivalent; `na_only` and legacy 4× selectable. (`_effective_monovalent_salt_mM` was removed with the superseded generations, D16 part 2.) |
 | — | Symmetry / self-complementarity term | `_is_self_complementary`, `calculate_duplex_concentration_term` | Implemented | Execution-tested | Independently validated | C/4 vs C and −1.4 e.u. handled. |
 | — | Wallace Tm | `calculate_tm_wallace` | Implemented | Execution-tested | Not applicable | Offered as a UI alternative; correctly described as approximate. |
 | — | Salt-adjusted Tm | `calculate_tm_salt_adjusted` | Implemented | Execution-tested | Not applicable | |
@@ -256,15 +256,15 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 | — | Specificity screen | `screen_primer_specificity` | Implemented | Execution-tested | Not applicable | Against supplied sequence only, not a genome (P3-2). |
 | — | Pairing and amplicon | `build_primer_pair`, `get_amplicon`, `summarize_primer_pair` | Implemented | Execution-tested | Not applicable | |
 | 3 | Single Primer Analysis | `analyze_primer`, `analyze_primer_professional`, `_primer_ui_single_analysis` | Implemented | Execution-tested | Not applicable | |
-| — | Failure diagnostics | `diagnose_thermodynamic_failure`, `_professional_failure_diagnostics` | Implemented | Execution-tested | Not applicable | |
-| — | Condition entry UI | `_primer_ui_read_conditions`, `_primer_ui_select_tm_model` | Implemented | Reachable | Not applicable | |
+| — | Failure diagnostics | `diagnose_thermodynamic_failure` | Implemented | Execution-tested since 2026-11-17 (`test_library_functions`) | Not applicable | Module function without a menu caller. The row said "Execution-tested" although no test ran it; `_professional_failure_diagnostics` was removed in D16 part 2 (verified 2026-11-17, Phase 7). |
+| — | Condition entry UI | `_primer_ui_read_conditions`, `_primer_ui_select_tm_model` | Implemented | Execution-tested (empty answers and defaults, `EmptyAnswerTests`) | Not applicable | (verified 2026-11-17, Phase 7) |
 | 2 | Design Primers Around a Restriction Site | `restriction_site_choices`, `design_primers_for_restriction_site`, `_primer_ui_restriction_site_design`, `core.api.design_primers_for_restriction_site` | Implemented | Execution-tested | Integration-tested | Added 2026-11-12 (Master Prompt 10.2): a CONFIRMED site is chosen, forward primers lie upstream of the site and its cuts, reverse primers downstream; each pair carries the predicted digest of its amplicon. Linear templates only. `test_integration_workflows` (RestrictionPrimerWorkflowTests), `test_rendered_menus` (primer_site). |
 | — | Reports | `print_primer_report`, `print_professional_primer_report`, `get_professional_primer_summary` | Implemented | Reachable | Not applicable | |
 | — | Self-tests | `run_primer_self_test`, `run_thermodynamic_self_test`, `run_primer_v3_self_test`, `run_primer_v3_self_test_final`, `run_primer_v4_screening_self_test` | Implemented | Execution-tested | Not applicable | Several self-test entry points, a remnant of the generations removed under **D16**. |
 
 ---
 
-## 9. Mutation analysis — `analyses/mutation.py` (4,184 lines, 82 definitions)
+## 9. Mutation analysis — `analyses/mutation.py`
 
 | Menu | Feature | Function | Implementation | Execution | Validation | Notes |
 |---|---|---|---|---|---|---|
@@ -277,22 +277,22 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 | 2 | Mutation Statistics | `calculate_mutation_statistics` | Implemented | Execution-tested | Not applicable | |
 | — | Mutation spectrum, hotspots | `build_mutation_spectrum`, `find_mutation_hotspots` | Implemented | Execution-tested | Not applicable | |
 | — | HGVS-style notation | `mutation_hgvs_c`, `mutation_hgvs_p`, `_mutation_notation` | Implemented | Execution-tested | **Independently validated** (Mutalyzer 3, synthetic sequences) | Predicted protein changes `p.(R12C)`, `p.(R12=)`, `p.(W24*)`, `p.(M1?)`, `p.(*110Qext*?)` since 2026-11-11, parsed by Mutalyzer without error. DNA changes in HGVS syntax with the 3′ rule, dup and delins since 2026-11-13 (`hgvs_c_allele`); 11/11 identical to Mutalyzer's `description_extract` (`test_hgvs_mutalyzer_reference.py`). Not checked against RefSeq transcripts. |
-| — | Indel left-normalization | `normalize_indel_left` | Implemented | Execution-tested | Not applicable | Separate from the variant module's implementation — duplication. |
+| — | Indel left-normalization | `normalize_indel_left` | Implemented | Execution-tested since 2026-11-17 (`test_library_functions`) | Not applicable | Module function without a menu caller; separate from the variant module's implementation (duplication). The row said "Execution-tested" although no test ran it (verified 2026-11-17, Phase 7). |
 | — | Context extraction | `extract_mutation_context` | Implemented | Execution-tested | Not applicable | |
 | — | Restriction-site impact | `restriction_site_impact` | Implemented | Execution-tested | Not applicable | Cross-module check. |
 | — | Primer / CRISPR overlap with variants | `check_features_against_variants`, `core.api.cross_check_variants`, `binding_features`, `ui/variant_check.py` | Implemented | **Integration-tested** | Not applicable | P2-4: API since 2026-11-11; in the primer and CRISPR menus since 2026-11-13 (T12) for variants of a VCF contig mapped onto the loaded sequence. `test_variant_crosscheck.py`. |
-| — | Protein comparison | `compare_proteins` | Implemented | Execution-tested | Not applicable | |
-| 3 | Coding Consequence Analysis (UI) | `run_mutation_analysis_ui` branch 3 | Implemented | Reachable | Not applicable | |
-| 4 | Mutation Report | `build_mutation_report`, `print_mutation_report`, `advanced_mutation_report`, `mutation_map` | Implemented | Reachable | Not applicable | |
+| — | Protein comparison | `compare_proteins` | Implemented | Execution-tested since 2026-11-17 (`test_library_functions`) | Not applicable | Module function without a menu caller; the row said "Execution-tested" although no test ran it (verified 2026-11-17, Phase 7). |
+| 3 | Coding Consequence Analysis (UI) | `run_mutation_analysis_ui` branch 3 | Implemented | Execution-tested (`test_dialog_paths`) | Not applicable | (verified 2026-11-17, Phase 7) |
+| 4 | Mutation Report | `build_mutation_report`, `print_mutation_report`, `advanced_mutation_report`, `mutation_map` | Implemented | Execution-tested (`test_dialog_paths`, `test_hgvs_mutalyzer_reference`) | HGVS descriptions checked with Mutalyzer | (verified 2026-11-17, Phase 7) |
 | — | Advanced analysis | `create_advanced_analysis`, `mutation_signature` | Implemented | Execution-tested | Not applicable | |
 | — | JSON export | `result_to_json` | Implemented | Execution-tested | Not applicable | |
 | — | Validation | `validate_mutation_result` | Implemented | Execution-tested | Not applicable | |
 | 5 | Self-test | `run_mutation_self_test` | Implemented | Execution-tested | Not applicable | 44/44 incl. the TEST_8 family. |
-| — | Size guard | 2,000 nt note | Partially implemented | Execution-tested | Not applicable | **S9**: a note with the measured figures, not a limit. P2-6 10 kb target unmet. |
+| — | Size guard | 2,000 nt note | Partially implemented | Execution-tested | Not applicable | **S9**: a note with the measured figures, not a limit. Similar sequences of 10 kb now align in an exact band (about 0.2 s, P2-6); unrelated long sequences still take O(n·m) time (about 23 s at 10 kb) (verified 2026-11-17, Phase 7). |
 
 ---
 
-## 10. Variant analysis — `analyses/variant_analysis.py` (2,322 lines, 73 definitions)
+## 10. Variant analysis — `analyses/variant_analysis.py`
 
 | Menu | Feature | Function | Implementation | Execution | Validation | Notes |
 |---|---|---|---|---|---|---|
@@ -301,7 +301,7 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 | — | Multi-allelic splitting | `_select_allele_specific_info`, `_remap_sample_data_for_alt`, `_genotype_index` | Implemented | Execution-tested | Not applicable | A/R/G cardinality; G uses F(j,k) = k(k+1)/2 + j. Other ALT alleles in GT → 0, as `bcftools norm -m-`. |
 | — | Genotype parsing, phasing, categories | `parse_genotype`, `genotype_category` | Implemented | Execution-tested | Not applicable | |
 | — | FILTER semantics | `_normalize_filter_status` | Implemented | Execution-tested | Not applicable | `.` = not applied, not failed. |
-| 2 | Add Variant Manually | `_prompt_variant` | Implemented | Reachable | Not applicable | |
+| 2 | Add Variant Manually | `_prompt_variant` | Implemented | Execution-tested (`test_dialog_paths`) | Not applicable | (verified 2026-11-17, Phase 7) |
 | 3 | Normalize Variants | `left_normalize_variant`, `normalize_variants`, `trim_common_bases` | Implemented | Execution-tested | **Independently validated** (against bcftools' published outputs) | Algorithm hand-verified against Tan et al. 2015 (audit §3.7); 29/29 alleles identical to `bcftools norm -m-` on the bcftools 1.25 test vectors, REF mismatch handling as `-cx` (2026-11-13, `test_bcftools_norm_reference`). Reference-only records (ALT `.`) are reported, not counted. |
 | — | REF validation | `check_reference_alleles`, `_reference_allele_matches` | Implemented | Execution-tested | Not applicable | **D12 corrected 2026-10-31**: a contig without a reference is flagged `REFERENCE_CONTIG_NOT_FOUND` and listed in `contigs_not_found`; `not_checked` is split by reason. Previously it was skipped silently. Tests: `tests/test_phase6_tier1.py::VariantContigMatchingTests`. |
 | — | Contig-name matching | `resolve_contig_names`, `ContigResolution`, `contig_matching=` | Implemented | Execution-tested | Not applicable | Exact by default; opt-in `chr_prefix` pairs `1`/`chr1` (flag `CONTIG_NAME_ALIASED`, CHROM unchanged). Mitochondrial names never paired; case variants not folded. **Not covered**: contig-length checks against `##contig`, RefSeq/GenBank accession names. |
@@ -320,7 +320,7 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 
 ---
 
-## 11. CRISPR analysis engine — `analyses/crispr.py` (2,574 lines, 134 definitions)
+## 11. CRISPR analysis engine — `analyses/crispr.py`
 
 | Menu | Feature | Function | Implementation | Execution | Validation | Notes |
 |---|---|---|---|---|---|---|
@@ -352,11 +352,11 @@ relative to size; the 28 self-tests are the module's own fixtures.
 
 ---
 
-## 12. BLAST search — `analyses/blast.py` (4,650 lines, 103 definitions)
+## 12. BLAST search — `analyses/blast.py`
 
 | Menu | Feature | Function | Implementation | Execution | Validation | Notes |
 |---|---|---|---|---|---|---|
-| 1 | Run BLAST Search (local) | `run_blast_analysis(engine="local")`, `LocalBlastEngine.run` | **Partially implemented** | **Execution-tested** | **Independently validated** | **Real BLAST+ 2.17.0+ run executed** (audit §6): 2 hits, coverage 100 % / 98.04 %, correct E-values and bands. The programmatic `local_database_path` branch now verifies the database prefix like a managed database (**D6**, **S7** corrected 2026-10-31; tested with real BLAST+). Protein queries (blastp/tblastn) were rejected by a type-vocabulary mismatch and the menu offered them no program (**D14-F2**, corrected 2026-10-31; a real local blastp run is now a test). |
+| 1 | Run BLAST Search (local) | `run_blast_analysis(engine="local")`, `LocalBlastEngine.run` | Implemented ("Partially implemented" until 2026-11-17; blastp and tblastn work since D14-F2 and a real local blastp run is a test) | **Execution-tested** | **Independently validated** | **Real BLAST+ 2.17.0+ run executed** (audit §6): 2 hits, coverage 100 % / 98.04 %, correct E-values and bands. The programmatic `local_database_path` branch now verifies the database prefix like a managed database (**D6**, **S7** corrected 2026-10-31; tested with real BLAST+). Protein queries (blastp/tblastn) were rejected by a type-vocabulary mismatch and the menu offered them no program (**D14-F2**, corrected 2026-10-31; a real local blastp run is now a test). |
 | 1 | Run BLAST Search (remote) | `NCBIBlastClient.submit/status/fetch_xml/run` | Implemented | Execution-tested (simulated network, `test_blast_polling`) | **Live-checked** (public pUC19 fragment: `nt` 2026-11-13, `core_nt` 2026-11-17, RID FR8EK6FN014) | Privacy confirmation before sending is implemented. Databases include `core_nt`, NCBI's default since 2024 (`test_blast_core_nt`). Live checks are snapshots; NCBI's databases change. |
 | — | Query building | `build_query`, `build_orf_query`, `infer_sequence_type`, `normalize_sequence` | Implemented | Execution-tested | Not applicable | ORF query retains global coordinates and strand. The query type comes from `core.alphabets`; an undetermined type is asked for (menu) or refused (API), RNA is searched as DNA with a note (**D14-F1**, corrected 2026-10-31). |
 | — | FASTA query loading | `load_fasta_queries`, `_resolve_synapse_user_path` | Implemented | Execution-tested | Not applicable | |
@@ -364,8 +364,8 @@ relative to size; the 28 self-tests are the module's own fixtures.
 | 3 | Search Configuration | `BlastParameters`, `.normalized()` | Implemented | Reachable | Not applicable | Program/database compatibility self-tested; program/query-type compatibility via `check_program_query_type` (D14-F2). |
 | 4 | BLAST Database Manager | `blast_database_manager_menu`, `LocalBlastDatabaseManager` | Implemented | Execution-tested | Not applicable | 8 sub-entries: status, download/update, verify, create custom from FASTA, remove, information, BLAST+ tool status, change root. |
 | 4.1/4.3/4.6 | Database status / scan / verify | `scan_database`, `verify_database`, `database_info`, `_parse_blastdbcmd_info` | Implemented | Execution-tested | Not applicable | 6 catalog entries correctly report `NOT_INSTALLED`. Multi-volume and alias discovery self-tested. |
-| 4.2 | Download / update NCBI database | `update_ncbi_database` | Implemented | **Not tested** | Blocked by external dependency | Would be a very large download; deliberately not run. |
-| 4.4 | Create custom database from FASTA | `create_custom_database` | Implemented | Not tested | Not applicable | `makeblastdb` is available, so this is now testable. |
+| 4.2 | Download / update NCBI database | `update_ncbi_database` | Implemented | **Not tested** (the menu's catalog list is rendered; the download itself never runs) | Blocked by external dependency | Would be a very large download; deliberately not run. |
+| 4.4 | Create custom database from FASTA | `create_custom_database` | Implemented | Execution-tested (real `makeblastdb` and `blastp`, `test_phase6_sequence_types`; skipped without BLAST+) | Not applicable | (verified 2026-11-17, Phase 7) |
 | — | XML parsing | `parse_blast_xml`, `_parse_hsp`, `_parse_hit`, `_parse_parameters`, `_parse_database_statistics` | Implemented | **Execution-tested** | **Independently validated** | Validated on real BLAST+ output, not only synthetic XML. |
 | 5 | Result Summary | `print_hit_summary`, `rank_hits` | Implemented | Execution-tested | Not applicable | |
 | 6 | Hit Detail & Alignment | `print_hit_detail`, `alignment_text` | Implemented | Execution-tested | Not applicable | |
@@ -384,36 +384,36 @@ relative to size; the 28 self-tests are the module's own fixtures.
 
 ---
 
-## 13. Literature search — `analyses/literature.py` (1,624 lines, 44 definitions)
+## 13. Literature search — `analyses/literature.py`
 
 | Menu | Feature | Function | Implementation | Execution | Validation | Notes |
 |---|---|---|---|---|---|---|
-| 1 | New Literature Search | `run_literature_search`, `LiteratureQuery` | Implemented | Execution-tested (offline) | Blocked by external dependency | No live call in this audit. |
+| 1 | New Literature Search | `run_literature_search`, `LiteratureQuery` | Implemented | Execution-tested (offline; dialog driven with stubbed providers, `test_dialog_paths`) | Live-checked once (2026-11-12, neutral query) | (verified 2026-11-17, Phase 7) |
 | — | PubMed provider | `search_pubmed`, `_journal_from_pubmed_xml`, `_publication_types_from_pubmed_xml` | Implemented | Execution-tested (fixtures) | Live-checked once (2026-11-12; two records compared with PubMed) | Throttled 3/s, 10/s with `SYNAPSE_NCBI_API_KEY`. |
-| — | Europe PMC provider | `search_europe_pmc` | Implemented | Execution-tested (fixtures) | Live-checked once (2026-11-12, neutral query; METHODS) | |
-| — | OpenAlex provider | `search_openalex` | Implemented | Execution-tested (fixtures) | Live-checked once (2026-11-12, neutral query; METHODS) | Stage 3 fixed a malformed `YYYY-MM-01-01` date. |
-| — | Crossref provider | `search_crossref` | Implemented | Execution-tested (fixtures) | Not validated (not among the default sources of the live check) | |
+| — | Europe PMC provider | `search_europe_pmc` | Implemented | Execution-tested since 2026-11-17 (request and parsing with a recorded-shape response, `test_library_functions`) | Live-checked once (2026-11-12, neutral query; METHODS) | Until 2026-11-17 no test ran this function; the row said "fixtures" (verified 2026-11-17, Phase 7). |
+| — | OpenAlex provider | `search_openalex` | Implemented | Execution-tested since 2026-11-17 (request filters, abstract reconstruction, `test_library_functions`) | Live-checked once (2026-11-12, neutral query; METHODS) | Stage 3 fixed a malformed `YYYY-MM-01-01` date. Until 2026-11-17 no test ran this function (verified 2026-11-17, Phase 7). |
+| — | Crossref provider | `search_crossref` | Implemented | Execution-tested since 2026-11-17 (`test_library_functions`) | Not validated (not among the default sources of the live check) | Until 2026-11-17 no test ran this function (verified 2026-11-17, Phase 7). |
 | — | Throttling and retry | `_throttle`, `_retry_delay`, `_request_text`, `_request_json` | Implemented | Execution-tested | Not applicable | Up to 3 attempts on 429/5xx, honours `Retry-After`; a simulated 503 is tested. |
 | — | Date handling | `_date_bound`, `_date_in_range`, `_apply_date_validation`, `_future_date_note` | Implemented | **Execution-tested** | Not applicable | `2020-03` → 2020-03-01 / 2020-03-31; `2020` → 2020-12-31. Correct. |
 | — | Deduplication | `deduplicate_articles`, `_is_placeholder_journal` | Implemented | Execution-tested (fixtures) | Not applicable | **S11**: cross-source duplicates unverified live (needs the owner's approval for external requests). |
 | — | Author-name handling | `_normalize_person_name`, `_deduplicate_author_names` | Implemented | Execution-tested | Not applicable | |
 | — | Relevance ranking | `rank_articles`, `_coverage`, `_tokenize`, `_query_phrase` | Implemented | Execution-tested | Not applicable | Text matching only — correctly stated not to measure evidence quality. |
 | — | Metadata enrichment | `_enrich_missing_metadata` | Implemented | Execution-tested (fixtures) | Not applicable | |
-| 2 | Search Configuration | `_interactive_menu` | Implemented | Reachable | Not applicable | Parameters entered per search. |
+| 2 | Search Configuration | `_interactive_menu` | Implemented | Execution-tested (`test_dialog_paths`) | Not applicable | Parameters entered per search (verified 2026-11-17, Phase 7). |
 | 3 | Run Self-Test | `self_test` | Implemented | Execution-tested | Not applicable | Passes offline. |
-| 4 | Data Sources & Scientific Limitations | `_interactive_menu` branch 4 | Implemented | Reachable | Not applicable | Good transparency feature. |
+| 4 | Data Sources & Scientific Limitations | `_interactive_menu` branch 4 | Implemented | Execution-tested (`test_dialog_paths`) | Not applicable | Good transparency feature (verified 2026-11-17, Phase 7). |
 | — | Export | `export_results`, `article_to_dict` | Implemented | Execution-tested | Not applicable | |
 | — | Sequence-context suggestion | `build_sequence_literature_context` | Implemented | Integration-tested | Not applicable | Offers the header as a suggestion; **no sequence data is sent**. |
 
 ---
 
-## 14. Core — `core/` (8 modules, 1,806 lines)
+## 14. Core — `core/` (10 modules)
 
 | Component | Function/class | Implementation | Execution | Notes |
 |---|---|---|---|---|
 | Shared data model | `models.Interval`, `Feature`, `SequenceRecord`, `AnalysisResult` | Implemented | Execution-tested | One internal convention (0-based half-open + strand) with explicit 1-based conversion. `SequenceRecord.alphabet` comes from `core.alphabets.classify_sequence` with an evidence level (**D14 corrected 2026-10-31**; level renamed from "confidence" under D18). |
 | Hashing / provenance | `models.sha256_text`, `sha256_file`, `provenance()` | Implemented | Execution-tested | Present in every stored result. |
-| Non-interactive API | `api.load_records`, `sequence_overview`, `find_orfs`, `analyze_rna`, `analyze_protein_from_cds`, `analyze_protein`, `restriction_digest`, `design_primers`, `compare_sequences`, `analyze_vcf`, `design_crispr_guides` | **Partially implemented** | Execution-tested | 16 entry points, no `input()`. Cloning, variant filtering, mutation reporting, BLAST and literature added 2026-10-31 (**S14**); the two that make external requests refuse to run without an explicit confirmation argument. Input types checked with `core.alphabets`, optional `sequence_type=` (**D14-F7** corrected 2026-10-31). **Missing**: cloning, variant filtering, mutation reporting, BLAST, literature (**S14**). `analyze_vcf` now reports `normalized: True` only when every variant had a reference, with `data["normalization"]` and per-contig warnings (**D12** corrected 2026-10-31). |
+| Non-interactive API | `core.api` (`__all__`: 21 entry points) | Implemented | Execution-tested | Every analysis has an entry point without `input()`: loading, sequence overview, ORFs, RNA (and the optional secondary structure), protein, restriction digest, primers (also around a restriction site), cloning, mutation report, VCF analysis and filtering, variant cross-check, CRISPR guides, BLAST (search and resume), literature. The two that make external requests refuse to run without an explicit confirmation argument. Input types are checked with `core.alphabets` (**D14-F7**). `analyze_vcf` reports `normalized: True` only when every variant had a reference (**D12**) and lists reference-only records. Until 2026-11-17 the row said "Partially implemented" and listed cloning, filtering, mutation, BLAST and literature as missing, which S14 had added on 2026-10-31 (verified 2026-11-17, Phase 7). |
 | Pipeline context and store | `pipeline.PipelineContext.store`, `store_result`, `latest`, `results` | Implemented | **Integration-tested** | ORF change clears `rna`, `protein`, `crispr`, `blast` — verified. `completed` has a fixed shape and `run_orf` takes the ORF search settings (**D19** corrected 2026-10-31). |
 | ORF-dependent invalidation | `pipeline.ORF_DEPENDENT_MODULES` | Implemented | Integration-tested | Confirmed working. |
 | RNA / protein source resolution | `pipeline.get_rna_source_dna`, `get_protein_source_rna` | Implemented | **Integration-tested** | Selected-ORF-vs-whole-sequence rule confirmed intact. |
@@ -468,7 +468,7 @@ explicitly not implemented.
 
 ## 17. Validation ledger
 
-### Performed in this audit (external references)
+### Performed (external references)
 
 | # | Validation | Reference | Result |
 |---|---|---|---|
@@ -484,16 +484,31 @@ explicitly not implemented.
 | 10 | Melting temperature, extended (Stage I, 2026-11-02) | primer3-py 2.4.0, 81 primers × 36 conditions (Mg²⁺ 0-3 mM) | 2,916 comparisons, max 0.0032 °C; in the suite |
 | 11 | Enzymes, digests, end compatibility (Stage I) | Biopython 1.88 `Bio.Restriction`, 6-kb test sequence, 2 topologies × 3 rotations | 22/22 enzymes, 132 digests and 484 pairs, 0 differences; in the suite |
 | 12 | Protein descriptors (Stage I) | Biopython 1.88 `ProtParam`, 31 proteins | found the IG instability weight error (corrected); then all within tolerance; in the suite |
+| 13 | Restriction enzyme definitions | REBASE 611, one-off query (2026-11-13) | 26/26 (22 palindromic, 4 Type IIS) |
+| 14 | Type IIS cut positions | Biopython 1.88, both strands | 140 cuts, 0 differences (2026-11-11) |
+| 15 | Primer hairpin and dimer screens | primer3-py 2.4.0 ΔG, 250 primers and 100 pairs | Spearman ρ −0.78 / −0.74 / −0.51 (heuristic; 2026-11-11) |
+| 16 | Live remote BLAST | NCBI, public pUC19 fragment, `nt` (2026-11-13) and `core_nt` (2026-11-17, RID FR8EK6FN014) | Expected vector hits, 100 % identity and coverage |
+| 17 | Literature providers | PubMed, Europe PMC, OpenAlex live, one neutral query (2026-11-12) | 29 records, no provider error; two compared with PubMed |
+| 18 | RNA MFE structures; hairpin screen | ViennaRNA 2.8.0 (2026-11-13) | Known values; screen finds 86 % of MFE hairpins, 35 % of candidates favorable alone |
+| 19 | Variant normalization | bcftools 1.25 published test outputs (2026-11-13) | 29/29 split-and-normalized alleles; REF check as `-cx` |
+| 20 | ORF calls | NCBI ORFfinder web service, pUC19, code 11, four settings (2026-11-13) | 69/69 ORFs identical; minimal length excludes the stop codon there |
+| 21 | HGVS descriptions | Mutalyzer 3.2.0.dev0 `description_extract`, 11 synthetic pairs (2026-11-13) | 11/11 |
+| 22 | Instability-index weights | ExPASy ProtParam, 420 probes (2026-11-13) | 399/400; KQ 24.68 there, 24.64 here |
+| 23 | Python 3.10 runtime | CPython 3.10.11 embeddable (2026-11-12, again 2026-11-17) | Full suite, 0 failures |
+| 24 | Local custom BLAST database | BLAST+ 2.17.0 `makeblastdb` and `blastp` | Built and searched in the suite |
 
-### Still open
+### Still open (2026-11-17)
 
 | Validation | Blocker | Route |
 |---|---|---|
-| NEBcutter comparison | Web service | Substantively superseded by validation 2 |
-| Live remote NCBI BLAST | Not run by choice | One confirmed run recording RID and provenance |
-| Local BLAST on a real database | `nt` is ~100 GB+ | `swissprot` (~0.5 GB) as a proportionate step |
-| Python 3.10 suite | 3.10 not installed (only 3.14.6); installing an interpreter needs the owner's approval | Install 3.10 and run the suite. Meanwhile `pyright --pythonversion 3.10` (112 diagnostics, baseline 134) and `Python310CompatibilityTests` (3.10 grammar, pre-3.12 f-string rules) run; the latter found and fixed one CRISPR import failure on 3.10/3.11 |
-| Primer hairpin/dimer screens | Heuristic by design | `primer3.calc_hairpin` / `calc_heterodimer` are available and would be a direct comparison |
+| NEBcutter comparison | Web application without an interface | Substance covered by validations 1, 2, 13, 14 |
+| Local BLAST on a real database | `swissprot` about 0.5 GB | Owner approval for the download |
+| Instability weight KQ | Guruprasad et al. 1990 not freely accessible | Read Table I of the paper |
+| ORFs across the origin vs ORFfinder | ORFfinder's web form treats sequences as linear | Standalone ORFfinder (Linux) or a curated circular set |
+| Running bcftools itself | No Windows build; WSL not installed | WSL or Linux (approval) |
+| Crossref live check | Not part of the 2026-11-12 query | One neutral live query |
+| CFD scoring, genome-wide off-targets | CRISPR work excluded by the owner (2026-11-17) | Owner decision |
+| primer3-py comparisons on 2026-11-17 | Windows application control blocks the compiled module (not bypassed) | Re-run when the block is lifted (passed 2026-11-02 and 2026-11-11) |
 
 ---
 
@@ -509,3 +524,8 @@ explicitly not implemented.
 5. Re-check the "advertised-but-absent" table (§16) at the end of Phase 6;
    every row must be implemented, removed from the interface, or
    explicitly labeled unavailable to the user.
+6. `tests/test_documentation_consistency.py` checks that every function
+   named in this table exists in the code. Before changing an execution
+   status, check the row against line coverage (Phase 7, 2026-11-17: the
+   check found rows marked "Execution-tested" whose functions no test ran,
+   and rows marked "Reachable" whose views tests had driven).

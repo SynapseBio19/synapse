@@ -423,3 +423,31 @@ research support and teaching.
   other rows were taken as recorded after the classification script, and
   a spot check found no further contradictions.
 - Coverage, pyright and benchmark figures are from 2026-11-17.
+
+---
+
+## Addendum (Phase 7, 2026-11-17): FEATURE_STATUS corrected
+
+The 13 out-of-date rows of section 3.3 were corrected in
+`docs/FEATURE_STATUS.md` after each was checked against the code and the
+tests. A full check of all 271 rows against line coverage then found
+eight more rows that the classification in section 3 had taken as
+recorded. They said "Execution-tested", but no test ran the functions
+they name:
+
+- the double digest;
+- `diagnose_thermodynamic_failure`;
+- `normalize_indel_left`;
+- `compare_proteins`;
+- the Europe PMC, OpenAlex and Crossref providers (stubbed out of every
+  search test).
+
+Two rows also named functions that had been deleted in D16 part 2.
+The eight functions now have tests (`tests/test_library_functions.py`),
+and `tests/test_documentation_consistency.py` checks that every function
+the inventory names exists.
+
+The counts in section 3.1 are therefore a snapshot of 2026-11-17 before
+these corrections. The current classification is in `docs/FEATURE_STATUS.md`
+and `docs/PHASE7_FINAL_REPORT.md`. The body of this assessment is left
+as written.

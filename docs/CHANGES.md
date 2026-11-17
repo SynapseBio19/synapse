@@ -2280,3 +2280,37 @@ Prompt of 2026-11-13. History and binding decisions:
   owner's decision of 2026-11-17; its content is unchanged.
 - PROJECT_HISTORY_AND_DECISIONS: that decision, and the status of every
   previously open item after this run.
+
+## Phase 7 – engineering stabilization (from 2026-11-17)
+
+Governed by the owner's Phase 7 Master Execution Prompt (engineering
+quality only; no new scientific features; CRISPR/CFD excluded; the AI
+Experiment Planner stays Coming Soon).
+
+### Package A: FEATURE_STATUS checked row by row
+
+- Method: every row's named functions were looked up in the code, and
+  their bodies were checked against line coverage of the full suite.
+- Out of date and corrected: the RNA codon view (uses the ORF's genetic
+  code since P1-9, not "always table 1"); the cloning digest fragments
+  (S17 corrected long ago); local BLAST (blastp works since D14-F2); the
+  core API (all entry points present since S14); custom BLAST databases
+  (tested with real `makeblastdb`); seven views marked "Reachable" that
+  tests drive; the literature menu entry (live-checked); the size-guard
+  note (10 kb similar sequences now fast).
+- Overclaimed and now tested: the double digest,
+  `diagnose_thermodynamic_failure`, `normalize_indel_left`,
+  `compare_proteins` (no menu caller) and the Europe PMC, OpenAlex and
+  Crossref providers. FEATURE_STATUS said "Execution-tested" but no test
+  ran them. New `tests/test_library_functions.py` (14).
+- Deleted names removed from the table: `_effective_monovalent_salt_mM`
+  and `_professional_failure_diagnostics` (D16 part 2).
+- Section headers no longer carry line counts, which went stale with
+  every change. The summary and the validation ledger (§17: 24
+  validations, current open list) are brought up to date.
+- New `tests/test_documentation_consistency.py` (2): every function the
+  inventory names must exist in the code.
+- Addenda added to `PHASE6_FINAL_REPORT.md` and
+  `PHASE6_FINAL_ASSESSMENT.md`; their original text is kept.
+- Code: unchanged. A dead `elif pmid` branch in the Europe PMC URL
+  construction was noted, not changed.

@@ -469,3 +469,16 @@ apply.
 - The Windows application-control block of primer3-py was not bypassed.
 - No scientific data, citation or validation result was invented. Every
   comparison named here was run; the ones not run are listed in I and K.
+
+---
+
+## Addendum (Phase 7, 2026-11-17)
+
+Appendix 1 marked §12 ("feature matrix kept current") COMPLETE.
+The final assessment of the same day found 13 out-of-date rows in
+`docs/FEATURE_STATUS.md`, and Phase 7 found eight more rows that claimed
+tests no test ran. Both are corrected in FEATURE_STATUS (Phase 7,
+package A). The status of §12 in this report should be read as PARTIALLY
+COMPLETE for the date of the report; the report itself is left as
+written. See `docs/PHASE6_FINAL_ASSESSMENT.md` and
+`docs/PHASE7_FINAL_REPORT.md`.
