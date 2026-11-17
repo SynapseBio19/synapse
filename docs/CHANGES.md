@@ -2508,3 +2508,14 @@ Each finding was traced to its cause; no check was disabled, no broad
   decisions).
 - README: a short licence section that points to both.
 - Repository hygiene checked: no generated file is tracked.
+
+### Package J: final verification
+
+- Suite 565 tests, 0 failures on CPython 3.14.6 (5 skipped) and 3.10.11
+  (23 skipped, reference packages not installed for 3.10); golden master
+  12/12; pyright gate passes (11 errors, all in `analyses/crispr.py`);
+  Ruff clean; coverage 81 %; clean-environment install and wheel checked;
+  `git diff --check` clean; ReadOnly 15/15.
+- FEATURE_STATUS and AUDIT_STATUS carry the final test count; FEATURE_STATUS
+  records the BibTeX escaping and the new "Remove database" row.
+- Reports: `docs/PHASE7_FINAL_REPORT.md` (A-L), `docs/PHASE7_CONTINUATION.md`.

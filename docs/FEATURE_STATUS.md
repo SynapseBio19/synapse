@@ -44,7 +44,7 @@ simulated keystrokes (see audit §11.5).
 | Functions and classes | 1,244 in `analyses/`, `core/`, `ui/`, `fileio/`, `data/` (all nesting levels, counted 2026-11-17); this table inventories them by feature, 271 rows |
 | Main-menu entries | 15 |
 | Sub-menu entries inventoried | 78 |
-| Automated tests | 516, all passing (2026-11-17; skipped: the opt-in benchmark, and four primer3-py comparisons while Windows application control blocks its compiled module). 356 at the end of Stage F (2026-11-03), 421 on 2026-11-11, 463 on 2026-11-13. The suite also passes on Python 3.10.11 (452 tests on 2026-11-12, `docs/TOOL_AND_DATA_LEDGER.md`). Line coverage: `docs/TEST_COVERAGE.md`. The count at the end of Stage 4 was 283. |
+| Automated tests | 565, all passing on Python 3.14.6 and 3.10.11 (2026-11-17, end of Phase 7; 516 at its start; skipped: the opt-in benchmark, and four primer3-py comparisons while Windows application control blocks its compiled module). 356 at the end of Stage F (2026-11-03), 421 on 2026-11-11, 463 on 2026-11-13. The suite also passes on Python 3.10.11 (452 tests on 2026-11-12, `docs/TOOL_AND_DATA_LEDGER.md`). Line coverage: `docs/TEST_COVERAGE.md`. The count at the end of Stage 4 was 283. |
 | Module self-tests | 12 suites, all passing (literature 64, mutation 44, BLAST 33, CRISPR 28, variant 27, others aggregated) |
 | Golden-master scenarios | 12 |
 | Confirmed defects | 25 (D1–D25), all corrected with a regression test (D1–D19 by 2026-11-03, D20–D25 in the completion run 2026-11-12/13; `docs/PHASE6_FINAL_REPORT.md`, section D) |
@@ -364,6 +364,7 @@ relative to size; the 28 self-tests are the module's own fixtures.
 | 3 | Search Configuration | `BlastParameters`, `.normalized()` | Implemented | Reachable | Not applicable | Program/database compatibility self-tested; program/query-type compatibility via `check_program_query_type` (D14-F2). |
 | 4 | BLAST Database Manager | `blast_database_manager_menu`, `LocalBlastDatabaseManager` | Implemented | Execution-tested | Not applicable | 8 sub-entries: status, download/update, verify, create custom from FASTA, remove, information, BLAST+ tool status, change root. |
 | 4.1/4.3/4.6 | Database status / scan / verify | `scan_database`, `verify_database`, `database_info`, `_parse_blastdbcmd_info` | Implemented | Execution-tested | Not applicable | 6 catalog entries correctly report `NOT_INSTALLED`. Multi-volume and alias discovery self-tested. |
+| 4.5 | Remove database | `remove_database` | Implemented | Execution-tested (real `makeblastdb` database created and removed, `test_blast_dialog`; skipped without BLAST+) | Not applicable | Since Phase 7 the BLAST+ version 5 metadata file (`.njs`/`.pjs`) is removed too; it was left behind before, and Database Information counted too few files. Removal needs the typed confirmation `REMOVE <name>`. |
 | 4.2 | Download / update NCBI database | `update_ncbi_database` | Implemented | **Not tested** (the menu's catalog list is rendered; the download itself never runs) | Blocked by external dependency | Would be a very large download; deliberately not run. |
 | 4.4 | Create custom database from FASTA | `create_custom_database` | Implemented | Execution-tested (real `makeblastdb` and `blastp`, `test_phase6_sequence_types`; skipped without BLAST+) | Not applicable | (verified 2026-11-17, Phase 7) |
 | — | XML parsing | `parse_blast_xml`, `_parse_hsp`, `_parse_hit`, `_parse_parameters`, `_parse_database_statistics` | Implemented | **Execution-tested** | **Independently validated** | Validated on real BLAST+ output, not only synthetic XML. |
@@ -402,7 +403,7 @@ relative to size; the 28 self-tests are the module's own fixtures.
 | 2 | Search Configuration | `_interactive_menu` | Implemented | Execution-tested (`test_dialog_paths`) | Not applicable | Parameters entered per search (verified 2026-11-17, Phase 7). |
 | 3 | Run Self-Test | `self_test` | Implemented | Execution-tested | Not applicable | Passes offline. |
 | 4 | Data Sources & Scientific Limitations | `_interactive_menu` branch 4 | Implemented | Execution-tested (`test_dialog_paths`) | Not applicable | Good transparency feature (verified 2026-11-17, Phase 7). |
-| — | Export | `export_results`, `article_to_dict` | Implemented | Execution-tested | Not applicable | |
+| — | Export | `export_results`, `article_to_dict` | Implemented | Execution-tested (all five formats, `test_literature_pipeline`) | Not applicable | BibTeX escapes the LaTeX special characters since Phase 7 (an `&` or `%` in a title used to stop a LaTeX run); the DOI field is left as it is. |
 | — | Sequence-context suggestion | `build_sequence_literature_context` | Implemented | Integration-tested | Not applicable | Offers the header as a suggestion; **no sequence data is sent**. |
 
 ---
