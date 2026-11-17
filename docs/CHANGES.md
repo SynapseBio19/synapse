@@ -2492,3 +2492,19 @@ Each finding was traced to its cause; no check was disabled, no broad
   11. It fails on the previous code.
 - METHODS, "Reproducibility": what the report records, per header and
   entry, and where external tools record their versions.
+
+### Package I: licence recommendation and governance
+
+- New `docs/LICENSING_AND_GOVERNANCE.md`: why a licence is needed, the
+  licences of every third-party item in or around the repository,
+  permissive, copyleft and source-available options with their
+  consequences, and the owner decisions they require (licence, copyright
+  holder, citation file, two unused legacy BLAST result files, two
+  unreachable report printers). No licence was selected and no LICENSE
+  file was added.
+- New `CONTRIBUTING.md`: setup, the checks to run, and the project rules
+  (golden master, no fabricated data, labeled heuristics, layers,
+  language, optional dependencies, documentation, history, owner
+  decisions).
+- README: a short licence section that points to both.
+- Repository hygiene checked: no generated file is tracked.

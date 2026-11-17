@@ -218,6 +218,12 @@ The full list, per module, is in `docs/METHODS.md`. The most important:
 - Remote BLAST and literature search depend on external services, their
   availability and their rate limits.
 
+## Licence
+
+No licence has been chosen yet; until the owner decides, all rights are
+reserved. The options and the decisions they need are in
+`docs/LICENSING_AND_GOVERNANCE.md`. How to contribute: `CONTRIBUTING.md`.
+
 ## Documentation
 
 - `docs/METHODS.md`: algorithms, equations, defaults, references,
