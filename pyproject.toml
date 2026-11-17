@@ -10,6 +10,15 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "Proprietary - all rights reserved (decision pending)" }
 authors = [{ name = "Onur Bayraktar" }]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+]
 # The scientific core deliberately uses only the Python standard library.
 dependencies = []
 
@@ -18,13 +27,12 @@ dependencies = []
 reference = ["biopython>=1.81", "primer3-py>=2.0"]
 # Optional energy model for the RNA secondary-structure view (MFE with ViennaRNA).
 structure = ["ViennaRNA>=2.6"]
-dev = ["pytest>=7", "pyright[nodejs]==1.1.414"]
+# Development tools; the suite itself runs with the standard-library unittest.
+dev = ["pyright[nodejs]==1.1.414", "ruff==0.14.4", "coverage>=7.10"]
 
 [tool.setuptools]
 packages = ["analyses", "core", "data", "fileio", "ui"]
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
 
 [tool.pyright]
 # Check against the oldest supported version (requires-python >= 3.10).

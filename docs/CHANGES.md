@@ -2424,3 +2424,35 @@ Each finding was traced to its cause; no check was disabled, no broad
   give byte-identical output before and after (64,706 and 26,122
   characters); `test_main_session`, the smoke tests and the golden master
   pass.
+
+### Packages E and F: continuous integration, dependencies, installation
+
+- New `.github/workflows/ci.yml` (GitHub Actions, no paid service):
+  standard-library install and test suite on Python 3.10-3.14 (Linux)
+  and 3.14 (Windows) with the golden master as its own step and the
+  skipped tests listed with their reasons; a reference job with Biopython,
+  primer3-py, ViennaRNA and BLAST+ in which only the opt-in benchmark may
+  skip, with a coverage report; a lint job with Ruff and the pyright gate.
+  The repository has no remote, so the workflow has not run on GitHub;
+  every command it runs was run locally (YAML parsed, scripts executed,
+  clean install below).
+- New `scripts/ci/pyright_gate.py`: fails on any pyright error outside the
+  documented allow-list (11 findings in `analyses/crispr.py`, excluded
+  from changes) and asks for the number to be lowered when it drops.
+- New `scripts/ci/check_skips.py`: lists skipped tests with reasons (also
+  in the GitHub job summary); with `--only` it fails on any other reason.
+- `pyproject.toml`: the `dev` extra lists the tools the project uses
+  (pyright 1.1.414, Ruff 0.14.4, coverage >= 7.10) instead of pytest,
+  which no test imports and no instruction used; the unused
+  `[tool.pytest.ini_options]` is removed (the suite stays runnable with
+  pytest). Python version and topic classifiers added. Runtime
+  dependencies remain none.
+- Clean-environment check: a new virtual environment with nothing but
+  `pip install .` installs Synapse without dependencies; the modules
+  import from `site-packages`, the golden master passes and the suite
+  passes with 22 visible skips (Biopython 11, ViennaRNA 6, primer3-py 4,
+  benchmark 1).
+- `.gitignore`: build artifacts (`/build/`, `/dist/`, `*.egg-info/`),
+  `.coverage` and `.ruff_cache/`.
+- README: development setup in a project-local environment and the
+  checks the CI runs.

@@ -1,0 +1,94 @@
+# Continuous integration for Synapse (Phase 7, 2026-11-17).
+#
+# The repository had no hosted remote when this file was written, so the
+# workflow has not run on GitHub yet; every step was run locally (see
+# docs/PHASE7_FINAL_REPORT.md, section G). No paid service is used.
+
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  tests:
+    # Mandatory: the standard-library-only install the README describes.
+    # Tests that need an optional package or BLAST+ skip with their reason,
+    # which is listed in the job summary.
+    name: Tests, Python ${{ matrix.python }} (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest]
+        python: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        include:
+          - os: windows-latest
+            python: "3.14"
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install Synapse (no runtime dependencies)
+        run: python -m pip install .
+      - name: Import check
+        run: python -c "import core.api, analyses.orf, analyses.rna_structure, ui.style; print('imports OK')"
+      - name: Golden master
+        run: python -m unittest -v tests.test_golden_master
+      - name: Test suite
+        run: python -m unittest discover -s tests -t . -v 2>&1 | tee test-output.txt; test ${PIPESTATUS[0]} -eq 0
+      - name: Skipped tests
+        if: always()
+        run: python scripts/ci/check_skips.py test-output.txt
+
+  reference:
+    # Optional dependencies installed: Biopython, primer3-py, ViennaRNA and
+    # BLAST+. Here only the opt-in benchmark may skip, so a reference
+    # comparison cannot be lost silently.
+    name: Reference comparisons (Python 3.12, Ubuntu)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install BLAST+
+        run: sudo apt-get update && sudo apt-get install -y ncbi-blast+
+      - name: Install Synapse with the optional extras
+        run: python -m pip install ".[reference,structure]" "coverage>=7.10"
+      - name: Test suite with coverage
+        run: |
+          python -m coverage run --branch --source=analyses,core,ui,fileio,data,main -m unittest discover -s tests -t . -v 2>&1 | tee test-output.txt
+          test ${PIPESTATUS[0]} -eq 0
+      - name: Only the benchmark may skip
+        if: always()
+        run: python scripts/ci/check_skips.py test-output.txt --only "SYNAPSE_BENCHMARK=1"
+      - name: Coverage report
+        if: always()
+        run: python -m coverage report --sort=cover | tee -a "$GITHUB_STEP_SUMMARY"
+
+  lint:
+    name: Ruff and pyright
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # pyproject.toml points pyright at ./.venv, so the tools are installed there.
+      - name: Install development tools into .venv
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install ".[dev,reference,structure]"
+      - name: Ruff
+        run: .venv/bin/python -m ruff check .
+      - name: Pyright (no error outside the documented allow-list)
+        run: .venv/bin/python scripts/ci/pyright_gate.py

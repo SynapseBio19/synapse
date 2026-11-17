@@ -59,6 +59,18 @@ Optional, for the energy-based RNA secondary structure (RNA menu entry 6):
 python -m pip install -e ".[structure]"
 ```
 
+Development setup in a project-local virtual environment (no system-wide
+installation; the commands are those the CI runs):
+
+```bash
+python -m venv .venv
+.venv/Scripts/python -m pip install -e ".[dev,reference,structure]"
+```
+
+On Linux and macOS the interpreter is `.venv/bin/python`. NCBI BLAST+ is a
+separate download from NCBI and is needed only for local BLAST and the
+tests that use it.
+
 ## Dependencies
 
 | Kind | What | Needed for |
@@ -68,7 +80,7 @@ python -m pip install -e ".[structure]"
 | Optional package | ViennaRNA (`[structure]` extra) | MFE secondary structure in the RNA module; without it the view says it is not available |
 | Optional network | NCBI BLAST and the four literature services | remote BLAST and literature search, only when the user starts one |
 | Test reference | Biopython, primer3-py (`[reference]` extra) | independent cross-checks in the tests |
-| Development | pyright (`[dev]` extra) | type checking against Python 3.10 |
+| Development | pyright, Ruff, coverage.py (`[dev]` extra) | type checking against Python 3.10, linting, line coverage |
 
 The scientific core uses the standard library only, so that every
 calculation is visible in this repository.
@@ -155,9 +167,23 @@ python -m unittest discover -s tests -t .
 ```
 
 The suite has run on Python 3.14 and on Python 3.10.11, the oldest
-supported version (`docs/TOOL_AND_DATA_LEDGER.md`); 516 tests on
-2026-11-17. Line coverage is
+supported version (`docs/TOOL_AND_DATA_LEDGER.md`). Line coverage is
 recorded in `docs/TEST_COVERAGE.md`.
+
+Checks the CI runs (`.github/workflows/ci.yml`):
+
+```bash
+python -m unittest -v tests.test_golden_master
+python -m ruff check .
+python scripts/ci/pyright_gate.py
+```
+
+`scripts/ci/pyright_gate.py` fails on any pyright error outside a short,
+documented allow-list (the findings in the CRISPR module, which was not
+changed in Phase 7). `scripts/ci/check_skips.py` lists skipped tests with
+their reasons. The workflow tests Python 3.10 to 3.14 on Linux and 3.14 on
+Windows, plus a job with every optional package. It has not yet run on a
+hosted service: the repository has no remote.
 
 The suite blocks all network access, so no test can depend on an external
 service. Golden-master snapshots in `tests/golden/` protect every

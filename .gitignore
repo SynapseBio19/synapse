@@ -11,3 +11,10 @@ Thumbs.db
 /logs/
 /.claude/skills/
 /.tools/
+
+# Build artifacts of "pip install ." and "python -m build".
+/build/
+/dist/
+*.egg-info/
+.coverage
+.ruff_cache/
