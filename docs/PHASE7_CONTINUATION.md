@@ -50,18 +50,34 @@ so that a new session continues from it instead of starting over.
 
 | Package | State | Commit |
 |---|---|---|
-| A Documentation accuracy | done | (this commit) |
-| B Pyright | open | |
-| C Refactoring | open | |
-| D Tests and coverage | open | |
+| A Documentation accuracy | done | `96d0f07` |
+| B Pyright 58 -> 11 (the 11 are in `crispr.py`, excluded) | done | `2f8f6e6` |
+| D Tests and coverage 75 % -> 79 % | mostly done | `cdbb7ac` (BLAST dialog; `.njs` removal defect fixed), `bedcd42` (main session, primer, overview), `ca5d53a` (literature pipeline; BibTeX escaping defect fixed) |
+| C Refactoring | in progress | `c97695d` (Ruff default rules clean, Ruff configured) |
 | E CI | open | |
 | F Dependencies and installation | open | |
-| G Error handling | open | |
+| G Error handling | open (BibTeX escaping done in `ca5d53a`) | |
 | H Reproducibility | open | |
 | I Licence and governance | open | |
 | J Final validation and report | open | |
 
+State after `c97695d`: 557 tests, 0 failures (5 skipped); golden 12/12;
+pyright 11 (all in `analyses/crispr.py`); Ruff default rules clean;
+coverage 79 % (measured after `bedcd42`); ReadOnly 15/15.
+
+Findings recorded for later packages:
+
+- `print_protein_report` (`ui/protein_menu.py`, about 600 lines) and
+  `print_primer_report` (`ui/primer_menu.py`) have no caller: candidates
+  for removal, an owner decision.
+- UI remainders: hand-padded `print(f"ΔH: ...")` lines in the single
+  primer analysis; "Use .json, .csv or .txt." without a prefix in the
+  BLAST export; prompts that begin with `\r\n` in the BLAST database
+  manager.
+
 ## Next action
 
-Package B: triage the pyright findings outside `analyses/crispr.py`,
-starting with `analyses/literature.py` and `core/report.py`.
+Package C: reduce `main.main()` (632 lines) by extracting the sequence
+overview computation, which is duplicated, and the per-module menu
+branches; verify with `test_main_session`, the smoke tests and the
+golden master.

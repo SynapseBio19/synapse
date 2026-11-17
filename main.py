@@ -302,6 +302,115 @@ def run_protein_record(record, selected_index):
             style.pause()
 
 
+# ============================================================
+# SESSION STEPS (extracted from main() in Phase 7)
+# ============================================================
+
+
+def compute_sequence_overview(dna):
+    """Every value the sequence overview shows and stores, by name.
+
+    The keys are the parameter names of ui.report.print_results; the
+    functions run in the order main() used to call them.
+    """
+    nucleotide_counts = count_nucleotides(dna)
+    return {
+        "nucleotide_counts": nucleotide_counts,
+        "nucleotide_percentages": calculate_nucleotide_percentages(nucleotide_counts),
+        "gc_content": calculate_gc_content(dna),
+        "at_content": calculate_at_content(dna),
+        "content_ranges": calculate_dna_content_ranges(dna),
+        "gc_skew": calculate_gc_skew(dna),
+        "at_skew": calculate_at_skew(dna),
+        "sequence_complexity": calculate_sequence_complexity(dna),
+        "homopolymers": find_homopolymers(dna),
+        "cpg_analysis": analyze_cpg(dna),
+        "cpg_islands": find_cpg_islands(dna),
+        "molecular_weight": calculate_dna_molecular_weight(dna),
+        "sequence_quality": analyze_sequence_quality(dna),
+        "ambiguous_counts": count_ambiguous_bases(dna),
+        "complement": get_complement(dna),
+        "reverse_complement": get_reverse_complement(dna),
+    }
+
+
+def show_sequence_overview(selected_index, header, dna, topology, overview):
+    """Draw the sequence overview from compute_sequence_overview()'s values."""
+    print_results(selected_index, header, dna, topology, **overview)
+
+
+def run_orf_step(pipeline, dna, topology):
+    """ORF analysis; a selected ORF is stored in the pipeline and returned."""
+    selected_orf = run_orf_analysis_ui(
+        dna,
+        include_partial=True,
+        min_length=DEFAULT_MIN_ORF_LENGTH,
+        topology=topology,
+    )
+    if selected_orf is None:
+        return None
+    pipeline.set_selected_orf(selected_orf)
+    pipeline.store("orf", selected_orf, parameters=selected_orf.get("search_parameters", {}))
+    style.header('ORF CONNECTED TO PIPELINE')
+    print()
+    style.field('Selected', f"ORF-{selected_orf['rank']:03d}")
+    style.field('Length', f"{selected_orf['length']} bp")
+    style.field('Protein', f"{selected_orf['protein_length']} aa")
+    style.field('Location', f"{selected_orf['start'] + 1}-"
+                f"{selected_orf.get('stop_on_circle', selected_orf['stop']) + 1} "
+                f"({selected_orf['strand']} strand, 1-based)")
+    print()
+    style.success("ORF stored in the pipeline; RNA, protein and CRISPR guide design can use it.")
+    if selected_orf.get("genetic_code", 1) != 1:
+        style.note(
+            "ORF found with NCBI table "
+            f"{selected_orf['genetic_code']}; protein analysis and the RNA "
+            "codon view use this table."
+        )
+    style.pause()
+    return selected_orf
+
+
+def show_protein_requires_orf():
+    """Protein analysis needs a selected ORF; there is no whole-sequence fallback."""
+    style.header('PROTEIN ANALYSIS')
+    print()
+    style.note("No ORF has been selected.")
+    print()
+    style.note("Please run [2] ORF Analysis first and select an ORF.")
+    print()
+    print("Protein Analysis will not use the full DNA sequence as a fallback.")
+    style.pause()
+
+
+def run_protein_step(pipeline, selected_orf):
+    """Protein analysis of the selected ORF, translated with the ORF's genetic code."""
+    orf_rank = selected_orf.get("rank")
+    run_protein_analysis_from_orf(
+        orf_sequence=selected_orf.get("sequence", ""),
+        orf_id=f"ORF-{orf_rank:03d}" if orf_rank is not None else "Selected ORF",
+        strand=selected_orf.get("strand"),
+        reading_frame=selected_orf.get("reading_frame", selected_orf.get("frame")),
+        orf_status=selected_orf.get("status"),
+        pipeline=pipeline,
+        genetic_code=selected_orf.get("genetic_code", 1),
+    )
+
+
+def show_planner_status():
+    """AI Experiment Planner: COMING SOON (owner decision of 2026-11-13)."""
+    print(
+        "\nAI Experiment Planner: COMING SOON. This feature is "
+        "planned but not yet available. Nothing is run or stored."
+    )
+    print(
+        "It is intentionally not implemented in this phase "
+        "(P3-1, docs/AUDIT_STATUS.md)."
+    )
+    style.pause()
+
+
+
 def main():
     """Run the interactive Synapse session.
 
@@ -377,133 +486,13 @@ def main():
 
 
         # ========================================================
-        # SEQUENCE ANALYSIS
-        # ========================================================
-
-
-        nucleotide_counts = (
-            count_nucleotides(dna)
-        )
-
-        nucleotide_percentages = (
-            calculate_nucleotide_percentages(
-                nucleotide_counts
-            )
-        )
-
-        gc_content = (
-            calculate_gc_content(dna)
-        )
-
-        at_content = (
-            calculate_at_content(dna)
-        )
-
-        content_ranges = (
-            calculate_dna_content_ranges(
-                dna
-            )
-        )
-
-        gc_skew = (
-            calculate_gc_skew(dna)
-        )
-
-        at_skew = (
-            calculate_at_skew(dna)
-        )
-
-        sequence_complexity = (
-            calculate_sequence_complexity(
-                dna
-            )
-        )
-
-        homopolymers = (
-            find_homopolymers(dna)
-        )
-
-        cpg_analysis = (
-            analyze_cpg(dna)
-        )
-
-        cpg_islands = (
-            find_cpg_islands(dna)
-        )
-
-        molecular_weight = (
-            calculate_dna_molecular_weight(
-                dna
-            )
-        )
-
-        sequence_quality = (
-            analyze_sequence_quality(
-                dna
-            )
-        )
-
-        ambiguous_counts = (
-            count_ambiguous_bases(
-                dna
-            )
-        )
-
-        complement = (
-            get_complement(dna)
-        )
-
-        reverse_complement = (
-            get_reverse_complement(dna)
-        )
-
-
-        # ========================================================
         # SEQUENCE OVERVIEW
         # ========================================================
 
-
-        print_results(
-            selected_index,
-            header,
-            dna,
-            topology,
-            nucleotide_counts,
-            nucleotide_percentages,
-            gc_content,
-            at_content,
-            content_ranges,
-            gc_skew,
-            at_skew,
-            sequence_complexity,
-            homopolymers,
-            cpg_analysis,
-            cpg_islands,
-            molecular_weight,
-            sequence_quality,
-            ambiguous_counts,
-            complement,
-            reverse_complement,
-        )
-
-        pipeline.context.store_sequence_analysis(parameters=_overview_parameters(topology), result={
-            "nucleotide_counts": nucleotide_counts,
-            "nucleotide_percentages": nucleotide_percentages,
-            "gc_content": gc_content,
-            "at_content": at_content,
-            "content_ranges": content_ranges,
-            "gc_skew": gc_skew,
-            "at_skew": at_skew,
-            "sequence_complexity": sequence_complexity,
-            "homopolymers": homopolymers,
-            "cpg_analysis": cpg_analysis,
-            "cpg_islands": cpg_islands,
-            "molecular_weight": molecular_weight,
-            "sequence_quality": sequence_quality,
-            "ambiguous_counts": ambiguous_counts,
-            "complement": complement,
-            "reverse_complement": reverse_complement,
-        })
+        overview = compute_sequence_overview(dna)
+        show_sequence_overview(selected_index, header, dna, topology, overview)
+        pipeline.context.store_sequence_analysis(
+            parameters=_overview_parameters(topology), result=dict(overview))
 
 
         # ========================================================
@@ -527,28 +516,7 @@ def main():
 
             if choice == "1":
 
-                print_results(
-                    selected_index,
-                    header,
-                    dna,
-                    topology,
-                    nucleotide_counts,
-                    nucleotide_percentages,
-                    gc_content,
-                    at_content,
-                    content_ranges,
-                    gc_skew,
-                    at_skew,
-                    sequence_complexity,
-                    homopolymers,
-                    cpg_analysis,
-                    cpg_islands,
-                    molecular_weight,
-                    sequence_quality,
-                    ambiguous_counts,
-                    complement,
-                    reverse_complement,
-                )
+                show_sequence_overview(selected_index, header, dna, topology, overview)
 
                 style.pause()
 
@@ -561,51 +529,10 @@ def main():
             elif choice == "2":
 
                 try:
-
-                    selected_orf_result = run_orf_analysis_ui(
-                        dna,
-                        include_partial=True,
-                        min_length=DEFAULT_MIN_ORF_LENGTH,
-                        topology=topology,
-                    )
-
-                    if selected_orf_result is not None:
-
-                        selected_orf = selected_orf_result
-
-                        pipeline.set_selected_orf(
-                            selected_orf
-                        )
-
-                        pipeline.store(
-                            "orf",
-                            selected_orf,
-                            parameters=selected_orf.get(
-                                "search_parameters", {}
-                            ),
-                        )
-
-                        style.header('ORF CONNECTED TO PIPELINE')
-                        print()
-                        style.field('Selected', f"ORF-{selected_orf['rank']:03d}")
-                        style.field('Length', f"{selected_orf['length']} bp")
-                        style.field('Protein', f"{selected_orf['protein_length']} aa")
-                        style.field('Location', f"{selected_orf['start'] + 1}-"
-                            f"{selected_orf.get('stop_on_circle', selected_orf['stop']) + 1} "
-                            f"({selected_orf['strand']} strand, 1-based)")
-                        print()
-                        style.success("ORF stored in the pipeline; RNA, protein and CRISPR guide design can use it.")
-                        if selected_orf.get("genetic_code", 1) != 1:
-                            style.note(
-                                "ORF found with NCBI table "
-                                f"{selected_orf['genetic_code']}; protein analysis and the RNA "
-                                "codon view use this table."
-                            )
-
-                        style.pause()
-
+                    orf_result = run_orf_step(pipeline, dna, topology)
+                    if orf_result is not None:
+                        selected_orf = orf_result
                 except Exception as error:
-
                     report_error("ORF ANALYSIS ERROR", error)
 
 
@@ -646,68 +573,12 @@ def main():
             elif choice == "4":
 
                 if selected_orf is None:
-
-                    style.header('PROTEIN ANALYSIS')
-                    print()
-                    style.note("No ORF has been selected.")
-                    print()
-                    style.note(
-                        "Please run [2] ORF Analysis first and "
-                        "select an ORF."
-                    )
-                    print()
-                    print(
-                        "Protein Analysis will not use the full DNA "
-                        "sequence as a fallback."
-                    )
-
-                    style.pause()
-
+                    show_protein_requires_orf()
                     continue
 
                 try:
-
-                    orf_sequence = selected_orf.get(
-                        "sequence",
-                        ""
-                    )
-
-                    orf_rank = selected_orf.get(
-                        "rank"
-                    )
-
-                    if orf_rank is not None:
-                        orf_id = f"ORF-{orf_rank:03d}"
-                    else:
-                        orf_id = "Selected ORF"
-
-                    strand = selected_orf.get(
-                        "strand"
-                    )
-
-                    reading_frame = selected_orf.get(
-                        "reading_frame",
-                        selected_orf.get(
-                            "frame"
-                        )
-                    )
-
-                    orf_status = selected_orf.get(
-                        "status"
-                    )
-
-                    run_protein_analysis_from_orf(
-                        orf_sequence=orf_sequence,
-                        orf_id=orf_id,
-                        strand=strand,
-                        reading_frame=reading_frame,
-                        orf_status=orf_status,
-                        pipeline=pipeline,
-                        genetic_code=selected_orf.get("genetic_code", 1),
-                    )
-
+                    run_protein_step(pipeline, selected_orf)
                 except Exception as error:
-
                     report_error("PROTEIN ANALYSIS ERROR", error)
 
 
@@ -864,18 +735,7 @@ def main():
 
             elif choice == "11":
 
-                # COMING SOON (owner decision 2026-11-13; audit D15, P3-1):
-                # the entry is kept, nothing is implemented behind it.
-                print(
-                    "\nAI Experiment Planner: COMING SOON. This feature is "
-                    "planned but not yet available. Nothing is run or stored."
-                )
-                print(
-                    "It is intentionally not implemented in this phase "
-                    "(P3-1, docs/AUDIT_STATUS.md)."
-                )
-
-                style.pause()
+                show_planner_status()
 
 
             # ====================================================

@@ -2406,3 +2406,21 @@ Each finding was traced to its cause; no check was disabled, no broad
   legacy folders excluded). The remaining finding, a lambda assignment in
   a CRISPR test, is ignored for that file with the reason stated, because
   CRISPR code and tests are not changed in this phase.
+
+### Package C, part 2: `main()` from 632 to 383 lines
+
+- The sequence overview computed 16 values into separate variables and
+  passed them to `print_results` in two identical 20-argument calls (on
+  selection and for menu entry 1), and once more into the stored result.
+  `compute_sequence_overview(dna)` now returns them by name and
+  `show_sequence_overview()` draws them; the stored result is the same
+  dictionary.
+- The ORF step (analysis, pipeline storage, confirmation screen), the
+  protein step from the selected ORF, its "no ORF selected" message and
+  the AI Experiment Planner message (Coming Soon, unchanged) are separate
+  functions. The CRISPR branch is unchanged.
+- Evidence: two scripted sessions (the example file through every module
+  entry except CRISPR, and pUC19 through ORF, protein, RNA and status)
+  give byte-identical output before and after (64,706 and 26,122
+  characters); `test_main_session`, the smoke tests and the golden master
+  pass.
