@@ -2344,3 +2344,20 @@ Each finding was traced to its cause; no check was disabled, no broad
 - Left: 11 findings in `analyses/crispr.py`, not edited because CRISPR
   work is excluded in this phase.
 - Suite, golden master and Ruff (pyflakes) unchanged.
+
+### Package D, part 1: BLAST dialog tests; Remove Database left a file behind
+
+- Defect found by the new test: "Remove Database" in the BLAST database
+  manager left the `.njs` file (the JSON metadata of BLAST+ version 5
+  databases, which `makeblastdb` writes) because the manager's list of
+  database files did not contain `.njs`/`.pjs`. The same list feeds the
+  file count and size in "Database Information", which were too low.
+  Corrected in `LocalBlastDatabaseManager._expected_extensions`; the test
+  failed before the change and passes after it.
+- New `tests/test_blast_dialog.py` (6): every result view after two
+  stubbed searches (configuration, summary, hit detail, evidence,
+  taxonomy, comparison, report, self-test, catalog, status), the JSON,
+  CSV and text exports, missing and unsupported export paths, a declined
+  remote search, the RID resume (missing, declined, resumed, failed) and
+  the database manager on a real `makeblastdb` database (create, inspect,
+  verify, wrong confirmation, remove; skipped without BLAST+).

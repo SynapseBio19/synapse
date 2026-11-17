@@ -1604,9 +1604,13 @@ class LocalBlastDatabaseManager:
         return prefix
 
     def _expected_extensions(self, database_type: str) -> Tuple[str, ...]:
+        # .njs/.pjs: the JSON metadata file of BLAST+ version 5 databases
+        # (Phase 7: without it, Remove Database left that file behind).
         if database_type == "protein":
-            return (".pal", ".phr", ".pin", ".psq", ".pdb", ".pog", ".pos", ".pot", ".ptf", ".pto", ".pni")
-        return (".nal", ".nhr", ".nin", ".nsq", ".ndb", ".nni", ".nog", ".nos", ".not", ".ntf", ".nto")
+            return (".pal", ".phr", ".pin", ".psq", ".pdb", ".pog", ".pos", ".pot", ".ptf", ".pto", ".pni",
+                    ".pjs")
+        return (".nal", ".nhr", ".nin", ".nsq", ".ndb", ".nni", ".nog", ".nos", ".not", ".ntf", ".nto",
+                ".njs")
 
     def _find_existing_prefix(self, name: str, database_type: str) -> Path:
         """Resolve a database prefix in flexible local BLAST layouts.
