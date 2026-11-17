@@ -1,6 +1,37 @@
 # Phase 6 completion run – continuation record
 
-## Continuation run under the Master Execution Prompt (2026-11-13, in progress)
+## Final state of the continuation run (2026-11-17)
+
+The continuation run is finished. Final report: `docs/PHASE6_FINAL_REPORT.md`
+(structure A-L). Verdict: Phase 6 is PARTIALLY COMPLETE. Every
+requirement that could be completed with the available resources,
+permissions and scope is done and verified; the rest is BLOCKED (very
+large data, owner decisions, an inaccessible primary source), DEFERRED
+(CRISPR-related work by the owner's decision of 2026-11-17, and the AI
+Experiment Planner, which stays COMING SOON) or PARTIALLY COMPLETE with
+the reason recorded (report section K).
+
+State: `main` at the commit that adds the final report; working tree
+clean; 516 tests, 0 failures on CPython 3.14.6 (5 skipped: the benchmark
+and four primer3-py comparisons blocked by Windows application control on
+2026-11-17) and on CPython 3.10.11 (23 skipped, reference packages not
+installed for 3.10); golden master 12/12; pyright 58 (baseline 134);
+coverage 75 %; ReadOnly 15/15.
+
+Done on 2026-11-17 under the owner's Safe Continuation Prompt (CRISPR,
+CFD and the AI Experiment Planner excluded):
+
+| Commit | Item |
+|---|---|
+| `4a4bb05` | Package A: NCBI `core_nt` offered for remote BLAST (first among nucleotide databases, also in the `update_blastdb.pl` catalog); live search RID FR8EK6FN014 confirmed it; FEATURE_STATUS no longer says the remote search was never live-checked |
+| `c24159f` | Package B: `tests/test_dialog_paths.py` (17) drives the variant, mutation, ORF and literature dialogs to the end of their branches (23-38 % -> 72-87 % coverage); five messages given their ERROR/NOTE/WARNING prefix; ORF settings note on the stop-codon difference to ORFfinder |
+| `c74d03a` | Package C: README, FEATURE_STATUS, AUDIT_STATUS and the decision record reconciled; CFD items marked deferred |
+| (final report commit) | Package D: final report A-L |
+
+Next work, only on the owner's request: section K of the final report
+lists every open item with what it needs.
+
+## Continuation run under the Master Execution Prompt (2026-11-13)
 
 Governing documents: the Phase 6 Master Prompt
 (`Project_Synapse_Phase_6_Master_Prompt_Skills_Integrated.txt`, SHA-256
