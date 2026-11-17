@@ -663,7 +663,8 @@ def analyze_shine_dalgarno(
                     + position
                 )
 
-    if best_motif is None:
+    # Motif and position are set together, so both are None or neither is.
+    if best_motif is None or best_position is None:
 
         return {
             "available": True,
@@ -2151,15 +2152,15 @@ def analyze_orf_relationships(orfs):
                 b_start <= a_start and a_end <= b_end
             )
 
+            # (outer, inner) when one ORF lies inside the other.
+            nesting = None
             if a_contains_b and not b_contains_a:
                 relation = "Nested"
-                outer = a
-                inner = b
+                nesting = (a, b)
                 nested_pairs.append((a, b))
             elif b_contains_a and not a_contains_b:
                 relation = "Nested"
-                outer = b
-                inner = a
+                nesting = (b, a)
                 nested_pairs.append((b, a))
             else:
                 relation = "Overlapping"
@@ -2180,9 +2181,9 @@ def analyze_orf_relationships(orfs):
                 "same_frame": a["frame"] == b["frame"],
             }
 
-            if relation == "Nested":
-                record["outer_orf_rank"] = outer["rank"]
-                record["inner_orf_rank"] = inner["rank"]
+            if nesting is not None:
+                record["outer_orf_rank"] = nesting[0]["rank"]
+                record["inner_orf_rank"] = nesting[1]["rank"]
 
             relationships.append(record)
 

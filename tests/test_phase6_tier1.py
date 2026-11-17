@@ -476,14 +476,14 @@ class OrfInitiationCodonTests(unittest.TestCase):
             ncbi_starts = set(unambiguous_dna_by_id[table].start_codons)
             with self.subTest(table=table, part="internal codons"):
                 for codon in codons:
-                    reference = str(Seq("ATG" + codon).translate(table=table))[1:]
+                    reference = str(Seq("ATG" + codon).translate(table=table))[1:]  # pyright: ignore[reportArgumentType] - Biopython stub says str; ids (int) are documented
                     ours = O.translate_orf_sequence("ATG" + codon, genetic_code=table)[1:]
                     self.assertEqual(ours, "" if reference == "*" else reference, codon)
             with self.subTest(table=table, part="first codon"):
                 decoded_as_met = {c for c in codons if O.translate_orf_sequence(c + "AAA", genetic_code=table)[:1] == "M"}
-                elongation_met = {c for c in codons if str(Seq(c).translate(table=table)) == "M"}
+                elongation_met = {c for c in codons if str(Seq(c).translate(table=table)) == "M"}  # pyright: ignore[reportArgumentType] - see above
                 for codon in ncbi_starts:  # Biopython's cds=True initiator rule
-                    self.assertEqual(str(Seq(codon + "AAATAA").translate(table=table, cds=True)), "MK")
+                    self.assertEqual(str(Seq(codon + "AAATAA").translate(table=table, cds=True)), "MK")  # pyright: ignore[reportArgumentType] - see above
                 synapse_policy = {"GTG"} if table == 1 else set()
                 self.assertEqual(decoded_as_met, ncbi_starts | synapse_policy | elongation_met)
 

@@ -41,8 +41,24 @@ from datetime import datetime, timezone
 
 from pathlib import Path
 
-from typing import Any, Optional
+from typing import Any, Optional, TypedDict
 from core.textformat import field_line
+
+
+class RelevanceComponents(TypedDict, total=False):
+    """How a relevance score was composed (rank_articles); keys appear as computed."""
+
+    title_coverage: float
+    abstract_coverage: float
+    keyword_coverage: float
+    query_term_coverage: float
+    exact_phrase_bonus: float
+    biological_context_coverage: float
+    matched_query_terms: list[str]
+    missing_query_terms: list[str]
+    matched_context_terms: list[str]
+    ranking_method: str
+
 
 MODULE_NAME = "Synapse Literature Intelligence"
 
@@ -142,7 +158,8 @@ class LiteratureQuery:
 
             parsed_dates[label] = parsed
 
-        if "date_from" in parsed_dates and "date_to" in parsed_dates:
+        # Both bounds are in parsed_dates exactly when both strings are set.
+        if self.date_from and self.date_to:
             # Interpret partial dates as ranges: YYYY means the whole year,
             # and YYYY-MM means the whole month. This avoids rejecting a valid
             # range such as 2026-10-15 through 2026-10.
@@ -207,7 +224,7 @@ class LiteratureArticle:
 
     relevance_score: Optional[float] = None
 
-    relevance_components: dict[str, float] = field(default_factory=dict)
+    relevance_components: RelevanceComponents = field(default_factory=lambda: RelevanceComponents())
 
     metadata: dict[str, Any] = field(default_factory=dict)
 
@@ -1426,11 +1443,12 @@ def _enrich_missing_metadata(articles: list[LiteratureArticle], limit: int = 12)
 
         # Crossref is a secondary fallback for DOI-bearing records, particularly
         # for journal and publication metadata. Its abstracts may contain JATS XML.
-        if article.normalized_doi() and (
+        normalized_doi = article.normalized_doi()
+        if normalized_doi and (
             not article.abstract or not article.journal or not article.publication_date
         ):
             try:
-                doi = urllib.parse.quote(article.normalized_doi(), safe="/")
+                doi = urllib.parse.quote(normalized_doi, safe="/")
                 payload = _request_json(
                     f"https://api.crossref.org/works/{doi}",
                     timeout=min(DEFAULT_TIMEOUT, 12),
@@ -1785,7 +1803,8 @@ def self_test() -> bool:
 
     ranked = rank_articles([LiteratureArticle(title="CRISPR gene editing", abstract="CRISPR gene editing methods"), LiteratureArticle(title="Unrelated topic")], "CRISPR gene editing")
 
-    check("relevance_ranking", ranked[0].relevance_score >= ranked[1].relevance_score)
+    # rank_articles sets every score; None would mean it did not run.
+    check("relevance_ranking", (ranked[0].relevance_score or 0.0) >= (ranked[1].relevance_score or 0.0))
 
     check("exact_phrase_ranking", rank_articles([LiteratureArticle(title="CRISPR gene editing"), LiteratureArticle(title="Editing genes with CRISPR")], "CRISPR gene editing")[0].title == "CRISPR gene editing")
 
@@ -1875,7 +1894,7 @@ def self_test() -> bool:
 
     check("biological_context_ranking_component", "biological_context_coverage" in context_ranked[0].relevance_components)
 
-    check("biological_context_match_recorded", "zebrafish" in context_ranked[0].relevance_components["matched_context_terms"])
+    check("biological_context_match_recorded", "zebrafish" in context_ranked[0].relevance_components.get("matched_context_terms", []))
 
     try:
 
@@ -2038,10 +2057,11 @@ def build_sequence_literature_context(header: Optional[str] = None, orf: Optiona
     and is never submitted without their confirmation.
     """
     context: dict[str, Any] = {}
-    words = [w for w in re.split(r"[\s|,;_]+", (header or "").strip()) if w]
+    text = (header or "").strip()
+    words = [w for w in re.split(r"[\s|,;_]+", text) if w]
     words = [w for w in words if not re.fullmatch(r"(?i)(topology|len|length)=.*|\d+", w)]
     if words:
-        context["sequence_header"] = header.strip()
+        context["sequence_header"] = text
         context["suggested_query"] = " ".join(words[:6])
     if orf:
         context["orf"] = f"rank {orf.get('rank', '?')} frame {orf.get('frame', '?')}"

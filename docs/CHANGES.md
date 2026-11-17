@@ -2314,3 +2314,33 @@ Experiment Planner stays Coming Soon).
   `PHASE6_FINAL_ASSESSMENT.md`; their original text is kept.
 - Code: unchanged. A dead `elif pmid` branch in the Europe PMC URL
   construction was noted, not changed.
+
+### Package B: pyright 58 -> 11 (the 11 are in the excluded CRISPR module)
+
+Each finding was traced to its cause; no check was disabled, no broad
+`Any` was added, and one targeted ignore carries its reason.
+
+- `analyses/literature.py`: `relevance_components` was declared
+  `dict[str, float]` but also holds term lists and the ranking-method
+  text; it is now a `TypedDict` (`RelevanceComponents`) with the real
+  keys. The date-range check, the Crossref DOI quote and the header-based
+  query suggestion use local values pyright can see are set; the self-test
+  compares scores defensively. Same behavior.
+- `analyses/orf.py`, `analyses/rna.py`: the Shine-Dalgarno search sets
+  motif and position together, and the early return now checks both;
+  `get_rna_complement` is typed `str -> str`; the ORF nesting record uses
+  one `nesting` tuple instead of two variables only bound on one branch.
+- `analyses/protein.py`: the mass-range bounds are checked together.
+- `analyses/blast.py`: the runtime alias directory is `None` unless an
+  alias was built, and the environment uses it instead of re-evaluating
+  the condition.
+- `core/report.py`: `to_dict` is looked up once with `getattr`.
+- Tests: `assert x is not None` before using results that can be `None`;
+  real `email.message.Message` headers for `HTTPError`; a package import
+  of the genetic-code fixture instead of a `sys.path` change; a typed
+  cast for the primer stand-ins; one `pyright: ignore[reportArgumentType]`
+  where Biopython's stub declares `table: str` although its
+  documentation and code accept NCBI table ids.
+- Left: 11 findings in `analyses/crispr.py`, not edited because CRISPR
+  work is excluded in this phase.
+- Suite, golden master and Ruff (pyflakes) unchanged.

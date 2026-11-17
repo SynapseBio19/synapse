@@ -1086,7 +1086,8 @@ def analyze_rna_shine_dalgarno(
                 + position
             )
 
-    if best_motif is None:
+    # Motif and position are set together, so both are None or neither is.
+    if best_motif is None or best_position is None:
 
         return {
             "available": True,
@@ -1120,7 +1121,7 @@ def analyze_rna_shine_dalgarno(
 # RNA COMPLEMENT
 # ============================================================
 
-def get_rna_complement(rna):
+def get_rna_complement(rna: str) -> str:
 
     return "".join(
         RNA_COMPLEMENT.get(

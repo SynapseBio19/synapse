@@ -16,12 +16,10 @@ class GeneticCodeTests(unittest.TestCase):
         # verified against all of them. Since Stage 4 the modules derive their
         # tables from core.seqtools, so the cross-check uses a preserved copy
         # of one of the hand-written tables (tests/fixtures).
-        import sys
         from core.seqtools import get_genetic_code
         from analyses import orf, mutation, rna
         from data.genetic_code import CODON_TABLE
-        sys.path.insert(0, str(FIXTURES_DIR))
-        from standard_code_reference import STANDARD_CODE
+        from tests.fixtures.standard_code_reference import STANDARD_CODE
 
         reference = get_genetic_code(1).codons
         self.assertEqual(reference, {k: ("*" if v == "STOP" else v) for k, v in STANDARD_CODE.items()})
@@ -120,6 +118,7 @@ class PipelineStoreTests(unittest.TestCase):
         pipeline.store("crispr", {"x": 1}, parameters={"system": "SpCas9"})
         pipeline.store("mutation", {"y": 2})
         result = pipeline.latest("crispr")
+        assert result is not None and result.input_sequence_sha256 is not None
         self.assertEqual(result.parameters["system"], "SpCas9")
         self.assertEqual(len(result.input_sequence_sha256), 64)
         pipeline.set_selected_orf({"sequence": "ATGAAATTTTAA", "rank": 1})
@@ -137,8 +136,10 @@ class PipelineStoreTests(unittest.TestCase):
         pipeline = SynapsePipeline("ACGT" * 50, "test")
         mutation_menu._store_pipeline_result(pipeline, "mutation", {"a": 1})
         variant_analysis_menu._store_variant_pipeline_result(pipeline, "variant", {"b": 2})
-        self.assertEqual(pipeline.latest("mutation").data, {"a": 1})
-        self.assertEqual(pipeline.latest("variant").data, {"b": 2})
+        stored_mutation, stored_variant = pipeline.latest("mutation"), pipeline.latest("variant")
+        assert stored_mutation is not None and stored_variant is not None
+        self.assertEqual(stored_mutation.data, {"a": 1})
+        self.assertEqual(stored_variant.data, {"b": 2})
 
     def test_attach_record_requires_matching_sequence(self):
         from core.pipeline import SynapsePipeline

@@ -11,6 +11,7 @@ run with checked output. The literature tests replace the HTTP layer
 import os
 import unittest
 from types import SimpleNamespace
+from typing import Sequence, cast
 from unittest import mock
 from urllib.parse import parse_qs, urlparse
 
@@ -41,8 +42,10 @@ class DoubleDigestTests(unittest.TestCase):
             R.analyze_double_digest(PUC19_MCS, "BamHI", "BamHI")
 
 
-def _candidate(tm):
-    return SimpleNamespace(thermodynamics=SimpleNamespace(tm_C=tm))
+def _candidates(*tms):
+    """Stand-ins with the one attribute the diagnosis reads (thermodynamics.tm_C)."""
+    stubs = [SimpleNamespace(thermodynamics=SimpleNamespace(tm_C=tm)) for tm in tms]
+    return cast(Sequence[P.AdvancedPrimerCandidate], stubs)
 
 
 class ThermodynamicFailureDiagnosisTests(unittest.TestCase):
@@ -56,16 +59,16 @@ class ThermodynamicFailureDiagnosisTests(unittest.TestCase):
 
     def test_candidates_outside_the_window_and_no_pair(self):
         reasons = P.diagnose_thermodynamic_failure(
-            forward_candidates=[_candidate(50.0), _candidate(52.0)],
-            reverse_candidates=[_candidate(70.0)], pairs=[], config=self.config)
+            forward_candidates=_candidates(50.0, 52.0),
+            reverse_candidates=_candidates(70.0), pairs=[], config=self.config)
         self.assertIn("No forward/reverse combination satisfies the thermodynamic pair constraints.", reasons)
         self.assertIn("Forward Tm values are consistently below the configured minimum.", reasons)
         self.assertIn("Reverse Tm values are consistently above the configured maximum.", reasons)
 
     def test_nothing_to_report_inside_the_window(self):
         reasons = P.diagnose_thermodynamic_failure(
-            forward_candidates=[_candidate(60.0)], reverse_candidates=[_candidate(59.0)],
-            pairs=[object()], config=self.config)
+            forward_candidates=_candidates(60.0), reverse_candidates=_candidates(59.0),
+            pairs=cast(Sequence[P.AdvancedPrimerPair], [object()]), config=self.config)
         self.assertEqual(reasons, [])
 
 

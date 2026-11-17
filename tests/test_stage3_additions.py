@@ -237,10 +237,12 @@ class LiteratureTests(unittest.TestCase):
             def __enter__(self):
                 return self
 
-            def __exit__(self, *args):
-                return False
+            def __exit__(self, *args) -> None:
+                return None
 
-        error = urllib.error.HTTPError("https://example.org/x", 503, "busy", {"Retry-After": "1"}, None)
+        retry_headers = email.message.Message()
+        retry_headers["Retry-After"] = "1"
+        error = urllib.error.HTTPError("https://example.org/x", 503, "busy", retry_headers, None)
         calls = [error, FakeResponse(b"ok")]
 
         def fake_urlopen(request, timeout=None):
@@ -257,7 +259,7 @@ class LiteratureTests(unittest.TestCase):
 
     def test_non_retryable_error_is_reported(self):
         from analyses import literature as L
-        error = urllib.error.HTTPError("https://example.org/y", 404, "nf", {}, None)
+        error = urllib.error.HTTPError("https://example.org/y", 404, "nf", email.message.Message(), None)
         with mock.patch.object(L.urllib.request, "urlopen", side_effect=error), \
                 mock.patch.object(L.time, "sleep", lambda s: None):
             with self.assertRaises(L.LiteratureSourceError):

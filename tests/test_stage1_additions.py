@@ -58,6 +58,7 @@ class OrfAdapterTests(unittest.TestCase):
         dna = "GG" + "ATG" + "GCT" * 30 + "TAA" + "GG"
         orf = O.find_orfs(dna, include_partial=False)[0]
         region = resolve_orf_region(orf, dna)
+        assert region is not None
         self.assertTrue(region.validated)
         self.assertEqual((region.start_1based, region.end_1based, region.strand), (3, 98, "+"))
 
@@ -68,6 +69,7 @@ class OrfAdapterTests(unittest.TestCase):
         dna = "GG" + reverse_complement(cds) + "GG"
         orf = [o for o in O.find_orfs(dna, include_partial=False) if o["strand"] == "-"][0]
         region = resolve_orf_region(orf, dna)
+        assert region is not None
         self.assertTrue(region.validated)
         self.assertEqual(region.forward_region, dna[2:98])
         self.assertEqual(region.coding_sequence, cds)
@@ -75,12 +77,14 @@ class OrfAdapterTests(unittest.TestCase):
     def test_generic_dict_keeps_one_based_start(self):
         from core.orf_context import resolve_orf_region
         region = resolve_orf_region({"sequence": "ATGCGT", "start": 101})
+        assert region is not None
         self.assertEqual((region.start_1based, region.end_1based), (101, 106))
 
     def test_mismatching_parent_is_not_trusted(self):
         from core.orf_context import resolve_orf_region
         orf = {"sequence": "ATGAAA", "start": 0, "stop": 5, "strand": "+", "frame": 1}
         region = resolve_orf_region(orf, "CCCCCCCC")
+        assert region is not None and region.note is not None
         self.assertFalse(region.validated)
         self.assertIn("does not match", region.note)
 
@@ -92,6 +96,7 @@ class OrfAdapterTests(unittest.TestCase):
         query = B.build_orf_query(orf, parent_sequence=dna)
         self.assertEqual(query.sequence, cds)
         self.assertEqual((query.region_start, query.region_end), (6, 101))
+        assert query.feature_name is not None
         self.assertIn("- strand", query.feature_name)
 
 

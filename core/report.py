@@ -69,9 +69,10 @@ def to_jsonable(value: Any, _depth: int = 0) -> Any:
         return value.isoformat()
     if isinstance(value, Path):
         return str(value)
-    if hasattr(value, "to_dict") and callable(value.to_dict):
+    to_dict = getattr(value, "to_dict", None)
+    if callable(to_dict):
         try:
-            return to_jsonable(value.to_dict(), _depth + 1)
+            return to_jsonable(to_dict(), _depth + 1)
         except Exception:  # noqa: BLE001 - fall back to repr below
             # Audit S8: this used to fall through without any trace, so a
             # payload whose to_dict() raised reached the report as an

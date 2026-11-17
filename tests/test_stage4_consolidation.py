@@ -84,6 +84,7 @@ class CoreApiTests(unittest.TestCase):
         direct = analyze_orfs_enhanced(self.SEQUENCE)
         self.assertEqual(normalize_for_json(result.data), normalize_for_json(direct))
         self.assertEqual(result.parameters["min_length_nt"], 75)
+        assert result.input_sequence_sha256 is not None
         self.assertEqual(len(result.input_sequence_sha256), 64)
 
     def test_restriction_api_uses_record_topology(self):

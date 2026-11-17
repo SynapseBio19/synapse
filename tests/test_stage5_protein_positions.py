@@ -37,7 +37,9 @@ class PositionalProteinTests(unittest.TestCase):
 
     def test_instability_index_ignores_unresolved_dipeptides(self):
         from analyses import protein as P
-        self.assertAlmostEqual(P.calculate_instability_index(UBIQUITIN), 36.055263, places=5)
+        index = P.calculate_instability_index(UBIQUITIN)
+        assert index is not None
+        self.assertAlmostEqual(index, 36.055263, places=5)
         self.assertIsNotNone(P.calculate_instability_index(AMBIGUOUS))
         self.assertIsNone(P.calculate_instability_index("??"))
 

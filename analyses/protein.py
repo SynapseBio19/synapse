@@ -1235,7 +1235,8 @@ def calculate_protein_molecular_weight(
     final_min = completed_min
     final_max = completed_max
 
-    if active_min is not None:
+    # The two bounds become None together (undetermined residue).
+    if active_min is not None and active_max is not None:
 
         final_min = (
             active_min

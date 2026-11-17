@@ -2813,6 +2813,8 @@ class LocalBlastEngine:
                 newline="",
             )
 
+            # Set only when a runtime alias is needed; the environment below uses it.
+            runtime_parent: Optional[Path] = None
             if _needs_runtime_blast_alias(database):
                 runtime_parent = Path(database.path).expanduser().resolve().parent
                 if re.fullmatch(r".+\.\d+", runtime_parent.name):
@@ -2867,7 +2869,7 @@ class LocalBlastEngine:
                 command.extend(["-seg" if program in {"blastp", "blastx", "tblastn", "tblastx"} else "-dust",
                                 local_parameters.filter_query])
 
-            if _needs_runtime_blast_alias(database):
+            if runtime_parent is not None:
                 env = _build_local_blast_environment(
                     runtime_parent
                 )
