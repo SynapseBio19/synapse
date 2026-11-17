@@ -155,7 +155,8 @@ python -m unittest discover -s tests -t .
 ```
 
 The suite has run on Python 3.14 and on Python 3.10.11, the oldest
-supported version (`docs/TOOL_AND_DATA_LEDGER.md`). Line coverage is
+supported version (`docs/TOOL_AND_DATA_LEDGER.md`); 516 tests on
+2026-11-17. Line coverage is
 recorded in `docs/TEST_COVERAGE.md`.
 
 The suite blocks all network access, so no test can depend on an external
@@ -173,8 +174,14 @@ The full list, per module, is in `docs/METHODS.md`. The most important:
   scores, signal-peptide and structure screens are model predictions or
   heuristics, and are labeled as such.
 - Off-target search covers only the sequences supplied, never a genome.
-- ORF search has no comparison with NCBI ORFfinder (not available on
-  this platform).
+- ORF calls were compared with NCBI ORFfinder on one plasmid (pUC19,
+  69 ORFs identical); Synapse counts the stop codon in the minimum length,
+  ORFfinder does not. ORFs across the origin were not part of that
+  comparison.
+- The RNA hairpin screen has no energy model of its own; the optional
+  MFE view (ViennaRNA) supplies one.
+- HGVS descriptions number the supplied sequence; they equal HGVS c./p.
+  numbering only if that sequence is the CDS.
 - Restriction analysis covers 22 palindromic and 4 Type IIS enzymes;
   methylation blocking and star activity are not modeled. Golden Gate
   assembly is not planned.

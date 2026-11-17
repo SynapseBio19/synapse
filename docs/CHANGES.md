@@ -2262,3 +2262,21 @@ Prompt of 2026-11-13. History and binding decisions:
 - ORF settings: a second note says that Synapse counts the stop codon in
   the minimum length and ORFfinder does not (78 nt here = ORFfinder's 75).
 - No analysis result changed; golden master unchanged.
+
+### Documentation reconciled with the continuation run (2026-11-17)
+
+- README: the ORFfinder limitation now states the comparison and its
+  scope; the hairpin screen and HGVS numbering limits are named; the test
+  count is current.
+- FEATURE_STATUS: test count 516; the instability index records the
+  ExPASy comparison; the primer structure screens record the primer3-py
+  comparison of 2026-11-11 (the row still said "Not validated"); PubMed,
+  Europe PMC and OpenAlex record the live check of 2026-11-12 (Crossref
+  was not part of it); origin-spanning ORFs are named as outside the
+  ORFfinder comparison.
+- AUDIT_STATUS: P1-1 test counts, P1-9 (ORFfinder), P1-10 (HGVS) and
+  open validation 9 (ExPASy, KQ open) updated.
+- CFD scoring (FEATURE_STATUS, AUDIT_STATUS) is marked deferred under the
+  owner's decision of 2026-11-17; its content is unchanged.
+- PROJECT_HISTORY_AND_DECISIONS: that decision, and the status of every
+  previously open item after this run.

@@ -44,7 +44,7 @@ simulated keystrokes (see audit §11.5).
 | Functions and classes inventoried | ~1,100 |
 | Main-menu entries | 15 |
 | Sub-menu entries inventoried | 78 |
-| Automated tests | 463, all passing (2026-11-13; the opt-in benchmark is skipped). 356 at the end of Stage F (2026-11-03), 421 on 2026-11-11. The suite also passes on Python 3.10.11 (452 tests on 2026-11-12, `docs/TOOL_AND_DATA_LEDGER.md`). Line coverage: `docs/TEST_COVERAGE.md`. The count at the end of Stage 4 was 283. |
+| Automated tests | 516, all passing (2026-11-17; skipped: the opt-in benchmark, and four primer3-py comparisons while Windows application control blocks its compiled module). 356 at the end of Stage F (2026-11-03), 421 on 2026-11-11, 463 on 2026-11-13. The suite also passes on Python 3.10.11 (452 tests on 2026-11-12, `docs/TOOL_AND_DATA_LEDGER.md`). Line coverage: `docs/TEST_COVERAGE.md`. The count at the end of Stage 4 was 283. |
 | Module self-tests | 12 suites, all passing (literature 64, mutation 44, BLAST 33, CRISPR 28, variant 27, others aggregated) |
 | Golden-master scenarios | 12 |
 | Confirmed defects | 19 (D1–D19), all corrected by the end of Phase 6 (`docs/PHASE6_FINAL_REPORT.md`, section A; D16 finished with the removal of the superseded primer generations). The first 16 corrections are dated 2026-10-31 in the rows below. |
@@ -129,7 +129,7 @@ relative to its use (every session runs it).
 | — | ORF density, frame statistics | `calculate_orf_density`, `calculate_frame_statistics` | Implemented | Execution-tested | Not applicable | |
 | — | ORF translation | `translate_orf_sequence`, `initiation_codons`, `is_initiation_codon` | Implemented | Execution-tested | **Independently validated** (Biopython, tables 1/2/4/11) | **D1 corrected 2026-10-31**: initiator Met only for initiation codons of the genetic code (table 1: ATG/CTG/GTG/TTG); internal codons use the elongation code. **D2 corrected 2026-10-31**: accepts the ORF dict and uses its `genetic_code`; a conflicting table raises; a bare string defaults to table 1. Agrees with `core.api` for every ORF found in tables 1/2/4/11. |
 | — | Start-codon classification and scores | `classify_start_codon`, `calculate_cds_quality`, `calculate_orf_heuristic_score` | Implemented | Execution-tested | Not applicable | **S19 corrected 2026-10-31**: all three use the initiation codons of the ORF's genetic code, so a CTG ORF found with `table_starts` is classified and scored like an equivalent GTG ORF. |
-| — | Circular / origin-spanning ORFs | `find_orfs(topology="circular")`, `_origin_spanning_orfs` | Implemented | Execution-tested | Not applicable | Since 2026-11-11 (P1-9): `wraps_origin`, unrolled `stop`, `stop_on_circle`; rotation-invariance test. No ORFfinder comparison (not available on this platform). |
+| — | Circular / origin-spanning ORFs | `find_orfs(topology="circular")`, `_origin_spanning_orfs` | Implemented | Execution-tested | Not applicable | Since 2026-11-11 (P1-9): `wraps_origin`, unrolled `stop`, `stop_on_circle`; rotation-invariance test. Not covered by the ORFfinder comparison of 2026-11-13, which used a linear sequence. |
 
 Test coverage: 19 test references — the best-covered module.
 
@@ -171,7 +171,7 @@ Test coverage: 2 test references.
 | — | Molecular weight | `calculate_protein_molecular_weight` | Implemented | Execution-tested | Independently validated | Ubiquitin 8564.84 Da = ExPASy. Returns a dict with min/max/ambiguity flags. |
 | — | Isoelectric point | `calculate_isoelectric_point` | Implemented | Execution-tested | Independently validated | 6.5616 vs ProtParam 6.56; lysozyme 9.3238 vs 9.32. |
 | — | GRAVY | `calculate_gravy` | Implemented | Execution-tested | Independently validated | −0.48947 vs −0.489. |
-| — | Instability index | `calculate_instability_index` | Implemented | Execution-tested | Independently validated | 36.055 vs 36.06; 16.091 vs 16.09. **IG weight corrected 2026-11-02** (−7.49 -> 1.0, the value in Biopython's table (`ProtParamData.DIWV`, which cites Guruprasad et al. 1990); the paper's table not consulted): the two audit proteins contain no IG dipeptide, so the error was invisible there; 20 of 31 random test proteins changed. Now within 2e-4 of Biopython on 31 proteins. |
+| — | Instability index | `calculate_instability_index` | Implemented | Execution-tested | Independently validated | 36.055 vs 36.06; 16.091 vs 16.09. **IG weight corrected 2026-11-02** (−7.49 -> 1.0, the value in Biopython's table (`ProtParamData.DIWV`, which cites Guruprasad et al. 1990); the paper's table not consulted): the two audit proteins contain no IG dipeptide, so the error was invisible there; 20 of 31 random test proteins changed. Now within 2e-4 of Biopython on 31 proteins. All 400 weights compared with ExPASy ProtParam on 2026-11-13 by probe measurements: 399 identical; KQ 24.68 there, 24.64 here and in Biopython; undecided without the 1990 paper (`test_instability_expasy_reference`). |
 | — | Aromaticity | `calculate_aromaticity` | Implemented | Execution-tested | Independently validated | Exact match. |
 | — | Extinction coefficient | `calculate_extinction_coefficient` | Implemented | Execution-tested | Independently validated | Reduced/oxidized both match, incl. 4 disulfide pairs in lysozyme. |
 | — | Charge at pH | `calculate_charge_at_ph`, `_get_pka_tables` | Implemented | Execution-tested | Not applicable | |
@@ -252,7 +252,7 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 | 1 | Design Primers | `design_primers`, `design_primers_professional`, `generate_primer_candidates` | Implemented | Execution-tested | Not applicable | |
 | — | Candidate scoring and ranking | `_v5`–`_v11` `*_pair_quality` / `*_rank_professional_primer_pairs` chain | Implemented | Execution-tested | Not applicable | **D16 corrected 2026-10-31**: the reachability review showed only the last binding of each name was reachable; superseded generations removed. Merging the surviving generations is not done. |
 | — | GC clamp, homopolymer, repeat screens | `count_gc_clamp`, `longest_homopolymer`, `longest_tandem_repeat` | Implemented | Execution-tested | Not applicable | |
-| — | Hairpin / self-dimer / heterodimer | `analyze_hairpin`, `analyze_self_dimer`, `analyze_heterodimer`, `_alignment_stem`, `_three_prime_complementarity` | Implemented | Execution-tested | **Not validated** | Heuristic complementarity screens, **not** thermodynamic structure prediction. Correctly disclaimed in METHODS. |
+| — | Hairpin / self-dimer / heterodimer | `analyze_hairpin`, `analyze_self_dimer`, `analyze_heterodimer`, `_alignment_stem`, `_three_prime_complementarity` | Implemented | Execution-tested | Compared with primer3-py ΔG (2026-11-11; Spearman ρ −0.78 hairpin, −0.74 self-dimer, −0.51 heterodimer) | Heuristic complementarity screens, **not** thermodynamic structure prediction; the severity classes overlap in ΔG. Correctly disclaimed in METHODS. |
 | — | Specificity screen | `screen_primer_specificity` | Implemented | Execution-tested | Not applicable | Against supplied sequence only, not a genome (P3-2). |
 | — | Pairing and amplicon | `build_primer_pair`, `get_amplicon`, `summarize_primer_pair` | Implemented | Execution-tested | Not applicable | |
 | 3 | Single Primer Analysis | `analyze_primer`, `analyze_primer_professional`, `_primer_ui_single_analysis` | Implemented | Execution-tested | Not applicable | |
@@ -338,7 +338,7 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 | 8 | Prime Editing | `design_prime_editing_candidates`, `_prime_edit_for_candidate` | Partially implemented | Execution-tested | Not applicable | **S3 corrected 2026-10-31**: the RTT is checked to contain the intended edit. Honest heuristic labeling. |
 | 9 | Off-Target Analysis | `search_local_off_targets`, `search_local_off_targets_detailed`, `annotate_local_off_targets`, `_oriented_candidate_windows` | Partially implemented | **Execution-tested** | Not applicable | PAM-aware, seed-aware, mismatch positions reported. **D9 corrected 2026-10-31**: the on-target site is excluded. Scope limited to supplied sequences — correctly stated. |
 | 10 | Specificity Profile | `specificity_profile`, `has_specificity_analysis` | Partially implemented | Execution-tested | Not applicable | **D9 corrected 2026-10-31**: `exact_matches` no longer counts the guide's own site. |
-| — | **CFD scoring** | — | **Not implemented** | Not applicable | Not applicable | P2-3: deliberately rejected pending a cited published mismatch matrix. **Correct decision — do not fabricate weights.** |
+| — | **CFD scoring** | — | **Not implemented** | Not applicable | Not applicable | P2-3: deliberately rejected pending a cited published mismatch matrix. **Correct decision — do not fabricate weights.** **Deferred** since 2026-11-17: CRISPR-related work is excluded from the continuation run by the owner's decision (`docs/PROJECT_HISTORY_AND_DECISIONS.md`). |
 | — | U6 poly-T rule | `quality_flags` poly-T warning | Partially implemented | Execution-tested | Not applicable | **S5 addressed 2026-10-31**: the flag is named as the Pol III (U6) terminator consideration and sourced; still a sequence rule, not a promoter model. |
 | 11 | Reports & Export | `format_report`, `print_report`, `export_json`, `export_csv`, `export_guides_fasta`, `export_batch_summary`, `resolve_export_path` | Implemented | Execution-tested | Not applicable | **D11 corrected 2026-10-31**: exports go to `exports/crispr` in the project unless `SYNAPSE_EXPORT_DIR` is set. |
 | — | Serialization | `guide_to_dict`, `result_to_dict`, `result_to_json` | Implemented | Execution-tested | Not applicable | Includes the modeled cut position (**D8 corrected 2026-10-31**). |
@@ -389,10 +389,10 @@ relative to size; the 28 self-tests are the module's own fixtures.
 | Menu | Feature | Function | Implementation | Execution | Validation | Notes |
 |---|---|---|---|---|---|---|
 | 1 | New Literature Search | `run_literature_search`, `LiteratureQuery` | Implemented | Execution-tested (offline) | Blocked by external dependency | No live call in this audit. |
-| — | PubMed provider | `search_pubmed`, `_journal_from_pubmed_xml`, `_publication_types_from_pubmed_xml` | Implemented | Execution-tested (fixtures) | Not validated | Throttled 3/s, 10/s with `SYNAPSE_NCBI_API_KEY`. |
-| — | Europe PMC provider | `search_europe_pmc` | Implemented | Execution-tested (fixtures) | Not validated | |
-| — | OpenAlex provider | `search_openalex` | Implemented | Execution-tested (fixtures) | Not validated | Stage 3 fixed a malformed `YYYY-MM-01-01` date. |
-| — | Crossref provider | `search_crossref` | Implemented | Execution-tested (fixtures) | Not validated | |
+| — | PubMed provider | `search_pubmed`, `_journal_from_pubmed_xml`, `_publication_types_from_pubmed_xml` | Implemented | Execution-tested (fixtures) | Live-checked once (2026-11-12; two records compared with PubMed) | Throttled 3/s, 10/s with `SYNAPSE_NCBI_API_KEY`. |
+| — | Europe PMC provider | `search_europe_pmc` | Implemented | Execution-tested (fixtures) | Live-checked once (2026-11-12, neutral query; METHODS) | |
+| — | OpenAlex provider | `search_openalex` | Implemented | Execution-tested (fixtures) | Live-checked once (2026-11-12, neutral query; METHODS) | Stage 3 fixed a malformed `YYYY-MM-01-01` date. |
+| — | Crossref provider | `search_crossref` | Implemented | Execution-tested (fixtures) | Not validated (not among the default sources of the live check) | |
 | — | Throttling and retry | `_throttle`, `_retry_delay`, `_request_text`, `_request_json` | Implemented | Execution-tested | Not applicable | Up to 3 attempts on 429/5xx, honours `Retry-After`; a simulated 503 is tested. |
 | — | Date handling | `_date_bound`, `_date_in_range`, `_apply_date_validation`, `_future_date_note` | Implemented | **Execution-tested** | Not applicable | `2020-03` → 2020-03-01 / 2020-03-31; `2020` → 2020-12-31. Correct. |
 | — | Deduplication | `deduplicate_articles`, `_is_placeholder_journal` | Implemented | Execution-tested (fixtures) | Not applicable | **S11**: cross-source duplicates unverified live (needs the owner's approval for external requests). |
@@ -457,7 +457,7 @@ As found by the audit, with the outcome of Phase 6 in each row.
 | BLAST P1-7 | RID resume | Implemented 2026-10-31: `resume()`, menu [2] (numbered [14] until the Stage F renumbering), `core.api.blast_resume()`. Tested against a stub; a live resume was not run. |
 | ORF METHODS | 5′-partial ORFs; ORFs across a circular origin | **Implemented 2026-11-11** (P1-9). |
 | Brief §10.2 | Restriction-site-driven primer design | **Implemented 2026-11-12**: primer menu entry 2, `core.api.design_primers_for_restriction_site`, workflow test 10.2. |
-| P2-3 | CFD off-target scoring | **Not implemented** — deliberately deferred pending a citable matrix. Correct call. |
+| P2-3 | CFD off-target scoring | **Not implemented** — deliberately deferred pending a citable matrix. Correct call. **Deferred** since 2026-11-17: CRISPR-related work is excluded from the continuation run by the owner's decision (`docs/PROJECT_HISTORY_AND_DECISIONS.md`). |
 
 **No original feature was lost.** Every capability listed in
 `docs/AUDIT_STATUS.md` and in the previous cycle's reports is accounted for

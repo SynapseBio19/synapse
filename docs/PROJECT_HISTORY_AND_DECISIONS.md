@@ -71,6 +71,7 @@ what is verified, and external sources decide scientific claims.
 | 2026-11-12 | Approval policy = Master Prompt §1.3/§14.5: project-local installs, small and moderate downloads and public sources are allowed; ask first for very large downloads, system-wide changes, costs, uploads of private data, irreversible actions | owner message 2026-11-11 23:34 ("diese Regeln übernehmen") |
 | 2026-11-13 | **AI Experiment Planner stays COMING SOON.** It is not implemented, researched or connected in this execution; the menu entry and placeholder stay | Master Execution Prompt §3 (supersedes the earlier "label as not implemented / needs a specification" handling, see §6) |
 | 2026-11-13 | Communicate with the owner in German; all code, comments, output and technical documentation in English | Master Execution Prompt §2.1 |
+| 2026-11-17 | **CRISPR-related work is excluded from the continuation and deferred**: no investigation, testing, research or change of the CRISPR guide design, its off-target analysis, CFD scoring or the sourcing and licensing of CRISPR scoring resources. The research step that was interrupted by a model safety mechanism on 2026-11-13 is not retried or reworded. Requirements that depend on it are recorded as deferred | owner's Safe Continuation Prompt, 2026-11-17 |
 
 ### Engineering decisions recorded in the repository
 
@@ -146,6 +147,20 @@ From section J of the final report, re-assessed for this run:
   (`pyproject.toml`: "Proprietary - all rights reserved (decision
   pending)") and whether to keep `blast_results/TEST_8_REFERENCE_blast.json`.
 
+Status after the continuation run (2026-11-13 to 2026-11-17):
+
+- Done: RNAfold (ViennaRNA as a project-local wheel), bcftools
+  normalization (against its published test vectors), ORFfinder (live),
+  HGVS (Mutalyzer 3), `core_nt` (live), file and network dialogs of the
+  variant, mutation, ORF and literature modules.
+- Partly done: the Guruprasad weights (399 of 400 confirmed through
+  ExPASy; KQ needs the paper).
+- Deferred by the owner's decision of 2026-11-17: the CFD matrix and every
+  other CRISPR-related item.
+- Still open: genome-scale specificity, local BLAST on a real database,
+  NEBcutter, Python 3.11-3.13, the remaining partial items and the two
+  owner decisions.
+
 What this run did with each item is recorded in `docs/PHASE6_FINAL_REPORT.md`
 and `docs/PHASE6_CONTINUATION.md`.
 
@@ -157,6 +172,10 @@ and `docs/PHASE6_CONTINUATION.md`.
 - During Phase 6 a CRISPR-related investigation (S3, S4, S5, S23) was
   interrupted by a model safeguard on 2026-10-31 and completed under a
   separately scoped assignment; the findings are in the initial audit.
+- On 2026-11-13 a research step on the sourcing of the CFD matrix was
+  interrupted by a model safety mechanism. The owner then excluded
+  CRISPR-related work from the continuation (decision above); nothing
+  from that step entered the repository.
 - `pyright.exe` is blocked by Windows application control; run pyright as
   `python -m pyright`. The same control once blocked primer3-py's compiled
   module (2026-11-13); reference tests skip with that reason instead of
