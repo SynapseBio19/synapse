@@ -2361,3 +2361,18 @@ Each finding was traced to its cause; no check was disabled, no broad
   remote search, the RID resume (missing, declined, resumed, failed) and
   the database manager on a real `makeblastdb` database (create, inspect,
   verify, wrong confirmation, remove; skipped without BLAST+).
+
+### Package D, part 2: the session, the single-primer analysis and the long-sequence overview
+
+- New `tests/test_main_session.py` (7): `main.main()` driven in-process
+  (the subprocess smoke test is not measured by coverage). It covers a
+  missing file, the full DNA session with reports in JSON and Markdown,
+  protein before an ORF, the planner entry (Coming Soon), every module
+  entry except CRISPR, sequence and file switching, a protein record, an
+  undetermined type declared or cancelled, an invalid record, and
+  `report_error`. `main.py` coverage 34 % -> 83 %.
+- New `tests/test_primer_and_overview_dialogs.py` (4): the single-primer
+  analysis (empty, invalid, cancelled, bad conditions, nearest-neighbor
+  and Wallace) and the overview profiles of a 2.7 kb sequence.
+- Found and left for package C: `print_protein_report` (about 600 lines)
+  and `print_primer_report` have no caller.
