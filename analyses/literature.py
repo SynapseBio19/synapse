@@ -1717,18 +1717,25 @@ def export_results(run: LiteratureSearchRun, path: str | Path) -> Path:
 
                 lines.append("AU  - " + author)
 
-            if a.journal: lines.append("JO  - " + a.journal)
+            if a.journal:
+                lines.append("JO  - " + a.journal)
 
-            if a.publication_date: lines.append("PY  - " + a.publication_date[:4])
+            if a.publication_date:
+                lines.append("PY  - " + a.publication_date[:4])
 
-            if a.doi: lines.append("DO  - " + a.doi)
+            if a.doi:
+                lines.append("DO  - " + a.doi)
 
-            if a.pmid: lines.append("AN  - PMID:" + a.pmid)
+            if a.pmid:
+                lines.append("AN  - PMID:" + a.pmid)
 
-            if a.abstract: lines.append("AB  - " + a.abstract.replace("\n", " "))
-            if a.metadata.get("date_validation") == "FUTURE_DATE_REVIEW": lines.append("N1  - REVIEW: FUTURE PUBLICATION DATE. " + a.metadata.get("date_validation_note", "Verify source date."))
+            if a.abstract:
+                lines.append("AB  - " + a.abstract.replace("\n", " "))
+            if a.metadata.get("date_validation") == "FUTURE_DATE_REVIEW":
+                lines.append("N1  - REVIEW: FUTURE PUBLICATION DATE. " + a.metadata.get("date_validation_note", "Verify source date."))
 
-            for url in a.source_urls: lines.append("UR  - " + url)
+            for url in a.source_urls:
+                lines.append("UR  - " + url)
 
             lines.append("ER  - ")
 
@@ -1766,16 +1773,22 @@ def export_results(run: LiteratureSearchRun, path: str | Path) -> Path:
 
             fields = [f"  title = {{{bib_escape(a.title)}}}"]
 
-            if a.authors: fields.append("  author = {" + " and ".join(bib_escape(x) for x in a.authors) + "}")
+            if a.authors:
+                fields.append("  author = {" + " and ".join(bib_escape(x) for x in a.authors) + "}")
 
-            if a.journal: fields.append(f"  journal = {{{bib_escape(a.journal)}}}")
+            if a.journal:
+                fields.append(f"  journal = {{{bib_escape(a.journal)}}}")
 
-            if a.publication_date: fields.append(f"  year = {{{a.publication_date[:4]}}}")
+            if a.publication_date:
+                fields.append(f"  year = {{{a.publication_date[:4]}}}")
 
-            if a.doi: fields.append(f"  doi = {{{bib_escape(a.doi, identifier=True)}}}")
+            if a.doi:
+                fields.append(f"  doi = {{{bib_escape(a.doi, identifier=True)}}}")
 
-            if a.abstract: fields.append(f"  abstract = {{{bib_escape(a.abstract)}}}")
-            if a.metadata.get("date_validation") == "FUTURE_DATE_REVIEW": fields.append("  note = {" + bib_escape("REVIEW: FUTURE PUBLICATION DATE. " + a.metadata.get("date_validation_note", "Verify source date.")) + "}")
+            if a.abstract:
+                fields.append(f"  abstract = {{{bib_escape(a.abstract)}}}")
+            if a.metadata.get("date_validation") == "FUTURE_DATE_REVIEW":
+                fields.append("  note = {" + bib_escape("REVIEW: FUTURE PUBLICATION DATE. " + a.metadata.get("date_validation_note", "Verify source date.")) + "}")
 
             entries.append("@article{" + key + ",\n" + ",\n".join(fields) + "\n}")
 

@@ -79,13 +79,15 @@ def print_results(run: LiteratureSearchRun, limit: int = 10) -> None:
 
         style.section("WARNINGS", blank_before=False)
 
-        for warning in run.warnings: print(f"- {warning}")
+        for warning in run.warnings:
+            print(f"- {warning}")
 
     if run.errors:
 
         style.section("SOURCE ERRORS", blank_before=bool(run.warnings))
 
-        for error in run.errors: print(f"- {error}")
+        for error in run.errors:
+            print(f"- {error}")
 
     print("\nInterpretation: relevance ranking reflects text/query overlap, not scientific quality or truth.")
 

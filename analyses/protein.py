@@ -1690,12 +1690,12 @@ def calculate_aliphatic_index(
     a = protein.count("A") * 100 / length
     v = protein.count("V") * 100 / length
     i = protein.count("I") * 100 / length
-    l = protein.count("L") * 100 / length
+    leu = protein.count("L") * 100 / length
 
     return (
         a
         + 2.9 * v
-        + 3.9 * (i + l)
+        + 3.9 * (i + leu)
     )
 
 

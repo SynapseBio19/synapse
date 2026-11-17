@@ -141,7 +141,7 @@ class MenuIntegrationTests(unittest.TestCase):
                                 lambda: primer_menu._v7_primer_ui_design(DNA, 0, len(DNA), pipeline))
         self.assertIn("VARIANTS IN BINDING SITES", output)
         self.assertIn("Variants on the contig:", output)
-        line = next(l for l in output.splitlines() if l.startswith("pair 1 forward primer"))
+        line = next(text for text in output.splitlines() if text.startswith("pair 1 forward primer"))
         self.assertIn(f"{last_base} ", line)
         self.assertIn("HIGH", line)
         self.assertIn("3' end", line)

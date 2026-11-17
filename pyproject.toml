@@ -34,3 +34,13 @@ venv = ".venv"
 include = ["main.py", "analyses", "core", "data", "fileio", "ui", "tests"]
 exclude = ["LEGACY", "Synapse_Website", "**/__pycache__", ".venv"]
 typeCheckingMode = "standard"
+
+[tool.ruff]
+# Ruff's default rule set (pyflakes and the pycodestyle E4/E7/E9 errors).
+target-version = "py310"
+extend-exclude = ["LEGACY", "Synapse_Website", ".tools"]
+
+[tool.ruff.lint.per-file-ignores]
+# One lambda assignment in a CRISPR test; CRISPR code and tests are not
+# changed in Phase 7 (owner decision of 2026-11-17).
+"tests/test_phase6_tier2.py" = ["E731"]

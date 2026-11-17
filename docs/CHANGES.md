@@ -2392,3 +2392,17 @@ Each finding was traced to its cause; no check was disabled, no broad
   open-access and date filters, DOI de-duplication, canonical links),
   metadata enrichment from Europe PMC, PubMed and Crossref (and failures
   kept as warnings), and the five export formats.
+
+### Package C, part 1: Ruff default rules clean; Ruff configured
+
+- Ruff's default rule set (pyflakes plus pycodestyle E4/E7/E9) reported
+  20 findings. Fixed 19 without behavior change: 15 one-line `if`/`for`
+  statements in the literature exports and summary split onto two lines;
+  a second, redundant `from dataclasses import ...` in the middle of
+  `analyses/primer.py` removed (the names were already imported at the
+  top); the ambiguous names `l` renamed (`leu` in the aliphatic index,
+  `text` in the GenBank reader and one test).
+- `pyproject.toml` now has a `[tool.ruff]` section (target Python 3.10,
+  legacy folders excluded). The remaining finding, a lambda assignment in
+  a CRISPR test, is ignored for that file with the reason stated, because
+  CRISPR code and tests are not changed in this phase.

@@ -102,7 +102,7 @@ def load_genbank(path: str) -> List[Dict[str, Any]]:
         if not block.strip():
             continue
         lines = block.strip("\n").splitlines()
-        locus_line = next((l for l in lines if l.startswith("LOCUS")), None)
+        locus_line = next((text for text in lines if text.startswith("LOCUS")), None)
         if locus_line is None:
             raise GenBankFormatError("Record without LOCUS line.")
 
