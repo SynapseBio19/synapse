@@ -323,7 +323,16 @@ class PipelineContext:
         self.rna_sequence = rna_sequence
         self.completed["rna"] = True
         source = (result or {}).get("pipeline_input", {}).get("source") if isinstance(result, dict) else None
-        self.store("rna", result, parameters={"source": source or self.rna_source})
+        parameters: Dict[str, Any] = {"source": source or self.rna_source}
+        if isinstance(result, dict):
+            # Recorded from the result itself (Phase 7): the input mode and the
+            # genetic code the codon view used.
+            mode = result.get("pipeline_input", {}).get("mode")
+            if mode is not None:
+                parameters["input_mode"] = mode
+            if result.get("genetic_code") is not None:
+                parameters["genetic_code_table"] = result["genetic_code"]
+        self.store("rna", result, parameters=parameters)
 
     # ========================================================
     # PROTEIN
@@ -337,7 +346,15 @@ class PipelineContext:
         self.protein_analysis = result
         self.protein_sequence = protein_sequence
         self.completed["protein"] = True
-        self.store("protein", result, parameters={"source": self.protein_source})
+        parameters: Dict[str, Any] = {"source": self.protein_source}
+        translation = result.get("translation") if isinstance(result, dict) else None
+        if isinstance(translation, dict):
+            # Recorded from the translation itself (Phase 7); a protein record
+            # has no translation and keeps only its source.
+            for key, name in (("genetic_code", "genetic_code_table"), ("reading_frame", "reading_frame")):
+                if translation.get(key) is not None:
+                    parameters[name] = translation[key]
+        self.store("protein", result, parameters=parameters)
 
     # ========================================================
     # RESTRICTION

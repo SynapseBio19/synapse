@@ -683,6 +683,20 @@ therefore upper estimates.
 - Every stored result is an `AnalysisResult` (parameters, input SHA-256,
   warnings, limitations, timestamp, Synapse and Python version).
 - Menu `[R]` exports all stored results (JSON complete, Markdown summary).
+  The report header names the Synapse and Python versions, the platform,
+  the input sequence (SHA-256, type and the evidence for it) and its
+  source file (path, format, SHA-256, record index); every entry adds its
+  module, time, parameters, warnings, limitations and the SHA-256 of its
+  data. Since Phase 7 (2026-11-17) the RNA and protein entries also state
+  the genetic code they used (`genetic_code_table`), the RNA input mode and
+  the protein reading frame, read from the results themselves
+  (`tests/test_report_traceability.py`).
+- External tools and data name their version where they report one: the
+  BLAST run records the program, BLAST+ or NCBI version, database and its
+  statistics, parameters, RID and times; the restriction results the enzyme
+  database version; the optional MFE view the ViennaRNA version and energy
+  model. The live validations are listed with dates in
+  `docs/TOOL_AND_DATA_LEDGER.md`.
 - `core/api.py` offers the same analyses without interactive input.
 
 ## References

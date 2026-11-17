@@ -2475,3 +2475,20 @@ Each finding was traced to its cause; no check was disabled, no broad
   excluded); both rules fail on the previous code.
 - BibTeX export escaping (earlier in Phase 7, `ca5d53a`) belongs to this
   package as well.
+
+### Package H: the genetic code in the RNA and protein report entries
+
+- Previous: the stored RNA and protein results recorded only their source
+  as parameters; the genetic code they used was inside their data, not in
+  the parameters a reader of the report looks at.
+- Now: `PipelineContext.store_rna_analysis` adds `input_mode` and
+  `genetic_code_table`, `store_protein_analysis` adds `genetic_code_table`
+  and `reading_frame`, each read from the result and only when present
+  (a protein record has no translation and keeps only its source). No
+  calculation changes.
+- New `tests/test_report_traceability.py` (5): a table-11 session on pUC19
+  exported to JSON; every entry carries versions, time, hashes,
+  parameters and limitations, and ORF, RNA and protein all state table
+  11. It fails on the previous code.
+- METHODS, "Reproducibility": what the report records, per header and
+  entry, and where external tools record their versions.
