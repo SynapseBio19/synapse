@@ -78,3 +78,38 @@ Per file (combined figure): `core/alphabets.py` 99 %, `core/api.py` 93 %,
 - 100 % coverage is not a goal in itself; the gaps above are recorded so
   that a reader knows which dialogs have only been rendered, not driven to
   the end.
+
+## Remeasured 2026-11-17 (continuation run)
+
+Same tool and command. Suite: 516 tests, all passing (5 skipped: the
+opt-in benchmark and four primer3-py comparisons, because Windows
+application control blocked primer3-py's compiled module that day).
+
+`tests/test_dialog_paths.py` (17 tests) drives the four dialogs that were
+least covered to the end of their branches: operations before any data
+exist, missing files, empty and invalid answers, cancel, settings,
+selection, and the VCF, TSV and literature exports into a temporary
+folder (the literature providers are stubbed; nothing is sent).
+
+| File | 2026-11-12 | 2026-11-17 |
+|---|---:|---:|
+| `ui/variant_analysis_menu.py` | 37 %* | 87 % |
+| `ui/orf_menu.py` | 35 % | 76 % |
+| `ui/mutation_menu.py` | 38 % | 72 % |
+| `ui/literature_menu.py` | 23 % | 72 % |
+| **Total (combined)** | 72 %* | 75 % |
+
+\* measured on 2026-11-17 before the new tests (the 2026-11-12 table above
+gives 21 % for the variant dialog and 70.9 % in total; tests added since
+raised them).
+
+Found while writing them, and corrected: three literature messages and
+two mutation messages were printed without their ERROR/NOTE/WARNING
+prefix, and the ORF settings note did not say that ORFfinder's minimal
+length excludes the stop codon.
+
+Still mostly uncovered: `ui/report.py` (12 %, driven only through the
+`main.py` subprocess, which coverage does not follow), the protein and
+BLAST dialogs (47 % and 51 %), and the local BLAST database download and
+`makeblastdb` paths. The CRISPR dialog was deliberately not extended in
+this run.

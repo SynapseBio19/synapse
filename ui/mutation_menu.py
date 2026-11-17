@@ -389,9 +389,7 @@ def run_mutation_analysis_ui(
 
             if last_result is None:
 
-                print(
-                    "Run a sequence comparison first."
-                )
+                style.note("Run a sequence comparison first.")
 
                 continue
 
@@ -553,9 +551,8 @@ def run_mutation_analysis_ui(
                 )
                 if frame_warnings:
                     print()
-                    print("WARNING - coding frame assumption:")
                     for warning in frame_warnings:
-                        print(f"  - {warning}")
+                        style.warning(f"Coding frame assumption: {warning}")
                 last_result.coding_analysis = (
                     coding
                 )
@@ -622,9 +619,7 @@ def run_mutation_analysis_ui(
 
             if last_result is None:
 
-                print(
-                    "Run a sequence comparison first."
-                )
+                style.note("Run a sequence comparison first.")
 
             else:
 

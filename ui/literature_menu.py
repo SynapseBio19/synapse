@@ -96,7 +96,7 @@ def print_article_detail(run: LiteratureSearchRun, article_index: int) -> None:
 
     if article_index < 1 or article_index > len(run.articles):
 
-        print("Article number is outside the result range.")
+        style.error("Article number is outside the result range.")
 
         return
 
@@ -281,7 +281,7 @@ def _interactive_menu(context: Optional[dict[str, Any]] = None) -> None:
 
         if not result.run:
 
-            print(result.message or "Search did not produce a run.")
+            style.error(result.message or "Search did not produce a run.")
 
             continue
 
@@ -311,7 +311,7 @@ def _interactive_menu(context: Optional[dict[str, Any]] = None) -> None:
 
             except ValueError:
 
-                print("Enter a valid result number.")
+                style.error("Enter a valid result number.")
 
         export = style.ask('Export results? Enter path with .json/.csv/.txt/.ris/.bib, or press Enter to skip')
 

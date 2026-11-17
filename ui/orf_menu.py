@@ -742,6 +742,8 @@ def _orf_settings_menu(settings):
         style.note("Defaults follow NCBI ORFfinder conventions (75 nt, ATG only, one ORF per "
                    "stop). They are screening conventions, not biological thresholds; adjust "
                    "them to your organism and question.")
+        style.note("Synapse counts the stop codon in the minimum length, ORFfinder does not: "
+                   "78 nt here gives ORFfinder's 75 nt.")
 
         choice = style.ask_choice()
 

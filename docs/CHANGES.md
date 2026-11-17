@@ -2247,3 +2247,18 @@ Prompt of 2026-11-13. History and binding decisions:
   fragment): NCBI reported the database as `core_nt` and gave the same
   top hits as `nt`. Tests: `tests/test_blast_core_nt.py` (4); the two
   rendered-menu assertions that list the databases were updated.
+
+### Dialog tests and message prefixes (2026-11-17)
+
+- New `tests/test_dialog_paths.py` (17): the variant, mutation, ORF and
+  literature dialogs driven through missing and invalid input, cancel,
+  settings and exports (`docs/TEST_COVERAGE.md`: 23-38 % -> 72-87 %).
+- Message prefixes (Master Prompt 5, 8.4): "Run a sequence comparison
+  first." (mutation, twice) is now a NOTE; the coding-frame warning is one
+  `WARNING: Coding frame assumption: ...` line per finding instead of a
+  hand-written "WARNING - coding frame assumption:" list; "Search did not
+  produce a run.", "Enter a valid result number." and "Article number is
+  outside the result range." (literature) are ERROR lines.
+- ORF settings: a second note says that Synapse counts the stop codon in
+  the minimum length and ORFfinder does not (78 nt here = ORFfinder's 75).
+- No analysis result changed; golden master unchanged.
