@@ -182,7 +182,6 @@ The full list, per module, is in `docs/METHODS.md`. The most important:
   cell; similar sequences are aligned in an exact band (10 kb in well
   under a second), unrelated long sequences still take time proportional
   to the product of the lengths.
-- Remote BLAST offers `nt` but not NCBI's newer default `core_nt`.
 - Remote BLAST and literature search depend on external services, their
   availability and their rate limits.
 

@@ -2232,3 +2232,18 @@ Prompt of 2026-11-13. History and binding decisions:
   paper is needed to decide which value is the published one.
 - Tests: `tests/test_instability_expasy_reference.py` (3), with the
   measurements as a fixture.
+
+### NCBI `core_nt` offered for remote BLAST (2026-11-17)
+
+- Previous: the remote nucleotide databases were `nt`, `refseq_rna` and
+  `refseq_genomic`; NCBI's default since 2024, `core_nt`, was missing.
+- Now: `core_nt` is listed first among the remote nucleotide databases
+  and is in the `update_blastdb.pl` catalog (not recommended for
+  download). `nt` and the default of the API (`database="nt"`) are
+  unchanged, so scripts behave as before.
+- Menu: in the remote nucleotide list, `core_nt` is entry 1 and `nt`
+  moves from 1 to 2.
+- Evidence: live search against `core_nt` (RID FR8EK6FN014, public pUC19
+  fragment): NCBI reported the database as `core_nt` and gave the same
+  top hits as `nt`. Tests: `tests/test_blast_core_nt.py` (4); the two
+  rendered-menu assertions that list the databases were updated.

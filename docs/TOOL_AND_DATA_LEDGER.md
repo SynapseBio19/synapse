@@ -33,6 +33,7 @@ under 3.14.6 skips only the benchmark.
 |---|---|---|---|---|---|---|
 | NCBI ORFfinder result tables (4 runs, 69 ORFs) | ORFfinder web service as of 2026-11-13 (no version shown on the page) | <https://www.ncbi.nlm.nih.gov/orffinder/>, query L09137.2, code 11 | 2026-11-13 (live, built-in browser) | US government work (NCBI), public | SHA-256 `2053f818059ad16849b2444aceaa7b9f21cf18b0bacb6337f6176cdacf599e11` of `tests/fixtures/orffinder/pUC19_L09137.2_orffinder.json` | `tests/test_orffinder_reference.py` |
 | Mutalyzer 3 API (`description_extract`, `description_to_model`) | Mutalyzer 3.2.0.dev0, API 2.2 (from `/api/version`) | <https://mutalyzer.nl/api/> (LUMC) | 2026-11-13 (live, synthetic sequences only) | Public web service | Answers recorded in `tests/test_hgvs_mutalyzer_reference.py` | HGVS description check |
+| NCBI BLAST URL API, live search against `core_nt` | BLASTN 2.17.0+ (as reported) | <https://blast.ncbi.nlm.nih.gov/Blast.cgi>, RID FR8EK6FN014 | 2026-11-17 (live; public pUC19 L09137.2 bases 401-700) | Public service | – | Verification that NCBI accepts `core_nt` (`docs/METHODS.md`) |
 | bcftools `norm` test vectors (10 files) | bcftools 1.25 (tag `1.25`, released 2026-10-27) | <https://github.com/samtools/bcftools/tree/1.25/test> | 2026-11-13 | MIT/Expat (bcftools dual licence MIT/Expat or GPL) | SHA-256 per file in `tests/fixtures/bcftools_norm/SOURCE.md`, checked by the test | `tests/test_bcftools_norm_reference.py` |
 
 ## Python packages (project `.venv`, from PyPI)

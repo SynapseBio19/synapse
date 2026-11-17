@@ -637,9 +637,16 @@ therefore upper estimates.
   timeout or an HTTP 429/5xx answer (up to 3 in a row, within the maximum
   wait); if it still fails, the error names the RID so the search can be
   collected later (D25, 2026-11-12).
-- Remote databases: `nt`, `refseq_rna`, `refseq_genomic`, `nr`,
-  `refseq_protein`, `swissprot`. NCBI's `core_nt`, its default nucleotide
-  database since 2024, is not offered.
+- Remote databases: `core_nt` (NCBI's default nucleotide database since
+  2024, listed first since 2026-11-17), `nt`, `refseq_rna`,
+  `refseq_genomic`, `nr`, `refseq_protein`, `swissprot`; `core_nt` is also
+  in the `update_blastdb.pl` catalog (not recommended for download: very
+  large). Live check of `core_nt` (2026-11-17, RID FR8EK6FN014, BLASTN
+  2.17.0+): the same public query as below (pUC19 L09137.2 bases 401-700);
+  NCBI reported the database as `core_nt`, 132,977,177 sequences, and
+  returned 50 hits, all significant; the top five are plasmid vectors
+  (PV256254 pKFT, LC257598 pK19mob, AY712950 pFTC1 and others) at 100 %
+  identity and 100 % query coverage, E = 1.6e-149, as against `nt`.
 - Tested: parsing and scoring with synthetic XML; local blastp against
   small protein databases built with `makeblastdb` when BLAST+ is
   installed; status polling with simulated network failures. Live remote

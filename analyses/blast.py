@@ -180,6 +180,12 @@ LOCAL_DATABASE_CATALOG = {
         "source": "NCBI preformatted BLAST database",
         "recommended": True,
     },
+    "core_nt": {
+        "type": "nucleotide",
+        "description": "NCBI core nucleotide collection (NCBI's default since 2024)",
+        "source": "NCBI preformatted BLAST database",
+        "recommended": False,
+    },
     "nt": {
         "type": "nucleotide",
         "description": "NCBI nucleotide collection",
@@ -278,6 +284,10 @@ def _is_transient_ncbi_error(error: BaseException) -> bool:
 
 
 DATABASES = {
+    "core_nt": {
+        "type": "nucleotide",
+        "description": "NCBI core nucleotide collection (NCBI's default since 2024).",
+    },
     "nt": {
         "type": "nucleotide",
         "description": "NCBI nucleotide collection.",

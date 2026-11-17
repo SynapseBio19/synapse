@@ -367,7 +367,7 @@ class BlastMenuTests(unittest.TestCase):
         self.assertEqual(type_menus[0]["zero"], style.CANCEL_LABEL)
         catalog = [m for m in s.menus if m["titles"] == ["NCBI databases available through update_blastdb.pl"]]
         self.assertEqual(len(catalog), 2)
-        self.assertEqual(len(catalog[0]["entries"]), 6)
+        self.assertEqual(len(catalog[0]["entries"]), 7)   # core_nt added 2026-11-17
         # unknown key, invalid type, invalid catalog entry: three replies, each back to the manager
         self.assertEqual(s.output.count(style.INVALID_SELECTION), 3)
         self.assertIn("LOCAL BLAST DATABASE STATUS", s.output)     # [1] status view
@@ -391,7 +391,7 @@ class BlastMenuTests(unittest.TestCase):
                          ["BLASTN", "BLASTX", "TBLASTX"])
         remote = by_title[("NCBI remote database",)][0]
         self.assertEqual([label.split(" - ")[0] for _, label in remote["entries"]],
-                         ["nt", "refseq_rna", "refseq_genomic"])
+                         ["core_nt", "nt", "refseq_rna", "refseq_genomic"])
         hits = by_title[("Ranked hits",)]
         self.assertEqual(hits[0]["entries"], [("1", "X1 | 100.00% identity | 10.67% coverage")])
         self.assertEqual(hits[0]["zero"], style.CANCEL_LABEL)
