@@ -1744,7 +1744,12 @@ def export_results(run: LiteratureSearchRun, path: str | Path) -> Path:
 
             key = re.sub(r"[^A-Za-z0-9]", "", (a.authors[0].split()[-1] if a.authors else "article") + (a.publication_date or "")[:4] + str(index)) or f"article{index}"
 
-            def bib_escape(value: str) -> str:
+            # LaTeX's special characters; an unescaped & or % in a title stops a
+            # LaTeX run (Phase 7). Identifiers (DOI) keep all but the brace rules.
+            latex_specials = {"&": r"\&", "%": r"\%", "$": r"\$", "#": r"\#", "_": r"\_",
+                              "~": r"\textasciitilde{}", "^": r"\textasciicircum{}"}
+
+            def bib_escape(value: str, *, identifier: bool = False) -> str:
                 escaped: list[str] = []
                 for character in value:
                     if character == "\\":
@@ -1753,6 +1758,8 @@ def export_results(run: LiteratureSearchRun, path: str | Path) -> Path:
                         escaped.append(r"\{")
                     elif character == "}":
                         escaped.append(r"\}")
+                    elif character in latex_specials and not identifier:
+                        escaped.append(latex_specials[character])
                     else:
                         escaped.append(character)
                 return "".join(escaped)
@@ -1765,7 +1772,7 @@ def export_results(run: LiteratureSearchRun, path: str | Path) -> Path:
 
             if a.publication_date: fields.append(f"  year = {{{a.publication_date[:4]}}}")
 
-            if a.doi: fields.append(f"  doi = {{{bib_escape(a.doi)}}}")
+            if a.doi: fields.append(f"  doi = {{{bib_escape(a.doi, identifier=True)}}}")
 
             if a.abstract: fields.append(f"  abstract = {{{bib_escape(a.abstract)}}}")
             if a.metadata.get("date_validation") == "FUTURE_DATE_REVIEW": fields.append("  note = {" + bib_escape("REVIEW: FUTURE PUBLICATION DATE. " + a.metadata.get("date_validation_note", "Verify source date.")) + "}")

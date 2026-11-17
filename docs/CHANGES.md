@@ -2376,3 +2376,19 @@ Each finding was traced to its cause; no check was disabled, no broad
   and Wallace) and the overview profiles of a 2.7 kb sequence.
 - Found and left for package C: `print_protein_report` (about 600 lines)
   and `print_primer_report` have no caller.
+
+### Package D, part 3: literature search pipeline; BibTeX export escaped too little
+
+- Defect found by the new test: the BibTeX export escaped only `\`, `{`
+  and `}`. A title such as "Lactase & diet" or "50% of cases" produced a
+  `.bib` entry on which LaTeX stops ("Misplaced alignment tab character").
+  `&`, `%`, `$`, `#`, `_`, `~` and `^` are now escaped in title, authors,
+  journal, abstract and note; the DOI field keeps its characters (it is an
+  identifier). The tests fail on the previous code.
+- New `tests/test_literature_pipeline.py` (8), HTTP replaced by
+  recorded-shape stand-ins: PubMed search (structured abstract,
+  collective author, DOI and PMC ids, date filters, no hits, malformed
+  XML, invalid arguments), the combined search (one provider failing,
+  open-access and date filters, DOI de-duplication, canonical links),
+  metadata enrichment from Europe PMC, PubMed and Crossref (and failures
+  kept as warnings), and the five export formats.
