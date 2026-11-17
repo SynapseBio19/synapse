@@ -319,6 +319,15 @@ What remains outside the shared renderers, each for a stated reason:
 - **Not yet covered by a rule**: the "RESULT:" lines of the module
   self-tests when a module is run as a script, and plain status lines such
   as "Loaded 2 FASTA record(s).".
+  Resolved on 2026-11-17 (Phase 7): the statement below that no other
+  hand-padded line remained was wrong; the single-primer analysis printed
+  five ("ΔH:", "ΔS:", "ΔG at 25 °C:", "3' GC clamp:" twice). They use
+  `style.field()` now, and so do three BLAST database-manager prompts that
+  began with a carriage return. "Use .json, .csv or .txt." (BLAST export),
+  "Cloning module could not be imported." and the literature date
+  warning have their ERROR/WARNING prefix, "No hits were returned" is a
+  NOTE. `tests/test_message_rules.py` fails on either form (the CRISPR
+  dialog, outside Phase 7, is not checked).
   Resolved on 2026-11-13: the last two hand-padded label lines
   ("Retrieved before deduplication", the RNA "Input source") are drawn
   with `style.field()`; a search on 2026-11-13 found no other.

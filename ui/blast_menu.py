@@ -322,7 +322,8 @@ def blast_database_manager_menu(
 
         if choice == "3":
             _print_local_database_status(manager)
-            name = style.ask('\r\nDatabase name to verify (0 cancel)')
+            print()
+            name = style.ask('Database name to verify (0 cancel)')
             if name == "0":
                 continue
             try:
@@ -375,7 +376,8 @@ def blast_database_manager_menu(
 
         if choice == "5":
             _print_local_database_status(manager)
-            name = style.ask('\r\nDatabase name to remove (0 cancel)')
+            print()
+            name = style.ask('Database name to remove (0 cancel)')
             if name == "0":
                 continue
 
@@ -398,7 +400,8 @@ def blast_database_manager_menu(
 
         if choice == "6":
             _print_local_database_status(manager)
-            name = style.ask('\r\nDatabase name (0 cancel)')
+            print()
+            name = style.ask('Database name (0 cancel)')
             if name == "0":
                 continue
             try:
@@ -789,10 +792,8 @@ def blast_menu(
                 style.success("BLAST search completed.")
                 print_hit_summary(last_run)
                 if not last_run.hits:
-                    print(
-                        "\r\nNo hits were returned. This is a valid BLAST result; "
-                        "it does not indicate that the query is biologically irrelevant."
-                    )
+                    print()
+                    style.note("No hits were returned. This is a valid BLAST result; it does not indicate that the query is biologically irrelevant.")
 
             except (BlastAnalysisError, AssertionError) as exc:
                 style.error(f"{exc}")
@@ -962,7 +963,7 @@ def blast_menu(
                 elif lower.endswith(".txt"):
                     export_text(last_run, path)
                 else:
-                    print("Use .json, .csv or .txt.")
+                    style.error("Use .json, .csv or .txt.")
                     continue
                 style.success(f"Exported: {path}")
             except OSError as exc:

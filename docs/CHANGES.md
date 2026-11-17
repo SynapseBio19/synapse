@@ -2456,3 +2456,22 @@ Each finding was traced to its cause; no check was disabled, no broad
   `.coverage` and `.ruff_cache/`.
 - README: development setup in a project-local environment and the
   checks the CI runs.
+
+### Package G: messages and prompts
+
+- Five hand-padded lines in the single-primer analysis ("ΔH:", "ΔS:",
+  "ΔG at 25 °C:", "3' GC clamp:" twice) are drawn with `style.field()`, so
+  their values align with the other fields. TERMINAL_UI_STANDARD had said
+  no such line remained; corrected there.
+- BLAST: an unsupported export suffix is an ERROR line; "No hits were
+  returned" is a NOTE; three database-manager prompts no longer begin
+  with a carriage return (a blank line is printed before them instead).
+- Restriction/cloning: "Cloning module could not be imported." is an
+  ERROR line. Literature: the date-validation remark is a WARNING line.
+- Main session: "Protein Analysis will not use the full DNA sequence as a
+  fallback." is a NOTE like the two lines above it.
+- New `tests/test_message_rules.py` (3): no hand-padded "Label:   value"
+  print and no prompt beginning with a line break in the dialogs (CRISPR
+  excluded); both rules fail on the previous code.
+- BibTeX export escaping (earlier in Phase 7, `ca5d53a`) belongs to this
+  package as well.

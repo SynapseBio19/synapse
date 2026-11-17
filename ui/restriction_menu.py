@@ -563,7 +563,8 @@ def run_restriction_cloning_ui(
 
         if choice == "2":
             if run_cloning_analysis_ui is None:
-                print("\nCloning module could not be imported.")
+                print()
+                style.error("Cloning module could not be imported.")
                 _synapse_ui_pause()
                 continue
 

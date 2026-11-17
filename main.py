@@ -379,7 +379,7 @@ def show_protein_requires_orf():
     print()
     style.note("Please run [2] ORF Analysis first and select an ORF.")
     print()
-    print("Protein Analysis will not use the full DNA sequence as a fallback.")
+    style.note("Protein Analysis will not use the full DNA sequence as a fallback.")
     style.pause()
 
 

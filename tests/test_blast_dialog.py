@@ -84,7 +84,7 @@ class BlastResultViewTests(unittest.TestCase):
             self.assertIn(heading, output)
         self.assertIn("X1", output)
         self.assertIn("ERROR: No path supplied.", output)
-        self.assertIn("Use .json, .csv or .txt.", output)
+        self.assertIn("ERROR: Use .json, .csv or .txt.", output)
         self.assertEqual(output.count("OK: Exported:"), 3)
         self.assertEqual(exported["metadata"]["rid"], "FAKE1")
         self.assertEqual(rows[1][0:1] != [], True)

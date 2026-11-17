@@ -117,7 +117,7 @@ def print_article_detail(run: LiteratureSearchRun, article_index: int) -> None:
         date_display += " [REVIEW: FUTURE DATE]"
     style.field('Publication date', f"{date_display}")
     if article.metadata.get("date_validation_note"):
-        print(f"DATE VALIDATION WARNING: {article.metadata['date_validation_note']}")
+        style.warning(f"Date validation: {article.metadata['date_validation_note']}")
 
     style.field('DOI', f"{article.doi or 'Not available'}")
 
