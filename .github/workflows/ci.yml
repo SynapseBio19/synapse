@@ -48,9 +48,10 @@ jobs:
         run: |
           cd "$RUNNER_TEMP"
           python -I -c "
-          import analyses.blast, analyses.primer, core.api, analyses.orf, analyses.rna_structure, ui.style
+          import analyses.blast, analyses.primer, analyses.mutation, analyses.cloning, core.api, analyses.orf, analyses.rna_structure, ui.style
           assert 'site-packages' in analyses.blast.__file__, analyses.blast.__file__
           assert analyses.blast.run_self_test(verbose=False)
+          assert analyses.cloning.run_cloning_self_test()["all_passed"]
           print('imports OK from', analyses.blast.__file__)"
       - name: Golden master
         run: python -m unittest -v tests.test_golden_master

@@ -2884,3 +2884,23 @@ reference tests decide whether a change alters a result.
   `analyses/cloning.py` ignores F401.
 - **Results.** Unchanged: snapshot, golden master, rendered menus and the
   suite. 608 tests, 0 failures on 3.14.6 and 3.10.11; coverage 84 %.
+
+### Package E: distribution name, homepage and the CI import check
+
+- **Distribution name** `synapse` -> `synapse-gen`. The product stays
+  **Synapse** (owner decision of 2026-11-18). The name `synapse` is
+  already taken on the Python Package Index, and the owner's domain is
+  `synapse-gen.com`. Only `pip install` / `pip show` see this name; the
+  import names are unchanged. An existing editable install keeps the old
+  metadata until it is reinstalled (`pip install -e .`).
+- **`[project.urls]`.** Homepage `https://synapse-gen.com`; keywords
+  added.
+- **CI.** The import check of the installed package now also imports
+  `analyses.mutation` and `analyses.cloning` and runs the cloning
+  self-test there. It was run locally against a clean non-editable
+  install: it passes, and `pip show synapse-gen` reports the homepage.
+- **Not done, recorded as the next packaging step.** There is no
+  installable `synapse` command yet. `main.py` finds its example files
+  next to itself (`examples/`), and they are not part of the installed
+  package. A console script needs the examples packaged as data and
+  `main` moved into a package.

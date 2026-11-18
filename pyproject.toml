@@ -3,13 +3,17 @@ requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "synapse"
+# The product is called Synapse. The distribution name follows the owner's
+# domain, because "synapse" is already taken on the Python Package Index;
+# the import names (analyses, core, ui, ...) are unchanged.
+name = "synapse-gen"
 version = "0.2.0.dev0"
 description = "Transparent, sequence-centric DNA analysis workbench (research/teaching software, not experimentally validated)."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "Proprietary - all rights reserved (decision pending)" }
 authors = [{ name = "Onur Bayraktar" }]
+keywords = ["bioinformatics", "DNA", "sequence analysis", "primer design", "BLAST", "ORF", "HGVS", "cloning"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.10",
@@ -21,6 +25,9 @@ classifiers = [
 ]
 # The scientific core deliberately uses only the Python standard library.
 dependencies = []
+
+[project.urls]
+Homepage = "https://synapse-gen.com"
 
 [project.optional-dependencies]
 # Independent reference implementations used for cross-validation only.
