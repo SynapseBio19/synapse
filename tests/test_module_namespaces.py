@@ -116,6 +116,38 @@ PRIMER_NAMES = (
     'design_primers_for_restriction_site',
 )
 
+# Phase 8: analyses.mutation, recorded from 727208a before its split.
+MUTATION_NAMES = (
+    'DNA_ALPHABET', 'IUPAC_CODES', 'IUPAC_FROM_BASES', 'IUPAC_COMPLEMENT', 'CODON_TABLE',
+    'AA_NAMES', 'PURINES', 'PYRIMIDINES', 'SequencePromptCancelled',
+    'MutationAnalysisError', 'AlignmentBlock', 'Mutation', 'MutationStatistics',
+    'CodingAnalysis', 'MutationAnalysisResult', 'SequenceCoordinate', 'SequenceQuality',
+    'MutationContext', 'MutationSpectrum', 'MutationHotspot', 'RestrictionSiteImpact',
+    'MutationImpact', 'AdvancedMutationAnalysis', 'normalize_dna',
+    'normalize_iupac_sequence', 'validate_dna_sequence', 'gc_content', 'reverse_complement',
+    'reverse_complement_iupac', 'iupac_matches', 'iupac_code', 'translate_dna',
+    'amino_acid_name', '_nucleotide_match', 'BANDED_ALIGNMENT_MIN_CELLS', '_banded_align',
+    '_banded_is_exact', 'global_align', 'alignment_identity', '_full_edit_distance',
+    '_banded_edit_distance', '_edit_distance', 'sequence_similarity',
+    'build_alignment_blocks', 'is_transition', 'classify_substitution',
+    '_mutation_notation', '_make_mutation', 'detect_mutations_from_alignment',
+    '_detect_simple_indel', 'detect_mutations', 'classify_coding_substitution',
+    '_translate_canonical', '_first_difference_position', 'analyze_coding_consequences',
+    'annotate_mutations_with_coding_consequences', 'calculate_mutation_statistics',
+    'compare_sequences', 'compare_multiple_variants', '_mutation_key', 'shared_mutations',
+    'unique_mutations', 'annotate_regions', 'annotate_sequence_regions',
+    'sequence_complexity', 'sequence_quality', 'extract_mutation_context',
+    'build_mutation_spectrum', 'find_mutation_hotspots', 'normalize_indel_left',
+    'MAX_RECOMMENDED_ALIGNMENT_LENGTH', 'CODING_FRAME_ASSUMPTION', 'assess_coding_frame',
+    'orf_reference_cds', 'mutation_hgvs_c', '_reference_span', 'hgvs_c_allele',
+    'mutation_hgvs_p', 'compare_proteins', '_find_all_occurrences',
+    'restriction_site_impact', '_interval_overlap', 'primer_mutation_overlap',
+    'crispr_mutation_overlap', 'validate_mutation_result', 'format_mutation',
+    'build_mutation_report', 'mutation_signature', 'create_advanced_analysis',
+    'advanced_mutation_report', 'mutation_map', 'result_to_json', 'run_mutation_self_test',
+    'assert_mutation_self_test', 'analyze_mutations', 'mutation_report', '__all__',
+)
+
 REMOVED = {"analyses.primer": ("_V5_ACTIVE_CONFIG",)}
 
 # Phase 8 (2026-11-18): the historical _vN_ helpers were renamed; the old
@@ -159,6 +191,14 @@ class PublicModuleNamespaceTests(unittest.TestCase):
         from analyses import primer
         self._check(primer, PRIMER_NAMES)
 
+    def test_mutation_namespace(self):
+        from analyses import mutation
+        self._check(mutation, MUTATION_NAMES)
+
+    def test_mutation_all_names_exist(self):
+        from analyses import mutation
+        self._check(mutation, mutation.__all__)
+
     def test_renamed_primer_helpers(self):
         from analyses import primer
         self._check(primer, tuple(RENAMED_PRIMER_NAMES.values()))
@@ -183,9 +223,9 @@ class InternalModuleIndependenceTests(unittest.TestCase):
 
     PROBE = textwrap.dedent('''
         import importlib, json, pkgutil, sys
-        import analyses._blast, analyses._primer
+        import analyses._blast, analyses._mutation, analyses._primer
         failures = {}
-        for package in (analyses._blast, analyses._primer):
+        for package in (analyses._blast, analyses._primer, analyses._mutation):
             for info in pkgutil.iter_modules(package.__path__):
                 name = package.__name__ + "." + info.name
                 for loaded in [m for m in sys.modules if m.startswith("analyses")]:
@@ -194,7 +234,7 @@ class InternalModuleIndependenceTests(unittest.TestCase):
                     importlib.import_module(name)
                 except Exception as error:
                     failures[name] = repr(error)
-                if "analyses.blast" in sys.modules or "analyses.primer" in sys.modules:
+                if {"analyses.blast", "analyses.primer", "analyses.mutation"} & set(sys.modules):
                     failures[name] = "imports the public module"
         for loaded in [m for m in sys.modules if m.startswith("analyses")]:
             del sys.modules[loaded]

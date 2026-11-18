@@ -11,8 +11,11 @@ or an exported file fails.
 The values are recorded with ``repr`` for floats, so the comparison is
 exact. Paths are recorded relative to the project root.
 
-To rewrite the snapshot (only with a reason in docs/CHANGES.md):
-``SYNAPSE_UPDATE_CHARACTERIZATION=1 python -m unittest tests.test_characterization``
+To rewrite the snapshots (only with a reason in docs/CHANGES.md):
+``SYNAPSE_UPDATE_CHARACTERIZATION=1 python -m unittest tests.test_characterization``;
+a section name instead of ``1`` (for example ``mutation``) rewrites only
+the file of that section. Later phases add sections (``mutation.json``,
+recorded from 727208a before the mutation module was split).
 """
 
 from __future__ import annotations
@@ -180,10 +183,86 @@ def blast_scenarios() -> dict:
     return out
 
 
+# ---------------------------------------------------------------------------
+# Mutation (added in Phase 8, recorded from 727208a before its split)
+# ---------------------------------------------------------------------------
+
+def _variants(reference: str) -> dict:
+    """Variants of ``reference`` with known edits (positions are 0-based)."""
+    sub = reference[:40] + ("A" if reference[40] != "A" else "C") + reference[41:]
+    ins = reference[:90] + "GGT" + reference[90:]
+    dele = reference[:150] + reference[156:]
+    multi = sub[:200] + ("T" if sub[200] != "T" else "G") + sub[201:230] + sub[232:]
+    iupac = reference[:60] + "N" + reference[61:]
+    return {"substitution": sub, "insertion": ins, "deletion": dele, "multiple": multi, "iupac": iupac}
+
+
+def mutation_scenarios() -> dict:
+    from analyses import mutation as M
+
+    reference = _puc19()[146:446]
+    variants = _variants(reference)
+    out: dict = {}
+    results = {}
+    for name, variant in variants.items():
+        result = M.compare_sequences(reference, variant, reference_name="ref", variant_name=name)
+        results[name] = result
+        out[f"compare_{name}"] = _plain(result)
+        out[f"report_{name}"] = M.build_mutation_report(result, include_alignment=True)
+        out[f"advanced_report_{name}"] = M.advanced_mutation_report(result)
+        out[f"json_{name}"] = M.result_to_json(result)
+        out[f"validate_{name}"] = _plain(M.validate_mutation_result(result))
+        out[f"map_{name}"] = M.mutation_map(result.mutations, len(reference))
+        out[f"signature_{name}"] = _plain(M.mutation_signature(result.mutations))
+        out[f"hgvs_{name}"] = [[M.mutation_hgvs_c(m, reference), M.mutation_hgvs_p(m), M.format_mutation(m, reference)]
+                               for m in result.mutations]
+        if result.mutations:
+            out[f"allele_{name}"] = M.hgvs_c_allele(result.mutations, reference)
+            out[f"context_{name}"] = _plain(M.extract_mutation_context(result.mutations[0], reference, variant))
+        out[f"restriction_{name}"] = _plain(M.restriction_site_impact(
+            reference, variant, {"EcoRI": "GAATTC", "BamHI": "GGATCC", "HindIII": "AAGCTT", "PstI": "CTGCAG"}))
+        out[f"primers_{name}"] = _plain(M.primer_mutation_overlap(result.mutations, [("fwd", 30, 50), ("rev", 140, 160)]))
+        out[f"regions_{name}"] = _plain(M.annotate_regions(result.mutations, {"a": (0, 100), "b": (100, 300)}))
+    multiple = M.compare_multiple_variants(reference, list(variants.values()))
+    out["compare_multiple"] = _plain(multiple)
+    out["shared"] = _plain(M.shared_mutations(multiple))
+    out["unique"] = _plain(M.unique_mutations(results["multiple"], [results["substitution"]]))
+    out["spectrum"] = _plain(M.build_mutation_spectrum(results["multiple"].mutations))
+    out["hotspots"] = _plain(M.find_mutation_hotspots(results["multiple"].mutations, len(reference), window_size=30,
+                                                      minimum_mutations=1))
+    out["statistics"] = _plain(M.calculate_mutation_statistics(results["multiple"].mutations,
+                                                                reference_length=len(reference)))
+    out["quality"] = _plain(M.sequence_quality(reference + "AAAAAAAAAAAAAAAAAAAA"))
+    out["indel_left"] = _plain(M.normalize_indel_left("ACGTTTTACG", "ACGTTTACG", 6, "T", ""))
+    out["alignment"] = _plain(M.global_align(reference[:80], variants["multiple"][:85]))
+    out["similarity"] = _plain(M.sequence_similarity(reference, variants["deletion"]))
+    out["detect"] = _plain(M.detect_mutations(reference, variants["insertion"]))
+    out["coding_frame"] = _plain(M.assess_coding_frame("ATGAAACCCGGGTTTTAA"))
+    out["proteins"] = _plain(M.compare_proteins("MKVLLAAGG", "MKVLPAAG"))
+    out["advanced"] = _plain(M.create_advanced_analysis(results["multiple"]))
+    out["self_test"] = _plain(M.run_mutation_self_test())
+    return out
+
+
+SECTIONS = {
+    SNAPSHOT: {"primer": primer_scenarios, "blast": blast_scenarios},
+    PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "mutation.json": {"mutation": mutation_scenarios},
+}
+
+
 def all_scenarios() -> dict:
     return {"primer": primer_scenarios(), "blast": blast_scenarios()}
 
 
-def write_snapshot() -> None:
-    SNAPSHOT.parent.mkdir(parents=True, exist_ok=True)
-    SNAPSHOT.write_text(json.dumps(all_scenarios(), indent=1, sort_keys=True) + "\n", encoding="utf-8")
+def snapshot_for(section: str) -> Path:
+    return next(path for path, sections in SECTIONS.items() if section in sections)
+
+
+def write_snapshot(only: str = "") -> None:
+    """Rewrite the snapshot files; ``only`` limits it to one section's file."""
+    for path, sections in SECTIONS.items():
+        if only and only not in sections:
+            continue
+        path.parent.mkdir(parents=True, exist_ok=True)
+        data = {name: function() for name, function in sections.items()}
+        path.write_text(json.dumps(data, indent=1, sort_keys=True) + "\n", encoding="utf-8")

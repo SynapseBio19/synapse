@@ -67,6 +67,8 @@ class BandedAlignmentTests(unittest.TestCase):
     def test_banded_and_full_alignments_are_identical(self):
         from unittest import mock
         from analyses import mutation as M
+        # Patch the module that reads the constant (Phase 8 split).
+        from analyses._mutation import alignment as ALIGNMENT
         rng = random.Random(11)
         for trial in range(150):
             length = rng.randint(20, 300)
@@ -76,9 +78,9 @@ class BandedAlignmentTests(unittest.TestCase):
             else:
                 variant = self._mutate(rng, reference, rng.randint(0, length // 4 + 1))
             with self.subTest(trial=trial):
-                with mock.patch.object(M, "BANDED_ALIGNMENT_MIN_CELLS", 10 ** 12):
+                with mock.patch.object(ALIGNMENT, "BANDED_ALIGNMENT_MIN_CELLS", 10 ** 12):
                     full = M.global_align(reference, variant)
-                with mock.patch.object(M, "BANDED_ALIGNMENT_MIN_CELLS", 0):
+                with mock.patch.object(ALIGNMENT, "BANDED_ALIGNMENT_MIN_CELLS", 0):
                     banded = M.global_align(reference, variant)
                 self.assertEqual(banded, full)
 

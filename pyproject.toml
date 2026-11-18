@@ -31,9 +31,9 @@ structure = ["ViennaRNA>=2.6"]
 dev = ["pyright[nodejs]==1.1.414", "ruff==0.14.4", "coverage>=7.10"]
 
 [tool.setuptools]
-# analyses._blast and analyses._primer: internal packages of analyses.blast
-# and analyses.primer (Phase 7.1).
-packages = ["analyses", "analyses._blast", "analyses._primer", "core", "data", "fileio", "ui"]
+# analyses._blast, analyses._primer (Phase 7.1) and analyses._mutation
+# (Phase 8): internal packages of the public modules of the same name.
+packages = ["analyses", "analyses._blast", "analyses._primer", "analyses._mutation", "core", "data", "fileio", "ui"]
 
 
 [tool.pyright]
@@ -58,3 +58,4 @@ extend-exclude = ["LEGACY", "Synapse_Website", ".tools"]
 # packages (Phase 7.1); the imports are the interface, not unused code.
 "analyses/blast.py" = ["F401"]
 "analyses/primer.py" = ["F401"]
+"analyses/mutation.py" = ["F401"]

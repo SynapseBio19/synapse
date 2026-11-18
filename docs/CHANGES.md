@@ -2794,3 +2794,51 @@ reference tests decide whether a change alters a result.
 - **Evidence.** The characterization snapshot (78 scenarios), the golden
   master, the screen-equivalence tests and the suite are unchanged: 603
   tests, 0 failures on 3.14.6 and 3.10.11.
+
+### Package C: `analyses/mutation.py` split into `analyses/_mutation/`
+
+- **Before.** One module of 4,670 lines.
+- **After.** `analyses/mutation.py` (about 280 lines) is the public module.
+  It keeps its docstring, `__all__` and the entry block, and re-exports
+  all 97 names it defined.
+- **The 11 modules of `analyses/_mutation/`.** `sequence`, `models`,
+  `alignment`, `detection`, `coding`, `hgvs`, `comparison`, `context`,
+  `impact`, `reporting`, `selftest`. No import cycle.
+  - `detect_mutations` (alignment, calls, coding consequences and
+    statistics in one result) sits in `comparison`, next to
+    `compare_sequences`. In `detection` it would have formed a cycle with
+    the statistics.
+- **How.** Same script and checks as Phase 7.1. All 99 statements were
+  found verbatim.
+- **Characterization first.** New section `mutation` in
+  `tests/characterization.py` with the snapshot
+  `tests/fixtures/characterization/mutation.json` (79 scenarios, recorded
+  from `727208a` before the split). It covers:
+  - five variant types and their reports, JSON, HGVS and alleles;
+  - context, restriction and primer impact, regions;
+  - variant sets, spectrum, hotspots, statistics, quality;
+  - left normalization, alignment, the coding frame, proteins;
+  - the advanced analysis and the self-test.
+- **Namespace.** `test_module_namespaces` now also guards the 97 names
+  and `__all__` of `analyses.mutation`. The independence test includes
+  `analyses._mutation`.
+- **A test that would have passed vacuously.**
+  `test_alignment_memory.test_banded_and_full_alignments_are_identical`
+  patched `analyses.mutation.BANDED_ALIGNMENT_MIN_CELLS`. After the move
+  that patch no longer reaches the alignment, and the test would have
+  compared the banded path with itself. It now patches
+  `analyses._mutation.alignment`.
+- **Snapshot comparison across interpreters.**
+  - CPython 3.10.11 and 3.14.6 on Windows differ in the last digit of
+    `math.log2`.
+  - `sequence_complexity` of one variant gives 98.82341858018908 on 3.10
+    and 98.82341858018907 on 3.14, with the unchanged code of `727208a`
+    on both.
+  - `tests/test_characterization.py` now compares floats with a relative
+    tolerance of 1e-12. Everything else is still compared exactly, and a
+    difference of 1e-9 is still reported.
+- **Packaging and lint.** `pyproject.toml` lists `analyses._mutation`;
+  `analyses/mutation.py` ignores F401.
+- **Results.** Unchanged: snapshot, golden master, rendered menus, the
+  Mutalyzer HGVS reference test and the full suite. 606 tests, 0 failures
+  on 3.14.6 and 3.10.11.
