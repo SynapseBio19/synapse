@@ -80,9 +80,11 @@ jobs:
         run: |
           python -m coverage run --branch --source=analyses,core,ui,fileio,data,main -m unittest discover -s tests -t . -v 2>&1 | tee test-output.txt
           test ${PIPESTATUS[0]} -eq 0
-      - name: Only the benchmark may skip
+      # Only the opt-in benchmark and the opt-in refseq_rna searches (about 80 GB
+      # database) may skip here.
+      - name: Only the opt-in tests may skip
         if: always()
-        run: python scripts/ci/check_skips.py test-output.txt --only "SYNAPSE_BENCHMARK=1"
+        run: python scripts/ci/check_skips.py test-output.txt --only "SYNAPSE_BENCHMARK=1" --only "SYNAPSE_REFSEQ_RNA_TESTS=1"
       - name: Coverage report
         if: always()
         run: python -m coverage report --sort=cover | tee -a "$GITHUB_STEP_SUMMARY"

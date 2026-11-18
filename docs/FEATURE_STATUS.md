@@ -503,7 +503,7 @@ explicitly not implemented.
 | Validation | Blocker | Route |
 |---|---|---|
 | NEBcutter comparison | Web application without an interface | Substance covered by validations 1, 2, 13, 14 |
-| Local BLAST on a real database | `swissprot` about 0.5 GB | Owner approval for the download |
+| Local BLAST on a real database | Done 2026-11-18 against the owner's `refseq_rna` (21 volumes, 81 GB, VERIFIED): `tests/test_blast_refseq_rna.py` (opt-in, 4 searches) passed. It found and fixed the E = 0 parsing defect and the runtime views left behind (`docs/CHANGES.md`, Phase 8, G/H) | Protein databases (`swissprot`) not yet run locally |
 | Instability weight KQ | Guruprasad et al. 1990 not freely accessible | Read Table I of the paper |
 | ORFs across the origin vs ORFfinder | ORFfinder's web form treats sequences as linear | Standalone ORFfinder (Linux) or a curated circular set |
 | Running bcftools itself | No Windows build; WSL not installed | WSL or Linux (approval) |

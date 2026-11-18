@@ -743,6 +743,12 @@ class LocalBlastDatabaseManager:
                         continue
 
                     parts = relative.parts
+                    # Synapse's own temporary views (synapse_blast_runtime_*,
+                    # synapse_blast_verify_*) are not databases. One left
+                    # behind by an interrupted search would otherwise be
+                    # listed as a second copy of the database (2026-11-18).
+                    if any(part.startswith("synapse_blast_") for part in parts[:-1]):
+                        continue
                     # Ignore any marker physically stored inside a numbered
                     # volume directory. Such files belong to the parent
                     # database and must not create a second database entry.

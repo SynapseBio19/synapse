@@ -263,5 +263,108 @@ class LocalEngineTests(unittest.TestCase):
         self.assertEqual(len(calls), 1)
 
 
+class RuntimeViewCleanupTests(unittest.TestCase):
+    """Synapse's temporary BLAST views do not outlive a search (2026-11-18).
+
+    For nested multi-volume databases the local engine builds a runtime
+    alias view (hard links) in ``synapse_blast_runtime_*`` next to the
+    database. It was never removed. The owner's refseq_rna folder held one
+    from 28 October, which the database manager then listed as a second
+    81-GB database ("refseq_rna/synapse_blast_runtime_.../refseq_rna").
+    """
+
+    def setUp(self):
+        self.root = Path(tempfile.mkdtemp(prefix="synapse_db_"))
+        self.addCleanup(lambda: __import__("shutil").rmtree(self.root, ignore_errors=True))
+        (self.root / "mydb").mkdir()
+        self.database = B.LocalBlastDatabase(name="mydb", database_type="nucleotide",
+                                             path=str(self.root / "mydb" / "mydb"),
+                                             installed=True, structurally_valid=True)
+
+    def _run(self, outcome):
+        def fake_alias(database, runtime_directory):
+            (Path(runtime_directory) / "mydb.nal").write_text("TITLE x\n")
+            return "mydb", Path(runtime_directory)
+
+        def fake_run(command, **options):
+            if isinstance(outcome, BaseException):
+                raise outcome
+            Path(command[command.index("-out") + 1]).write_text(EMPTY_XML, encoding="utf-8")
+            return subprocess.CompletedProcess(command, 0, stdout="", stderr="")
+
+        engine = B.LocalBlastEngine(_FakeExecutables())  # type: ignore[arg-type]
+        query = B.build_query("ACGT" * 60, name="q")
+        with mock.patch.object(local_engine, "_needs_runtime_blast_alias", return_value=True), \
+                mock.patch.object(local_engine, "_create_runtime_blast_alias", side_effect=fake_alias), \
+                mock.patch.object(local_engine.subprocess, "run", side_effect=fake_run):
+            return engine.run(query, B.BlastParameters(program="blastn"), self.database)
+
+    def _leftovers(self):
+        return sorted(p.name for p in self.root.rglob("synapse_blast_runtime_*"))
+
+    def test_the_view_is_removed_after_a_search(self):
+        self._run(None)
+        self.assertEqual(self._leftovers(), [])
+
+    def test_the_view_is_removed_after_a_failed_search(self):
+        with self.assertRaises(B.BlastAnalysisError):
+            self._run(OSError("denied"))
+        self.assertEqual(self._leftovers(), [])
+
+    def test_leftover_views_are_not_listed_as_databases(self):
+        # A view left behind by an interrupted search (or by Synapse before
+        # this fix) must not appear as a database of its own.
+        for prefix in ("synapse_blast_runtime_abc", "synapse_blast_verify_abc"):
+            view = self.root / "mydb" / prefix
+            view.mkdir()
+            (view / "mydb.nal").write_text("TITLE view\nDBLIST mydb\n")
+        (self.root / "mydb" / "mydb.nal").write_text("TITLE real\nDBLIST mydb\n")
+        names = [db.name for db in B.LocalBlastDatabaseManager(self.root).list_databases()]
+        self.assertIn("mydb", names)
+        self.assertEqual([n for n in names if "synapse_blast_" in n], [])
+
+
+class ZeroEvalueTests(unittest.TestCase):
+    """BLAST reports E = 0 for its strongest matches (found 2026-11-18).
+
+    The parser read ``Hsp_evalue`` with ``... or math.inf``, so an E-value of
+    exactly 0 became infinity. A perfect 400-nt GAPDH match against the
+    owner's refseq_rna was then reported as NOT_SIGNIFICANT, ranked behind
+    every weaker hit and exported as the invalid JSON token ``Infinity``.
+    """
+
+    def _run(self):
+        perfect = _blast_xml(1, 400, 400, "0", "A" * 400, "A" * 400)
+        weaker = _blast_xml(1, 400, 400, "1e-5", "A" * 400, "A" * 400).replace("X1", "X2")
+        hits = perfect.split("<Iteration_hits>")[1].split("</Iteration_hits>")[0]
+        xml = weaker.replace("<Iteration_hits>", "<Iteration_hits>" + hits, 1)
+        query = B.build_query("A" * 400, name="q")
+        return B.parse_blast_xml(xml, query=query, rid="T", parameters=B.BlastParameters(),
+                                 submitted_at="2026-01-01T00:00:00+00:00")
+
+    def test_zero_is_kept(self):
+        run = self._run()
+        perfect = next(hit for hit in run.hits if hit.accession == "X1")
+        self.assertEqual(perfect.best_evalue, 0.0)
+        self.assertNotEqual(B.calculate_evidence_score(perfect).evidence_band, "NOT_SIGNIFICANT")
+
+    def test_the_perfect_hit_ranks_first_and_counts_as_significant(self):
+        run = self._run()
+        self.assertEqual([hit.accession for hit in B.rank_hits(run.hits)], ["X1", "X2"])
+        self.assertEqual(run.significant_hit_count, 2)
+
+    def test_the_export_is_valid_json(self):
+        import json
+        text = B.run_to_json(self._run())
+        self.assertNotIn("Infinity", text)
+        json.loads(text, parse_constant=lambda token: self.fail(f"invalid JSON token {token}"))
+
+    def test_a_missing_evalue_is_still_infinite(self):
+        xml = _blast_xml(1, 50, 50, "", "A" * 50, "A" * 50)
+        run = B.parse_blast_xml(xml, query=B.build_query("A" * 50, name="q"), rid="T",
+                                parameters=B.BlastParameters(), submitted_at="2026-01-01T00:00:00+00:00")
+        self.assertEqual(run.hits[0].best_evalue, float("inf"))
+
+
 if __name__ == "__main__":
     unittest.main()

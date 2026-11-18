@@ -56,12 +56,21 @@ def _to_float(value: str, default: Optional[float] = None) -> Optional[float]:
 # BLAST XML PARSER
 # ============================================================================
 
+def _evalue_or_infinity(text: str) -> float:
+    """The E-value in ``text``; infinity if it is missing or not a number."""
+    value = _to_float(text)
+    return math.inf if value is None or math.isnan(value) else value
+
+
 def _parse_hsp(hsp_element: ET.Element) -> BlastHSP:
     return BlastHSP(
         number=_to_int(_child_text(hsp_element, "Hsp_num"), 1) or 1,
         bit_score=_to_float(_child_text(hsp_element, "Hsp_bit-score"), 0.0) or 0.0,
         raw_score=_to_float(_child_text(hsp_element, "Hsp_score")),
-        evalue=_to_float(_child_text(hsp_element, "Hsp_evalue"), math.inf) or math.inf,
+        # BLAST reports E = 0 for its strongest matches. A missing or unreadable
+        # value is infinite; 0 must stay 0 (it became infinity with "or" until
+        # 2026-11-18, which ranked perfect hits last as NOT_SIGNIFICANT).
+        evalue=_evalue_or_infinity(_child_text(hsp_element, "Hsp_evalue")),
         query_start=_to_int(_child_text(hsp_element, "Hsp_query-from"), 0) or 0,
         query_end=_to_int(_child_text(hsp_element, "Hsp_query-to"), 0) or 0,
         subject_start=_to_int(_child_text(hsp_element, "Hsp_hit-from"), 0) or 0,

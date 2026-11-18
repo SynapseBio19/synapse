@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+from contextlib import ExitStack
 import re
+import shutil
 import subprocess
 import tempfile
 from datetime import datetime, timezone
@@ -101,7 +103,9 @@ class LocalBlastEngine:
             email=parameters.email,
         )
 
-        with tempfile.TemporaryDirectory(prefix="synapse_blast_") as temp_dir:
+        # The ExitStack removes the runtime alias view (below) when the search
+        # ends, also after an error. Before 2026-11-18 it was never removed.
+        with tempfile.TemporaryDirectory(prefix="synapse_blast_") as temp_dir, ExitStack() as cleanup:
             temp = Path(temp_dir)
             query_file = temp / "query.fasta"
             output_file = temp / "result.xml"
@@ -125,6 +129,8 @@ class LocalBlastEngine:
                         dir=str(runtime_parent),
                     )
                 )
+                # Hard links only: removing them leaves the database untouched.
+                cleanup.callback(shutil.rmtree, runtime_directory, ignore_errors=True)
                 database_reference, database_working_directory = _create_runtime_blast_alias(
                     database, runtime_directory
                 )

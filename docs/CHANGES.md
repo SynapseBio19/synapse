@@ -2904,3 +2904,82 @@ reference tests decide whether a change alters a result.
   next to itself (`examples/`), and they are not part of the installed
   package. A console script needs the examples packaged as data and
   `main` moved into a package.
+
+### Package G: local BLAST left its runtime views behind (defect, fixed)
+
+- **Found** on 2026-11-18, when the owner copied the real `refseq_rna`
+  database (21 volumes, 81 GB) into `data/blast_db/`.
+- **Defect.**
+  - For nested multi-volume databases, `LocalBlastEngine.run` builds a
+    runtime alias view of hard links in `synapse_blast_runtime_*` next to
+    the database. It never removed it. (`verify_database` does the same in
+    a `TemporaryDirectory` and cleans up.)
+  - The owner's folder held one from 28 October: 155 hard links and an
+    alias file. The database manager then listed it as a second 81-GB
+    database, `refseq_rna/synapse_blast_runtime_s3lx6pw3/refseq_rna`.
+- **Fix.**
+  - `analyses/_blast/local_engine.py` registers the view in an
+    `ExitStack`, which removes it when the search ends, also after an
+    error. Removing hard links leaves the database files untouched.
+  - `analyses/_blast/databases.py` no longer lists anything inside a
+    `synapse_blast_*` directory as a database. A view left by an
+    interrupted search therefore cannot appear as a database again.
+- **Evidence.** New `RuntimeViewCleanupTests` (3 tests in
+  `tests/test_blast_components.py`) cover a successful search, a failed
+  search and discovery. All three failed on the code before the fix.
+- **Owner's data.**
+  - The stale view was removed after checking that every file in it was a
+    hard link to a file in `refseq_rna.NN/` (the same file ID). The one
+    exception was the view's own alias file.
+  - `verify_database("refseq_rna")` afterwards: VERIFIED, 83,968,556
+    sequences, 249,422,900,906 bases, BLASTDB version 5, dated 30 Sep 2026.
+- **Also removed (owner's request).** `data/blast_db/local_test`, a
+  byte-identical copy of the tracked `data/local_test`, which the tests
+  use. It was sent to the Recycle Bin.
+
+### Package H: an E-value of 0 was read as infinity (scientific defect, fixed)
+
+- **Found** by the first real searches against the owner's `refseq_rna`
+  on 2026-11-18. A 400-nt fragment of human GAPDH mRNA (NM_002046.7, nt
+  301-700) matched its transcripts with 100 % identity and coverage, yet
+  Synapse reported E = infinity and the band `NOT_SIGNIFICANT`.
+- **Cause.** `_parse_hsp` read
+  `_to_float(Hsp_evalue, math.inf) or math.inf`. BLAST reports E = 0 for
+  its strongest matches, and `0 or math.inf` is infinity.
+- **Effect, for remote and local searches alike.** Every hit with E = 0:
+  - was reported as `NOT_SIGNIFICANT`;
+  - was not counted among the significant hits;
+  - was ranked behind every weaker hit (`rank_hits` sorts by E-value);
+  - was exported as `Infinity`, which is not valid JSON.
+
+  The evidence score itself already treated E <= 0 as the strongest case;
+  the parser never passed it on.
+- **Fix.** `_evalue_or_infinity` in `analyses/_blast/parsing.py`. A missing
+  or unreadable value is still infinite; 0 stays 0.
+- **Evidence.**
+  - `ZeroEvalueTests` (4 tests): three of them failed before the fix (the
+    perfect hit ranked behind a hit with E = 1e-5).
+  - The same refseq_rna search after the fix: E = 0.0, band
+    `VERY_STRONG_SEQUENCE_EVIDENCE`.
+  - Characterization snapshot and golden master unchanged: their XML
+    contains no E = 0.
+
+### Package I: opt-in searches against a real refseq_rna
+
+`tests/test_blast_refseq_rna.py` (4 tests) runs Synapse's local engine
+against an installed, verified `refseq_rna`, with the GAPDH query above.
+It runs only with `SYNAPSE_REFSEQ_RNA_TESTS=1` (about 15 minutes). It
+checks:
+- the exact fragment: human GAPDH, 100 %/100 %, E = 0, a significant band;
+- three substitutions: 99.25 %;
+- the reverse complement: a minus-strand hit;
+- a 22-nt query: no hit in the standard search, found by the blastn-short
+  rescue;
+- that no runtime view is left behind.
+
+The CI reference job allows this skip next to the benchmark. Without
+that, its gate would fail, which was checked with `check_skips.py`.
+
+Timing on the owner's machine: about 190 s per 400-nt search, and 444 s
+for the 22-nt query (standard search plus rescue). blastn used about 7 GB
+of memory.
