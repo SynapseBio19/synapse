@@ -4020,8 +4020,14 @@ def _v5_structure_penalty(stem: int, low: int, high: int) -> float:
     return 30.0 * (stem - low) / float(high - low)
 
 
-def _v5_candidate_quality(item) -> float:
-    """Score a candidate while strongly penalizing structural risk."""
+def _v5_candidate_quality(item, config) -> float:
+    """Score a candidate while strongly penalizing structural risk.
+
+    ``config`` is the ProfessionalPrimerConfig of the design. Before Phase 7.1
+    it was read from a module global that the candidate generator set on
+    every call (``_V5_ACTIVE_CONFIG``); both callers already held the same
+    object as their ``config`` argument.
+    """
     profile = item.thermodynamics
     candidate = item.candidate
 
@@ -4033,10 +4039,10 @@ def _v5_candidate_quality(item) -> float:
 
     # Prefer primers close to the configured optimum, but structure dominates.
     tm_error = abs(
-        float(profile.tm_C) - float(_V5_ACTIVE_CONFIG.primer.optimal_tm)
+        float(profile.tm_C) - float(config.primer.optimal_tm)
     )
     gc_error = abs(
-        float(candidate.gc_percent) - float(_V5_ACTIVE_CONFIG.primer.optimal_gc)
+        float(candidate.gc_percent) - float(config.primer.optimal_gc)
     )
 
     penalty = (
@@ -4052,9 +4058,6 @@ def _v5_candidate_quality(item) -> float:
         - gc_error
     )
 
-
-# Bind the V5 implementations.
-_V5_ACTIVE_CONFIG = ProfessionalPrimerConfig()
 
 
 # ============================================================================
@@ -4142,11 +4145,8 @@ def _v7_generate_professional_primer_candidates(
     config=None,
 ):
     """Generate a complete professional candidate pool for any Tm model."""
-    global _V5_ACTIVE_CONFIG
-
     config = config or ProfessionalPrimerConfig()
     config.validate()
-    _V5_ACTIVE_CONFIG = config
 
     base_config = config.primer
     relaxed = _v6_relaxed_generation_config(base_config)
@@ -4249,7 +4249,7 @@ def _v7_screening_score(candidate: PrimerCandidate, config) -> float:
         candidate, conditions=config.thermodynamics,
     )
     advanced = _v7_apply_selected_tm_model(advanced, candidate, config)
-    return float(_v5_candidate_quality(advanced))
+    return float(_v5_candidate_quality(advanced, config))
 
 
 def _v7_screening_upper_bound(sequence, orientation, start, end, config, relaxed, profile=None) -> float:
@@ -4326,7 +4326,7 @@ def _v7_measure_candidates(candidates, config):
         advanced.screening_tier = _v7_tm_tier(
             float(advanced.thermodynamics.tm_C), base_config,
         )
-        advanced.screening_score = _v5_candidate_quality(advanced)
+        advanced.screening_score = _v5_candidate_quality(advanced, config)
         measured.append(advanced)
 
     measured.sort(

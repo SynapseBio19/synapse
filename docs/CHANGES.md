@@ -2582,3 +2582,28 @@ stays Coming Soon). Audit: `docs/PHASE71_ARCHITECTURE_AUDIT.md`.
   interface.
 - **Results.** Unchanged: characterization snapshot, golden master,
   rendered menus and the full suite.
+
+### Package C, step 1: the primer screen without a hidden global (F3)
+
+- **Before.**
+  - `_v7_generate_professional_primer_candidates` wrote the design's
+    configuration into the module global `_V5_ACTIVE_CONFIG`.
+  - `_v5_candidate_quality` read the optimum Tm and GC from it, so a score
+    depended on the last design that ran.
+  - Two tests set the global from outside.
+- **After.** `_v5_candidate_quality(item, config)` takes the
+  configuration as an argument. Its two callers, `_v7_screening_score` and
+  `_v7_measure_candidates`, pass the `config` they already received; on
+  every public path it was the object the global held. The global is
+  removed.
+- **Evidence.**
+  - The characterization snapshot is unchanged: professional design under
+    all three Tm models and high salt, restriction-site design, the
+    self-tests.
+  - The screen-equivalence tests pass.
+  - New `tests/test_primer_screen_configuration.py` (3 tests): the
+    optimum of the given configuration is used, an earlier design no
+    longer changes a later score, and the module keeps no active
+    configuration.
+- **Tests changed.** `test_primer_corrections` passes the configuration;
+  `test_primer_screen_equivalence` no longer sets the global.

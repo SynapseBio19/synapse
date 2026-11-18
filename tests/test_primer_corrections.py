@@ -17,9 +17,12 @@ import unittest
 from analyses import primer as P
 
 
+# The configuration of the screen; passed explicitly since Phase 7.1 (F3).
+CONFIG = P.ProfessionalPrimerConfig()
+
+
 def _advanced(primer: str) -> P.AdvancedPrimerCandidate:
-    config = P.ProfessionalPrimerConfig()
-    P._V5_ACTIVE_CONFIG = config
+    config = CONFIG
     relaxed = P._v6_relaxed_generation_config(config.primer)
     candidate = P._make_candidate(primer, "FORWARD", 0, len(primer), relaxed, config.tm_method)
     advanced = P.analyze_primer_candidate_thermodynamics(candidate, conditions=config.thermodynamics)
@@ -40,7 +43,7 @@ class StructuralPenaltyTests(unittest.TestCase):
         )
         # _v5_structure_penalty(8, 3, 8) is the full 30 points.
         self.assertAlmostEqual(
-            P._v5_candidate_quality(without_stem) - P._v5_candidate_quality(advanced), 30.0)
+            P._v5_candidate_quality(without_stem, CONFIG) - P._v5_candidate_quality(advanced, CONFIG), 30.0)
 
     def test_a_self_dimer_stem_lowers_the_screening_score(self):
         advanced = _advanced("ATGAATTCATGCAGGTCAAG")
@@ -56,7 +59,7 @@ class StructuralPenaltyTests(unittest.TestCase):
         expected = P._v5_structure_penalty(stem, 4, 9)
         self.assertGreater(expected, 0.0)
         self.assertAlmostEqual(
-            P._v5_candidate_quality(without_stem) - P._v5_candidate_quality(advanced), expected)
+            P._v5_candidate_quality(without_stem, CONFIG) - P._v5_candidate_quality(advanced, CONFIG), expected)
 
 
 class PairAssessmentExportTests(unittest.TestCase):

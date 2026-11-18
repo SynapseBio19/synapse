@@ -199,7 +199,6 @@ class TieredScreenTests(unittest.TestCase):
         rng = random.Random(6)
         for method in ("nearest_neighbor", "wallace", "salt_adjusted"):
             config = self._config(method, {}, {})
-            P._V5_ACTIVE_CONFIG = config
             relaxed = P._v6_relaxed_generation_config(config.primer)
             sequence = "".join(rng.choice("ACGT") for _ in range(400))
             for _ in range(150):
