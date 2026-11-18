@@ -47,6 +47,19 @@ cd synapse
 python main.py
 ```
 
+Or install it as a command (the package is called `synapse-gen`, the
+command `synapse`):
+
+```bash
+python -m pip install .
+synapse
+```
+
+An installed Synapse keeps logs, exports and local BLAST databases in a
+per-user folder (`%LOCALAPPDATA%\Synapse` on Windows,
+`~/.local/share/synapse` elsewhere); run from the source folder it uses
+the project folder, as before (see Configuration).
+
 Optional, for the reference comparisons in the test suite:
 
 ```bash
@@ -93,7 +106,7 @@ calculation is visible in this repository.
 python main.py
 ```
 
-Load a FASTA or GenBank file (Enter loads `examples/dna.fasta`), choose a
+Load a FASTA or GenBank file (Enter loads the example `data/examples/dna.fasta`), choose a
 record, then an analysis. A record's type (DNA, RNA or protein) is taken
 from the file when it states one and otherwise from its letters; when the
 letters cannot decide, Synapse asks rather than guesses. Positions shown
@@ -106,7 +119,7 @@ Every analysis is also available without the menus, through `core.api`:
 ```python
 from core import api
 
-records = api.load_records("examples/dna.fasta")
+records = api.load_records("data/examples/dna.fasta")
 orfs = api.find_orfs(records[0])
 print(orfs.parameters, orfs.data["candidate_count"])
 digest = api.restriction_digest(records[0], ["EcoRI", "BamHI"])
@@ -125,10 +138,11 @@ The environment variables below configure the session:
 
 | Variable | Effect |
 |---|---|
-| `SYNAPSE_LOG_DIR` | Directory for log files (default `logs/`) |
+| `SYNAPSE_HOME` | Synapse's folder for logs, exports and BLAST databases (default: the project folder from source, a per-user folder when installed) |
+| `SYNAPSE_LOG_DIR` | Directory for log files (default `logs/` in Synapse's folder) |
 | `SYNAPSE_EXPORT_DIR` | Directory for CRISPR exports (default `exports/crispr/`; a configured directory gets a `crispr/` subdirectory) |
 | `SYNAPSE_BLAST_BIN`, `NCBI_BLAST_BIN`, `BLAST_HOME`, `NCBI_BLAST_HOME` | Where to look for BLAST+ executables |
-| `SYNAPSE_BLAST_DB_ROOT` | Root directory of local BLAST databases |
+| `SYNAPSE_BLAST_DB_ROOT` | Root directory of local BLAST databases (default `data/blast_db` from source, `blast_db` in the per-user folder when installed). NCBI databases are large (swissprot 0.4 GB, refseq_rna about 81 GB, core_nt about 308 GB); keep them outside cloud-synchronized folders such as OneDrive. The database manager shows the size and the free space before a download |
 | `SYNAPSE_NCBI_EMAIL`, `SYNAPSE_NCBI_TOOL`, `SYNAPSE_NCBI_API_KEY` | Identification sent to NCBI, as NCBI asks of API users |
 | `SYNAPSE_OPENALEX_EMAIL`, `SYNAPSE_CROSSREF_EMAIL` | Contact address for OpenAlex and Crossref |
 

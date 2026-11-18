@@ -3084,3 +3084,66 @@ values). No defect found:
   real swissprot metadata file as a fixture (SOURCE.md).
 - **Interface.** The new names are exported by `analyses.blast`; the
   menu imports them from there.
+
+### Package D: an installable `synapse` command, and no user files in site-packages
+
+- **Before.** `pip install .` installed the packages but no way to start
+  the session: `main.py` was not packaged, and the example FASTA lived
+  outside any package. An installed Synapse would also have written into
+  `site-packages`:
+  - logs to `site-packages/logs`;
+  - session exports to `site-packages/exports`;
+  - the default BLAST database root, `site-packages/data/blast_db`
+    (`_resolve_default_local_db_root` found the installed `data`
+    package).
+- **New `core/paths.py`.**
+  - From the source folder (detected by `pyproject.toml` next to the
+    packages), Synapse's folder is the project folder, as before.
+  - Installed, it is a per-user folder: `%LOCALAPPDATA%\Synapse`, or
+    `$XDG_DATA_HOME/synapse` (`~/.local/share/synapse`) elsewhere.
+  - `SYNAPSE_HOME` overrides it; `SYNAPSE_LOG_DIR` and
+    `SYNAPSE_BLAST_DB_ROOT` still win for their own files.
+  - Logs, exports, relative paths and the BLAST root use it.
+- **The session moved.** `main.py` -> `synapse_gen/app.py` (`git mv`).
+  - `main.py` is now a launcher: `import main` returns the app module
+    itself, so `main.main()` and patches of `main` keep working.
+  - New `cli()` wraps `main()`. When the input ends (Ctrl+Z / Ctrl+D or
+    the end of piped input) or on Ctrl+C, the session now ends with a note
+    instead of a traceback (exit code 0, or 130 for Ctrl+C).
+  - `[project.scripts] synapse = "synapse_gen.app:cli"`, plus
+    `python -m synapse_gen`.
+- **The example moved.** `examples/dna.fasta` -> `data/examples/dna.fasta`,
+  installed as package data. `examples/crispr_batch_test.fasta` stays,
+  because CRISPR is excluded.
+- **Found while doing this.**
+  1. `_test_default_database_root_resolution` only accepted a root ending
+     in `data/blast_db`. With the owner's `SYNAPSE_BLAST_DB_ROOT` (set on
+     2026-11-18), the BLAST self-test, and with it the suite, would have
+     failed in every new terminal. It now checks the exact expected root
+     for each configuration, and that the root is never inside the
+     `analyses` package.
+  2. The suite depended on the user's environment. `tests/__init__.py` now
+     removes `SYNAPSE_BLAST_DB_ROOT`, `SYNAPSE_HOME`, `SYNAPSE_LOG_DIR` and
+     the NCBI identification variables. It keeps them in
+     `USER_ENVIRONMENT` for the opt-in refseq_rna test, which needs the
+     real database folder.
+  3. My own Phase 8 change to the CI import check put
+     `["all_passed"]` inside a double-quoted `python -c "..."`, which ends
+     the shell string. It was corrected to `['all_passed']`. The step is
+     now verified by running the workflow's lines exactly as written
+     (extracted from the YAML) against a clean installation.
+- **Tests.**
+  - `tests/test_app_entry.py` (4): the launcher, the clean ends, the
+    declared command.
+  - `StorageLocationTests` (5, in `test_blast_components`): source folder,
+    installed, precedence of the settings, logs, the packaged example.
+  - The tests that scan or start `main.py` now read
+    `synapse_gen/app.py` where they check the session's code.
+- **Verified on a fresh installation.** In a new virtual environment with
+  a non-editable install:
+  - `synapse` starts and loads the bundled example;
+  - logs land in `SYNAPSE_HOME/logs`;
+  - the CI import step passes.
+- **Not changed.** CRISPR exports still default to the project folder
+  (`analyses/crispr.py`, excluded); set `SYNAPSE_EXPORT_DIR` when
+  Synapse is installed.

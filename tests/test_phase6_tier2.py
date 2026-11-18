@@ -936,7 +936,7 @@ class MainEntryPointTests(unittest.TestCase):
 
     def test_module_level_flow_is_behind_the_guard(self):
         import ast
-        tree = ast.parse((PROJECT_ROOT / "main.py").read_text(encoding="utf-8"))
+        tree = ast.parse((PROJECT_ROOT / "synapse_gen" / "app.py").read_text(encoding="utf-8"))
         loops = [n for n in tree.body if isinstance(n, (ast.While, ast.For))]
         self.assertEqual(loops, [], "main.py must not loop at module level")
         guards = [
@@ -944,7 +944,8 @@ class MainEntryPointTests(unittest.TestCase):
             if isinstance(n, ast.If) and ast.unparse(n.test) == "__name__ == '__main__'"
         ]
         self.assertEqual(len(guards), 1)
-        self.assertIn("main()", ast.unparse(guards[0]))
+        # Since Phase 9 the guard calls cli(), which wraps main() (synapse_gen/app.py).
+        self.assertTrue({"main()", "cli()"} & {call for call in ("main()", "cli()") if call in ast.unparse(guards[0])})
 
 
 # ----------------------------------------------------------------------
@@ -1222,7 +1223,7 @@ class ExportedWarningsTests(unittest.TestCase):
 # Stage H (8.6, 9.6): one spelling, American English as in the identifiers
 # ----------------------------------------------------------------------
 def _python_sources():
-    paths = [PROJECT_ROOT / "main.py"]
+    paths = [PROJECT_ROOT / "main.py", PROJECT_ROOT / "synapse_gen" / "app.py"]
     for directory in ("analyses", "core", "data", "fileio", "ui", "tests"):
         paths.extend(sorted((PROJECT_ROOT / directory).glob(_PY_PATTERN.get(directory, "*.py"))))
     return paths
@@ -1240,7 +1241,7 @@ class SpellingStandardTests(unittest.TestCase):
     def test_text_and_documentation_use_american_spelling(self):
         import re
         pattern = re.compile(r"\b(" + "|".join(self.BRITISH) + r")\b", re.IGNORECASE)
-        paths = [PROJECT_ROOT / "README.md", PROJECT_ROOT / "main.py"]
+        paths = [PROJECT_ROOT / "README.md", PROJECT_ROOT / "main.py", PROJECT_ROOT / "synapse_gen" / "app.py"]
         for directory in ("docs", "analyses", "core", "fileio", "ui", "tests"):
             paths.extend(sorted((PROJECT_ROOT / directory).glob("*.md")))
             paths.extend(sorted((PROJECT_ROOT / directory).glob(_PY_PATTERN.get(directory, "*.py"))))

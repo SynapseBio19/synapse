@@ -169,7 +169,7 @@ class RestrictionPrimerWorkflowTests(_Quiet):
         """10.7: the overview and the cloning dialogs store what they ran with (T4)."""
         import builtins
         from unittest import mock
-        import main
+        from synapse_gen import app as main   # the session (main.py since Phase 9 is a launcher)
         from analyses import sequence as S
         from core.pipeline import SynapsePipeline
         from core.report import build_analysis_report

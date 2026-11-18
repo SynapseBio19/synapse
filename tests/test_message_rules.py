@@ -11,7 +11,7 @@ import unittest
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-FILES = [path for path in [*ROOT.glob("ui/*.py"), ROOT / "main.py"] if path.name != "crispr_menu.py"]
+FILES = [path for path in [*ROOT.glob("ui/*.py"), ROOT / "synapse_gen" / "app.py"] if path.name != "crispr_menu.py"]
 
 HAND_PADDED = re.compile(r"""print\(f?["'][^"'\n]{1,40}:\s{3,}""")
 PROMPT_WITH_BREAK = re.compile(r"""\bask\(\s*f?["']\\[rn]""")

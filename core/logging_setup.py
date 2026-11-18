@@ -1,7 +1,8 @@
 """Central logging configuration for the interactive application.
 
-Log file: ``logs/synapse.log`` in the project folder (override with the
-environment variable ``SYNAPSE_LOG_DIR``). Analysis modules log through
+Log file: ``logs/synapse.log`` in Synapse's user folder: the project folder
+when Synapse runs from source, a per-user folder when it is installed
+(``core.paths``). Override with the environment variable ``SYNAPSE_LOG_DIR``. Analysis modules log through
 ``logging.getLogger("synapse.<module>")``; they never configure handlers
 themselves, so library use and tests stay silent.
 """
@@ -13,12 +14,14 @@ import os
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+from core.paths import SOURCE_ROOT, user_data_dir
+
+PROJECT_ROOT = SOURCE_ROOT
 
 
 def log_directory() -> Path:
     configured = os.environ.get("SYNAPSE_LOG_DIR", "").strip()
-    return Path(configured).expanduser() if configured else PROJECT_ROOT / "logs"
+    return Path(configured).expanduser() if configured else user_data_dir() / "logs"
 
 
 def configure_logging(level: int = logging.INFO) -> Path:

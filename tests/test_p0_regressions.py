@@ -11,7 +11,7 @@ import unittest
 
 from tests._support import PROJECT_ROOT, read_fasta_records, reverse_complement, deterministic_dna
 
-EXAMPLES = dict(read_fasta_records(PROJECT_ROOT / "examples" / "dna.fasta"))
+EXAMPLES = dict(read_fasta_records(PROJECT_ROOT / "data" / "examples" / "dna.fasta"))
 
 
 def _blast_xml(query_from, query_to, align_len, evalue, qseq, hseq, extra_hsp=""):

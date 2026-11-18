@@ -21,7 +21,7 @@ from ui import cloning_menu, literature_menu, primer_menu
 UI_FILES = sorted(
     [p for p in (PROJECT_ROOT / "analyses").glob("**/*.py") if p.name != "__init__.py"]
     + [p for p in (PROJECT_ROOT / "ui").glob("*.py") if p.name != "__init__.py"]
-    + [PROJECT_ROOT / "core" / "pipeline.py", PROJECT_ROOT / "main.py"]
+    + [PROJECT_ROOT / "core" / "pipeline.py", PROJECT_ROOT / "synapse_gen" / "app.py"]
 )
 
 SEPARATOR = re.compile(r'"(=|-)"\s*\*\s*')
@@ -130,7 +130,7 @@ class NavigationTests(unittest.TestCase):
             for label in zero_labels(read(path)):
                 if label == style.EXIT_LABEL:
                     exits.append(path.name)
-        self.assertEqual(sorted(set(exits)), ["main.py", "menu.py"], exits)
+        self.assertEqual(sorted(set(exits)), ["app.py", "menu.py"], exits)
 
     def test_is_back_recognizes_the_key(self):
         self.assertTrue(style.is_back("0"))
@@ -401,7 +401,7 @@ SHARED_UI_MODULES = ("orf", "crispr", "blast", "literature", "primer", "variant_
 MENU_MODULES = ("orf", "crispr", "blast", "literature", "primer", "variant_analysis",
                 "rna", "protein", "restriction", "cloning", "mutation")
 INTERFACE_SOURCES = tuple(
-    [PROJECT_ROOT / "main.py", PROJECT_ROOT / "core" / "pipeline.py"]
+    [PROJECT_ROOT / "synapse_gen" / "app.py", PROJECT_ROOT / "core" / "pipeline.py"]
     + [PROJECT_ROOT / "ui" / name for name in ("menu.py", "report.py")]
     + [PROJECT_ROOT / "ui" / f"{name}_menu.py" for name in MENU_MODULES]
     + [PROJECT_ROOT / "analyses" / f"{name}.py" for name in MENU_MODULES + ("sequence",)]
@@ -675,7 +675,7 @@ class EmptyAnswerTests(unittest.TestCase):
 
     def test_modules_keep_bracket_hints_in_the_label(self):
         """A bracket in a prompt is a hint; ask(..., default=...) would return it as a value."""
-        hits = [f"{path.name}:{number}" for path in INTERFACE_SOURCES if path.name != "main.py"
+        hits = [f"{path.name}:{number}" for path in INTERFACE_SOURCES if path.name != "app.py"
                 for number, line in enumerate(read(path).splitlines(), 1)
                 if re.search(r"style\.ask\([^)]*default=", line)]
         self.assertEqual(hits, [])

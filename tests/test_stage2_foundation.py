@@ -99,7 +99,7 @@ class LoaderTests(unittest.TestCase):
 
     def test_example_file_still_loads(self):
         from fileio.loader import load_sequences
-        records = load_sequences(str(PROJECT_ROOT / "examples" / "dna.fasta"))
+        records = load_sequences(str(PROJECT_ROOT / "data" / "examples" / "dna.fasta"))
         self.assertEqual(records[0]["header"], "TEST_8_REFERENCE")
 
     def test_unknown_format_rejected(self):

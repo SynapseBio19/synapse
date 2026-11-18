@@ -39,7 +39,12 @@ GAPDH = "glyceraldehyde-3-phosphate dehydrogenase (GAPDH)"
 def _database():
     if os.environ.get("SYNAPSE_REFSEQ_RNA_TESTS") != "1":
         return None
-    database = B.LocalBlastDatabaseManager().verify_database("refseq_rna")
+    # tests/__init__.py removes SYNAPSE_BLAST_DB_ROOT for the suite; this
+    # opt-in test needs the user's real database folder.
+    from tests import USER_ENVIRONMENT
+    root = USER_ENVIRONMENT.get("SYNAPSE_BLAST_DB_ROOT")
+    manager = B.LocalBlastDatabaseManager(root) if root else B.LocalBlastDatabaseManager()
+    database = manager.verify_database("refseq_rna")
     return database if database.verification_status == "VERIFIED" else None
 
 

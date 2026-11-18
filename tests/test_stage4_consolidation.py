@@ -105,7 +105,7 @@ class CoreApiTests(unittest.TestCase):
         self.assertEqual(comparison.data.statistics.total_mutations, 1)
         guides = api.design_crispr_guides(self.SEQUENCE)
         self.assertEqual(guides.parameters["system"], "SpCas9")
-        records = api.load_records(str(PROJECT_ROOT / "examples" / "dna.fasta"))
+        records = api.load_records(str(PROJECT_ROOT / "data" / "examples" / "dna.fasta"))
         self.assertEqual(records[0].identifier, "TEST_8_REFERENCE")
 
     def test_vcf_api(self):

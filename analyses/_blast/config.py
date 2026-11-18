@@ -8,6 +8,7 @@ from core.alphabets import PROTEIN_IUPAC
 from pathlib import Path
 
 from analyses._blast.paths import ANALYSES_DIR
+from core.paths import HOME_ENV, is_source_checkout, user_data_dir
 
 
 # ============================================================================
@@ -54,6 +55,12 @@ def _resolve_default_local_db_root() -> Path:
     configured = os.environ.get(LOCAL_DB_ROOT_ENV, "").strip()
     if configured:
         return Path(configured).expanduser().resolve()
+
+    # An installed Synapse lives in site-packages, which also holds a "data"
+    # package; databases must not land there (Phase 9). Use the per-user
+    # folder instead. From the source folder nothing changes.
+    if not is_source_checkout() or os.environ.get(HOME_ENV, "").strip():
+        return (user_data_dir() / "blast_db").resolve()
 
     module_dir = ANALYSES_DIR
     candidates = [module_dir, *module_dir.parents]

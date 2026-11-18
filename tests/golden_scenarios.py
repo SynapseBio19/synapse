@@ -14,7 +14,7 @@ from dataclasses import asdict
 
 from tests._support import PROJECT_ROOT, deterministic_dna, read_fasta_records
 
-EXAMPLES = dict(read_fasta_records(PROJECT_ROOT / "examples" / "dna.fasta"))
+EXAMPLES = dict(read_fasta_records(PROJECT_ROOT / "data" / "examples" / "dna.fasta"))
 REFERENCE = EXAMPLES["TEST_8_REFERENCE"]
 RANDOM_600 = deterministic_dna(600, seed=2026)
 

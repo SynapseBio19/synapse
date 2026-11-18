@@ -366,5 +366,54 @@ class ZeroEvalueTests(unittest.TestCase):
         self.assertEqual(run.hits[0].best_evalue, float("inf"))
 
 
+
+class StorageLocationTests(unittest.TestCase):
+    """Where Synapse keeps databases and logs (core.paths, Phase 9).
+
+    From the source folder: the project folder, as always. Installed
+    (site-packages): a per-user folder, never site-packages itself, which
+    also holds a "data" package that the old search would have picked.
+    """
+
+    def _root(self, environment, checkout=True):
+        from analyses._blast import config
+        with mock.patch.dict(os.environ, environment, clear=False),                 mock.patch.object(config, "is_source_checkout", return_value=checkout),                 mock.patch("core.paths.is_source_checkout", return_value=checkout):
+            for name in ("SYNAPSE_BLAST_DB_ROOT", "SYNAPSE_HOME"):
+                if name not in environment:
+                    os.environ.pop(name, None)
+            return config._resolve_default_local_db_root()
+
+    def test_source_folder(self):
+        from core.paths import SOURCE_ROOT
+        self.assertEqual(self._root({}), (SOURCE_ROOT / "data" / "blast_db").resolve())
+
+    def test_installed_uses_the_user_folder(self):
+        from core.paths import SOURCE_ROOT
+        root = self._root({"LOCALAPPDATA": str(Path(tempfile.gettempdir()) / "appdata"),
+                           "XDG_DATA_HOME": str(Path(tempfile.gettempdir()) / "xdg")}, checkout=False)
+        self.assertEqual(root.name, "blast_db")
+        self.assertIn(root.parent.name, ("Synapse", "synapse"))
+        self.assertNotIn(SOURCE_ROOT, root.parents)
+
+    def test_settings_take_precedence(self):
+        home = Path(tempfile.gettempdir()) / "synapse_home"
+        explicit = Path(tempfile.gettempdir()) / "my_db_root"
+        self.assertEqual(self._root({"SYNAPSE_HOME": str(home)}), (home / "blast_db").resolve())
+        self.assertEqual(self._root({"SYNAPSE_HOME": str(home), "SYNAPSE_BLAST_DB_ROOT": str(explicit)}),
+                         explicit.resolve())
+
+    def test_logs_follow_the_user_folder(self):
+        from core import logging_setup
+        home = Path(tempfile.gettempdir()) / "synapse_home_logs"
+        with mock.patch.dict(os.environ, {"SYNAPSE_HOME": str(home)}):
+            os.environ.pop("SYNAPSE_LOG_DIR", None)
+            self.assertEqual(logging_setup.log_directory(), home.resolve() / "logs")
+
+    def test_the_example_is_part_of_the_data_package(self):
+        from core.paths import example_sequence_file
+        self.assertTrue(example_sequence_file().is_file())
+        self.assertEqual(example_sequence_file().parent.parent.name, "data")
+
+
 if __name__ == "__main__":
     unittest.main()

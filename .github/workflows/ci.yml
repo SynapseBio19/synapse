@@ -51,8 +51,10 @@ jobs:
           import analyses.blast, analyses.primer, analyses.mutation, analyses.cloning, core.api, analyses.orf, analyses.rna_structure, ui.style
           assert 'site-packages' in analyses.blast.__file__, analyses.blast.__file__
           assert analyses.blast.run_self_test(verbose=False)
-          assert analyses.cloning.run_cloning_self_test()["all_passed"]
+          assert analyses.cloning.run_cloning_self_test()['all_passed']
           print('imports OK from', analyses.blast.__file__)"
+          # The installed command starts the session and quits on Q.
+          printf 'Q\n' | synapse
       - name: Golden master
         run: python -m unittest -v tests.test_golden_master
       - name: Test suite
@@ -78,7 +80,7 @@ jobs:
         run: python -m pip install ".[reference,structure]" "coverage>=7.10"
       - name: Test suite with coverage
         run: |
-          python -m coverage run --branch --source=analyses,core,ui,fileio,data,main -m unittest discover -s tests -t . -v 2>&1 | tee test-output.txt
+          python -m coverage run --branch --source=analyses,core,ui,fileio,data,main,synapse_gen -m unittest discover -s tests -t . -v 2>&1 | tee test-output.txt
           test ${PIPESTATUS[0]} -eq 0
       # Only the opt-in benchmark and the opt-in refseq_rna searches (about 80 GB
       # database) may skip here.

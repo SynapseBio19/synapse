@@ -9,9 +9,11 @@ up to date here.
 ## 1. Layers
 
 ```
-main.py                 terminal session: sequence loading, the module menu
+main.py                 launcher from the source folder (python main.py)
+synapse_gen/            the terminal session (app.py) and the `synapse` command
 ui/                     dialogs and reports (draw through ui/style.py)
-core/                   data model, pipeline and provenance, public API, alphabets
+core/                   data model, pipeline and provenance, public API, alphabets,
+                        storage locations (paths.py)
 analyses/               the scientific modules (one public module per analysis)
   _blast/, _primer/     internal implementation packages (Phase 7.1)
 fileio/                 FASTA and GenBank reading

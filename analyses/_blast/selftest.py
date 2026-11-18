@@ -13,6 +13,7 @@ from analyses._blast.paths import ANALYSES_DIR, _resolve_synapse_user_path
 from analyses._blast.config import (
     BLAST_EXECUTABLES,
     DEFAULT_LOCAL_DB_ROOT,
+    LOCAL_DB_ROOT_ENV,
     NCBI_MIN_POLL_INTERVAL_SECONDS,
     NCBI_MIN_REQUEST_INTERVAL_SECONDS,
     PROGRAMS,
@@ -393,17 +394,24 @@ def _test_local_blast_environment_preserves_existing() -> None:
 
 
 def _test_default_database_root_resolution() -> None:
-    """Ensure the default root is a project-level data/blast_db path."""
-    expected_name = Path("data") / "blast_db"
+    """The default root is the configured one, never a folder next to the code.
+
+    Until 2026-11-19 this only checked that the path ended in data/blast_db,
+    which failed whenever SYNAPSE_BLAST_DB_ROOT pointed elsewhere (as it
+    should, for an 80-GB database) and passed for analyses/data/blast_db.
+    """
+    from core.paths import HOME_ENV, SOURCE_ROOT, is_source_checkout, user_data_dir
+
     resolved = DEFAULT_LOCAL_DB_ROOT.resolve()
-    _assert(
-        resolved.name == expected_name.name,
-        "Default BLAST root must end in data/blast_db",
-    )
-    _assert(
-        resolved.parent.name == expected_name.parent.name,
-        "Default BLAST root parent must be data",
-    )
+    configured = os.environ.get(LOCAL_DB_ROOT_ENV, "").strip()
+    if configured:
+        expected = Path(configured).expanduser().resolve()
+    elif os.environ.get(HOME_ENV, "").strip() or not is_source_checkout():
+        expected = (user_data_dir() / "blast_db").resolve()
+    else:
+        expected = (SOURCE_ROOT / "data" / "blast_db").resolve()
+    _assert(resolved == expected, f"Default BLAST root is {resolved}, expected {expected}")
+    _assert(ANALYSES_DIR not in resolved.parents, "The BLAST root must not be inside the analyses package")
 
 
 def _test_local_database_structure() -> None:
