@@ -192,6 +192,36 @@ PROTEIN_NAMES = (
     'create_protein_preview',
 )
 
+# Phase 9: analyses.variant_analysis, recorded from 6e52ca7 before its split.
+VARIANT_NAMES = (
+    'DNA_BASES', 'VALID_FILTER_STATUS', 'VALID_VARIANT_TYPES', 'CONSEQUENCE_PRIORITY',
+    'GT_ALLELE_SEPARATOR_RE', 'VariantAnalysisError', 'Variant', 'RESERVED_INFO_NUMBER',
+    'RESERVED_FORMAT_NUMBER', '_HEADER_FIELD_RE', 'parse_vcf_header_numbers',
+    '_field_number', '_genotype_index', '_select_allele_specific_info',
+    '_remap_sample_data_for_alt', 'VariantRecord', 'VariantFilter', 'VariantFilterResult',
+    'VariantStatistics', 'SampleVariantSummary', 'CohortVariantSummary',
+    'VariantComparison', 'VariantAnalysisResult', 'parse_float', 'parse_int',
+    'validate_allele', 'validate_variant', 'classify_variant_type', 'parse_info_field',
+    '_coerce_info_value', 'format_info_field', 'parse_genotype', 'genotype_category',
+    '_normalize_filter_status', 'parse_vcf', 'parse_vcf_file', 'trim_common_bases',
+    '_reference_allele_matches', 'left_normalize_variant', 'CONTIG_MATCHING_MODES',
+    'MITOCHONDRIAL_CONTIG_NAMES', 'ContigResolution', 'validate_contig_matching',
+    'validate_reference_sequence', 'validate_contig_references', '_chr_prefix_partner',
+    'resolve_contig_names', '_add_validation_flag', '_annotate_contig_resolution',
+    'normalize_variants', 'check_reference_alleles', 'annotate_variant',
+    'annotate_from_info', 'synchronize_variant_fields', 'variant_passes_filter',
+    'filter_variants', 'is_transition_variant', 'calculate_variant_statistics',
+    'sample_variant_summary', 'calculate_cohort_summary', 'variant_key_set',
+    'compare_variant_sets', 'variants_by_chromosome', 'variants_by_gene',
+    'variants_by_consequence', 'consequence_priority', 'prioritize_variants',
+    'check_features_against_variants', 'variants_in_interval', 'interval_variant_density',
+    'variants_to_vcf', 'write_vcf', 'variants_to_tsv', 'analyze_variants',
+    'analyze_vcf_text', 'format_variant', 'build_variant_report',
+    'annotate_from_mutation_analysis', 'VariantEvidence', 'attach_evidence',
+    'highest_priority_consequence', 'run_variant_analysis_self_test',
+    'assert_variant_analysis_self_test', '__all__',
+)
+
 REMOVED = {"analyses.primer": ("_V5_ACTIVE_CONFIG",)}
 
 # Phase 8 (2026-11-18): the historical _vN_ helpers were renamed; the old
@@ -251,6 +281,10 @@ class PublicModuleNamespaceTests(unittest.TestCase):
         from analyses import protein
         self._check(protein, PROTEIN_NAMES)
 
+    def test_variant_analysis_namespace(self):
+        from analyses import variant_analysis
+        self._check(variant_analysis, VARIANT_NAMES)
+
     def test_renamed_primer_helpers(self):
         from analyses import primer
         self._check(primer, tuple(RENAMED_PRIMER_NAMES.values()))
@@ -275,10 +309,10 @@ class InternalModuleIndependenceTests(unittest.TestCase):
 
     PROBE = textwrap.dedent('''
         import importlib, json, pkgutil, sys
-        import analyses._blast, analyses._cloning, analyses._mutation, analyses._primer, analyses._protein
+        import analyses._blast, analyses._cloning, analyses._mutation, analyses._primer, analyses._protein, analyses._variant
         failures = {}
         for package in (analyses._blast, analyses._primer, analyses._mutation, analyses._cloning,
-                        analyses._protein):
+                        analyses._protein, analyses._variant):
             for info in pkgutil.iter_modules(package.__path__):
                 name = package.__name__ + "." + info.name
                 for loaded in [m for m in sys.modules if m.startswith("analyses")]:
@@ -288,7 +322,7 @@ class InternalModuleIndependenceTests(unittest.TestCase):
                 except Exception as error:
                     failures[name] = repr(error)
                 if {"analyses.blast", "analyses.primer", "analyses.mutation", "analyses.cloning",
-                    "analyses.protein"} & set(sys.modules):
+                    "analyses.protein", "analyses.variant_analysis"} & set(sys.modules):
                     failures[name] = "imports the public module"
         for loaded in [m for m in sys.modules if m.startswith("analyses")]:
             del sys.modules[loaded]

@@ -3170,3 +3170,25 @@ values). No defect found:
   on 3.14.
 - **Plan.** `scripts/refactor/plans/protein.py`. Packaged in
   `pyproject.toml`; covered by the independence test.
+
+### Package F: `analyses/variant_analysis.py` split into `analyses/_variant/`
+
+- **Characterization first.** The section `variant`
+  (`tests/fixtures/characterization/variant.json`) holds 45 scenarios
+  recorded from `6e52ca7`. It runs four VCFs (the two module samples and
+  two of the bcftools test vectors) through:
+  - analysis, report, VCF and TSV export;
+  - statistics, cohort summary, prioritization;
+  - normalization with contig references in both matching modes;
+  - a quality filter, set comparison, intervals, feature overlap;
+  - the self-test.
+
+  The 84 names are frozen.
+- **After.** Eight modules: `models`, `vcf`, `normalization`,
+  `annotation`, `statistics`, `export`, `workflow`, `selftest`. The
+  public module keeps `__all__`. No cycle; all 86 statements moved
+  verbatim.
+  - `classify_variant_type` sits in `models`, because `Variant` calls it.
+  - `VariantRecord` sits in `vcf`, beside the remapping helpers it uses.
+- **Results.** Unchanged on 3.14.6 and 3.10.11, including the bcftools
+  vectors.

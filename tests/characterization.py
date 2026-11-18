@@ -336,11 +336,68 @@ def protein_scenarios() -> dict:
     return out
 
 
+# ---------------------------------------------------------------------------
+# Variant analysis (added in Phase 9, recorded from 6e52ca7 before its split)
+# ---------------------------------------------------------------------------
+
+def _fasta_contigs(path: Path) -> dict:
+    contigs, name = {}, None
+    for line in path.read_text().splitlines():
+        if line.startswith(">"):
+            name = line[1:].split()[0]
+            contigs[name] = []
+        elif name:
+            contigs[name].append(line.strip())
+    return {key: "".join(value) for key, value in contigs.items()}
+
+
+def variant_scenarios() -> dict:
+    from analyses import variant_analysis as V
+
+    out: dict = {}
+    norm = PROJECT_ROOT / "tests" / "fixtures" / "bcftools_norm"
+    texts = {
+        "test_variants": (PROJECT_ROOT / "analyses" / "test_variants.vcf").read_text(),
+        "test_export": (PROJECT_ROOT / "analyses" / "test_export.vcf").read_text(),
+        "bcftools_norm": (norm / "norm.vcf").read_text(),
+        "bcftools_split": (norm / "norm.split.vcf").read_text(),
+    }
+    contigs = _fasta_contigs(norm / "norm.fa")
+    for name, text in texts.items():
+        result = V.analyze_vcf_text(text, name=name)
+        out[f"analyze_{name}"] = _plain(result)
+        out[f"report_{name}"] = V.build_variant_report(result)
+        variants, metadata, samples = V.parse_vcf(text)
+        out[f"vcf_{name}"] = V.variants_to_vcf(variants, metadata=metadata, sample_names=samples)
+        out[f"tsv_{name}"] = V.variants_to_tsv(variants)
+        out[f"statistics_{name}"] = _plain(V.calculate_variant_statistics(variants))
+        out[f"cohort_{name}"] = _plain(V.calculate_cohort_summary(variants))
+        out[f"priority_{name}"] = _plain(V.prioritize_variants(variants))
+        for mode in ("exact", "chr_prefix"):
+            try:
+                out[f"normalize_{name}_{mode}"] = _plain(V.normalize_variants(
+                    variants, contig_references=contigs, contig_matching=mode))
+            except Exception as error:
+                out[f"normalize_{name}_{mode}"] = f"{type(error).__name__}: {error}"
+        filtered = V.filter_variants(variants, V.VariantFilter(minimum_quality=70.0))
+        out[f"filter_{name}"] = _plain(filtered)
+    left = V.parse_vcf(texts["test_variants"])[0]
+    right = V.parse_vcf(texts["test_export"])[0]
+    out["compare"] = _plain(V.compare_variant_sets(left, right))
+    out["interval"] = _plain(V.variants_in_interval(left, "chr1", 150, 350))
+    out["density"] = _plain(V.interval_variant_density(left, "chr1", 1, 1000))
+    out["features"] = _plain(V.check_features_against_variants(
+        [{"name": "geneA", "start": 90, "end": 250, "chromosome": "chr1"}], left))
+    out["self_test"] = _plain(V.run_variant_analysis_self_test())
+    return out
+
+
 SECTIONS = {
     SNAPSHOT: {"primer": primer_scenarios, "blast": blast_scenarios},
     PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "mutation.json": {"mutation": mutation_scenarios},
     PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "cloning.json": {"cloning": cloning_scenarios},
     PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "protein.json": {"protein": protein_scenarios},
+    PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "variant.json": {"variant": variant_scenarios},
 }
 
 
