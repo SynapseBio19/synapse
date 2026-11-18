@@ -916,7 +916,14 @@ class LocalBlastDatabaseManager:
         name: str,
         *,
         timeout: Optional[float] = None,
+        required_free_bytes: Optional[int] = None,
     ) -> LocalBlastDatabase:
+        """Download or update ``name`` with NCBI's update_blastdb.pl.
+
+        ``required_free_bytes`` (from NCBI's metadata, see ncbi_metadata) makes
+        the call refuse to start when the drive of the database root has less
+        free space (2026-11-19).
+        """
         if name not in LOCAL_DATABASE_CATALOG:
             raise BlastAnalysisError(
                 f"'{name}' is not in the Synapse NCBI database catalog."
@@ -936,6 +943,16 @@ class LocalBlastDatabaseManager:
             )
 
         self.ensure_root()
+        if required_free_bytes is not None:
+            from analyses._blast.ncbi_metadata import format_bytes, free_disk_bytes
+
+            free = free_disk_bytes(self.root)
+            if free < required_free_bytes:
+                raise BlastAnalysisError(
+                    f"Not enough free disk space for {name}: about "
+                    f"{format_bytes(required_free_bytes)} needed, {format_bytes(free)} free "
+                    f"on the drive of {self.root}."
+                )
         command = [
             perl,
             script,

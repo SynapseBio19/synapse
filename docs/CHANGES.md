@@ -3055,3 +3055,32 @@ values). No defect found:
   decodes them as amino acids too, as `GeneticCode.translate` does: "Such
   codons will be translated as amino acid".
 - No defect found.
+
+### Package C: size, release and disk space before an NCBI database download
+
+- **Before.** The database manager started `update_blastdb.pl` after the
+  user typed DOWNLOAD. It showed no size and did not check the disk:
+  core_nt needs about 308 GB, refseq_protein about 253 GB.
+- **After.** New `analyses/_blast/ncbi_metadata.py` reads NCBI's metadata
+  file for the chosen database (a few kB; JSON, metadata version 1.1).
+  - Before the confirmation, the dialog shows NCBI's release date, the
+    number of sequences, the download size, the size on disk, the free
+    space needed and the free space on the drive.
+  - It says whether NCBI's release is newer than an installed copy (the
+    date `blastdbcmd -info` reports).
+  - If the drive is too small, no download is offered, and the message
+    points to `SYNAPSE_BLAST_DB_ROOT`.
+  - `update_ncbi_database(..., required_free_bytes=...)` refuses to start
+    as well.
+  - Without network access the dialog says the size is unknown and still
+    allows the download, as before.
+- **Space estimate.** The decompressed size, less what an installed copy
+  occupies, plus one average volume archive: `update_blastdb.pl` unpacks
+  one volume at a time.
+- **Owner's data on 2026-11-19.** NCBI's refseq_rna release is 2026-10-30
+  (85,490,457 sequences); the installed copy is from 2026-09-30. The
+  dialog would offer the update.
+- **Evidence.** `tests/test_blast_download_plan.py` (8 tests) with NCBI's
+  real swissprot metadata file as a fixture (SOURCE.md).
+- **Interface.** The new names are exported by `analyses.blast`; the
+  menu imports them from there.

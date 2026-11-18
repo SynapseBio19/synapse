@@ -13,3 +13,6 @@ tests/fixtures/expasy/* -text
 
 # NCBI gc.prt stored verbatim (SHA-256 checked in tests/test_genetic_codes_ncbi.py).
 tests/fixtures/ncbi_gc/gc.prt -text
+
+# NCBI BLAST database metadata stored verbatim (tests/test_blast_download_plan.py).
+tests/fixtures/ncbi_blastdb/*.json -text

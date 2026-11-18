@@ -46,6 +46,12 @@ from analyses.blast import (  # noqa: F401
     rank_hits,
     run_self_test,
 )
+from analyses.blast import (
+    check_download_space,
+    fetch_database_metadata,
+    format_bytes,
+    newer_release_available,
+)
 from ui import style
 from ui.style import minor_rule
 
@@ -237,6 +243,43 @@ def _select_local_database(
         return None
 
 
+def _show_ncbi_download_plan(manager: LocalBlastDatabaseManager, name: str):
+    """Show NCBI's size and release for ``name`` before a download (2026-11-19).
+
+    Returns the free bytes the download needs, None when NCBI's metadata could
+    not be read (the download stays possible; the user checks the space), or
+    False when the drive is too small (no download is offered).
+    """
+    try:
+        metadata = fetch_database_metadata(name)
+    except BlastAnalysisError as exc:
+        style.warning(f"Size and release are unknown: {exc}")
+        style.note("Check the free disk space yourself before downloading.")
+        return None
+    installed = manager.scan_database(name)
+    if installed.exists:
+        installed = manager.verify_database(name)
+    check = check_download_space(metadata, manager.root,
+                                 installed.size_bytes if installed.exists else 0)
+    style.field("NCBI release", metadata.last_updated.isoformat())
+    style.field("Sequences", f"{metadata.sequence_count:,}")
+    style.field("Download", format_bytes(metadata.download_bytes))
+    style.field("Size on disk", format_bytes(metadata.disk_bytes))
+    style.field("Needed free space", format_bytes(check.required_bytes))
+    style.field("Free on this drive", format_bytes(check.free_bytes))
+    if installed.exists:
+        newer = newer_release_available(installed, metadata)
+        if newer is True:
+            style.note(f"NCBI's release is newer than the installed copy ({installed.database_date}).")
+        elif newer is False:
+            style.note("The installed copy is NCBI's current release.")
+    if not check.sufficient:
+        style.error("Not enough free disk space on this drive. Set SYNAPSE_BLAST_DB_ROOT to a "
+                    "folder on a larger drive, then start Synapse again.")
+        return False
+    return check.required_bytes
+
+
 def blast_database_manager_menu(
     manager: Optional[LocalBlastDatabaseManager] = None,
 ) -> None:
@@ -304,13 +347,17 @@ def blast_database_manager_menu(
                 "Large databases can require substantial disk space and network "
                 "bandwidth. Synapse does not start this automatically."
             )
+            required = _show_ncbi_download_plan(manager, name)
+            if required is False:
+                continue
             confirm = style.ask('Type DOWNLOAD to continue')
             if confirm != "DOWNLOAD":
                 style.note("Download cancelled.")
                 continue
 
             try:
-                database = manager.update_ncbi_database(name)
+                database = manager.update_ncbi_database(
+                    name, required_free_bytes=required if isinstance(required, int) else None)
                 print()
                 style.success(f"Update completed: {database.name}")
                 style.field('Status', f"{database.verification_status}")

@@ -130,6 +130,19 @@ from analyses._blast.parsing import (
 )
 from analyses._blast.ncbi import _is_transient_ncbi_error, logger, NCBIBlastClient, STATUS_RETRIES
 from analyses._blast.executables import BlastExecutableManager
+from analyses._blast.ncbi_metadata import (
+    check_download_space,
+    DownloadSpaceCheck,
+    fetch_database_metadata,
+    format_bytes,
+    free_disk_bytes,
+    local_release_date,
+    metadata_url,
+    NCBI_DB_METADATA_URL,
+    NcbiDatabaseMetadata,
+    newer_release_available,
+    parse_database_metadata,
+)
 from analyses._blast.runtime import (
     _build_local_blast_environment,
     _build_local_database_command_reference,
