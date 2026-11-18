@@ -2613,7 +2613,7 @@ stays Coming Soon). Audit: `docs/PHASE71_ARCHITECTURE_AUDIT.md`.
 - **Before.** One module of 5,182 lines in historical layers. The legacy
   engine at the top called functions defined thousands of lines further
   down; Python resolved those calls at run time.
-- **After.** `analyses/primer.py` (250 lines) is the public module. It
+- **After.** `analyses/primer.py` (244 lines) is the public module. It
   keeps its docstring and both `python -m` entry blocks and re-exports
   all 139 names it defines.
 - **The modules of `analyses/_primer/`, in dependency order.**
@@ -2667,3 +2667,41 @@ stays Coming Soon). Audit: `docs/PHASE71_ARCHITECTURE_AUDIT.md`.
     with `ModuleNotFoundError: No module named 'analyses._primer'`.
 - **Not checked.** The workflow has still not run on GitHub: there is no
   remote.
+
+### Package D: component tests for the least-reached BLAST and primer parts
+
+- **How chosen.** The split showed per responsibility what the suite
+  reached least. The tests pin documented behavior; none changes a result.
+- **`tests/test_blast_components.py` (19 tests).**
+  - Every rejected-input message of query validation and of the FASTA
+    loader.
+  - Program/query compatibility and the ORF adapter (which CRISPR has its
+    own copy of; CRISPR is not touched).
+  - The search order for BLAST+ programs and `update_blastdb.pl`.
+  - The local engine with a fake `subprocess.run`: parameters to flags,
+    `-seg` versus `-dust`, timeout, start failure, non-zero exit, missing
+    output, preconditions, and the short-query rescue: it runs once, keeps
+    the E-value and states its notes.
+- **`tests/test_primer_components.py` (8 tests).**
+  - Rejection of invalid reaction conditions and ionic-strength inputs.
+  - The specificity screen: arguments, both orientations, both input forms.
+  - The professional workflow's warnings with and without references, and
+    the failure reason when no pair fits.
+- **Observation, not changed.** On a poly-A template the professional
+  design returns one pair (A21/T21), flagged `high_risk` and
+  `critical_risk` with a heterodimer warning. The screen measures every
+  window without hard filters and leaves the risk to the ranking (V6
+  section). The test records this as current behavior.
+- **Coverage.**
+
+  | Module | Before | After |
+  |---|---:|---:|
+  | `_blast/query` | 66 % | 97 % |
+  | `_blast/executables` | 62 % | 91 % |
+  | `_blast/local_engine` | 59 % | 91 % |
+  | `_primer/specificity` | 85 % | 100 % |
+  | `_primer/thermodynamics` | 85 % | 90 % |
+  | `_primer/workflow` | 85 % | 92 % |
+  | **Total** | 81 % | 82 % |
+
+- **Suite.** 601 tests, 0 failures on 3.14.6 and 3.10.11.
