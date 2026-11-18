@@ -148,6 +148,28 @@ MUTATION_NAMES = (
     'assert_mutation_self_test', 'analyze_mutations', 'mutation_report', '__all__',
 )
 
+# Phase 8: analyses.cloning, recorded from 8e1f6d2 before its split.
+CLONING_NAMES = (
+    '_STRATEGY_SEARCH_CACHE', '_strategy_search_cache', '_IMMUTABLE', '_T', '_copy_result',
+    '_cached', 'IUPAC_BASES', 'normalize_sequence', '_normalize_topology',
+    'reverse_complement', 'get_enzyme_data', 'get_recognition_sequence', 'get_cut_type',
+    'get_overhang', 'get_overhang_polarity', 'is_blunt_enzyme', 'find_restriction_sites',
+    'analyze_enzyme', '_analyze_enzyme', 'build_restriction_map', '_validate_sequence',
+    '_validate_sequence_uncached', 'validate_dna_sequence', 'make_site',
+    'make_missing_site', '_end_signature', '_site_polarity', 'ends_compatible',
+    'analyze_end_compatibility', 'analyze_junction', '_ambiguity_reason', '_end_definition',
+    '_internal_site_check', 'analyze_directional_strategy', '_digest_fragments',
+    '_selected_digest', '_score_strategy', 'score_cloning_strategy',
+    'evaluate_cloning_strategy', 'analyze_enzyme_pair', 'analyze_cloning',
+    'assess_enzyme_suitability', 'find_compatible_enzymes', '_candidate_enzyme_names',
+    '_candidate_key', '_strategy_identity', 'find_best_cloning_strategies',
+    '_find_all_cloning_strategies', '_site_diagnostics', '_no_strategy_diagnostics',
+    'automatic_cloning_planner', 'run_advanced_cloning_analysis', 'run_cloning_analysis',
+    'get_best_cloning_strategy', 'get_cloning_junctions', 'get_cloning_summary',
+    'rank_cloning_strategy', 'compare_cloning_strategies', 'get_design_reasons',
+    'run_cloning_self_test', '_cloning_ui_normalize_choice',
+)
+
 REMOVED = {"analyses.primer": ("_V5_ACTIVE_CONFIG",)}
 
 # Phase 8 (2026-11-18): the historical _vN_ helpers were renamed; the old
@@ -198,6 +220,10 @@ class PublicModuleNamespaceTests(unittest.TestCase):
     def test_mutation_all_names_exist(self):
         from analyses import mutation
         self._check(mutation, mutation.__all__)
+
+    def test_cloning_namespace(self):
+        from analyses import cloning
+        self._check(cloning, CLONING_NAMES)
 
     def test_renamed_primer_helpers(self):
         from analyses import primer

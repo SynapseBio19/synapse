@@ -92,6 +92,9 @@ class CharacterizationSnapshotTests(unittest.TestCase):
     def test_mutation_results_are_unchanged(self):
         self._compare("mutation", C.mutation_scenarios())
 
+    def test_cloning_results_are_unchanged(self):
+        self._compare("cloning", C.cloning_scenarios())
+
 
 if __name__ == "__main__":
     unittest.main()

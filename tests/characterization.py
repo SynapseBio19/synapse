@@ -244,9 +244,57 @@ def mutation_scenarios() -> dict:
     return out
 
 
+# ---------------------------------------------------------------------------
+# Cloning (added in Phase 8, recorded from 8e1f6d2 before its split)
+# ---------------------------------------------------------------------------
+
+def cloning_scenarios() -> dict:
+    from analyses import cloning as C
+    from tests._support import deterministic_dna
+
+    vector = deterministic_dna(400) + "GAATTC" + deterministic_dna(300)[::-1] + "GGATCC" + deterministic_dna(200)
+    insert = "GAATTC" + deterministic_dna(240) + "GGATCC"
+    enzymes = ["EcoRI", "BamHI", "HindIII", "XhoI", "PstI", "SmaI", "KpnI", "XbaI"]
+    out: dict = {}
+    for topology in ("linear", "circular"):
+        out[f"planner_{topology}"] = _plain(C.automatic_cloning_planner(
+            vector, insert, enzyme_names=enzymes, top_n=5, vector_topology=topology))
+        out[f"best_{topology}"] = _plain(C.find_best_cloning_strategies(
+            vector, insert, enzyme_names=enzymes, top_n=5, vector_topology=topology))
+        out[f"restriction_map_{topology}"] = _plain(C.build_restriction_map(vector, enzymes, topology))
+    directional = C.evaluate_cloning_strategy(vector, insert, "EcoRI", "BamHI", "EcoRI", "BamHI")
+    out["evaluate_directional"] = _plain(directional)
+    out["evaluate_mismatched"] = _plain(C.evaluate_cloning_strategy(vector, insert, "EcoRI", "BamHI", "PstI", "KpnI"))
+    out["pair"] = _plain(C.analyze_enzyme_pair(vector, insert, "EcoRI", "BamHI", "EcoRI", "BamHI"))
+    single = C.analyze_cloning(vector, insert, "EcoRI", "EcoRI")
+    out["single_enzyme"] = _plain(single)
+    out["summary"] = _plain(C.get_cloning_summary(single))
+    out["junctions"] = _plain(C.get_cloning_junctions(single))
+    out["reasons"] = _plain(C.get_design_reasons(single))
+    out["rank"] = _plain(C.rank_cloning_strategy(single))
+    out["compare"] = _plain(C.compare_cloning_strategies(single, directional))
+    out["suitability"] = {name: _plain(C.assess_enzyme_suitability(vector, insert, name)) for name in enzymes}
+    out["compatible"] = _plain(C.find_compatible_enzymes(vector, insert, enzymes))
+    for mode in ("auto", "advanced"):
+        try:
+            out[f"run_{mode}"] = _plain(C.run_cloning_analysis(vector, insert, mode=mode, enzyme_names=enzymes))
+        except Exception as error:  # record the documented rejection as well
+            out[f"run_{mode}"] = f"{type(error).__name__}: {error}"
+    out["best_strategy"] = _plain(C.get_best_cloning_strategy(vector, insert, enzymes))
+    out["overhangs"] = {name: _plain(C.get_overhang(name)) for name in enzymes}
+    left = C.make_site(C.analyze_enzyme(vector, "EcoRI"), 400)
+    right = C.make_site(C.analyze_enzyme(insert, "EcoRI"), 0)
+    out["end_compatibility"] = _plain(C.analyze_end_compatibility(left, right))
+    out["junction"] = _plain(C.analyze_junction(left, right, "left"))
+    out["validation"] = [C.validate_dna_sequence("acgt nacg"), _plain(C.analyze_enzyme("GAATTCGAATTC", "EcoRI", "circular"))]
+    out["self_test"] = _plain(C.run_cloning_self_test())
+    return out
+
+
 SECTIONS = {
     SNAPSHOT: {"primer": primer_scenarios, "blast": blast_scenarios},
     PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "mutation.json": {"mutation": mutation_scenarios},
+    PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "cloning.json": {"cloning": cloning_scenarios},
 }
 
 
