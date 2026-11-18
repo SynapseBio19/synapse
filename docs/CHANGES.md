@@ -3037,3 +3037,21 @@ values). No defect found:
   - ORFs end at TAA under code 28.
 
   Characterization, golden master and rendered menus are unchanged.
+
+### Package B: ORF finder and RNA translation checked in all 27 codes
+
+- **ORF finder.** `tests/test_orf_differential.py` compares Synapse's ORF
+  finder (ATG only, complete ORFs, no nesting) with a deliberately naive
+  independent finder: for each stop, the most upstream in-frame ATG after
+  the previous stop, on both strands.
+  - On 2026-11-19 the two agreed on all 675 random sequences (25 per code,
+    60-900 nt, minimum lengths 30, 75 and 150).
+  - The suite runs 4 per code plus a fixed case. That case guards against
+    agreeing on empty sets.
+- **RNA translation.** `rna.translate_rna_frame` equals the NCBI tables up
+  to the first stop in 1,620 random frames, across all codes and all three
+  frames.
+- **Biopython agrees on the context-dependent codons.** `Bio.Seq.translate`
+  decodes them as amino acids too, as `GeneticCode.translate` does: "Such
+  codons will be translated as amino acid".
+- No defect found.
