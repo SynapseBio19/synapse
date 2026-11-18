@@ -984,7 +984,10 @@ def calculate_sequence_complexity(dna):
         base:
             standard_bases.count(base)
 
-        for base in DNA_STANDARD_BASES
+        # Sorted: a set iterates in a different order in every process, which
+        # changed the last digit of the entropy sum and, through ties, the
+        # reported position of the complexity maximum (fixed 2026-11-19).
+        for base in sorted(DNA_STANDARD_BASES)
     }
 
     entropy = 0.0

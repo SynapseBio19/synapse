@@ -3192,3 +3192,30 @@ values). No defect found:
   - `VariantRecord` sits in `vcf`, beside the remapping helpers it uses.
 - **Results.** Unchanged on 3.14.6 and 3.10.11, including the bcftools
   vectors.
+
+### Package G: sequence complexity depended on Python's hash seed (defect, fixed)
+
+- **Found** while recording the characterization snapshot of
+  `analyses/sequence.py`: two runs of the same code gave different
+  results.
+- **Cause.** `calculate_sequence_complexity` summed the Shannon entropy
+  terms while iterating over the set `{"A", "T", "C", "G"}`. Python
+  randomizes set iteration per process (`PYTHONHASHSEED`), so the order
+  of the four additions changed between runs, and with it the last digit
+  of the complexity.
+- **Visible effect.** Where windows tie, the reported position of the
+  complexity maximum depends on that last digit; one test sequence gave
+  position 180 in one run and 145 in the next. The overview report was
+  therefore not reproducible.
+- **Fix.** The bases are iterated in sorted order. The values change at
+  most in the last digit.
+- **Evidence.**
+  - New `tests/test_determinism.py` runs a sequence analysis under four
+    hash seeds and requires identical output. It failed before the fix.
+  - The same comparison of all 7 characterization sections under three
+    hash seeds found no other dependence; only the sequence section
+    differed (252 values).
+  - The characterization section `sequence` (111 scenarios: five sequences
+    including IUPAC, CpG-rich and homopolymer cases, every overview
+    function, the profiles, the self-test) was recorded after the fix. It
+    is identical under four further hash seeds and on 3.10.11.

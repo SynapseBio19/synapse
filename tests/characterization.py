@@ -392,12 +392,50 @@ def variant_scenarios() -> dict:
     return out
 
 
+# ---------------------------------------------------------------------------
+# Sequence overview (added in Phase 9, recorded from 94c2c0d before its split)
+# ---------------------------------------------------------------------------
+
+def sequence_scenarios() -> dict:
+    from analyses import sequence as S
+
+    puc = _puc19()
+    sequences = {
+        "puc_900": puc[:900],
+        "iupac": puc[100:400] + "NNRYKMSW" + puc[400:500],
+        "cpg_rich": "CGCGGCGCGTACGCGCGGGCGCCCGCGATCG" * 12 + puc[:200],
+        "homopolymers": "AAAAAAAATTTTTGGGGGGCCCC" * 5 + "ACGT" * 30,
+        "short": "ACGTNACG",
+    }
+    out: dict = {}
+    for name, dna in sequences.items():
+        out[f"analyze_{name}"] = _plain(S.analyze_sequence(dna, profile_window=50, profile_step=5))
+        out[f"summary_{name}"] = _plain(S.create_sequence_summary(dna))
+        for function in ("count_nucleotides", "count_ambiguous_bases", "get_complement", "get_reverse_complement",
+                         "analyze_sequence_quality", "calculate_gc_content", "calculate_at_content",
+                         "calculate_dna_content_ranges", "calculate_gc_skew", "calculate_at_skew",
+                         "calculate_sequence_complexity", "analyze_cpg", "calculate_dna_molecular_weight",
+                         "calculate_average_dna_molecular_weight", "get_sequence_forms",
+                         "calculate_sequence_statistics"):
+            try:
+                out[f"{function}_{name}"] = _plain(getattr(S, function)(dna))
+            except Exception as error:
+                out[f"{function}_{name}"] = f"{type(error).__name__}: {error}"
+        out[f"homopolymers_{name}"] = _plain(S.find_homopolymers(dna, min_length=4))
+        out[f"cpg_islands_{name}"] = _plain(S.find_cpg_islands(dna, window_size=100))
+        out[f"gc_profile_{name}"] = _plain(S.analyze_gc_profile(dna, window_size=40, step=7))
+        out[f"complexity_profile_{name}"] = _plain(S.analyze_complexity_profile(dna, window_size=40, step=7))
+    out["self_test"] = _plain(S.run_sequence_self_test())
+    return out
+
+
 SECTIONS = {
     SNAPSHOT: {"primer": primer_scenarios, "blast": blast_scenarios},
     PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "mutation.json": {"mutation": mutation_scenarios},
     PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "cloning.json": {"cloning": cloning_scenarios},
     PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "protein.json": {"protein": protein_scenarios},
     PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "variant.json": {"variant": variant_scenarios},
+    PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "sequence.json": {"sequence": sequence_scenarios},
 }
 
 

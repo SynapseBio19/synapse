@@ -105,6 +105,9 @@ class CharacterizationSnapshotTests(unittest.TestCase):
     def test_variant_results_are_unchanged(self):
         self._compare("variant", C.variant_scenarios())
 
+    def test_sequence_results_are_unchanged(self):
+        self._compare("sequence", C.sequence_scenarios())
+
 
 if __name__ == "__main__":
     unittest.main()
