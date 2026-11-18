@@ -2798,7 +2798,7 @@ reference tests decide whether a change alters a result.
 ### Package C: `analyses/mutation.py` split into `analyses/_mutation/`
 
 - **Before.** One module of 4,670 lines.
-- **After.** `analyses/mutation.py` (about 280 lines) is the public module.
+- **After.** `analyses/mutation.py` (307 lines) is the public module.
   It keeps its docstring, `__all__` and the entry block, and re-exports
   all 97 names it defined.
 - **The 11 modules of `analyses/_mutation/`.** `sequence`, `models`,
@@ -2842,3 +2842,45 @@ reference tests decide whether a change alters a result.
 - **Results.** Unchanged: snapshot, golden master, rendered menus, the
   Mutalyzer HGVS reference test and the full suite. 606 tests, 0 failures
   on 3.14.6 and 3.10.11.
+
+### Package D: `analyses/cloning.py` split into `analyses/_cloning/`
+
+- **Characterization first** (`b9d9d6e`).
+  `tests/fixtures/characterization/cloning.json` holds 25 scenarios
+  recorded from `8e1f6d2`:
+  - planner and best strategies on linear and circular vectors;
+  - restriction maps; directional and mismatched strategies;
+  - single-enzyme cloning with summary, junctions, reasons and ranking;
+  - suitability, compatibility, run modes, overhangs, end compatibility;
+  - validation and the self-test.
+  `test_module_namespaces` freezes the 61 top-level names. (The commit
+  message of `b9d9d6e` says 58; the list has 61.)
+- **After.** `analyses/cloning.py` is the public module. The code is in
+  seven modules of `analyses/_cloning/`: `cache`, `sites`, `ends`,
+  `strategy`, `search`, `summary`, `selftest`. They form a strict layer
+  order without a cycle. All 62 statements moved verbatim.
+- **The cache stays one module.** `_strategy_search_cache` sets the
+  global `_STRATEGY_SEARCH_CACHE` and `_cached` reads it; both are in
+  `cache`. `analyses.cloning._STRATEGY_SEARCH_CACHE` is now only the value
+  at import time.
+- **Three cache tests would have passed vacuously.** `test_planner_cache`
+  patched `cloning._analyze_enzyme` and `cloning._cached` and read
+  `cloning._STRATEGY_SEARCH_CACHE`. After the move, none of these reaches
+  the code: the counting test would have counted nothing and still
+  passed. The tests now patch `analyses._cloning.sites` and read
+  `analyses._cloning.cache`. The counting test also asserts that it
+  counted at least one call.
+- **Self-test.** `run_cloning_self_test` checked the public API with
+  `globals()`, which were the public module's before the move. It now
+  asks `analyses.cloning` (a lazy import inside the function). This is
+  the one edit inside moved code; the snapshot's self-test entry is
+  unchanged.
+- **Re-exported imports.** The golden master and two tests read
+  `cloning.RESTRICTION_ENZYMES` and check that `cloning.bases_match` is
+  the restriction module's matcher. `analyses/cloning.py` therefore keeps
+  importing `RESTRICTION_ENZYMES`, `bases_match` and
+  `find_recognition_site_matches`.
+- **Packaging and lint.** `pyproject.toml` lists `analyses._cloning`;
+  `analyses/cloning.py` ignores F401.
+- **Results.** Unchanged: snapshot, golden master, rendered menus and the
+  suite. 608 tests, 0 failures on 3.14.6 and 3.10.11; coverage 84 %.

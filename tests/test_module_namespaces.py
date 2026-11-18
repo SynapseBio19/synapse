@@ -249,9 +249,9 @@ class InternalModuleIndependenceTests(unittest.TestCase):
 
     PROBE = textwrap.dedent('''
         import importlib, json, pkgutil, sys
-        import analyses._blast, analyses._mutation, analyses._primer
+        import analyses._blast, analyses._cloning, analyses._mutation, analyses._primer
         failures = {}
-        for package in (analyses._blast, analyses._primer, analyses._mutation):
+        for package in (analyses._blast, analyses._primer, analyses._mutation, analyses._cloning):
             for info in pkgutil.iter_modules(package.__path__):
                 name = package.__name__ + "." + info.name
                 for loaded in [m for m in sys.modules if m.startswith("analyses")]:
@@ -260,7 +260,7 @@ class InternalModuleIndependenceTests(unittest.TestCase):
                     importlib.import_module(name)
                 except Exception as error:
                     failures[name] = repr(error)
-                if {"analyses.blast", "analyses.primer", "analyses.mutation"} & set(sys.modules):
+                if {"analyses.blast", "analyses.primer", "analyses.mutation", "analyses.cloning"} & set(sys.modules):
                     failures[name] = "imports the public module"
         for loaded in [m for m in sys.modules if m.startswith("analyses")]:
             del sys.modules[loaded]

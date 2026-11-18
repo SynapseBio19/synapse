@@ -24,26 +24,30 @@ class PlannerCacheTests(unittest.TestCase):
     def test_each_analysis_is_computed_once_per_search(self):
         from analyses import cloning as C
         calls = []
-        original = C._analyze_enzyme
+        from analyses._cloning import sites  # the module that calls _analyze_enzyme
+        original = sites._analyze_enzyme
 
         def counting(sequence, enzyme, topology):
             calls.append((len(sequence), enzyme, topology))
             return original(sequence, enzyme, topology)
 
-        with mock.patch.object(C, "_analyze_enzyme", counting):
+        with mock.patch.object(sites, "_analyze_enzyme", counting):
             result = C.automatic_cloning_planner(VECTOR, INSERT, enzyme_names=ENZYMES, top_n=3)
         self.assertGreaterEqual(result["evaluated_count"], 30)    # each needs four analyses
+        self.assertTrue(calls)                                    # the patch reached the analysis
         self.assertEqual(len(calls), len(set(calls)))            # no analysis twice
         self.assertLessEqual(len(calls), 2 * len(ENZYMES))       # two molecules x enzymes
 
     def test_results_equal_an_uncached_search(self):
         from analyses import cloning as C
+        # Patch and read the modules that hold the cache and call it (Phase 8 split).
+        from analyses._cloning import cache, sites
         for topology in ("linear", "circular"):
             with self.subTest(vector_topology=topology):
                 cached = C.automatic_cloning_planner(VECTOR, INSERT, enzyme_names=ENZYMES, top_n=50,
                                                      vector_topology=topology)
-                self.assertIsNone(C._STRATEGY_SEARCH_CACHE)     # the cache ended with the search
-                with mock.patch.object(C, "_cached", lambda key, compute: compute()):
+                self.assertIsNone(cache._STRATEGY_SEARCH_CACHE)  # the cache ended with the search
+                with mock.patch.object(sites, "_cached", lambda key, compute: compute()):
                     uncached = C.automatic_cloning_planner(VECTOR, INSERT, enzyme_names=ENZYMES, top_n=50,
                                                            vector_topology=topology)
                 self.assertEqual(cached, uncached)
