@@ -3147,3 +3147,26 @@ values). No defect found:
 - **Not changed.** CRISPR exports still default to the project folder
   (`analyses/crispr.py`, excluded); set `SYNAPSE_EXPORT_DIR` when
   Synapse is installed.
+
+### Package E: `analyses/protein.py` split into `analyses/_protein/`
+
+- **Characterization first.** The section `protein`
+  (`tests/fixtures/characterization/protein.json`) holds 103 scenarios
+  recorded from `ee8203d`:
+  - four proteins (one with ambiguous residues and a stop), with every
+    property function, the combined analyses and the charge at four pH
+    values;
+  - four RNAs, among them IUPAC codons, translated under codes 1, 2 and 11;
+  - codon resolution.
+
+  `test_module_namespaces` freezes the 56 names.
+- **After.** Seven modules: `constants`, `sequence`, `translation`,
+  `composition`, `charge`, `profiles`, `report`. No cycle; all 56
+  statements moved verbatim. `analyze_protein`, the composition count,
+  sits in `composition`; in `report` it formed a cycle.
+- **Snapshot comparison.** Floats now also allow an absolute difference
+  of 1e-12. Since Python 3.12, `sum()` of floats is compensated, so a
+  hydropathy window that sums to 0 gives -7.4e-17 on 3.10 and -8.6e-17
+  on 3.14.
+- **Plan.** `scripts/refactor/plans/protein.py`. Packaged in
+  `pyproject.toml`; covered by the independence test.

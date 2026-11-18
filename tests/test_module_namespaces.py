@@ -170,6 +170,28 @@ CLONING_NAMES = (
     'run_cloning_self_test', '_cloning_ui_normalize_choice',
 )
 
+# Phase 9: analyses.protein, recorded from ee8203d before its split.
+PROTEIN_NAMES = (
+    'STANDARD_AMINO_ACIDS', 'AA_ORDER', 'NONSTANDARD_RESIDUES', 'AMBIGUOUS_RESIDUE_OPTIONS',
+    'UNRESOLVED_RESIDUES', 'STOP_SYMBOL', 'RNA_IUPAC', 'AMINO_ACID_RESIDUE_MASSES',
+    'WATER_MASS', 'HYDROPHOBIC_RESIDUES', 'POLAR_RESIDUES', 'POSITIVE_RESIDUES',
+    'NEGATIVE_RESIDUES', 'AROMATIC_RESIDUES', 'ALIPHATIC_RESIDUES', 'KYTE_DOOLITTLE',
+    'FLEXIBILITY_SCALE', 'POSITIVE_PKA', 'NEGATIVE_PKA', 'NTERM_PKA', 'CTERM_PKA',
+    'INSTABILITY_ORDER', 'INSTABILITY_ROWS', 'build_instability_weights',
+    'INSTABILITY_WEIGHTS', '_strip_terminal_stop', 'validate_protein_sequence',
+    'get_resolved_protein', 'get_positional_protein', 'analyze_protein_quality',
+    'expand_iupac_codon', 'rna_codon_table', 'resolve_codon', 'translate_protein',
+    'analyze_translation', 'analyze_protein', 'calculate_amino_acid_percentages',
+    'calculate_protein_molecular_weight', '_get_pka_tables', 'calculate_charge_at_ph',
+    'calculate_isoelectric_point', 'calculate_gravy', 'calculate_hydropathy_profile',
+    'find_hydrophobic_regions', 'find_transmembrane_domains', 'calculate_aliphatic_index',
+    'calculate_aromaticity', 'calculate_extinction_coefficient',
+    'calculate_instability_index', 'calculate_secondary_structure_propensity',
+    'calculate_secondary_structure_fraction', 'calculate_flexibility_profile',
+    'predict_signal_peptide', 'analyze_protein_properties', 'analyze_complete_protein',
+    'create_protein_preview',
+)
+
 REMOVED = {"analyses.primer": ("_V5_ACTIVE_CONFIG",)}
 
 # Phase 8 (2026-11-18): the historical _vN_ helpers were renamed; the old
@@ -225,6 +247,10 @@ class PublicModuleNamespaceTests(unittest.TestCase):
         from analyses import cloning
         self._check(cloning, CLONING_NAMES)
 
+    def test_protein_namespace(self):
+        from analyses import protein
+        self._check(protein, PROTEIN_NAMES)
+
     def test_renamed_primer_helpers(self):
         from analyses import primer
         self._check(primer, tuple(RENAMED_PRIMER_NAMES.values()))
@@ -249,9 +275,10 @@ class InternalModuleIndependenceTests(unittest.TestCase):
 
     PROBE = textwrap.dedent('''
         import importlib, json, pkgutil, sys
-        import analyses._blast, analyses._cloning, analyses._mutation, analyses._primer
+        import analyses._blast, analyses._cloning, analyses._mutation, analyses._primer, analyses._protein
         failures = {}
-        for package in (analyses._blast, analyses._primer, analyses._mutation, analyses._cloning):
+        for package in (analyses._blast, analyses._primer, analyses._mutation, analyses._cloning,
+                        analyses._protein):
             for info in pkgutil.iter_modules(package.__path__):
                 name = package.__name__ + "." + info.name
                 for loaded in [m for m in sys.modules if m.startswith("analyses")]:
@@ -260,7 +287,8 @@ class InternalModuleIndependenceTests(unittest.TestCase):
                     importlib.import_module(name)
                 except Exception as error:
                     failures[name] = repr(error)
-                if {"analyses.blast", "analyses.primer", "analyses.mutation", "analyses.cloning"} & set(sys.modules):
+                if {"analyses.blast", "analyses.primer", "analyses.mutation", "analyses.cloning",
+                    "analyses.protein"} & set(sys.modules):
                     failures[name] = "imports the public module"
         for loaded in [m for m in sys.modules if m.startswith("analyses")]:
             del sys.modules[loaded]

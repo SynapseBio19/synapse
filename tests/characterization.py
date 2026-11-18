@@ -291,10 +291,56 @@ def cloning_scenarios() -> dict:
     return out
 
 
+# ---------------------------------------------------------------------------
+# Protein (added in Phase 9, recorded from ee8203d before its split)
+# ---------------------------------------------------------------------------
+
+PROTEINS = (
+    "MKTAYIAKQRQISFVKSHFSRQLEERLGLIEVQAPILSRVGDGTQDNLSGAEKAVQVKVKALPDAQFEVVHSLAKWKRQTLGQHDFSAGEGLYTHMKALRPDEDRLSPLHSVYVDQWDWERVMGDGERQFSTLKSTVEAIWAGIKATEAAVSEEFGLAPFLPDQIHFVHSQELLSRYPDLDAKGRERAIAKDLGAVFLVGIGGKLSDGHRHDVRAPDYDDWUAQSDILRRTQ",
+    "MALWMRLLPLLALLALWGPDPAAAFVNQHLCGSHLVEALYLVCGERGFFYTPKTRREAEDLQVGQVELGGGPGAGSLQPLALEGSLQKRGIVEQCCTSICSLYQLENYCN",
+    "MKXBZJACDEF*",
+    "MLLAVLYCLLWSFQTSAGHFPRACVSSKNLMEKECCPPWSGDRSPCGQLSGRGSCQNILLSNAPLGPQFPFTGVDDRESWPSVFYNRTCQCSGNFMGFNCGNCKFGFWGPNCTERRLLVRRNIFDLSAPEKDKFFAYLTLAKHTISSDYVIPIGTYGQMKNGSTPMFNDINIYDLFVWMHYYVSMDALLGGSEIWRDIDFAHEAPAFLPWHRLFLLRWEQEIQKLTGDENFTIPYWDWRDAEKCDICTDEYMGGQHPTNPNLLSPASFFSSWQIVCSRLEEYNSHQSLCNGTPEGPLRRNPGNHDKSRTPRLPSSADVEFCLSLTQYESGSMDKAANFSFRNTLEGFASPLTGIADASQSSMHNALHIYMNGTMSQVQGSANDPIFLLHHAFVDSIFEQWLRRHRPLQEVYPEANAPIGHNRESYMVPFIPLYRNGDFFISSKDLGYDYSYLQDSDPDSFQDYIKSYLEQASRIWSWLLGAAMVGAVLTALLAGLVSLLCRHKRKQLPEEKQPLLMEKEDYHSLYQSHL",
+)
+RNAS = ("AUGGCUUCUAAAUAA", "AUGNNNGCUUAGGCU", "GUGAAACCCGGGUUUUGA", "AUGRYSWKMBDHVNUAA")
+
+
+def protein_scenarios() -> dict:
+    from analyses import protein as P
+
+    out: dict = {}
+    for index, sequence in enumerate(PROTEINS):
+        out[f"complete_{index}"] = _plain(P.analyze_complete_protein(sequence))
+        out[f"preview_{index}"] = P.create_protein_preview(sequence)
+        out[f"quality_{index}"] = _plain(P.analyze_protein_quality(sequence))
+        for name in ("calculate_amino_acid_percentages", "calculate_protein_molecular_weight",
+                     "calculate_isoelectric_point", "calculate_gravy", "calculate_hydropathy_profile",
+                     "find_hydrophobic_regions", "find_transmembrane_domains", "calculate_aliphatic_index",
+                     "calculate_aromaticity", "calculate_extinction_coefficient", "calculate_instability_index",
+                     "calculate_secondary_structure_propensity", "calculate_secondary_structure_fraction",
+                     "calculate_flexibility_profile", "predict_signal_peptide", "analyze_protein_properties"):
+            try:
+                out[f"{name}_{index}"] = _plain(getattr(P, name)(sequence))
+            except Exception as error:  # the documented rejection is part of the behavior
+                out[f"{name}_{index}"] = f"{type(error).__name__}: {error}"
+        out[f"charge_{index}"] = [repr(P.calculate_charge_at_ph(sequence, pH)) for pH in (3.0, 7.0, 7.4, 11.0)]
+    for index, rna in enumerate(RNAS):
+        for code in (1, 2, 11):
+            out[f"translation_{index}_{code}"] = _plain(P.analyze_translation(rna, initiator_start=True,
+                                                                              genetic_code=code))
+        out[f"translate_{index}"] = _plain(P.translate_protein(rna))
+        out[f"complete_rna_{index}"] = _plain(P.analyze_complete_protein(P.translate_protein(rna), rna=rna,
+                                                                          initiator_start=True))
+    out["codons"] = {codon: _plain(P.resolve_codon(codon)) for codon in ("AUG", "GCN", "RAY", "NNN", "UAR", "UGA")}
+    out["iupac"] = _plain(P.expand_iupac_codon("RYN"))
+    out["instability_weights_size"] = len(P.build_instability_weights())
+    return out
+
+
 SECTIONS = {
     SNAPSHOT: {"primer": primer_scenarios, "blast": blast_scenarios},
     PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "mutation.json": {"mutation": mutation_scenarios},
     PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "cloning.json": {"cloning": cloning_scenarios},
+    PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "protein.json": {"protein": protein_scenarios},
 }
 
 

@@ -18,8 +18,12 @@ from tests import characterization as C
 # that differ in the last digit: sequence_complexity of the "deletion"
 # variant is 98.82341858018908 on 3.10 and 98.82341858018907 on 3.14, with
 # the unchanged code of 727208a on both (checked 2026-11-18). That is the
-# interpreter's math library, not a change of Synapse.
+# interpreter's math library, not a change of Synapse. Since Python 3.12,
+# sum() of floats is compensated (more exact), so sums that should be 0
+# differ around 1e-17 between 3.10 and 3.14 (protein hydropathy windows,
+# found 2026-11-19); ABS_TOL covers values near zero.
 REL_TOL = 1e-12
+ABS_TOL = 1e-12
 
 
 def _as_float(text):
@@ -50,7 +54,7 @@ def _first_difference(actual, expected, path):
                 return found
         return None
     if isinstance(actual, (int, float)) and isinstance(expected, (int, float))             and not isinstance(actual, bool) and not isinstance(expected, bool):
-        return None if math.isclose(actual, expected, rel_tol=REL_TOL) else f"{path}: {actual!r} != {expected!r}"
+        return None if math.isclose(actual, expected, rel_tol=REL_TOL, abs_tol=ABS_TOL) else f"{path}: {actual!r} != {expected!r}"
     if isinstance(actual, str) and isinstance(expected, str):
         a, e = _as_float(actual), _as_float(expected)
         if a is not None and e is not None:
@@ -94,6 +98,9 @@ class CharacterizationSnapshotTests(unittest.TestCase):
 
     def test_cloning_results_are_unchanged(self):
         self._compare("cloning", C.cloning_scenarios())
+
+    def test_protein_results_are_unchanged(self):
+        self._compare("protein", C.protein_scenarios())
 
 
 if __name__ == "__main__":
