@@ -289,8 +289,9 @@ class LiteratureTests(unittest.TestCase):
         from analyses import blast as B
         body = io.BytesIO(b"Message ID#24 Error: busy")
         error = urllib.error.HTTPError(B.NCBI_BLAST_URL, 500, "error", email.message.Message(), body)
+        from analyses._blast import ncbi as NCBI  # the module that calls urlopen
         client = B.NCBIBlastClient(tool="Synapse", email="")
-        with mock.patch.object(B, "urlopen", side_effect=error), \
+        with mock.patch.object(NCBI, "urlopen", side_effect=error), \
                 mock.patch.object(client, "_throttle_request", lambda: None):
             with self.assertRaises(B.BlastAnalysisError) as raised:
                 client._request({"CMD": "Get"})

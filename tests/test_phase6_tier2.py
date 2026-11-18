@@ -1021,12 +1021,17 @@ def _confidence_keys(value, path="$"):
     return found
 
 
+# analyses/ has internal packages since Phase 7.1 (analyses/_blast,
+# analyses/_primer); the source scans include them.
+_PY_PATTERN = {"analyses": "**/*.py"}
+
+
 def _literal_keys_containing(word, directories):
     """String literals used as dict keys or subscripts that contain ``word``."""
     import ast
     hits = []
     for directory in directories:
-        for path in sorted((PROJECT_ROOT / directory).glob("*.py")):
+        for path in sorted((PROJECT_ROOT / directory).glob(_PY_PATTERN.get(directory, "*.py"))):
             tree = ast.parse(path.read_text(encoding="utf-8"))
             for node in ast.walk(tree):
                 keys = []
@@ -1096,7 +1101,7 @@ def _fstring_literal_parts(directories):
     import ast
     parts = []
     for directory in directories:
-        for path in sorted((PROJECT_ROOT / directory).glob("*.py")):
+        for path in sorted((PROJECT_ROOT / directory).glob(_PY_PATTERN.get(directory, "*.py"))):
             tree = ast.parse(path.read_text(encoding="utf-8"))
             for node in ast.walk(tree):
                 if isinstance(node, ast.JoinedStr):
@@ -1219,7 +1224,7 @@ class ExportedWarningsTests(unittest.TestCase):
 def _python_sources():
     paths = [PROJECT_ROOT / "main.py"]
     for directory in ("analyses", "core", "data", "fileio", "ui", "tests"):
-        paths.extend(sorted((PROJECT_ROOT / directory).glob("*.py")))
+        paths.extend(sorted((PROJECT_ROOT / directory).glob(_PY_PATTERN.get(directory, "*.py"))))
     return paths
 
 
@@ -1238,7 +1243,7 @@ class SpellingStandardTests(unittest.TestCase):
         paths = [PROJECT_ROOT / "README.md", PROJECT_ROOT / "main.py"]
         for directory in ("docs", "analyses", "core", "fileio", "ui", "tests"):
             paths.extend(sorted((PROJECT_ROOT / directory).glob("*.md")))
-            paths.extend(sorted((PROJECT_ROOT / directory).glob("*.py")))
+            paths.extend(sorted((PROJECT_ROOT / directory).glob(_PY_PATTERN.get(directory, "*.py"))))
         # docs/CHANGES.md must quote the original wording of an editorial
         # change (Master Prompt 8.7), so it is the one exempt document.
         exempt = {pathlib.Path(__file__).resolve(), (PROJECT_ROOT / "docs" / "CHANGES.md").resolve()}

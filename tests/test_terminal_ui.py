@@ -19,7 +19,7 @@ from ui import cloning_menu, literature_menu, primer_menu
 
 # Every file that draws a terminal interface.
 UI_FILES = sorted(
-    [p for p in (PROJECT_ROOT / "analyses").glob("*.py") if p.name != "__init__.py"]
+    [p for p in (PROJECT_ROOT / "analyses").glob("**/*.py") if p.name != "__init__.py"]
     + [p for p in (PROJECT_ROOT / "ui").glob("*.py") if p.name != "__init__.py"]
     + [PROJECT_ROOT / "core" / "pipeline.py", PROJECT_ROOT / "main.py"]
 )
@@ -295,7 +295,7 @@ class LayeringTests(unittest.TestCase):
         block, which runs when a module is started as a script, never on import.
         """
         hits = []
-        for path in sorted((PROJECT_ROOT / "analyses").glob("*.py")):
+        for path in sorted((PROJECT_ROOT / "analyses").glob("**/*.py")):  # with the Phase 7.1 packages
             tree = ast.parse(read(path))
             script_blocks = [node for node in tree.body if isinstance(node, ast.If)
                              and ast.unparse(node.test) in ("__name__ == '__main__'", '__name__ == "__main__"')]

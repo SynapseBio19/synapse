@@ -31,7 +31,8 @@ structure = ["ViennaRNA>=2.6"]
 dev = ["pyright[nodejs]==1.1.414", "ruff==0.14.4", "coverage>=7.10"]
 
 [tool.setuptools]
-packages = ["analyses", "core", "data", "fileio", "ui"]
+# analyses._blast: internal package of analyses.blast (Phase 7.1).
+packages = ["analyses", "analyses._blast", "core", "data", "fileio", "ui"]
 
 
 [tool.pyright]
@@ -52,3 +53,6 @@ extend-exclude = ["LEGACY", "Synapse_Website", ".tools"]
 # One lambda assignment in a CRISPR test; CRISPR code and tests are not
 # changed in Phase 7 (owner decision of 2026-11-17).
 "tests/test_phase6_tier2.py" = ["E731"]
+# The public modules re-export the implementation of their internal
+# packages (Phase 7.1); the imports are the interface, not unused code.
+"analyses/blast.py" = ["F401"]

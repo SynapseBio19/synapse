@@ -2519,3 +2519,66 @@ Each finding was traced to its cause; no check was disabled, no broad
 - FEATURE_STATUS and AUDIT_STATUS carry the final test count; FEATURE_STATUS
   records the BibTeX escaping and the new "Remove database" row.
 - Reports: `docs/PHASE7_FINAL_REPORT.md` (A-L), `docs/PHASE7_CONTINUATION.md`.
+
+## Phase 7.1 – architectural modularization (from 2026-11-18)
+
+Governed by the owner's Phase 7.1 prompt (internal architecture only; no
+new scientific features; CRISPR/CFD excluded; the AI Experiment Planner
+stays Coming Soon). Audit: `docs/PHASE71_ARCHITECTURE_AUDIT.md`.
+
+### Package A: baseline and characterization tests (`cd23f74`)
+
+- Baseline at `9077f1e` verified again (565 tests; primer3-py now loads on
+  this machine, so its four comparisons ran and passed).
+- `tests/test_module_namespaces.py`: the 264 top-level names of
+  `analyses.blast` and `analyses.primer` stay reachable.
+- `tests/test_characterization.py` with
+  `tests/fixtures/characterization/blast_primer.json`: 78 scenarios
+  recorded from `9077f1e` and compared exactly (floats by `repr`).
+- Code: unchanged.
+
+### Package B: `analyses/blast.py` split into `analyses/_blast/`
+
+- **Before.** One module of 4,667 lines with ten responsibilities.
+- **After.** `analyses/blast.py` (217 lines) is the public module. It keeps
+  its docstring and the `python -m` entry point and re-exports all 125
+  names it defined. The code is in 14 modules of `analyses/_blast/`:
+  `paths`, `config`, `models`, `query`, `parsing`, `ncbi`, `executables`,
+  `runtime`, `databases`, `local_engine`, `evidence`, `reporting`,
+  `workflow`, `selftest`. The import graph between them has no cycle.
+- **How.** A script cut the module at statement boundaries and generated
+  the imports from the names each piece uses. An independent check found
+  all 127 statements verbatim in their new place.
+- **The only edit inside moved code.**
+  - Four `Path(__file__).resolve().parent[.parent]` lookups (database
+    root, executable search, user paths, one self-test) now read
+    `ANALYSES_DIR[.parent]`.
+  - `ANALYSES_DIR` (`analyses/_blast/paths.py`) is the `analyses`
+    directory, which is what `Path(__file__)` meant in the old location.
+  - The snapshot records the database root, the project-local executable
+    directories and the user-path base: all unchanged.
+- **`rank_hits`** moved to `models` next to `BlastRun`, because
+  `BlastRun.ranked_hits` calls it. Placing it with the evidence code would
+  have created an import cycle.
+- **Names no longer in the namespace.** The standard-library and
+  `core.alphabets` / `core.textformat` names that `analyses.blast` only
+  imported (`json`, `time`, `urlopen`, `Path`, `RNA_IUPAC`, `minor_rule`,
+  ...) are no longer attributes of it.
+  - Two tests patched them: `B.time.sleep` in `test_blast_polling` and
+    `B.urlopen` in `test_stage3_additions`.
+  - They now patch `analyses._blast.ncbi`, the module that calls them.
+    Patched on the old module, the patch would silently have stopped
+    taking effect.
+- **Packaging.** `pyproject.toml` lists packages explicitly. Without
+  adding `analyses._blast`, `pip install .` would have shipped a
+  `blast.py` that cannot import; a clean non-editable install was checked.
+- **Rule tests.** The scans in `test_terminal_ui` (layering, UI rules),
+  `test_phase6_tier2` (spelling, heuristic vocabulary, output notation)
+  and `test_documentation_consistency` read `analyses/*.py` only. They
+  now include `analyses/**`, so the moved code stays under the same
+  rules. In `test_phase6_tier2` only these scan helpers changed, not the
+  CRISPR tests.
+- **Ruff.** `analyses/blast.py` ignores F401: its imports are the
+  interface.
+- **Results.** Unchanged: characterization snapshot, golden master,
+  rendered menus and the full suite.

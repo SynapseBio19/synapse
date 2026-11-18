@@ -16,7 +16,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCUMENT = ROOT / "docs" / "FEATURE_STATUS.md"
-SOURCES = [*ROOT.glob("analyses/*.py"), *ROOT.glob("core/*.py"), *ROOT.glob("ui/*.py"),
+# analyses/**: the internal packages of Phase 7.1 (analyses/_blast, analyses/_primer).
+SOURCES = [*ROOT.glob("analyses/**/*.py"), *ROOT.glob("core/*.py"), *ROOT.glob("ui/*.py"),
            *ROOT.glob("fileio/*.py"), *ROOT.glob("data/*.py"), ROOT / "main.py"]
 IDENTIFIER = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
 

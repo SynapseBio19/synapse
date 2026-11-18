@@ -16,6 +16,7 @@ from unittest import mock
 from urllib.error import HTTPError, URLError
 
 from analyses import blast as B
+from analyses._blast import ncbi as NCBI  # the module that calls time.sleep
 
 
 def _error(cause: BaseException) -> B.BlastAnalysisError:
@@ -41,7 +42,7 @@ class StatusPollingTests(unittest.TestCase):
         logging.disable(logging.CRITICAL)
         self.addCleanup(logging.disable, logging.NOTSET)
         self.client = B.NCBIBlastClient()
-        patcher = mock.patch.object(B.time, "sleep", lambda seconds: None)
+        patcher = mock.patch.object(NCBI.time, "sleep", lambda seconds: None)
         patcher.start()
         self.addCleanup(patcher.stop)
 
@@ -85,7 +86,7 @@ class SubmittedSearchTests(unittest.TestCase):
         self.addCleanup(logging.disable, logging.NOTSET)
         client = B.NCBIBlastClient()
         query = B.build_query("ACGT" * 15, name="q")
-        with mock.patch.object(B.time, "sleep", lambda seconds: None), \
+        with mock.patch.object(NCBI.time, "sleep", lambda seconds: None), \
                 mock.patch.object(client, "submit", return_value=("RIDXYZ123", 0, "")), \
                 mock.patch.object(client, "status", side_effect=TRANSIENT):
             with self.assertRaises(B.BlastAnalysisError) as caught:
