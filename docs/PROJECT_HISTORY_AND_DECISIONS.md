@@ -198,3 +198,21 @@ and `docs/PHASE6_CONTINUATION.md`.
 - primer3-py loads on this machine again (2026-11-18); its comparisons
   ran and passed.
 - Details: `docs/PHASE71_ARCHITECTURE.md`, `docs/PHASE71_FINAL_REPORT.md`.
+
+## 11. Phase 8 (2026-11-18): consolidation under the owner's mandate
+
+- The owner's mandate (§4, decision of 2026-11-18) allows restructuring,
+  fixes with evidence, deleting dead code, renaming internals and
+  dropping ReadOnly. CRISPR and the Planner stay excluded; the name
+  Synapse stays (domain `synapse-gen.com`).
+- Done:
+  - ReadOnly dropped;
+  - two unreachable report printers and an unread BLAST file deleted;
+  - the legacy BLAST record moved into the test fixtures;
+  - the `_vN_` primer helpers renamed;
+  - `analyses/mutation.py` and `analyses/cloning.py` split like BLAST and
+    primer, each after its own characterization snapshot;
+  - pip distribution name `synapse-gen` with the homepage.
+- Three tests that patched the public module after a split would have
+  passed without testing anything; they were found and corrected.
+- Details: `docs/PHASE8_REPORT.md`, `docs/ARCHITECTURE.md`.

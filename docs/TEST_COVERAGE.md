@@ -146,3 +146,26 @@ Least-covered BLAST modules now:
 
 The 85 % target is not reached: the CRISPR dialog stays excluded, and
 `print_protein_report` stays unreachable until the owner decides.
+
+## Remeasured 2026-11-18 (Phase 8)
+
+Same tool and command. Suite: 608 tests, all passing. 7 skipped: the
+opt-in benchmark and six ViennaRNA tests, because Windows application
+control blocked ViennaRNA's DLL that day.
+
+| Scope | Phase 7.1 end | Phase 8 |
+|---|---:|---:|
+| Mutation (`mutation.py` + `_mutation/`) | – | 88.8 % |
+| Cloning (`cloning.py` + `_cloning/`) | – | 85.0 % |
+| `analyses` | 84.6 % | 85.5 % |
+| `core` | 87.6 % | 87.0 % |
+| `ui` | 74.2 % | 77.1 % |
+| `fileio` | 91.8 % | 91.8 % |
+| `main.py` | 83.6 % | 83.6 % |
+| **Total** | **82.3 %** | **83.7 %** |
+
+- `ui` rose because the 638 unreachable lines of the two deleted report
+  printers no longer count, not because of new tests.
+- `core` fell by 0.6 points. The likely cause is the ViennaRNA entry
+  point in `core/api.py`, which only the skipped tests reach; this was not
+  checked line by line.
