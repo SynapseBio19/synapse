@@ -141,6 +141,13 @@ use 0-based inclusive `start <= stop` on the forward strand.
   policy; table 1 = ATG, CTG, GTG, TTG). An IUPAC codon counts only if
   every reading is an initiation codon. Internal codons always use the
   elongation code (e.g. internal CTG = Leu, internal GTG = Val).
+- Genetic codes: all 27 NCBI codes, copied from NCBI's gc.prt 4.6
+  (`core/seqtools.py`; checked against the file and Biopython). In codes
+  27, 28 and 31 some codons are context-dependent: NCBI lists an amino
+  acid (e.g. TGA = Trp in code 27) and marks them as able to terminate.
+  Synapse ends ORFs at them and decodes them as that amino acid inside a
+  sequence; ORF predictions in these codes are therefore a conservative
+  reading (the true gene end needs context Synapse does not model).
 - An ORF is translated with its own genetic code: `translate_orf_sequence`
   and `core.api.analyze_protein_from_cds` accept the ORF dict and read its
   `genetic_code` (a conflicting explicit table is an error). A bare DNA

@@ -118,7 +118,7 @@ relative to its use (every session runs it).
 | 6.3 | Nested ORFs | `_keep_longest_per_stop` | Implemented | Execution-tested | Not applicable | **S2 not a defect** (verified by execution 2026-10-31): nested minus-strand ORFs share frame and 3' end and collapse correctly. |
 | 6.4 | Ranking | `_orf_sort_key`, `rank_orf_candidates` | Implemented | Execution-tested | Not applicable | `length` (default) or `heuristic`. |
 | 6.5 | Partial ORFs | `find_orfs(include_partial=, include_5prime_partial=)` | Implemented | Execution-tested | Not applicable | 3′-partial (missing stop) by default; 5′-partial (missing start, and missing both) on request since 2026-11-11 (P1-9). The first codon of a 5′-partial ORF is never read as initiator Met. `test_orf_partial_circular.py`. |
-| 6.6 | Genetic code | `codon_table_for` | Implemented | Execution-tested | Independently validated | NCBI 1, 2, 4, 11 verified against `Bio.Data.CodonTable`. |
+| 6.6 | Genetic code | `codon_table_for` | Implemented | Execution-tested | Independently validated | All 27 NCBI codes (gc.prt 4.6, since 2026-11-19; 1, 2, 4 and 11 before), each table checked against NCBI's file and `Bio.Data.CodonTable` (`tests/test_genetic_codes_ncbi.py`). Context-dependent codons of codes 27, 28, 31 end ORFs and decode as NCBI's amino acid inside. |
 | 6.7/6.8 | Restore Synapse / legacy settings | `LEGACY_ORF_SETTINGS` | Implemented | Execution-tested | Not applicable | Golden-master proves legacy equivalence. |
 | — | Start-codon classification | `classify_start_codon` | Implemented | Execution-tested | Not applicable | |
 | — | Ambiguity analysis | `analyze_orf_ambiguity` | Implemented | Execution-tested | Not applicable | Deterministic vs uncertain codons separated. |
@@ -477,7 +477,7 @@ explicitly not implemented.
 | 2 | Digests on pUC19 (L09137.2) | Biopython, 22 enzymes × 2 topologies × 3 rotations | 132 comparisons, 0 differences |
 | 3 | End-compatibility matrix | Biopython `ovhg`/`ovhgseq` | 484 pairs, 0 mismatches |
 | 4 | Melting temperature | primer3-py 2.4.0 (SantaLucia) | 40 comparisons, max 0.003 °C |
-| 5 | Genetic codes 1/2/4/11 | `Bio.Data.CodonTable` | Identical, incl. start sets |
+| 5 | Genetic codes (all 27 NCBI codes since 2026-11-19) | NCBI gc.prt 4.6 and `Bio.Data.CodonTable` | Identical, incl. start sets |
 | 6 | Protein properties | `Bio.SeqUtils.ProtParam`, ExPASy | pI, GRAVY, instability, aromaticity, extinction, MW all match |
 | 7 | Local BLAST pipeline | BLAST+ 2.17.0+ on the bundled database | Real run; coverage, E-values, bands, provenance correct |
 | 8 | Variant left-alignment | Tan et al. 2015, hand-verified | 5/5 cases correct, incl. correct non-shifts |

@@ -2983,3 +2983,57 @@ that, its gate would fail, which was checked with `check_skips.py`.
 Timing on the owner's machine: about 190 s per 400-nt search, and 444 s
 for the 22-nt query (standard search plus rescue). blastn used about 7 GB
 of memory.
+
+## Phase 9 – completion under the owner's mandate (from 2026-11-19)
+
+The owner's mandate of 2026-11-18 holds: fix all defects and complete the
+project; CRISPR and the AI Experiment Planner stay excluded. Windows
+Smart App Control was switched off by the owner on 2026-11-19, so
+primer3-py, ViennaRNA and `pyright.exe` run again.
+
+**Housekeeping (no code change).**
+- The 82-GB BLAST database was moved out of the OneDrive project folder to
+  `C:\SynapseData\blast_db`; `SYNAPSE_BLAST_DB_ROOT` (user environment)
+  points there. The move was a rename on the same drive; the files were
+  local and complete beforehand.
+- `refseq_rna` is verified again after the move.
+- The stale `refseq_rna/synapse_test.nal` went to the Recycle Bin. It
+  pointed to the original "Project Synapse" folder and showed up as an
+  extra database.
+
+**Differential checks against Biopython**, on random input
+(1,500 sequences for the reverse complements, 400 alignments, 200 GC
+values). No defect found:
+- all seven reverse-complement implementations equal
+  `Bio.Seq.reverse_complement` on IUPAC sequences;
+- every mutation alignment reaches the optimal score of
+  `Bio.Align.PairwiseAligner` (linear gaps, 2/-1/-2) and preserves both
+  sequences;
+- GC content is identical;
+- the DNA molecular weight differs by the terminal groups (17.7 Da at
+  100 nt). That is the documented convention ("terminal-group assumptions
+  differ"), not a defect.
+
+### Package A: all 27 NCBI genetic codes
+
+- **Before.** 4 of NCBI's 27 genetic codes (1, 2, 4, 11). The four were
+  correct (identical to NCBI and Biopython).
+- **After.** All 27, copied from NCBI's gc.prt version 4.6. The file is
+  stored verbatim with its SHA-256 in `tests/fixtures/ncbi_gc/`. Code 4
+  now carries NCBI's exact name.
+- **Context-dependent codons** (codes 27, 28, 31). NCBI lists an amino
+  acid for them and marks them as able to terminate; Biopython lists them
+  only as stops.
+  - `GeneticCode.stop_codons` now includes every codon that can
+    terminate, and the new `context_dependent_codons` names these ones.
+  - `orf.codon_table_for` ends ORFs at them; `translate` decodes them as
+    the amino acid (METHODS).
+- **The ORF menu** lists the codes from `available_genetic_codes()`, so
+  all 27 are selectable without a UI change.
+- **Evidence.** `tests/test_genetic_codes_ncbi.py` (5 tests):
+  - the fixture's checksum;
+  - every table equal to NCBI's file (amino acids, starts, stops, name);
+  - equal to Biopython except exactly the context-dependent codons;
+  - ORFs end at TAA under code 28.
+
+  Characterization, golden master and rendered menus are unchanged.

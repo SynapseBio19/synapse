@@ -138,7 +138,10 @@ def codon_table_for(genetic_code=1):
         return GENETIC_CODE
     from core.seqtools import get_genetic_code
     table = get_genetic_code(int(genetic_code))
-    return {codon: ("STOP" if aa == "*" else aa) for codon, aa in table.codons.items()}
+    # Codons that can terminate count as stops, also where NCBI lists an
+    # amino acid for them (context-dependent codons of codes 27, 28, 31).
+    return {codon: ("STOP" if aa == "*" or codon in table.stop_codons else aa)
+            for codon, aa in table.codons.items()}
 
 
 def start_codons_for(genetic_code=1, start_codon_policy=None):

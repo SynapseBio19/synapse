@@ -78,19 +78,92 @@ _BASE1 = "TTTTTTTTTTTTTTTTCCCCCCCCCCCCCCCCAAAAAAAAAAAAAAAAGGGGGGGGGGGGGGGG"
 _BASE2 = "TTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGGTTTTCCCCAAAAGGGG"
 _BASE3 = "TCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAGTCAG"
 
+# All genetic codes of NCBI's gc.prt, version 4.6, read on 2026-11-19
+# (tests/fixtures/ncbi_gc/gc.prt; tests/test_genetic_codes_ncbi.py checks
+# every table against it). Per table: NCBI name, ncbieaa (amino acid per
+# codon in TCAG order), sncbieaa ("M" = start codon, "*" = can terminate).
 _NCBI_TABLES = {
-    1: ("Standard",
-        "FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
-        "---M------**--*----M---------------M----------------------------"),
-    2: ("Vertebrate Mitochondrial",
-        "FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNKKSS**VVVVAAAADDEEGGGG",
-        "----------**--------------------MMMM----------**---M------------"),
-    4: ("Mold, Protozoan, Coelenterate Mitochondrial; Mycoplasma/Spiroplasma",
-        "FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
-        "--MM------**-------M------------MMMM---------------M------------"),
-    11: ("Bacterial, Archaeal and Plant Plastid",
-         "FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG",
-         "---M------**--*----M------------MMMM---------------M------------"),
+    1: ('Standard',
+         'FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG',
+         '---M------**--*----M---------------M----------------------------'),
+    2: ('Vertebrate Mitochondrial',
+         'FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNKKSS**VVVVAAAADDEEGGGG',
+         '----------**--------------------MMMM----------**---M------------'),
+    3: ('Yeast Mitochondrial',
+         'FFLLSSSSYY**CCWWTTTTPPPPHHQQRRRRIIMMTTTTNNKKSSRRVVVVAAAADDEEGGGG',
+         '----------**----------------------MM---------------M------------'),
+    4: ('Mold Mitochondrial; Protozoan Mitochondrial; Coelenterate Mitochondrial; Mycoplasma; Spiroplasma',
+         'FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG',
+         '--MM------**-------M------------MMMM---------------M------------'),
+    5: ('Invertebrate Mitochondrial',
+         'FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNKKSSSSVVVVAAAADDEEGGGG',
+         '---M------**--------------------MMMM---------------M------------'),
+    6: ('Ciliate Nuclear; Dasycladacean Nuclear; Hexamita Nuclear',
+         'FFLLSSSSYYQQCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG',
+         '--------------*--------------------M----------------------------'),
+    9: ('Echinoderm Mitochondrial; Flatworm Mitochondrial',
+         'FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNNKSSSSVVVVAAAADDEEGGGG',
+         '----------**-----------------------M---------------M------------'),
+    10: ('Euplotid Nuclear',
+         'FFLLSSSSYY**CCCWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG',
+         '----------**-----------------------M----------------------------'),
+    11: ('Bacterial, Archaeal and Plant Plastid',
+         'FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG',
+         '---M------**--*----M------------MMMM---------------M------------'),
+    12: ('Alternative Yeast Nuclear',
+         'FFLLSSSSYY**CC*WLLLSPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG',
+         '----------**--*----M---------------M----------------------------'),
+    13: ('Ascidian Mitochondrial',
+         'FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNKKSSGGVVVVAAAADDEEGGGG',
+         '---M------**----------------------MM---------------M------------'),
+    14: ('Alternative Flatworm Mitochondrial',
+         'FFLLSSSSYYY*CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNNKSSSSVVVVAAAADDEEGGGG',
+         '-----------*-----------------------M----------------------------'),
+    15: ('Blepharisma Macronuclear',
+         'FFLLSSSSYY*QCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG',
+         '----------*---*--------------------M----------------------------'),
+    16: ('Chlorophycean Mitochondrial',
+         'FFLLSSSSYY*LCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG',
+         '----------*---*--------------------M----------------------------'),
+    21: ('Trematode Mitochondrial',
+         'FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIMMTTTTNNNKSSSSVVVVAAAADDEEGGGG',
+         '----------**-----------------------M---------------M------------'),
+    22: ('Scenedesmus obliquus Mitochondrial',
+         'FFLLSS*SYY*LCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG',
+         '------*---*---*--------------------M----------------------------'),
+    23: ('Thraustochytrium Mitochondrial',
+         'FF*LSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG',
+         '--*-------**--*-----------------M--M---------------M------------'),
+    24: ('Rhabdopleuridae Mitochondrial',
+         'FFLLSSSSYY**CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSSKVVVVAAAADDEEGGGG',
+         '---M------**-------M---------------M---------------M------------'),
+    25: ('Candidate Division SR1 and Gracilibacteria',
+         'FFLLSSSSYY**CCGWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG',
+         '---M------**-----------------------M---------------M------------'),
+    26: ('Pachysolen tannophilus Nuclear',
+         'FFLLSSSSYY**CC*WLLLAPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG',
+         '----------**--*----M---------------M----------------------------'),
+    27: ('Karyorelict Nuclear',
+         'FFLLSSSSYYQQCCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG',
+         '--------------*--------------------M----------------------------'),
+    28: ('Condylostoma Nuclear',
+         'FFLLSSSSYYQQCCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG',
+         '----------**--*--------------------M----------------------------'),
+    29: ('Mesodinium Nuclear',
+         'FFLLSSSSYYYYCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG',
+         '--------------*--------------------M----------------------------'),
+    30: ('Peritrich Nuclear',
+         'FFLLSSSSYYEECC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG',
+         '--------------*--------------------M----------------------------'),
+    31: ('Blastocrithidia Nuclear',
+         'FFLLSSSSYYEECCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG',
+         '----------**-----------------------M----------------------------'),
+    32: ('Balanophoraceae Plastid',
+         'FFLLSSSSYY*WCC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG',
+         '---M------*---*----M------------MMMM---------------M------------'),
+    33: ('Cephalodiscidae Mitochondrial',
+         'FFLLSSSSYYY*CCWWLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSSKVVVVAAAADDEEGGGG',
+         '---M-------*-------M---------------M---------------M------------'),
 }
 
 
@@ -101,6 +174,11 @@ class GeneticCode:
     codons: Dict[str, str]
     start_codons: FrozenSet[str]
     stop_codons: FrozenSet[str]
+    # Codons that encode an amino acid but can also terminate translation
+    # (NCBI marks them "*" in sncbieaa; codes 27, 28 and 31). They are in
+    # stop_codons, so ORFs end there; translate() decodes them as the amino
+    # acid NCBI lists, which is their meaning inside a coding sequence.
+    context_dependent_codons: FrozenSet[str] = frozenset()
 
     def translate_codon(self, codon: str) -> str:
         """Amino acid for a codon; '*' for stop, 'X' if it cannot be resolved.
@@ -137,8 +215,10 @@ def _build(table_id: int) -> GeneticCode:
     name, amino_acids, starts = _NCBI_TABLES[table_id]
     codons = {b1 + b2 + b3: aa for b1, b2, b3, aa in zip(_BASE1, _BASE2, _BASE3, amino_acids)}
     start_codons = frozenset(c for c, flag in zip(codons, starts) if flag == "M")
-    stop_codons = frozenset(c for c, aa in codons.items() if aa == "*")
-    return GeneticCode(table_id, name, codons, start_codons, stop_codons)
+    can_terminate = frozenset(c for c, flag in zip(codons, starts) if flag == "*")
+    stop_codons = frozenset(c for c, aa in codons.items() if aa == "*") | can_terminate
+    context_dependent = frozenset(c for c in can_terminate if codons[c] != "*")
+    return GeneticCode(table_id, name, codons, start_codons, stop_codons, context_dependent)
 
 
 GENETIC_CODES: Dict[int, GeneticCode] = {table_id: _build(table_id) for table_id in _NCBI_TABLES}
