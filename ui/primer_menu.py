@@ -295,7 +295,7 @@ def print_professional_primer_report(
     print(major_rule())
 
 
-def _primer_ui_design_menu_v4(dna, header, pipeline):
+def _primer_ui_design_menu(dna, header, pipeline):
     """Improved compact Primer Design module menu."""
     sequence = normalize_dna_sequence(dna)
 
@@ -356,14 +356,14 @@ def run_primer_analysis_ui(
         style.error(f"{exc}")
         return None
 
-    return _primer_ui_design_menu_v4(
+    return _primer_ui_design_menu(
         dna,
         header,
         pipeline,
     )
 
 
-def _v7_primer_ui_design(sequence, target_start, target_end, pipeline):
+def _primer_ui_design(sequence, target_start, target_end, pipeline):
     """Run all three Tm models through the professional workflow."""
     tm_method = _primer_ui_select_tm_model()
 
@@ -399,9 +399,6 @@ def _v7_primer_ui_design(sequence, target_start, target_end, pipeline):
     except (TypeError, ValueError, ZeroDivisionError) as exc:
         style.error(f"{exc}")
         return None
-
-
-_primer_ui_design = _v7_primer_ui_design
 
 
 def _primer_ui_restriction_site_design(sequence, pipeline):

@@ -45,13 +45,13 @@ class SharedTableTests(unittest.TestCase):
         from analyses import primer as P
         # The public name is the adapter; the model is reachable privately.
         self.assertIn("salt_mM", P.calculate_tm_nearest_neighbor.__doc__ or "")
-        self.assertIsNot(P.calculate_tm_nearest_neighbor, P._calculate_tm_nearest_neighbor_v3_raw)
+        self.assertIsNot(P.calculate_tm_nearest_neighbor, P._calculate_tm_nearest_neighbor_raw)
         sequence = "ACGTACGTACGTACGTACGT"
         # The adapter's legacy aliases reach the same model as the v3 names.
         # cast(): the adapter is declared float | NearestNeighborTmResult and
         # returns the float unless return_details=True.
         legacy = cast(float, P.calculate_tm_nearest_neighbor(sequence, salt_mM=50.0, mg_mM=1.5))
-        direct = P._calculate_tm_nearest_neighbor_v3_raw(sequence, sodium_mM=50.0, magnesium_mM=1.5)
+        direct = P._calculate_tm_nearest_neighbor_raw(sequence, sodium_mM=50.0, magnesium_mM=1.5)
         self.assertIsInstance(legacy, float)
         self.assertAlmostEqual(legacy, direct)
 

@@ -51,28 +51,22 @@ from analyses._primer.professional import (
 #
 # The underlying thermodynamic calculations and legacy APIs remain intact.
 #
-# Reading guide for the _vN_ prefixes (audit D16).
+# Names (audit D16; Phase 8). The "V5"-"V11" headings below record the
+# generation a change was made in; they are history, not alternatives.
+# Until 2026-11-18 the helpers carried that generation as a prefix
+# (_v5_candidate_quality, _v7_measure_candidates, ...) and the public names
+# were bound to them by assignment. The helpers now have descriptive names
+# and the public functions are defined directly:
 #
-# These names record the generation a helper was introduced in; they are not
-# a chain of live alternatives. Each public name is bound exactly once, at the
-# end of the section that defines its final implementation:
+#   generate_professional_primer_candidates  (this module)
+#   rank_professional_primer_pairs           (analyses/_primer/ranking.py)
+#   _primer_ui_design                        (ui/primer_menu.py)
+#   design_primers_professional              (analyses/_primer/workflow.py)
 #
-#   generate_professional_primer_candidates -> _v7_generate_professional_primer_candidates
-#   rank_professional_primer_pairs          -> _v11_rank_professional_primer_pairs
-#   _primer_ui_design                       -> _v7_primer_ui_design
-#   design_primers_professional             -> the plain def near the end of the module
-#
-# Earlier generations used to rebind the same public names in sequence, so a
-# reader had to scan the whole module to learn which implementation actually
-# ran. Those superseded bindings and the 24 private definitions they alone
-# kept reachable were removed in Phase 6; every surviving helper below is
-# reached from one of the four entry points above. Helpers that still carry an
-# older prefix (_v5_structure_penalty, _v6_relaxed_generation_config,
-# _v8_structure_severity) are live and shared - the prefix is history, not a
-# version switch.
+# The old-to-new mapping is listed in docs/CHANGES.md (Phase 8, package B).
 # ============================================================================
 
-def _v5_structure_penalty(stem: int, low: int, high: int) -> float:
+def _structure_penalty(stem: int, low: int, high: int) -> float:
     """Return a graded penalty for a structural stem length."""
     if stem <= low:
         return 0.0
@@ -81,7 +75,7 @@ def _v5_structure_penalty(stem: int, low: int, high: int) -> float:
     return 30.0 * (stem - low) / float(high - low)
 
 
-def _v5_candidate_quality(item, config) -> float:
+def _screening_quality(item, config) -> float:
     """Score a candidate while strongly penalizing structural risk.
 
     ``config`` is the ProfessionalPrimerConfig of the design. Before Phase 7.1
@@ -107,8 +101,8 @@ def _v5_candidate_quality(item, config) -> float:
     )
 
     penalty = (
-        _v5_structure_penalty(hairpin, 3, 8)
-        + _v5_structure_penalty(self_dimer, 4, 9)
+        _structure_penalty(hairpin, 3, 8)
+        + _structure_penalty(self_dimer, 4, 9)
     )
 
     return (
@@ -135,7 +129,7 @@ def _v5_candidate_quality(item, config) -> float:
 # generate_primer_candidates() behavior remains unchanged for compatibility.
 # ============================================================================
 
-def _v6_relaxed_generation_config(base_config: PrimerDesignConfig) -> PrimerDesignConfig:
+def _measurement_config(base_config: PrimerDesignConfig) -> PrimerDesignConfig:
     """Create a measurement-only configuration with no hard quality filters."""
     return replace(
         base_config,
@@ -167,7 +161,7 @@ def _v6_relaxed_generation_config(base_config: PrimerDesignConfig) -> PrimerDesi
 # thermodynamic information.
 # ============================================================================
 
-def _v7_apply_selected_tm_model(
+def _apply_selected_tm_model(
     advanced: AdvancedPrimerCandidate,
     candidate: PrimerCandidate,
     config: ProfessionalPrimerConfig,
@@ -197,7 +191,7 @@ def _v7_apply_selected_tm_model(
     return advanced
 
 
-def _v7_generate_professional_primer_candidates(
+def generate_professional_primer_candidates(
     sequence: str,
     target_start: int,
     target_end: int,
@@ -210,7 +204,7 @@ def _v7_generate_professional_primer_candidates(
     config.validate()
 
     base_config = config.primer
-    relaxed = _v6_relaxed_generation_config(base_config)
+    relaxed = _measurement_config(base_config)
 
     limit = int(getattr(config, "max_pair_candidates", 80))
 
@@ -229,17 +223,17 @@ def _v7_generate_professional_primer_candidates(
     if len(windows) > relaxed.max_candidates_per_orientation:
         # The generator would truncate the pool before the tier sort; keep
         # its exact behavior by measuring every window.
-        return _v7_measure_all_candidates(
+        return _measure_all_candidates(
             sequence, target_start, target_end, orientation, config, relaxed, limit,
         )
 
     windows_by_tier: dict[int, list[int]] = {}
     profiles: dict[int, PrimerThermodynamicProfile] = {}
     for index, (start, end) in enumerate(windows):
-        tm, profile = _v7_screening_tm(sequence, orientation, start, end, config, relaxed)
+        tm, profile = _screening_tm(sequence, orientation, start, end, config, relaxed)
         if profile is not None:
             profiles[index] = profile
-        windows_by_tier.setdefault(_v7_tm_tier(tm, base_config), []).append(index)
+        windows_by_tier.setdefault(_tm_tier(tm, base_config), []).append(index)
 
     # Within a tier the next sort key is the screening score. Without the
     # hairpin and self-dimer measurements it has an upper bound (a primer
@@ -253,7 +247,7 @@ def _v7_generate_professional_primer_candidates(
         places = limit - len(accepted)
         bounded = sorted(
             (
-                (-_v7_screening_upper_bound(
+                (-_screening_upper_bound(
                     sequence, orientation, windows[index][0], windows[index][1],
                     config, relaxed, profiles.get(index),
                 ), index)
@@ -272,24 +266,23 @@ def _v7_generate_professional_primer_candidates(
             )
             if not candidate.rejection_reasons:
                 accepted.append((index, candidate))
-                tier_scores.append(_v7_screening_score(candidate, config))
+                tier_scores.append(_screening_score(candidate, config))
         if len(accepted) >= limit:
             break
 
     accepted.sort(key=lambda item: item[0])
     candidates = [candidate for _, candidate in accepted]
     candidates.sort(key=_generation_sort_key(relaxed))
-    measured = _v7_measure_candidates(candidates, config)
+    measured = _measure_candidates(candidates, config)
     return measured[:limit], len(windows)
 
 
-_V7_NEAREST_NEIGHBOR_METHODS = NEAREST_NEIGHBOR_TM_METHODS
 
 
-def _v7_screening_tm(sequence, orientation, start, end, config, relaxed):
+def _screening_tm(sequence, orientation, start, end, config, relaxed):
     """Return the Tm that decides a window's screening tier.
 
-    It is the value _v7_apply_selected_tm_model leaves in the candidate's
+    It is the value _apply_selected_tm_model leaves in the candidate's
     thermodynamic profile: the nearest-neighbor profile Tm, or the selected
     model's Tm rounded as the candidate stores it. The nearest-neighbor
     profile is returned too (None for the other models) so that it is not
@@ -297,28 +290,28 @@ def _v7_screening_tm(sequence, orientation, start, end, config, relaxed):
     """
     template = sequence[start:end]
     primer = template if orientation == "FORWARD" else reverse_complement(template)
-    if config.tm_method.lower().strip() in _V7_NEAREST_NEIGHBOR_METHODS:
+    if config.tm_method.lower().strip() in NEAREST_NEIGHBOR_TM_METHODS:
         profile = calculate_primer_thermodynamics(primer, conditions=config.thermodynamics)
         return float(profile.tm_C), profile
     candidate_tm = round(float(_candidate_thermodynamics(primer, relaxed, config.tm_method).tm), 2)
     return float(round(float(candidate_tm), 2)), None
 
 
-def _v7_screening_score(candidate: PrimerCandidate, config) -> float:
-    """Return the screening score _v7_measure_candidates gives a candidate."""
+def _screening_score(candidate: PrimerCandidate, config) -> float:
+    """Return the screening score _measure_candidates gives a candidate."""
     advanced = analyze_primer_candidate_thermodynamics(
         candidate, conditions=config.thermodynamics,
     )
-    advanced = _v7_apply_selected_tm_model(advanced, candidate, config)
-    return float(_v5_candidate_quality(advanced, config))
+    advanced = _apply_selected_tm_model(advanced, candidate, config)
+    return float(_screening_quality(advanced, config))
 
 
-def _v7_screening_upper_bound(sequence, orientation, start, end, config, relaxed, profile=None) -> float:
+def _screening_upper_bound(sequence, orientation, start, end, config, relaxed, profile=None) -> float:
     """Return an upper bound of a window's screening score.
 
     It is the score of the same primer with no hairpin and no self-dimer:
     score_primer_candidate then awards the full structure score, and the
-    structural penalty of _v5_candidate_quality is zero. Every other term
+    structural penalty of _screening_quality is zero. Every other term
     is computed exactly as for the measured candidate, and each step is
     monotone, so the true score never exceeds the bound.
     """
@@ -341,7 +334,7 @@ def _v7_screening_upper_bound(sequence, orientation, start, end, config, relaxed
         profile = calculate_primer_thermodynamics(primer, conditions=config.thermodynamics)
     thermodynamic_score = score_thermodynamic_profile(profile)
     method = config.tm_method.lower().strip()
-    if method not in _V7_NEAREST_NEIGHBOR_METHODS:
+    if method not in NEAREST_NEIGHBOR_TM_METHODS:
         profile = replace(profile, method=method, tm_C=round(float(round(tm, 2)), 2))
         thermodynamic_score = score_thermodynamic_profile(
             profile,
@@ -360,7 +353,7 @@ def _v7_screening_upper_bound(sequence, orientation, start, end, config, relaxed
     )
 
 
-def _v7_tm_tier(tm: float, base_config: PrimerDesignConfig) -> int:
+def _tm_tier(tm: float, base_config: PrimerDesignConfig) -> int:
     if base_config.min_tm <= tm <= base_config.max_tm:
         return 1
     if (base_config.min_tm - 2.0) <= tm <= (base_config.max_tm + 2.0):
@@ -368,7 +361,7 @@ def _v7_tm_tier(tm: float, base_config: PrimerDesignConfig) -> int:
     return 3
 
 
-def _v7_measure_candidates(candidates, config):
+def _measure_candidates(candidates, config):
     """Add the thermodynamic profile, tier and screening score, then order."""
     base_config = config.primer
     measured = []
@@ -378,16 +371,16 @@ def _v7_measure_candidates(candidates, config):
             conditions=config.thermodynamics,
         )
 
-        advanced = _v7_apply_selected_tm_model(
+        advanced = _apply_selected_tm_model(
             advanced,
             candidate,
             config,
         )
 
-        advanced.screening_tier = _v7_tm_tier(
+        advanced.screening_tier = _tm_tier(
             float(advanced.thermodynamics.tm_C), base_config,
         )
-        advanced.screening_score = _v5_candidate_quality(advanced, config)
+        advanced.screening_score = _screening_quality(advanced, config)
         measured.append(advanced)
 
     measured.sort(
@@ -407,7 +400,7 @@ def _v7_measure_candidates(candidates, config):
     return measured
 
 
-def _v7_measure_all_candidates(sequence, target_start, target_end, orientation, config, relaxed, limit):
+def _measure_all_candidates(sequence, target_start, target_end, orientation, config, relaxed, limit):
     """Measure every window (the behavior before the tier screen)."""
     candidates, evaluated = generate_primer_candidates(
         sequence,
@@ -417,9 +410,6 @@ def _v7_measure_all_candidates(sequence, target_start, target_end, orientation, 
         relaxed,
         config.tm_method,
     )
-    measured = _v7_measure_candidates(candidates, config)
+    measured = _measure_candidates(candidates, config)
     return measured[:limit], evaluated
 
-
-# Bind V7 implementations.
-generate_professional_primer_candidates = _v7_generate_professional_primer_candidates

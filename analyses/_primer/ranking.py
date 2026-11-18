@@ -12,8 +12,6 @@ from analyses._primer.professional import (
 )
 
 
-# V8 bindings.
-
 
 # ============================================================================
 # V9 PRIMER RANKING / DEDUPLICATION
@@ -42,7 +40,7 @@ from analyses._primer.professional import (
 # ============================================================================
 
 
-def _v11_model_tm(pair, advanced, method):
+def _pair_model_tm(pair, advanced, method):
     method = str(method).lower().replace("-", "_")
     if method in {"wallace"}:
         return float(pair.forward.tm), float(pair.reverse.tm)
@@ -54,7 +52,7 @@ def _v11_model_tm(pair, advanced, method):
     )
 
 
-def _v11_tm_optimum(method):
+def _model_tm_optimum(method):
     method = str(method).lower().replace("-", "_")
     if method == "wallace":
         return 55.0
@@ -63,7 +61,7 @@ def _v11_tm_optimum(method):
     return 60.0
 
 
-def _v11_piecewise_penalty(value, thresholds):
+def _piecewise_penalty(value, thresholds):
     """Return the penalty for a structural metric using (threshold, penalty)."""
     penalty = 0.0
     for threshold, amount in thresholds:
@@ -72,11 +70,11 @@ def _v11_piecewise_penalty(value, thresholds):
     return penalty
 
 
-def _v11_pair_quality(pair, advanced, config):
+def _pair_quality(pair, advanced, config):
     """Calculate a transparent 0-100 pair score plus explicit risk gates."""
     method = config.tm_method
-    f_tm, r_tm = _v11_model_tm(pair, advanced, method)
-    tm_opt = _v11_tm_optimum(method)
+    f_tm, r_tm = _pair_model_tm(pair, advanced, method)
+    tm_opt = _model_tm_optimum(method)
     tm_delta = abs(f_tm - r_tm)
 
     f_gc = float(pair.forward.gc_percent)
@@ -111,11 +109,11 @@ def _v11_pair_quality(pair, advanced, config):
         score -= min(5.0, abs(length - config.primer.optimal_length) * 0.9)
 
     # Structural penalties increase sharply once risk becomes meaningful.
-    score -= _v11_piecewise_penalty(
+    score -= _piecewise_penalty(
         hetero,
         ((4, 2), (5, 4), (6, 7), (7, 13), (8, 22), (9, 32), (10, 45)),
     )
-    score -= _v11_piecewise_penalty(
+    score -= _piecewise_penalty(
         hetero_3p,
         ((2, 2), (3, 10), (4, 22)),
     )
@@ -124,17 +122,17 @@ def _v11_pair_quality(pair, advanced, config):
         (f_self, f_self_3p),
         (r_self, r_self_3p),
     ):
-        score -= _v11_piecewise_penalty(
+        score -= _piecewise_penalty(
             stem,
             ((4, 1), (5, 3), (6, 6), (7, 10), (8, 16), (9, 23), (10, 32)),
         )
-        score -= _v11_piecewise_penalty(
+        score -= _piecewise_penalty(
             terminal,
             ((2, 2), (3, 9), (4, 20)),
         )
 
     for stem in (f_hairpin, r_hairpin):
-        score -= _v11_piecewise_penalty(
+        score -= _piecewise_penalty(
             stem,
             ((4, 1), (5, 3), (6, 6), (7, 11), (8, 17), (9, 24), (10, 32)),
         )
@@ -220,7 +218,7 @@ def _v11_pair_quality(pair, advanced, config):
     return score, high_risk, critical, reasons, category
 
 
-def _v11_sequence_similarity(a, b):
+def _sequence_similarity(a, b):
     """Simple normalized identity used only for diversity selection."""
     a = str(a).upper()
     b = str(b).upper()
@@ -231,13 +229,13 @@ def _v11_sequence_similarity(a, b):
     return same / max(len(a), len(b))
 
 
-def _v11_is_diverse(candidate, selected):
+def _is_diverse(candidate, selected):
     """Reject alternatives that are effectively the same design."""
     pair = candidate.pair
     for old in selected:
         old_pair = old.pair
-        f_identity = _v11_sequence_similarity(pair.forward.sequence, old_pair.forward.sequence)
-        r_identity = _v11_sequence_similarity(pair.reverse.sequence, old_pair.reverse.sequence)
+        f_identity = _sequence_similarity(pair.forward.sequence, old_pair.forward.sequence)
+        r_identity = _sequence_similarity(pair.reverse.sequence, old_pair.reverse.sequence)
         f_shift = abs(int(pair.forward.start) - int(old_pair.forward.start))
         r_shift = abs(int(pair.reverse.start) - int(old_pair.reverse.start))
 
@@ -254,7 +252,7 @@ def _v11_is_diverse(candidate, selected):
     return True
 
 
-def _v11_select_pairs(pairs, top_n):
+def _select_diverse_pairs(pairs, top_n):
     """Select safe, high-quality and genuinely diverse alternatives."""
     if not pairs:
         return []
@@ -271,7 +269,7 @@ def _v11_select_pairs(pairs, top_n):
         for item in pool:
             if len(selected) >= top_n:
                 break
-            if _v11_is_diverse(item, selected):
+            if _is_diverse(item, selected):
                 selected.append(item)
         if len(selected) >= top_n:
             break
@@ -295,7 +293,7 @@ def _v11_select_pairs(pairs, top_n):
     return selected
 
 
-def _v11_rank_professional_primer_pairs(
+def rank_professional_primer_pairs(
     sequence,
     forward_candidates,
     reverse_candidates,
@@ -342,7 +340,7 @@ def _v11_rank_professional_primer_pairs(
                 max_tm_delta=config.primer.max_tm_delta,
             )
 
-            score, high_risk, critical, reasons, category = _v11_pair_quality(
+            score, high_risk, critical, reasons, category = _pair_quality(
                 pair,
                 advanced,
                 config,
@@ -357,7 +355,7 @@ def _v11_rank_professional_primer_pairs(
             advanced.high_risk = high_risk
             advanced.critical_risk = critical
             advanced.structural_warnings = reasons
-            advanced.model_tm_delta = abs(_v11_model_tm(pair, advanced, config.tm_method)[0] - _v11_model_tm(pair, advanced, config.tm_method)[1])
+            advanced.model_tm_delta = abs(_pair_model_tm(pair, advanced, config.tm_method)[0] - _pair_model_tm(pair, advanced, config.tm_method)[1])
             advanced.specificity_screened = bool(reference_sequences)
 
             pairs.append(advanced)
@@ -375,11 +373,10 @@ def _v11_rank_professional_primer_pairs(
         )
     )
 
-    selected = _v11_select_pairs(pairs, int(config.top_pairs))
+    selected = _select_diverse_pairs(pairs, int(config.top_pairs))
     return selected, evaluated
 
 
-rank_professional_primer_pairs = _v11_rank_professional_primer_pairs
 
 
 # ============================================================================

@@ -89,7 +89,7 @@ def _three_prime_complementarity(
 # the heterodimer length was read from a non-existent "stem_length" attribute.
 # ============================================================================
 
-def _v8_structure_severity(max_stem: int, three_prime_stem: int = 0) -> str:
+def _structure_severity(max_stem: int, three_prime_stem: int = 0) -> str:
     """Classify structural risk from the measured stem, not the old default."""
     max_stem = int(max_stem or 0)
     three_prime_stem = int(three_prime_stem or 0)
@@ -140,7 +140,7 @@ def analyze_hairpin(sequence: str, max_stem: int = 4) -> StructureResult:
         max_stem=best,
         three_prime_stem=0,
         best_position=best_position,
-        severity=_v8_structure_severity(best),
+        severity=_structure_severity(best),
         explanation=(
             f"Longest detected intramolecular stem: {best} bp; "
             "3-nt minimum-loop heuristic."
@@ -159,7 +159,7 @@ def analyze_self_dimer(sequence: str, max_stem: int = 4) -> StructureResult:
         max_stem=stem,
         three_prime_stem=terminal,
         best_position=position,
-        severity=_v8_structure_severity(stem, terminal),
+        severity=_structure_severity(stem, terminal),
         explanation=(
             f"Longest self-complementary stem: {stem} bp; "
             f"estimated 3'-complementarity: {terminal} bp."
@@ -186,7 +186,7 @@ def analyze_heterodimer(
         max_stem=stem,
         three_prime_stem=terminal,
         best_position=position,
-        severity=_v8_structure_severity(stem, terminal),
+        severity=_structure_severity(stem, terminal),
         explanation=(
             f"Longest heterodimer stem: {stem} bp; "
             f"estimated 3'-complementarity: {terminal} bp."

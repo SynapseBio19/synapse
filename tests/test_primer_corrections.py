@@ -1,6 +1,6 @@
 """Primer-design corrections found on 2026-11-12 (D20, D21).
 
-D20: the candidate screening score (_v5_candidate_quality) is documented to
+D20: the candidate screening score (_screening_quality) is documented to
 penalize hairpin and self-dimer stems, but it read the stems from the
 thermodynamic profile, which has no such fields. The penalty was always
 zero. Both tests below fail on the code before the correction.
@@ -23,10 +23,10 @@ CONFIG = P.ProfessionalPrimerConfig()
 
 def _advanced(primer: str) -> P.AdvancedPrimerCandidate:
     config = CONFIG
-    relaxed = P._v6_relaxed_generation_config(config.primer)
+    relaxed = P._measurement_config(config.primer)
     candidate = P._make_candidate(primer, "FORWARD", 0, len(primer), relaxed, config.tm_method)
     advanced = P.analyze_primer_candidate_thermodynamics(candidate, conditions=config.thermodynamics)
-    return P._v7_apply_selected_tm_model(advanced, candidate, config)
+    return P._apply_selected_tm_model(advanced, candidate, config)
 
 
 class StructuralPenaltyTests(unittest.TestCase):
@@ -41,9 +41,9 @@ class StructuralPenaltyTests(unittest.TestCase):
                 hairpin=dataclasses.replace(advanced.candidate.hairpin, max_stem=0),
             ),
         )
-        # _v5_structure_penalty(8, 3, 8) is the full 30 points.
+        # _structure_penalty(8, 3, 8) is the full 30 points.
         self.assertAlmostEqual(
-            P._v5_candidate_quality(without_stem, CONFIG) - P._v5_candidate_quality(advanced, CONFIG), 30.0)
+            P._screening_quality(without_stem, CONFIG) - P._screening_quality(advanced, CONFIG), 30.0)
 
     def test_a_self_dimer_stem_lowers_the_screening_score(self):
         advanced = _advanced("ATGAATTCATGCAGGTCAAG")
@@ -56,10 +56,10 @@ class StructuralPenaltyTests(unittest.TestCase):
                 self_dimer=dataclasses.replace(advanced.candidate.self_dimer, max_stem=0),
             ),
         )
-        expected = P._v5_structure_penalty(stem, 4, 9)
+        expected = P._structure_penalty(stem, 4, 9)
         self.assertGreater(expected, 0.0)
         self.assertAlmostEqual(
-            P._v5_candidate_quality(without_stem, CONFIG) - P._v5_candidate_quality(advanced, CONFIG), expected)
+            P._screening_quality(without_stem, CONFIG) - P._screening_quality(advanced, CONFIG), expected)
 
 
 class PairAssessmentExportTests(unittest.TestCase):

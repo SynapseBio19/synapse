@@ -188,8 +188,8 @@ class TieredScreenTests(unittest.TestCase):
                 start, end = (0, 260) if case_index % 2 else (20, 230)
                 screened, evaluated = P.generate_professional_primer_candidates(
                     sequence, start, end, orientation, config=config)
-                relaxed = P._v6_relaxed_generation_config(config.primer)
-                full, full_evaluated = P._v7_measure_all_candidates(
+                relaxed = P._measurement_config(config.primer)
+                full, full_evaluated = P._measure_all_candidates(
                     sequence, start, end, orientation, config, relaxed,
                     int(config.max_pair_candidates))
                 self.assertEqual(evaluated, full_evaluated)
@@ -199,15 +199,15 @@ class TieredScreenTests(unittest.TestCase):
         rng = random.Random(6)
         for method in ("nearest_neighbor", "wallace", "salt_adjusted"):
             config = self._config(method, {}, {})
-            relaxed = P._v6_relaxed_generation_config(config.primer)
+            relaxed = P._measurement_config(config.primer)
             sequence = "".join(rng.choice("ACGT") for _ in range(400))
             for _ in range(150):
                 start = rng.randint(0, 370)
                 end = start + rng.randint(18, 25)
                 for orientation in ("FORWARD", "REVERSE"):
                     candidate = P._make_candidate(sequence, orientation, start, end, relaxed, config.tm_method)
-                    bound = P._v7_screening_upper_bound(sequence, orientation, start, end, config, relaxed)
-                    self.assertLessEqual(P._v7_screening_score(candidate, config), bound)
+                    bound = P._screening_upper_bound(sequence, orientation, start, end, config, relaxed)
+                    self.assertLessEqual(P._screening_score(candidate, config), bound)
 
 
 @unittest.skipUnless(os.environ.get("SYNAPSE_BENCHMARK"), "set SYNAPSE_BENCHMARK=1 to time a 10 kb design")

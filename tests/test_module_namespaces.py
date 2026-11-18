@@ -90,7 +90,7 @@ PRIMER_NAMES = (
     'calculate_effective_ionic_strength', 'calculate_salt_correction',
     '_is_self_complementary', '_terminal_at_count', '_nearest_neighbor_sum',
     '_nearest_neighbor_sum_uncached', '_nearest_neighbor_sum_cached',
-    'calculate_duplex_concentration_term', '_calculate_tm_nearest_neighbor_v3_raw',
+    'calculate_duplex_concentration_term', '_calculate_tm_nearest_neighbor_raw',
     'calculate_duplex_thermodynamics', '_duplex_thermodynamics',
     'calculate_terminal_stability', 'calculate_primer_thermodynamics',
     '_duplex_thermodynamics_cached', 'calculate_tm_advanced', 'AdvancedPrimerCandidate',
@@ -103,15 +103,13 @@ PRIMER_NAMES = (
     'HIGH_SALT_SCREENING_CONFIG', 'LOW_SALT_SCREENING_CONFIG', 'get_thermodynamic_summary',
     'PRIMER_V3_PUBLIC_API', 'NearestNeighborTmResult', 'calculate_tm_nearest_neighbor',
     'run_primer_v3_self_test_final', 'primer_pair_binding_sites',
-    'run_primer_v4_screening_self_test', '_v5_structure_penalty', '_v5_candidate_quality',
-    '_v6_relaxed_generation_config', '_v7_apply_selected_tm_model',
-    '_v7_generate_professional_primer_candidates', '_V7_NEAREST_NEIGHBOR_METHODS',
-    '_v7_screening_tm', '_v7_screening_score', '_v7_screening_upper_bound', '_v7_tm_tier',
-    '_v7_measure_candidates', '_v7_measure_all_candidates',
-    'generate_professional_primer_candidates', '_v8_structure_severity', 'analyze_hairpin',
-    'analyze_self_dimer', 'analyze_heterodimer', '_v11_model_tm', '_v11_tm_optimum',
-    '_v11_piecewise_penalty', '_v11_pair_quality', '_v11_sequence_similarity',
-    '_v11_is_diverse', '_v11_select_pairs', '_v11_rank_professional_primer_pairs',
+    'run_primer_v4_screening_self_test', '_structure_penalty', '_screening_quality',
+    '_measurement_config', '_apply_selected_tm_model',
+    'generate_professional_primer_candidates', '_screening_tm', '_screening_score',
+    '_screening_upper_bound', '_tm_tier', '_measure_candidates', '_measure_all_candidates',
+    '_structure_severity', 'analyze_hairpin', 'analyze_self_dimer', 'analyze_heterodimer',
+    '_pair_model_tm', '_model_tm_optimum', '_piecewise_penalty', '_pair_quality',
+    '_sequence_similarity', '_is_diverse', '_select_diverse_pairs',
     'rank_professional_primer_pairs', 'summarize_professional_primer_pair',
     'design_primers_professional', '_professional_primer_report',
     'RestrictionSitePrimerDesign', 'restriction_site_choices',
@@ -119,6 +117,33 @@ PRIMER_NAMES = (
 )
 
 REMOVED = {"analyses.primer": ("_V5_ACTIVE_CONFIG",)}
+
+# Phase 8 (2026-11-18): the historical _vN_ helpers were renamed; the old
+# names are gone on purpose (docs/CHANGES.md, Phase 8, package B).
+RENAMED_PRIMER_NAMES = {
+    '_v5_structure_penalty': '_structure_penalty',
+    '_v5_candidate_quality': '_screening_quality',
+    '_v6_relaxed_generation_config': '_measurement_config',
+    '_v7_apply_selected_tm_model': '_apply_selected_tm_model',
+    '_v7_generate_professional_primer_candidates': 'generate_professional_primer_candidates',
+    '_V7_NEAREST_NEIGHBOR_METHODS': 'NEAREST_NEIGHBOR_TM_METHODS',
+    '_v7_screening_tm': '_screening_tm',
+    '_v7_screening_score': '_screening_score',
+    '_v7_screening_upper_bound': '_screening_upper_bound',
+    '_v7_tm_tier': '_tm_tier',
+    '_v7_measure_candidates': '_measure_candidates',
+    '_v7_measure_all_candidates': '_measure_all_candidates',
+    '_v8_structure_severity': '_structure_severity',
+    '_v11_model_tm': '_pair_model_tm',
+    '_v11_tm_optimum': '_model_tm_optimum',
+    '_v11_piecewise_penalty': '_piecewise_penalty',
+    '_v11_pair_quality': '_pair_quality',
+    '_v11_sequence_similarity': '_sequence_similarity',
+    '_v11_is_diverse': '_is_diverse',
+    '_v11_select_pairs': '_select_diverse_pairs',
+    '_v11_rank_professional_primer_pairs': 'rank_professional_primer_pairs',
+    '_calculate_tm_nearest_neighbor_v3_raw': '_calculate_tm_nearest_neighbor_raw',
+}
 
 
 class PublicModuleNamespaceTests(unittest.TestCase):
@@ -133,6 +158,12 @@ class PublicModuleNamespaceTests(unittest.TestCase):
     def test_primer_namespace(self):
         from analyses import primer
         self._check(primer, PRIMER_NAMES)
+
+    def test_renamed_primer_helpers(self):
+        from analyses import primer
+        self._check(primer, tuple(RENAMED_PRIMER_NAMES.values()))
+        stale = [old for old in RENAMED_PRIMER_NAMES if hasattr(primer, old)]
+        self.assertEqual(stale, [])
 
     def test_the_declared_primer_api_exists(self):
         # PRIMER_V3_PUBLIC_API listed two report printers of ui/primer_menu.py
@@ -190,7 +221,7 @@ class InternalModuleIndependenceTests(unittest.TestCase):
         self.assertIs(blast.NCBIBlastClient, ncbi.NCBIBlastClient)
         self.assertIs(primer.calculate_tm_nearest_neighbor, thermodynamics.calculate_tm_nearest_neighbor)
         self.assertIs(primer._nearest_neighbor_sum_cached, thermodynamics._nearest_neighbor_sum_cached)
-        self.assertIs(primer._v7_measure_candidates, screening._v7_measure_candidates)
+        self.assertIs(primer._measure_candidates, screening._measure_candidates)
 
 
 if __name__ == "__main__":

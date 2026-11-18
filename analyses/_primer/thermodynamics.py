@@ -703,7 +703,7 @@ def calculate_duplex_concentration_term(
 # rebound to the private name and shadowed by the adapter, so the definition a
 # reader found first was not the one that ran. Naming it privately here leaves
 # exactly one definition per name without changing which code executes.
-def _calculate_tm_nearest_neighbor_v3_raw(
+def _calculate_tm_nearest_neighbor_raw(
     sequence: str,
     *,
     sodium_mM: float = 50.0,
@@ -1527,7 +1527,7 @@ def calculate_tm_nearest_neighbor(
             "is part of the nearest-neighbor model."
         )
 
-    tm = _calculate_tm_nearest_neighbor_v3_raw(
+    tm = _calculate_tm_nearest_neighbor_raw(
         sequence,
         sodium_mM=sodium_mM,
         magnesium_mM=magnesium_mM,

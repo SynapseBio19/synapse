@@ -121,7 +121,7 @@ change without notice, the public module's names may not.
 2. -> `screening.generate_professional_primer_candidates`, per
    orientation. It measures each window with `design._make_candidate`
    (Tm from `thermodynamics`, structures from `structure`) and scores it
-   with `_v5_candidate_quality(item, config)`.
+   with `_screening_quality(item, config)`.
 3. -> `ranking.rank_professional_primer_pairs`: pairs from
    `design.build_primer_pair`, with the specificity screen when references
    are given.

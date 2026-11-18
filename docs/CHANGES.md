@@ -2747,3 +2747,50 @@ reference tests decide whether a change alters a result.
   Anwendungssteuerungsrichtlinie hat diese Datei blockiert"). The six
   ViennaRNA tests skip with that reason; the block is not bypassed. They
   passed earlier the same day.
+
+### Package B: the historical `_vN_` primer helpers get descriptive names
+
+- **Before.** The professional primer engine's helpers carried the
+  generation they were introduced in (`_v5_`-`_v11_`, `_v3_raw`, `_v4`).
+  The public functions were bound to them by assignment
+  (`rank_professional_primer_pairs = _v11_rank_professional_primer_pairs`).
+  `_V7_NEAREST_NEIGHBOR_METHODS` was a second name for
+  `NEAREST_NEIGHBOR_TM_METHODS`.
+- **After.** Descriptive names. `generate_professional_primer_candidates`,
+  `rank_professional_primer_pairs` and `_primer_ui_design` are defined
+  directly; the alias constant is gone.
+- **Unchanged.** The "V5"-"V11" section headings, which record history.
+- **Mapping.**
+
+| Before | After |
+|---|---|
+| `_v5_structure_penalty` | `_structure_penalty` |
+| `_v5_candidate_quality` | `_screening_quality` |
+| `_v6_relaxed_generation_config` | `_measurement_config` |
+| `_v7_apply_selected_tm_model` | `_apply_selected_tm_model` |
+| `_v7_generate_professional_primer_candidates` | `generate_professional_primer_candidates` |
+| `_V7_NEAREST_NEIGHBOR_METHODS` | `NEAREST_NEIGHBOR_TM_METHODS` |
+| `_v7_screening_tm` | `_screening_tm` |
+| `_v7_screening_score` | `_screening_score` |
+| `_v7_screening_upper_bound` | `_screening_upper_bound` |
+| `_v7_tm_tier` | `_tm_tier` |
+| `_v7_measure_candidates` | `_measure_candidates` |
+| `_v7_measure_all_candidates` | `_measure_all_candidates` |
+| `_v8_structure_severity` | `_structure_severity` |
+| `_v11_model_tm` | `_pair_model_tm` |
+| `_v11_tm_optimum` | `_model_tm_optimum` |
+| `_v11_piecewise_penalty` | `_piecewise_penalty` |
+| `_v11_pair_quality` | `_pair_quality` |
+| `_v11_sequence_similarity` | `_sequence_similarity` |
+| `_v11_is_diverse` | `_is_diverse` |
+| `_v11_select_pairs` | `_select_diverse_pairs` |
+| `_v11_rank_professional_primer_pairs` | `rank_professional_primer_pairs` |
+| `_v7_primer_ui_design` | `_primer_ui_design` |
+| `_primer_ui_design_menu_v4` | `_primer_ui_design_menu` |
+| `_calculate_tm_nearest_neighbor_v3_raw` | `_calculate_tm_nearest_neighbor_raw` |
+
+- **Compatibility.** The old names were private. `test_module_namespaces`
+  now expects the new names and checks that the old ones are gone.
+- **Evidence.** The characterization snapshot (78 scenarios), the golden
+  master, the screen-equivalence tests and the suite are unchanged: 603
+  tests, 0 failures on 3.14.6 and 3.10.11.

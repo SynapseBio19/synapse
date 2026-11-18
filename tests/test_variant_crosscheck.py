@@ -138,7 +138,7 @@ class MenuIntegrationTests(unittest.TestCase):
             _variant(5, DNA[4], "G", chromosome="other"),   # another contig: ignored
         ])
         _, output = self._drive(["", "", "", "", ""],      # Tm model, four conditions: defaults
-                                lambda: primer_menu._v7_primer_ui_design(DNA, 0, len(DNA), pipeline))
+                                lambda: primer_menu._primer_ui_design(DNA, 0, len(DNA), pipeline))
         self.assertIn("VARIANTS IN BINDING SITES", output)
         self.assertIn("Variants on the contig:", output)
         line = next(text for text in output.splitlines() if text.startswith("pair 1 forward primer"))
@@ -151,7 +151,7 @@ class MenuIntegrationTests(unittest.TestCase):
         from ui import primer_menu
         pipeline = SynapsePipeline(DNA, "seq")
         _, output = self._drive(["", "", "", "", ""],
-                                lambda: primer_menu._v7_primer_ui_design(DNA, 0, len(DNA), pipeline))
+                                lambda: primer_menu._primer_ui_design(DNA, 0, len(DNA), pipeline))
         self.assertNotIn("VARIANTS IN BINDING SITES", output)
         pipeline.context.set_mapped_variants("seq", [_variant(100, DNA[99])])
         other = deterministic_dna(900, seed=5)
