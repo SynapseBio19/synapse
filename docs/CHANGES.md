@@ -2649,3 +2649,21 @@ stays Coming Soon). Audit: `docs/PHASE71_ARCHITECTURE_AUDIT.md`.
 - **Results.** Unchanged: characterization snapshot, golden master,
   primer3-py comparisons (run on this machine), screen-equivalence tests
   and the full suite.
+
+### Package G: the CI import check uses the installed package
+
+- **Found.** Every CI step runs in the checkout, so Python imports
+  `analyses` from the source tree even after `pip install .`. A package
+  missing from the explicit list in `pyproject.toml` would pass every job.
+  Package B nearly shipped such a case: `analyses._blast` was not listed.
+- **Changed.** The import check in the `tests` job now runs in
+  `$RUNNER_TEMP` with `python -I`. It imports `analyses.blast`,
+  `analyses.primer` and the earlier modules, asserts that they come from
+  `site-packages`, and runs the BLAST self-test there.
+- **Checked locally.**
+  - The step's commands were run against a clean non-editable install in
+    a new virtual environment: they pass.
+  - With `analyses/_primer` removed from that installation, the step fails
+    with `ModuleNotFoundError: No module named 'analyses._primer'`.
+- **Not checked.** The workflow has still not run on GitHub: there is no
+  remote.

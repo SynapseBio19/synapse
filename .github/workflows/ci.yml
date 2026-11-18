@@ -2,7 +2,8 @@
 #
 # The repository had no hosted remote when this file was written, so the
 # workflow has not run on GitHub yet; every step was run locally (see
-# docs/PHASE7_FINAL_REPORT.md, section G). No paid service is used.
+# docs/PHASE7_FINAL_REPORT.md, section G, and docs/PHASE71_FINAL_REPORT.md,
+# section H). No paid service is used.
 
 name: CI
 
@@ -39,8 +40,18 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: Install Synapse (no runtime dependencies)
         run: python -m pip install .
-      - name: Import check
-        run: python -c "import core.api, analyses.orf, analyses.rna_structure, ui.style; print('imports OK')"
+      # Run outside the checkout so that Python imports the installed
+      # package, not the source tree. Every later step runs in the checkout,
+      # so a package missing from pyproject.toml would otherwise go
+      # unnoticed (Phase 7.1: analyses._blast and analyses._primer).
+      - name: Import check (installed package)
+        run: |
+          cd "$RUNNER_TEMP"
+          python -I -c "
+          import analyses.blast, analyses.primer, core.api, analyses.orf, analyses.rna_structure, ui.style
+          assert 'site-packages' in analyses.blast.__file__, analyses.blast.__file__
+          assert analyses.blast.run_self_test(verbose=False)
+          print('imports OK from', analyses.blast.__file__)"
       - name: Golden master
         run: python -m unittest -v tests.test_golden_master
       - name: Test suite
