@@ -2607,3 +2607,45 @@ stays Coming Soon). Audit: `docs/PHASE71_ARCHITECTURE_AUDIT.md`.
     configuration.
 - **Tests changed.** `test_primer_corrections` passes the configuration;
   `test_primer_screen_equivalence` no longer sets the global.
+
+### Package C, step 2: `analyses/primer.py` split into `analyses/_primer/`
+
+- **Before.** One module of 5,182 lines in historical layers. The legacy
+  engine at the top called functions defined thousands of lines further
+  down; Python resolved those calls at run time.
+- **After.** `analyses/primer.py` (250 lines) is the public module. It
+  keeps its docstring and both `python -m` entry blocks and re-exports
+  all 139 names it defines.
+- **The modules of `analyses/_primer/`, in dependency order.**
+  - `sequence`, `models`, `thermodynamics`, `structure`, `specificity`.
+  - `design`: the legacy engine.
+  - `professional`: model, scores, single-primer analysis, diagnosis.
+  - `screening`: the candidate pool and its Tm-tier screen.
+  - `ranking`: pair scoring and diversity selection.
+  - `workflow`: `design_primers_professional` and restriction-site design.
+  - `selftest`.
+  - The import graph has no cycle. Each module reads top-down without a
+    forward reference to code elsewhere.
+- **How.** With the same script as package B. All 147 statements were
+  found verbatim; no code inside a statement changed.
+- **The statement that defines no name.**
+  - `_SANTALUCIA_2004_STACKS.update({...})` sets the 2004 AA/TT stack. It
+    moved into `thermodynamics`, directly after the dict it changes, as in
+    the original.
+  - A first run of the script had left it in the public module. Through
+    the shared dict it would still have taken effect, but only once
+    `analyses.primer` was imported.
+  - New `InternalModuleIndependenceTests` (in
+    `tests/test_module_namespaces.py`) import every internal module of
+    both packages without the public module. They check that the 2004
+    parameter set is complete. Two further checks: no internal module
+    imports a public one, and the public names are the implementation
+    objects.
+- **Unchanged names.** `GAS_CONSTANT` is still assigned twice with the
+  same value. The four `calculate_tm_nearest_neighbor` definitions (three
+  overloads and the implementation) stay together.
+- **Packaging and lint.** `pyproject.toml` lists `analyses._primer`;
+  `analyses/primer.py` ignores F401 like `blast.py`.
+- **Results.** Unchanged: characterization snapshot, golden master,
+  primer3-py comparisons (run on this machine), screen-equivalence tests
+  and the full suite.

@@ -14,7 +14,14 @@ explicitly (``docs/CHANGES.md``, Phase 7.1).
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
+import subprocess
+import sys
+import textwrap
 import unittest
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 BLAST_NAMES = (
     'NCBI_BLAST_URL', 'DEFAULT_TOOL', 'DEFAULT_EMAIL', 'API_TIMEOUT_SECONDS',
@@ -126,6 +133,58 @@ class PublicModuleNamespaceTests(unittest.TestCase):
     def test_primer_namespace(self):
         from analyses import primer
         self._check(primer, PRIMER_NAMES)
+
+
+class InternalModuleIndependenceTests(unittest.TestCase):
+    """Each module of the internal packages is complete on its own.
+
+    The public modules import everything, so a statement left behind in
+    them (or a module that only works after another one ran) would go
+    unnoticed in the rest of the suite. Each internal module is imported
+    here in a clean interpreter state, without the public module.
+    """
+
+    PROBE = textwrap.dedent('''
+        import importlib, json, pkgutil, sys
+        import analyses._blast, analyses._primer
+        failures = {}
+        for package in (analyses._blast, analyses._primer):
+            for info in pkgutil.iter_modules(package.__path__):
+                name = package.__name__ + "." + info.name
+                for loaded in [m for m in sys.modules if m.startswith("analyses")]:
+                    del sys.modules[loaded]
+                try:
+                    importlib.import_module(name)
+                except Exception as error:
+                    failures[name] = repr(error)
+                if "analyses.blast" in sys.modules or "analyses.primer" in sys.modules:
+                    failures[name] = "imports the public module"
+        for loaded in [m for m in sys.modules if m.startswith("analyses")]:
+            del sys.modules[loaded]
+        from analyses._primer import thermodynamics
+        stacks = thermodynamics.NN_PARAMETER_SETS["santalucia_2004"]["stacks"]
+        print(json.dumps({"failures": failures, "aa_2004": stacks["AA"], "aa_1998": thermodynamics.NEAREST_NEIGHBOR_PARAMETERS["AA"]}))
+    ''')
+
+    def test_every_internal_module_imports_alone(self):
+        result = subprocess.run([sys.executable, "-c", self.PROBE], cwd=PROJECT_ROOT,
+                                capture_output=True, text=True, check=True)
+        report = json.loads(result.stdout.strip().splitlines()[-1])
+        self.assertEqual(report["failures"], {})
+        # The SantaLucia & Hicks (2004) AA/TT stack is set by a statement that
+        # defines no name; it must run with the thermodynamics module itself.
+        self.assertEqual(report["aa_2004"], [-7.6, -21.3])
+        self.assertEqual(report["aa_1998"], [-7.9, -22.2])
+
+    def test_public_names_are_the_implementation_objects(self):
+        from analyses import blast, primer
+        from analyses._blast import models, ncbi
+        from analyses._primer import screening, thermodynamics
+        self.assertIs(blast.BlastRun, models.BlastRun)
+        self.assertIs(blast.NCBIBlastClient, ncbi.NCBIBlastClient)
+        self.assertIs(primer.calculate_tm_nearest_neighbor, thermodynamics.calculate_tm_nearest_neighbor)
+        self.assertIs(primer._nearest_neighbor_sum_cached, thermodynamics._nearest_neighbor_sum_cached)
+        self.assertIs(primer._v7_measure_candidates, screening._v7_measure_candidates)
 
 
 if __name__ == "__main__":
