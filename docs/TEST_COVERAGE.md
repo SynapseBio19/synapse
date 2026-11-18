@@ -113,3 +113,36 @@ Still mostly uncovered: `ui/report.py` (12 %, driven only through the
 BLAST dialogs (47 % and 51 %), and the local BLAST database download and
 `makeblastdb` paths. The CRISPR dialog was deliberately not extended in
 this run.
+
+
+## Remeasured 2026-11-18 (end of Phase 7.1)
+
+Same tool and command. Suite: 601 tests, all passing (1 skipped: the
+opt-in benchmark; primer3-py loads again, so its comparisons ran).
+
+Since Phase 7.1 `analyses/blast.py` and `analyses/primer.py` keep their
+code in `analyses/_blast/` and `analyses/_primer/`, so coverage is
+reported per responsibility. `tests/test_blast_components.py` and
+`tests/test_primer_components.py` were written for the parts that the
+split showed as least reached.
+
+| Scope | 2026-11-17 | 2026-11-18 |
+|---|---:|---:|
+| BLAST (`blast.py`, then `blast.py` + `_blast/`) | 77 % | 84.9 % |
+| Primer (`primer.py`, then `primer.py` + `_primer/`) | 86 % | 91.7 % |
+| `analyses` | 82.6 % | 84.6 % |
+| `core` | 87.6 % | 87.6 % |
+| `ui` | 74.2 % | 74.2 % |
+| `fileio` | 91.8 % | 91.8 % |
+| `main.py` | 83.6 % | 83.6 % |
+| **Total** | **81 %** | **82.3 %** |
+
+Least-covered BLAST modules now:
+- `_blast/runtime` (67 %): the cleanup after a failed alias view;
+- `_blast/ncbi` (72 %): HTTP retry branches;
+- `_blast/workflow` (73 %);
+- `_blast/databases` (75 %): the NCBI download and verification against a
+  real database.
+
+The 85 % target is not reached: the CRISPR dialog stays excluded, and
+`print_protein_report` stays unreachable until the owner decides.

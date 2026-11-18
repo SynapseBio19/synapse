@@ -136,7 +136,9 @@ The environment variables below configure the session:
 
 ```
 main.py      session: file loading, record selection, main menu
-analyses/    one module per analysis: the science, without any terminal code
+analyses/    one module per analysis: the science, without any terminal code;
+             blast.py and primer.py keep their code in the internal packages
+             analyses/_blast/ and analyses/_primer/ (docs/PHASE71_ARCHITECTURE.md)
 core/        data model, sequence types, pipeline state, report, API, text layout
 fileio/      FASTA and GenBank reading
 ui/          terminal interface: shared presentation (ui/style.py), main menu,

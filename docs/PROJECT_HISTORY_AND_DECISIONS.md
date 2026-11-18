@@ -181,3 +181,19 @@ and `docs/PHASE6_CONTINUATION.md`.
   module (2026-11-13); reference tests skip with that reason instead of
   bypassing the control.
 - `Synapse_Website/` exists from an earlier period and is out of scope.
+
+
+## 10. Phase 7.1 (2026-11-18): architectural modularization
+
+- `analyses/blast.py` and `analyses/primer.py` remain the public modules.
+  Their code is in the internal packages `analyses/_blast/` (14 modules)
+  and `analyses/_primer/` (11 modules). Every name stays importable, and
+  the results are unchanged against a snapshot recorded before the move.
+- The hidden global of the primer screen (`_V5_ACTIVE_CONFIG`) is replaced
+  by an explicit argument.
+- ReadOnly protection now also covers the 27 files of the two internal
+  packages, because the protected code moved there. The owner can revert
+  this.
+- primer3-py loads on this machine again (2026-11-18); its comparisons
+  ran and passed.
+- Details: `docs/PHASE71_ARCHITECTURE.md`, `docs/PHASE71_FINAL_REPORT.md`.
