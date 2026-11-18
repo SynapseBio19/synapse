@@ -62,15 +62,14 @@ Practical notes:
    institution if one holds the rights.
 3. **Citation.** Whether to add a `CITATION.cff` so the software can be
    cited (recommended for research software).
-4. **Two unused legacy files.**
-   - `blast_results/TEST_8_REFERENCE_blast.json` (already pending).
-   - `blast_test.json` in the project root: a BLAST run from 2026-10-06,
-     part of the baseline commit, referenced by no code or document.
-   Keep them as historical records, or delete them.
-5. **Two unreachable report printers.** `print_protein_report`
-   (`ui/protein_menu.py`, about 600 lines) and `print_primer_report`
-   (`ui/primer_menu.py`) have no caller. They are older versions of
-   reports the menus now draw differently. Keep them, or delete them.
+4. **Two unused legacy files.** Settled on 2026-11-18 (Phase 8, owner
+   mandate).
+   - `blast_test.json` is deleted; it remains in the Git history.
+   - `TEST_8_REFERENCE_blast.json` is test evidence (a test reads it) and
+     moved to `tests/fixtures/legacy_blast/`.
+5. **Two unreachable report printers.** Settled on 2026-11-18:
+   `print_protein_report` and `print_primer_report` are deleted (no
+   caller; they remain in the Git history).
 
 ## 5. Governance in place
 

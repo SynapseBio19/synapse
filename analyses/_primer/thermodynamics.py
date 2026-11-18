@@ -156,7 +156,6 @@ def get_thermodynamic_conditions(config: PrimerDesignConfig) -> dict:
 #     analyze_primer(...)
 #     get_primer_summary(...)
 #     get_amplicon(...)
-#     print_primer_report(...)
 #
 # New public functions:
 #

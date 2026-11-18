@@ -2705,3 +2705,45 @@ stays Coming Soon). Audit: `docs/PHASE71_ARCHITECTURE_AUDIT.md`.
   | **Total** | 81 % | 82 % |
 
 - **Suite.** 601 tests, 0 failures on 3.14.6 and 3.10.11.
+
+## Phase 8 – consolidation under the owner's mandate (from 2026-11-18)
+
+The owner's mandate of 2026-11-18 (`docs/PROJECT_HISTORY_AND_DECISIONS.md`
+§4) allows Claude, in the copy, to:
+- restructure code;
+- correct defects that are backed by evidence;
+- delete dead code;
+- rename internal names;
+- drop the ReadOnly protection.
+
+CRISPR and the AI Experiment Planner stay excluded. The rules of
+`CONTRIBUTING.md` still hold: the snapshot, the golden master and the
+reference tests decide whether a change alters a result.
+
+### Package A: ReadOnly dropped, dead code and legacy files removed
+
+- **ReadOnly.** The flag is cleared on all 42 tracked files that carried
+  it. Git history, the test suite and the characterization snapshot are
+  the protection; the flag only slowed every edit.
+- **Deleted.**
+  - `print_protein_report` (`ui/protein_menu.py`, 599 lines) and
+    `print_primer_report` (`ui/primer_menu.py`, 39 lines). Neither had a
+    caller; they were older versions of reports the menus now draw
+    differently.
+  - The four imports that only they used.
+  - `blast_test.json` (project root): a BLAST run from 2026-10-06 that no
+    code or document read.
+- **Moved.** `blast_results/TEST_8_REFERENCE_blast.json` and its README
+  are now in `tests/fixtures/legacy_blast/` (`SOURCE.md`). The file is
+  test evidence: `test_p0_regressions` reads it. The README claimed
+  otherwise ("No code or test reads this file"); corrected.
+- **`PRIMER_V3_PUBLIC_API`** named two functions that do not exist in
+  `analyses.primer`: `print_primer_report` and
+  `print_professional_primer_report`, a report printer of
+  `ui/primer_menu.py`. Both are removed from the list. A new test checks
+  that every listed name exists.
+- **Environment, not code.** Windows application control blocked
+  ViennaRNA's compiled module on 2026-11-18 ("Eine
+  Anwendungssteuerungsrichtlinie hat diese Datei blockiert"). The six
+  ViennaRNA tests skip with that reason; the block is not bypassed. They
+  passed earlier the same day.

@@ -49,7 +49,7 @@ class P01BlastCoverageAndEvidence(unittest.TestCase):
         # The audited result file: 32-bp HSP on a 99-bp query, E = 7.45.
         import json
         from analyses import blast as B
-        data = json.loads((PROJECT_ROOT / "blast_results" / "TEST_8_REFERENCE_blast.json").read_text())
+        data = json.loads((PROJECT_ROOT / "tests" / "fixtures" / "legacy_blast" / "TEST_8_REFERENCE_blast.json").read_text())
         hsp = data["hits"][0]["hsps"][0]
         self.assertEqual(hsp["alignment_length"], 32)
         hit = B.BlastHit(hit_id="h", accession="h", definition="", length=None,

@@ -1,4 +1,7 @@
-# blast_results/ – legacy artifact, do not use as a result
+# Legacy BLAST record – test evidence, do not use as a result
+
+Moved here from `blast_results/` on 2026-11-18 (Phase 8): the file is
+test data, not a result directory.
 
 `TEST_8_REFERENCE_blast.json` is the stored output of one remote NCBI
 BLAST run (RID `CD3MMW95016`, 2026-10-07, blastn against `refseq_rna`),
@@ -15,6 +18,8 @@ as the record of that run and of the defect, not as a valid result
 - The HSP keys (`query_from`/`query_to`) are an older schema; current
   code (`query_start`/`query_end`) cannot re-read the file.
 
-No code or test reads this file. A current run is reproduced by the
-BLAST tests in `tests/test_phase6_tier2.py` and
-`tests/test_phase6_sequence_types.py` (local BLAST+).
+`tests/test_p0_regressions.py` (`test_stored_test8_result_recomputed`)
+reads it to show the corrected coverage; no application code does. (This
+note said "no test reads this file" until 2026-11-18, which was wrong.) A
+current run is reproduced by the BLAST tests in `tests/test_phase6_tier2.py`
+and `tests/test_phase6_sequence_types.py` (local BLAST+).

@@ -259,7 +259,7 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 | — | Failure diagnostics | `diagnose_thermodynamic_failure` | Implemented | Execution-tested since 2026-11-17 (`test_library_functions`) | Not applicable | Module function without a menu caller. The row said "Execution-tested" although no test ran it; `_professional_failure_diagnostics` was removed in D16 part 2 (verified 2026-11-17, Phase 7). |
 | — | Condition entry UI | `_primer_ui_read_conditions`, `_primer_ui_select_tm_model` | Implemented | Execution-tested (empty answers and defaults, `EmptyAnswerTests`) | Not applicable | (verified 2026-11-17, Phase 7) |
 | 2 | Design Primers Around a Restriction Site | `restriction_site_choices`, `design_primers_for_restriction_site`, `_primer_ui_restriction_site_design`, `core.api.design_primers_for_restriction_site` | Implemented | Execution-tested | Integration-tested | Added 2026-11-12 (Master Prompt 10.2): a CONFIRMED site is chosen, forward primers lie upstream of the site and its cuts, reverse primers downstream; each pair carries the predicted digest of its amplicon. Linear templates only. `test_integration_workflows` (RestrictionPrimerWorkflowTests), `test_rendered_menus` (primer_site). |
-| — | Reports | `print_primer_report`, `print_professional_primer_report`, `get_professional_primer_summary` | Implemented | Reachable | Not applicable | |
+| — | Reports | `print_professional_primer_report` (`ui/primer_menu.py`), `get_professional_primer_summary` | Implemented | Reachable | Not applicable | |
 | — | Self-tests | `run_primer_self_test`, `run_thermodynamic_self_test`, `run_primer_v3_self_test`, `run_primer_v3_self_test_final`, `run_primer_v4_screening_self_test` | Implemented | Execution-tested | Not applicable | Several self-test entry points, a remnant of the generations removed under **D16**. |
 
 ---
@@ -381,7 +381,7 @@ relative to size; the 28 self-tests are the module's own fixtures.
 | — | Short-query rescue | `_should_run_short_query_rescue`, task configuration | Implemented | Execution-tested | Not applicable | Self-tested policy for short queries. |
 | 12 | Self-Test | `run_self_test` | Implemented | Execution-tested | Not applicable | 33/33. |
 | 13/14 | Supported programs; database status | `PROGRAMS`, `LOCAL_DATABASE_CATALOG` | Implemented | Execution-tested | Not applicable | |
-| — | Stored run artifact | `blast_results/TEST_8_REFERENCE_blast.json` | Legacy record | Not applicable | Not applicable | Labeled as a pre-P0-1 legacy record in `blast_results/README.md` (**D7** corrected 2026-10-31; deletion left to the owner). Originally: stale pre-P0-1 values (100 % coverage at E = 7.45, null query length) and an obsolete key schema; no test reads it. |
+| — | Stored run artifact | `tests/fixtures/legacy_blast/TEST_8_REFERENCE_blast.json` | Legacy record (test evidence) | Not applicable | Not applicable | Labeled as a pre-P0-1 legacy record in `tests/fixtures/legacy_blast/SOURCE.md` (**D7** corrected 2026-10-31; moved from `blast_results/` on 2026-11-18, Phase 8, because `test_p0_regressions` reads it). Originally: stale pre-P0-1 values (100 % coverage at E = 7.45, null query length) and an obsolete key schema. |
 
 ---
 

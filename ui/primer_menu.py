@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from analyses.primer import (  # noqa: F401
     NN_PARAMETER_SETS,
-    PrimerDesignReport,
     ProfessionalPrimerConfig,
     ProfessionalPrimerDesignReport,
     RestrictionSitePrimerDesign,
@@ -20,54 +19,12 @@ from analyses.primer import (  # noqa: F401
     design_primers_professional,
     normalize_dna_sequence,
     restriction_site_choices,
-    summarize_primer_pair,
     summarize_professional_primer_pair,
     validate_target_region,
 )
 from ui import style
 from ui.variant_check import print_variant_check
 from ui.style import major_rule
-
-
-def print_primer_report(report: PrimerDesignReport) -> None:
-    """Print the complete Synapse primer report."""
-    style.header('PRIMER DESIGN')
-    style.field('Sequence length', f"{report.sequence_length} bp")
-    style.field('Target region', f"{report.target_start + 1}-{report.target_end} (1-based; {report.target_length} bp)")
-    style.section("THERMODYNAMIC SETTINGS")
-    style.field('Tm model', f"{report.tm_model}")
-    conditions = report.thermodynamic_conditions
-    style.field('Na+ / salt', f"{conditions['salt_mM']:.2f} mM")
-    style.field('Mg2+', f"{conditions['mg_mM']:.2f} mM")
-    style.field('dNTPs', f"{conditions['dntp_mM']:.2f} mM")
-    style.field('Primer concentration', f"{conditions['primer_concentration_nM']:.1f} nM")
-    style.field('Symmetry correction', f"{'YES' if conditions['include_symmetry_correction'] else 'NO'}")
-    style.section("CANDIDATE GENERATION")
-    style.field('Forward evaluated', f"{report.forward_candidates_evaluated}")
-    style.field('Forward accepted', f"{report.forward_candidates_accepted}")
-    style.field('Reverse evaluated', f"{report.reverse_candidates_evaluated}")
-    style.field('Reverse accepted', f"{report.reverse_candidates_accepted}")
-    style.section("PAIR EVALUATION")
-    style.field('Pairs evaluated', f"{report.pairs_evaluated}")
-    style.field('Pairs accepted/ranked', f"{report.pairs_accepted}")
-    print()
-    if report.ranked_pairs:
-        for index, pair in enumerate(report.ranked_pairs, start=1):
-            print(summarize_primer_pair(pair, index))
-            print()
-    else:
-        style.section("NO ACCEPTABLE PRIMER PAIR FOUND", blank_before=False)
-        print()
-        if report.failure_reasons:
-            style.section("MAIN LIMITING FACTORS", blank_before=False)
-            for reason in report.failure_reasons:
-                print(f"- {reason}")
-            print()
-    if report.warnings:
-        style.section("WARNINGS", blank_before=False)
-        for warning in report.warnings:
-            print(f"- {warning}")
-    print(major_rule())
 
 
 def _print_thermodynamic_conditions(

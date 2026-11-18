@@ -134,6 +134,12 @@ class PublicModuleNamespaceTests(unittest.TestCase):
         from analyses import primer
         self._check(primer, PRIMER_NAMES)
 
+    def test_the_declared_primer_api_exists(self):
+        # PRIMER_V3_PUBLIC_API listed two report printers of ui/primer_menu.py
+        # until 2026-11-18; the list now names only analyses.primer itself.
+        from analyses import primer
+        self._check(primer, primer.PRIMER_V3_PUBLIC_API)
+
 
 class InternalModuleIndependenceTests(unittest.TestCase):
     """Each module of the internal packages is complete on its own.

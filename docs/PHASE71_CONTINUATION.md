@@ -16,7 +16,7 @@ prompt (2026-11-18). **Finished on 2026-11-18.** Final report:
 | Pyright | 11 errors, all in `analyses/crispr.py` (allow-list) |
 | Ruff | clean |
 | Coverage | 82.3 % (BLAST 84.9 %, primer 91.7 %) |
-| ReadOnly | the 15 original files, plus the 15 files of `analyses/_blast/` and the 12 of `analyses/_primer/` |
+| ReadOnly | at the end of Phase 7.1: the 15 original files plus the 27 files of the internal packages. **Dropped on 2026-11-18 (Phase 8, owner mandate); Git is the protection.** |
 
 ## Completed stages
 
@@ -32,9 +32,8 @@ prompt (2026-11-18). **Finished on 2026-11-18.** Final report:
 
 - **Imports.** Import from `analyses.blast` and `analyses.primer` only.
 - **Changing code.** Change it in the internal module named in
-  `docs/PHASE71_ARCHITECTURE.md` §3/§4, after clearing its ReadOnly flag
-  (`Set-ItemProperty <file> -Name IsReadOnly -Value $false`). Restore the
-  flag afterwards.
+  `docs/PHASE71_ARCHITECTURE.md` §3/§4. (The ReadOnly flags were dropped
+  in Phase 8.)
 - **Patching in tests.** Patch the module that calls the function, for
   example `analyses._blast.ncbi.urlopen`.
 - **A new public name** must be added to the internal module and to the

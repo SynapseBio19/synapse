@@ -72,6 +72,7 @@ what is verified, and external sources decide scientific claims.
 | 2026-11-13 | **AI Experiment Planner stays COMING SOON.** It is not implemented, researched or connected in this execution; the menu entry and placeholder stay | Master Execution Prompt §3 (supersedes the earlier "label as not implemented / needs a specification" handling, see §6) |
 | 2026-11-13 | Communicate with the owner in German; all code, comments, output and technical documentation in English | Master Execution Prompt §2.1 |
 | 2026-11-17 | **CRISPR-related work is excluded from the continuation and deferred**: no investigation, testing, research or change of the CRISPR guide design, its off-target analysis, CFD scoring or the sourcing and licensing of CRISPR scoring resources. The research step that was interrupted by a model safety mechanism on 2026-11-13 is not retried or reworded. Requirements that depend on it are recorded as deferred | owner's Safe Continuation Prompt, 2026-11-17 |
+| 2026-11-18 | Broad mandate (Phase 8): in the copy, Claude may restructure code, correct defects that are backed by evidence, delete dead code, rename internal names and drop the ReadOnly protection. CRISPR and the AI Experiment Planner stay excluded for now. The name **Synapse** stays; the owner's domain is `synapse-gen.com` | owner, chat of 2026-11-18 |
 
 ### Engineering decisions recorded in the repository
 
