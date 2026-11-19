@@ -114,6 +114,9 @@ class CharacterizationSnapshotTests(unittest.TestCase):
     def test_restriction_results_are_unchanged(self):
         self._compare("restriction", C.restriction_scenarios())
 
+    def test_rna_results_are_unchanged(self):
+        self._compare("rna", C.rna_scenarios())
+
 
 if __name__ == "__main__":
     unittest.main()

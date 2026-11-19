@@ -3277,3 +3277,19 @@ values). No defect found:
     `get_type_iis_enzyme` stay importable from `analyses.restriction`.
     The restriction menu imports them there; 31 tests failed until they
     were re-exported.
+
+### Package K: `analyses/rna.py` split into `analyses/_rna/`
+
+- **Characterization first.** The section `rna`
+  (`tests/fixtures/characterization/rna.json`) holds 101 scenarios
+  recorded from `8dff342`: four sequences (one with IUPAC symbols, one
+  hairpin-rich, one with homopolymers) under codes 1 and 2, every
+  analysis function, the profiles and the pipeline source.
+- **Determinism.** The exact comparison under three hash seeds now covers
+  all ten sections and finds no difference.
+- **After.** Six modules: `bases`, `composition`, `coding`, `structure`,
+  `summary`, `pipeline`. `_orf_value` moved to `bases`, beside its caller
+  `orf_genetic_code`, to avoid a cycle. All 47 statements moved verbatim;
+  the 47 names are frozen.
+- **Results.** Suite OK on 3.14.6 and 3.10.11; the ViennaRNA comparisons
+  ran.

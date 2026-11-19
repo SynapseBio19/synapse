@@ -502,6 +502,46 @@ def restriction_scenarios() -> dict:
     return out
 
 
+# ---------------------------------------------------------------------------
+# RNA analysis (added in Phase 9, recorded from 8dff342 before its split)
+# ---------------------------------------------------------------------------
+
+def rna_scenarios() -> dict:
+    from analyses import rna as R
+
+    puc = _puc19()
+    sequences = {
+        "puc_600": puc[:600],
+        "iupac": puc[200:500] + "NNRYSW" + puc[500:600],
+        "hairpin": "GGGAAACCCUUUGGGAAACCC".replace("U", "T") + "GCGCAAAAGCGC" * 3 + puc[:120],
+        "homopolymers": "AAAAAAATTTTTTGGGGGCCCCC" * 4 + "ACGT" * 20,
+    }
+    out: dict = {}
+    for name, dna in sequences.items():
+        rna = R.transcribe_rna(dna)
+        for code in (1, 2):
+            out[f"analyze_{name}_{code}"] = _plain(R.analyze_rna(dna, profile_window=40, profile_step=5,
+                                                                 genetic_code=code))
+        out[f"three_frames_{name}"] = _plain(R.analyze_rna_three_frames(rna, genetic_code=11))
+        for function in ("count_rna_bases", "calculate_rna_gc_content", "calculate_rna_au_content",
+                         "calculate_rna_content_ranges", "calculate_rna_gc_skew", "calculate_rna_au_skew",
+                         "analyze_rna_ambiguity", "analyze_rna_quality", "calculate_rna_molecular_weight",
+                         "calculate_rna_complexity", "find_rna_homopolymers", "analyze_rna_codon_usage",
+                         "calculate_rna_codon_diversity", "analyze_rna_kozak_context",
+                         "analyze_rna_shine_dalgarno", "get_rna_reverse_complement", "summarize_rna_structure",
+                         "find_rna_start_stop_landscape", "create_rna_preview"):
+            try:
+                out[f"{function}_{name}"] = _plain(getattr(R, function)(rna))
+            except Exception as error:
+                out[f"{function}_{name}"] = f"{type(error).__name__}: {error}"
+        out[f"hairpins_{name}"] = _plain(R.find_rna_hairpins(rna, allow_gu=True))
+        out[f"gc_profile_{name}"] = _plain(R.calculate_rna_gc_profile(rna, window_size=40, step=7))
+        out[f"complexity_profile_{name}"] = _plain(R.calculate_rna_complexity_profile(rna, window_size=40, step=7))
+    out["resolve"] = _plain(R.resolve_rna_source(puc[:300], selected_orf={"sequence": puc[30:120], "start": 30,
+                                                                           "strand": "+", "genetic_code": 11}))
+    return out
+
+
 SECTIONS = {
     SNAPSHOT: {"primer": primer_scenarios, "blast": blast_scenarios},
     PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "mutation.json": {"mutation": mutation_scenarios},
@@ -512,6 +552,7 @@ SECTIONS = {
     PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "orf.json": {"orf": orf_scenarios},
     PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "restriction.json": {
         "restriction": restriction_scenarios},
+    PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "rna.json": {"rna": rna_scenarios},
 }
 
 

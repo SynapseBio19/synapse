@@ -283,6 +283,27 @@ RESTRICTION_NAMES = (
     'run_restriction_self_test', 'get_physical_cut_boundaries',
 )
 
+# Phase 9: analyses.rna, recorded from 8dff342 before its split.
+RNA_NAMES = (
+    'RNA_STANDARD_BASES', 'RNA_IUPAC_BASES', 'RNA_AMBIGUOUS_CODES', 'RNA_COMPLEMENT',
+    'RNA_NUCLEOTIDE_RESIDUE_MASSES', 'RNA_CODON_TABLE', 'rna_codon_table',
+    'orf_genetic_code', 'transcribe_rna', 'count_rna_bases',
+    'calculate_rna_base_percentages', 'calculate_rna_gc_content',
+    'calculate_rna_au_content', 'calculate_rna_content_ranges', 'calculate_rna_gc_skew',
+    'calculate_rna_au_skew', 'calculate_rna_gc_profile', 'analyze_rna_ambiguity',
+    'analyze_rna_quality', 'calculate_rna_molecular_weight', 'calculate_rna_complexity',
+    'calculate_rna_complexity_profile', 'find_rna_homopolymers',
+    'find_rna_homopolymer_regions', 'analyze_rna_codon_usage',
+    'calculate_rna_codon_diversity', 'analyze_rna_kozak_context',
+    'analyze_rna_shine_dalgarno', 'get_rna_complement', 'get_rna_reverse_complement',
+    'find_rna_hairpins', 'summarize_rna_structure', 'find_rna_start_stop_landscape',
+    'translate_rna_frame', 'analyze_rna_three_frames', 'calculate_rna_feature_score',
+    'summarize_rna_analysis', 'analyze_rna', 'create_rna_preview', '_orf_value',
+    '_clean_sequence', '_get_pipeline_context', '_get_pipeline_selected_orf',
+    'resolve_rna_source', '_store_rna_in_pipeline', 'analyze_rna_from_pipeline',
+    'run_rna_pipeline',
+)
+
 REMOVED = {"analyses.primer": ("_V5_ACTIVE_CONFIG",)}
 
 # Phase 8 (2026-11-18): the historical _vN_ helpers were renamed; the old
@@ -358,6 +379,10 @@ class PublicModuleNamespaceTests(unittest.TestCase):
         from analyses import restriction
         self._check(restriction, RESTRICTION_NAMES)
 
+    def test_rna_namespace(self):
+        from analyses import rna
+        self._check(rna, RNA_NAMES)
+
     def test_renamed_primer_helpers(self):
         from analyses import primer
         self._check(primer, tuple(RENAMED_PRIMER_NAMES.values()))
@@ -382,16 +407,16 @@ class InternalModuleIndependenceTests(unittest.TestCase):
 
     PROBE = textwrap.dedent('''
         import importlib, json, pkgutil, sys
-        import analyses._blast, analyses._cloning, analyses._mutation, analyses._primer, analyses._protein, analyses._variant, analyses._sequence, analyses._orf, analyses._restriction
+        import analyses._blast, analyses._cloning, analyses._mutation, analyses._primer, analyses._protein, analyses._variant, analyses._sequence, analyses._orf, analyses._restriction, analyses._rna
         failures = {}
         OWN_PUBLIC = {"analyses._blast": "analyses.blast", "analyses._primer": "analyses.primer",
                       "analyses._mutation": "analyses.mutation", "analyses._cloning": "analyses.cloning",
                       "analyses._protein": "analyses.protein", "analyses._variant": "analyses.variant_analysis",
                       "analyses._sequence": "analyses.sequence", "analyses._orf": "analyses.orf",
-                      "analyses._restriction": "analyses.restriction"}
+                      "analyses._restriction": "analyses.restriction", "analyses._rna": "analyses.rna"}
         for package in (analyses._blast, analyses._primer, analyses._mutation, analyses._cloning,
                         analyses._protein, analyses._variant, analyses._sequence, analyses._orf,
-                        analyses._restriction):
+                        analyses._restriction, analyses._rna):
             for info in pkgutil.iter_modules(package.__path__):
                 name = package.__name__ + "." + info.name
                 for loaded in [m for m in sys.modules if m.startswith("analyses")]:
