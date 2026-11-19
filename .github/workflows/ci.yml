@@ -48,11 +48,18 @@ jobs:
         run: |
           cd "$RUNNER_TEMP"
           python -I -c "
-          import analyses.blast, analyses.primer, analyses.mutation, analyses.cloning, core.api, analyses.orf, analyses.rna_structure, ui.style
+          import importlib, pkgutil
+          import analyses, core, data, fileio, synapse_gen, ui
+          names = [m.name for p in (analyses, core, data, fileio, synapse_gen, ui)
+                   for m in pkgutil.walk_packages(p.__path__, p.__name__ + '.')]
+          for name in names:
+              importlib.import_module(name)
+          import analyses.blast, analyses.cloning, analyses.restriction
           assert 'site-packages' in analyses.blast.__file__, analyses.blast.__file__
           assert analyses.blast.run_self_test(verbose=False)
           assert analyses.cloning.run_cloning_self_test()['all_passed']
-          print('imports OK from', analyses.blast.__file__)"
+          assert analyses.restriction.run_restriction_self_test()['all_passed']
+          print(len(names), 'modules import from', analyses.blast.__file__)"
           # The installed command starts the session and quits on Q.
           printf 'Q\n' | synapse
       - name: Golden master

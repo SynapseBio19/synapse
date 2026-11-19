@@ -3293,3 +3293,23 @@ values). No defect found:
   the 47 names are frozen.
 - **Results.** Suite OK on 3.14.6 and 3.10.11; the ViennaRNA comparisons
   ran.
+
+### Package L: the CI imports every installed module; `literature.py` stays one module
+
+- **CI.** The import check of the installed package walks every module of
+  `analyses`, `core`, `data`, `fileio`, `synapse_gen` and `ui` (138 on
+  2026-11-19) instead of a hand-kept list, so a package missing from
+  `pyproject.toml` fails the job. It also runs the restriction self-test.
+  The step was run exactly as written, against a clean non-editable
+  install.
+- **`analyses/literature.py` is not split, on purpose.**
+  - Its tests replace `_request_json`, `_request_text`, the provider
+    searches, `urllib.request.urlopen` and `time.sleep` on the module 20
+    times.
+  - The providers share one module-level throttle (`_LAST_REQUEST_AT`,
+    set with `global`).
+  - After a split, a replacement on the public module would no longer
+    reach the code that calls it, while the tests would still pass. That
+    is the failure this phase found three times.
+  - The module is cohesive: one search pipeline over four providers. The
+    expected gain does not justify the risk.
