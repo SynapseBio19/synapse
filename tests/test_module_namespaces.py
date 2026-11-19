@@ -240,6 +240,27 @@ SEQUENCE_NAMES = (
     'create_sequence_summary', 'analyze_sequence', 'run_sequence_self_test',
 )
 
+# Phase 9: analyses.orf, recorded from b46ed3d before its split.
+ORF_NAMES = (
+    'STANDARD_START_CODONS', 'ALTERNATIVE_START_CODONS', 'ALL_START_CODONS',
+    'STANDARD_STOP_CODONS', 'DEFAULT_MIN_ORF_LENGTH', 'START_CODON_POLICIES',
+    'DEFAULT_START_CODON_POLICY', 'DEFAULT_REPORT_NESTED', 'DEFAULT_RANKING',
+    'ORF_RANKING_MODES', 'LEGACY_ORF_SETTINGS', 'DNA_IUPAC', 'GENETIC_CODE',
+    'expand_iupac_codon', '_stop_codons_of', 'codon_table_for', 'start_codons_for',
+    'initiation_codons', 'is_initiation_codon', '_genetic_code_name',
+    'analyze_codon_identity', '_is_alternative_start', 'classify_start_codon',
+    'analyze_orf_ambiguity', 'analyze_codon_usage', 'calculate_codon_diversity',
+    'analyze_kozak_context', 'analyze_shine_dalgarno', 'analyze_start_context',
+    'calculate_cds_quality', 'calculate_orf_heuristic_score', 'calculate_orf_confidence',
+    'resolve_start_codons', '_orf_sort_key', '_keep_longest_per_stop',
+    'MISSING_START_STATUSES', 'orf_has_start_codon', '_five_prime_partial_orfs',
+    '_origin_spanning_orfs', 'orf_end_on_sequence', 'find_orfs', 'calculate_orf_density',
+    'calculate_frame_statistics', 'summarize_orfs', 'analyze_orfs', 'create_orf_preview',
+    '_orf_genomic_interval', 'analyze_orf_relationships', 'rank_orf_candidates',
+    'compare_orf_candidates', 'translate_orf_sequence', 'analyze_selected_orf',
+    'calculate_orf_feature_summary', 'analyze_orfs_enhanced',
+)
+
 REMOVED = {"analyses.primer": ("_V5_ACTIVE_CONFIG",)}
 
 # Phase 8 (2026-11-18): the historical _vN_ helpers were renamed; the old
@@ -307,6 +328,10 @@ class PublicModuleNamespaceTests(unittest.TestCase):
         from analyses import sequence
         self._check(sequence, SEQUENCE_NAMES)
 
+    def test_orf_namespace(self):
+        from analyses import orf
+        self._check(orf, ORF_NAMES)
+
     def test_renamed_primer_helpers(self):
         from analyses import primer
         self._check(primer, tuple(RENAMED_PRIMER_NAMES.values()))
@@ -331,10 +356,14 @@ class InternalModuleIndependenceTests(unittest.TestCase):
 
     PROBE = textwrap.dedent('''
         import importlib, json, pkgutil, sys
-        import analyses._blast, analyses._cloning, analyses._mutation, analyses._primer, analyses._protein, analyses._variant, analyses._sequence
+        import analyses._blast, analyses._cloning, analyses._mutation, analyses._primer, analyses._protein, analyses._variant, analyses._sequence, analyses._orf
         failures = {}
+        OWN_PUBLIC = {"analyses._blast": "analyses.blast", "analyses._primer": "analyses.primer",
+                      "analyses._mutation": "analyses.mutation", "analyses._cloning": "analyses.cloning",
+                      "analyses._protein": "analyses.protein", "analyses._variant": "analyses.variant_analysis",
+                      "analyses._sequence": "analyses.sequence", "analyses._orf": "analyses.orf"}
         for package in (analyses._blast, analyses._primer, analyses._mutation, analyses._cloning,
-                        analyses._protein, analyses._variant, analyses._sequence):
+                        analyses._protein, analyses._variant, analyses._sequence, analyses._orf):
             for info in pkgutil.iter_modules(package.__path__):
                 name = package.__name__ + "." + info.name
                 for loaded in [m for m in sys.modules if m.startswith("analyses")]:
@@ -343,9 +372,10 @@ class InternalModuleIndependenceTests(unittest.TestCase):
                     importlib.import_module(name)
                 except Exception as error:
                     failures[name] = repr(error)
-                if {"analyses.blast", "analyses.primer", "analyses.mutation", "analyses.cloning",
-                    "analyses.protein", "analyses.variant_analysis", "analyses.sequence"} & set(sys.modules):
-                    failures[name] = "imports the public module"
+                # An internal module may use other analyses (orf uses
+                # analyses.sequence), but never its own public module.
+                if OWN_PUBLIC[package.__name__] in sys.modules:
+                    failures[name] = "imports its own public module"
         for loaded in [m for m in sys.modules if m.startswith("analyses")]:
             del sys.modules[loaded]
         from analyses._primer import thermodynamics

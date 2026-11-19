@@ -429,6 +429,45 @@ def sequence_scenarios() -> dict:
     return out
 
 
+# ---------------------------------------------------------------------------
+# ORF finder (added in Phase 9, recorded from b46ed3d before its split)
+# ---------------------------------------------------------------------------
+
+def orf_scenarios() -> dict:
+    from analyses import orf as O
+
+    puc = _puc19()
+    out: dict = {}
+    settings = {
+        "default": {},
+        "legacy": dict(O.LEGACY_ORF_SETTINGS),
+        "table_starts_code11": {"start_codon_policy": "table_starts", "genetic_code": 11, "min_length": 150},
+        "nested_code2": {"nested": True, "genetic_code": 2, "min_length": 90},
+        "partial5": {"include_5prime_partial": True, "min_length": 120},
+    }
+    for name, options in settings.items():
+        for topology in ("linear", "circular"):
+            result = O.analyze_orfs(puc, topology=topology, **options)
+            out[f"analyze_{name}_{topology}"] = _plain(result)
+    enhanced = O.analyze_orfs_enhanced(puc, min_length=150, top_n=5, topology="circular")
+    out["enhanced"] = _plain(enhanced)
+    orfs = O.analyze_orfs(puc, min_length=150, topology="circular")["orfs"]
+    out["relationships"] = _plain(O.analyze_orf_relationships(orfs))
+    out["ranked"] = _plain(O.rank_orf_candidates(orfs))
+    out["compare"] = _plain(O.compare_orf_candidates(orfs, top_n=3))
+    out["feature_summary"] = _plain(O.calculate_orf_feature_summary(orfs))
+    out["summary"] = _plain(O.summarize_orfs(orfs, sequence_length=len(puc)))
+    for index, item in enumerate(orfs[:4]):
+        out[f"selected_{index}"] = _plain(O.analyze_selected_orf(item))
+        out[f"translation_{index}"] = _plain(O.translate_orf_sequence(item))
+    iupac = puc[:300] + "ATGNNNRYKAAATAG" + puc[300:600]
+    out["iupac"] = _plain(O.analyze_orfs(iupac, min_length=30))
+    out["codon_tables"] = {str(code): _plain(O.codon_table_for(code)) for code in (1, 4, 28)}
+    out["starts"] = {f"{code}_{policy}": sorted(O.start_codons_for(code, policy))
+                     for code in (1, 11) for policy in O.START_CODON_POLICIES}
+    return out
+
+
 SECTIONS = {
     SNAPSHOT: {"primer": primer_scenarios, "blast": blast_scenarios},
     PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "mutation.json": {"mutation": mutation_scenarios},
@@ -436,6 +475,7 @@ SECTIONS = {
     PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "protein.json": {"protein": protein_scenarios},
     PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "variant.json": {"variant": variant_scenarios},
     PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "sequence.json": {"sequence": sequence_scenarios},
+    PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "orf.json": {"orf": orf_scenarios},
 }
 
 

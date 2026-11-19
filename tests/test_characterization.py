@@ -108,6 +108,9 @@ class CharacterizationSnapshotTests(unittest.TestCase):
     def test_sequence_results_are_unchanged(self):
         self._compare("sequence", C.sequence_scenarios())
 
+    def test_orf_results_are_unchanged(self):
+        self._compare("orf", C.orf_scenarios())
+
 
 if __name__ == "__main__":
     unittest.main()

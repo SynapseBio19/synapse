@@ -66,6 +66,12 @@ def annotation_nodes(node):
 
 def used_names(node):
     names = {x.id for x in ast.walk(node) if isinstance(x, ast.Name) and not isinstance(x.ctx, ast.Store)}
+    # Names a function imports itself are not module-level uses (Phase 9:
+    # orf's finder imports DNA_IUPAC from core.alphabets inside a function).
+    if not isinstance(node, (ast.Import, ast.ImportFrom)):
+        for inner in ast.walk(node):
+            if isinstance(inner, (ast.Import, ast.ImportFrom)) and inner is not node:
+                names -= {(alias.asname or alias.name).split(".")[0] for alias in inner.names}
     for ann in annotation_nodes(node):
         for x in ast.walk(ann):
             if isinstance(x, ast.Constant) and isinstance(x.value, str):

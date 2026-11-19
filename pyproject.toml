@@ -45,7 +45,7 @@ dev = ["pyright[nodejs]==1.1.414", "ruff==0.14.4", "coverage>=7.10"]
 # analyses._blast, analyses._primer (Phase 7.1), analyses._mutation and
 # analyses._cloning (Phase 8): internal packages of the public modules of
 # the same name.
-packages = ["analyses", "analyses._blast", "analyses._primer", "analyses._mutation", "analyses._cloning", "analyses._protein", "analyses._variant", "analyses._sequence", "core", "data", "fileio", "synapse_gen", "ui"]
+packages = ["analyses", "analyses._blast", "analyses._primer", "analyses._mutation", "analyses._cloning", "analyses._protein", "analyses._variant", "analyses._sequence", "analyses._orf", "core", "data", "fileio", "synapse_gen", "ui"]
 
 [tool.setuptools.package-data]
 # The example sequence that Enter loads in the session (moved from examples/ in Phase 9).
@@ -79,3 +79,4 @@ extend-exclude = ["LEGACY", "Synapse_Website", ".tools"]
 "analyses/protein.py" = ["F401"]
 "analyses/variant_analysis.py" = ["F401"]
 "analyses/sequence.py" = ["F401"]
+"analyses/orf.py" = ["F401"]

@@ -3228,3 +3228,28 @@ values). No defect found:
 - **Results.** The snapshot recorded after package G is unchanged; so are
   the golden master and the rendered menus. Suite OK on 3.14.6 and
   3.10.11.
+
+### Package I: `analyses/orf.py` split into `analyses/_orf/`
+
+- **Characterization first.** The section `orf`
+  (`tests/fixtures/characterization/orf.json`) holds 32 scenarios
+  recorded from `b46ed3d`:
+  - pUC19, linear and circular, under five settings: default, legacy,
+    code 11 with table starts, nested ORFs under code 2, 5'-partial ORFs;
+  - the enhanced analysis, relationships, ranking, comparison, the feature
+    summary, selected ORFs and their translations;
+  - an IUPAC case, codon tables of codes 1, 4 and 28, start-codon sets.
+
+  It is identical under two hash seeds and on 3.10.11. The 54 names are
+  frozen.
+- **After.** Five modules: `codes`, `features`, `finder`, `summary`,
+  `selection`. No cycle; all 54 statements moved verbatim. One generated
+  import was removed: `finder` imports `DNA_IUPAC` from `core.alphabets`
+  inside a function.
+- **`scripts/refactor/split_module.py`** no longer counts names a
+  function imports itself as module-level uses.
+- **Independence test.** It now checks that an internal module never
+  imports its own public module. Other analyses are allowed: `_orf` uses
+  `analyses.sequence`.
+- **Results.** Unchanged: ORFfinder comparison, the differential ORF test
+  in all 27 codes, the golden master.
