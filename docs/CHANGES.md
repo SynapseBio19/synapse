@@ -3232,7 +3232,7 @@ values). No defect found:
 ### Package I: `analyses/orf.py` split into `analyses/_orf/`
 
 - **Characterization first.** The section `orf`
-  (`tests/fixtures/characterization/orf.json`) holds 32 scenarios
+  (`tests/fixtures/characterization/orf.json`) holds 27 scenarios
   recorded from `b46ed3d`:
   - pUC19, linear and circular, under five settings: default, legacy,
     code 11 with table starts, nested ORFs under code 2, 5'-partial ORFs;

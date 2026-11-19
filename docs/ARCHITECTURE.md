@@ -196,12 +196,36 @@ change without notice, the public module's names may not.
 `RESTRICTION_ENZYMES`, `bases_match` and `find_recognition_site_matches`.
 The golden master and tests read them there.
 
-## 7. Testing strategy for refactorings
+## 7. The other analyses (Phase 9)
+
+Same pattern as above: a public module with the original docstring and
+entry block, and an internal package that holds the code. Plans:
+`scripts/refactor/plans/`.
+
+| Public module | Internal package | Modules, in dependency order |
+|---|---|---|
+| `analyses/protein.py` | `analyses/_protein/` | `constants`, `sequence`, `translation`, `composition`, `charge`, `profiles`, `report` |
+| `analyses/variant_analysis.py` | `analyses/_variant/` | `models`, `vcf`, `normalization`, `annotation`, `statistics`, `export`, `workflow`, `selftest` (`__all__` stays in the public module) |
+| `analyses/sequence.py` | `analyses/_sequence/` | `bases`, `composition`, `profiles`, `cpg`, `summary`, `selftest` |
+| `analyses/orf.py` | `analyses/_orf/` | `codes`, `features`, `finder`, `summary`, `selection` |
+| `analyses/restriction.py` | `analyses/_restriction/` | `sites`, `digest`, `compatibility`, `api`, `selftest` (also re-exports `RESTRICTION_ENZYMES`, `get_restriction_enzyme`, `get_type_iis_enzyme`) |
+| `analyses/rna.py` | `analyses/_rna/` | `bases`, `composition`, `coding`, `structure`, `summary`, `pipeline` |
+
+**Not split.**
+- `analyses/literature.py` (2,095 lines): its tests replace module
+  functions 20 times, and the providers share one module-level throttle,
+  so a split would let those tests pass without reaching the code (see
+  `docs/CHANGES.md`, Phase 9 L).
+- `analyses/crispr.py` is excluded by owner decision.
+- Smaller single-file modules stay as they are: `rna_structure`,
+  `core/*`, `fileio/*`.
+
+## 8. Testing strategy for refactorings
 
 | Layer | Test | Guards |
 |---|---|---|
 | Names | `tests/test_module_namespaces.py` | every name of `analyses.blast` (125), `analyses.primer`, `analyses.mutation` (97, and `__all__`) and `analyses.cloning` (61) stays reachable; renamed primer helpers are gone; each internal module of the four packages imports alone and complete; public names are the implementation objects |
-| Results | `tests/test_characterization.py` + `tests/fixtures/characterization/` | `blast_primer.json` (78 scenarios, from `9077f1e`), `mutation.json` (79, from `727208a`), `cloning.json` (25, from `8e1f6d2`), each recorded before its module moved. Compared exactly, except floats within a relative 1e-12, the last-digit difference of `math.log2` between CPython 3.10 and 3.14 |
+| Results | `tests/test_characterization.py` + `tests/fixtures/characterization/` | ten sections, each recorded before its module moved: `blast_primer.json` (78 scenarios, from `9077f1e`), `mutation.json` (79), `cloning.json` (25), `protein.json` (103), `variant.json` (45), `sequence.json` (111), `orf.json` (27), `restriction.json` (46), `rna.json` (101). Compared exactly, except floats within a relative 1e-12, the last-digit difference of `math.log2` between CPython 3.10 and 3.14 |
 | Science | golden master, primer3-py, ViennaRNA, bcftools, ORFfinder, Mutalyzer and ExPASy comparisons | unchanged reference agreement |
 | Components | `tests/test_blast_components.py`, `tests/test_primer_components.py`, `tests/test_primer_screen_configuration.py` | rejected-input messages, executable discovery, local-execution failures and rescue, condition validation, specificity screen, workflow messages, the explicit screen configuration |
 | Interface | rendered-menu, dialog and session tests | byte-identical terminal output |
@@ -215,14 +239,9 @@ The golden master and tests read them there.
 - Both scripts and the four split plans are in `scripts/refactor/`, for
   the next modules.
 
-## 8. Remaining architectural limitations
+## 9. Remaining architectural limitations
 
-- Still single modules with built-in self-tests: `analyses/protein.py`
-  (2,544 lines), `analyses/variant_analysis.py` (2,531),
-  `analyses/sequence.py` (2,494), `analyses/orf.py` (2,467),
-  `analyses/restriction.py`, `analyses/rna.py` and
-  `analyses/literature.py`. The pattern of `scripts/refactor/` applies to
-  them unchanged.
+- `analyses/literature.py` stays one module, on purpose (section 7).
 - Large but cohesive:
   - `LocalBlastDatabaseManager` (985 lines);
   - `_primer/thermodynamics` (1,581);
@@ -237,5 +256,8 @@ The golden master and tests read them there.
 - CRISPR code (`analyses/crispr.py`, `ui/crispr_menu.py`) is excluded from
   all of this by owner decision. It does not depend on the split modules.
   `analyses._mutation.impact.crispr_mutation_overlap` was moved unchanged.
-- There is no installable `synapse` command yet: `main.py` reads
-  `examples/` next to itself (`docs/CHANGES.md`, Phase 8, package E).
+- Determinism: all ten characterization sections are bit-identical under
+  different hash seeds (`tests/test_determinism.py` keeps the sequence
+  analysis that way). Floats may differ in the last digit between Python
+  versions (`math.log2`, compensated `sum()` since 3.12); the snapshot
+  comparison allows 1e-12.

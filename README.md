@@ -151,8 +151,8 @@ The environment variables below configure the session:
 ```
 main.py      session: file loading, record selection, main menu
 analyses/    one module per analysis: the science, without any terminal code;
-             blast.py, primer.py, mutation.py and cloning.py keep their code
-             in the internal packages analyses/_<name>/ (docs/ARCHITECTURE.md)
+             the larger modules keep their code in internal packages
+             analyses/_<name>/ (docs/ARCHITECTURE.md)
 core/        data model, sequence types, pipeline state, report, API, text layout
 fileio/      FASTA and GenBank reading
 ui/          terminal interface: shared presentation (ui/style.py), main menu,

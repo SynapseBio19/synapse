@@ -169,3 +169,26 @@ control blocked ViennaRNA's DLL that day.
 - `core` fell by 0.6 points. The likely cause is the ViennaRNA entry
   point in `core/api.py`, which only the skipped tests reach; this was not
   checked line by line.
+
+## Remeasured 2026-11-19 (Phase 9)
+
+Same tool and command, with `synapse_gen` added to the measured packages.
+Suite: 659 tests, all passing. 5 skipped: the opt-in benchmark and the
+four opt-in refseq_rna searches. The primer3-py and ViennaRNA comparisons
+ran.
+
+| Scope | Phase 8 | Phase 9 |
+|---|---:|---:|
+| `analyses` | 85.5 % | 87.3 % |
+| `core` | 87.0 % | 87.7 % |
+| `ui` | 77.1 % | 77.7 % |
+| `fileio` | 91.8 % | 91.8 % |
+| `synapse_gen` (the session, formerly `main.py` at 83.6 %) | – | 83.0 % |
+| **Total** | **83.7 %** | **85.0 %** |
+
+The 85 % target of Phase 7 is reached. It is reached by tests of real
+behavior, not by tests written for the percentage:
+- component tests;
+- the genetic-code, ORF-differential and determinism tests;
+- the download check;
+- the command and path tests.
