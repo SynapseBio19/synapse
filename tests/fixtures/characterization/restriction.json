@@ -1,0 +1,4850 @@
+{
+ "restriction": {
+  "analysis_circular": {
+   "analysis": {
+    "digest": {
+     "cut_count": 10,
+     "cut_positions": [
+      184,
+      396,
+      406,
+      412,
+      414,
+      417,
+      423,
+      429,
+      439,
+      447
+     ],
+     "cuts": [
+      {
+       "bottom_cut": 187,
+       "bottom_cut_0based": 186,
+       "bottom_cut_1based": 187,
+       "cut_info": {
+        "bottom_cut": 186,
+        "bottom_cut_0based": 186,
+        "bottom_cut_1based": 187,
+        "overhang_length": 2,
+        "recognition_end": 187,
+        "recognition_end_1based": 188,
+        "recognition_start": 182,
+        "recognition_start_1based": 183,
+        "top_cut": 184,
+        "top_cut_0based": 184,
+        "top_cut_1based": 185
+       },
+       "enzyme": "NdeI",
+       "position": 184,
+       "position_0based": 184,
+       "position_1based": 185,
+       "site_position": 183,
+       "site_position_0based": 182,
+       "site_position_1based": 183,
+       "status": "CONFIRMED",
+       "top_cut": 185,
+       "top_cut_0based": 184,
+       "top_cut_1based": 185,
+       "wraps_origin": false
+      },
+      {
+       "bottom_cut": 401,
+       "bottom_cut_0based": 400,
+       "bottom_cut_1based": 401,
+       "cut_info": {
+        "bottom_cut": 400,
+        "bottom_cut_0based": 400,
+        "bottom_cut_1based": 401,
+        "overhang_length": 4,
+        "recognition_end": 400,
+        "recognition_end_1based": 401,
+        "recognition_start": 395,
+        "recognition_start_1based": 396,
+        "top_cut": 396,
+        "top_cut_0based": 396,
+        "top_cut_1based": 397
+       },
+       "enzyme": "EcoRI",
+       "position": 396,
+       "position_0based": 396,
+       "position_1based": 397,
+       "site_position": 396,
+       "site_position_0based": 395,
+       "site_position_1based": 396,
+       "status": "CONFIRMED",
+       "top_cut": 397,
+       "top_cut_0based": 396,
+       "top_cut_1based": 397,
+       "wraps_origin": false
+      },
+      {
+       "bottom_cut": 403,
+       "bottom_cut_0based": 402,
+       "bottom_cut_1based": 403,
+       "cut_info": {
+        "bottom_cut": 402,
+        "bottom_cut_0based": 402,
+        "bottom_cut_1based": 403,
+        "overhang_length": 4,
+        "recognition_end": 406,
+        "recognition_end_1based": 407,
+        "recognition_start": 401,
+        "recognition_start_1based": 402,
+        "top_cut": 406,
+        "top_cut_0based": 406,
+        "top_cut_1based": 407
+       },
+       "enzyme": "SacI",
+       "position": 406,
+       "position_0based": 406,
+       "position_1based": 407,
+       "site_position": 402,
+       "site_position_0based": 401,
+       "site_position_1based": 402,
+       "status": "CONFIRMED",
+       "top_cut": 407,
+       "top_cut_0based": 406,
+       "top_cut_1based": 407,
+       "wraps_origin": false
+      },
+      {
+       "bottom_cut": 409,
+       "bottom_cut_0based": 408,
+       "bottom_cut_1based": 409,
+       "cut_info": {
+        "bottom_cut": 408,
+        "bottom_cut_0based": 408,
+        "bottom_cut_1based": 409,
+        "overhang_length": 4,
+        "recognition_end": 412,
+        "recognition_end_1based": 413,
+        "recognition_start": 407,
+        "recognition_start_1based": 408,
+        "top_cut": 412,
+        "top_cut_0based": 412,
+        "top_cut_1based": 413
+       },
+       "enzyme": "KpnI",
+       "position": 412,
+       "position_0based": 412,
+       "position_1based": 413,
+       "site_position": 408,
+       "site_position_0based": 407,
+       "site_position_1based": 408,
+       "status": "CONFIRMED",
+       "top_cut": 413,
+       "top_cut_0based": 412,
+       "top_cut_1based": 413,
+       "wraps_origin": false
+      },
+      {
+       "bottom_cut": 415,
+       "bottom_cut_0based": 414,
+       "bottom_cut_1based": 415,
+       "cut_info": {
+        "bottom_cut": 414,
+        "bottom_cut_0based": 414,
+        "bottom_cut_1based": 415,
+        "overhang_length": 0,
+        "recognition_end": 416,
+        "recognition_end_1based": 417,
+        "recognition_start": 411,
+        "recognition_start_1based": 412,
+        "top_cut": 414,
+        "top_cut_0based": 414,
+        "top_cut_1based": 415
+       },
+       "enzyme": "SmaI",
+       "position": 414,
+       "position_0based": 414,
+       "position_1based": 415,
+       "site_position": 412,
+       "site_position_0based": 411,
+       "site_position_1based": 412,
+       "status": "CONFIRMED",
+       "top_cut": 415,
+       "top_cut_0based": 414,
+       "top_cut_1based": 415,
+       "wraps_origin": false
+      },
+      {
+       "bottom_cut": 422,
+       "bottom_cut_0based": 421,
+       "bottom_cut_1based": 422,
+       "cut_info": {
+        "bottom_cut": 421,
+        "bottom_cut_0based": 421,
+        "bottom_cut_1based": 422,
+        "overhang_length": 4,
+        "recognition_end": 421,
+        "recognition_end_1based": 422,
+        "recognition_start": 416,
+        "recognition_start_1based": 417,
+        "top_cut": 417,
+        "top_cut_0based": 417,
+        "top_cut_1based": 418
+       },
+       "enzyme": "BamHI",
+       "position": 417,
+       "position_0based": 417,
+       "position_1based": 418,
+       "site_position": 417,
+       "site_position_0based": 416,
+       "site_position_1based": 417,
+       "status": "CONFIRMED",
+       "top_cut": 418,
+       "top_cut_0based": 417,
+       "top_cut_1based": 418,
+       "wraps_origin": false
+      },
+      {
+       "bottom_cut": 428,
+       "bottom_cut_0based": 427,
+       "bottom_cut_1based": 428,
+       "cut_info": {
+        "bottom_cut": 427,
+        "bottom_cut_0based": 427,
+        "bottom_cut_1based": 428,
+        "overhang_length": 4,
+        "recognition_end": 427,
+        "recognition_end_1based": 428,
+        "recognition_start": 422,
+        "recognition_start_1based": 423,
+        "top_cut": 423,
+        "top_cut_0based": 423,
+        "top_cut_1based": 424
+       },
+       "enzyme": "XbaI",
+       "position": 423,
+       "position_0based": 423,
+       "position_1based": 424,
+       "site_position": 423,
+       "site_position_0based": 422,
+       "site_position_1based": 423,
+       "status": "CONFIRMED",
+       "top_cut": 424,
+       "top_cut_0based": 423,
+       "top_cut_1based": 424,
+       "wraps_origin": false
+      },
+      {
+       "bottom_cut": 434,
+       "bottom_cut_0based": 433,
+       "bottom_cut_1based": 434,
+       "cut_info": {
+        "bottom_cut": 433,
+        "bottom_cut_0based": 433,
+        "bottom_cut_1based": 434,
+        "overhang_length": 4,
+        "recognition_end": 433,
+        "recognition_end_1based": 434,
+        "recognition_start": 428,
+        "recognition_start_1based": 429,
+        "top_cut": 429,
+        "top_cut_0based": 429,
+        "top_cut_1based": 430
+       },
+       "enzyme": "SalI",
+       "position": 429,
+       "position_0based": 429,
+       "position_1based": 430,
+       "site_position": 429,
+       "site_position_0based": 428,
+       "site_position_1based": 429,
+       "status": "CONFIRMED",
+       "top_cut": 430,
+       "top_cut_0based": 429,
+       "top_cut_1based": 430,
+       "wraps_origin": false
+      },
+      {
+       "bottom_cut": 436,
+       "bottom_cut_0based": 435,
+       "bottom_cut_1based": 436,
+       "cut_info": {
+        "bottom_cut": 435,
+        "bottom_cut_0based": 435,
+        "bottom_cut_1based": 436,
+        "overhang_length": 4,
+        "recognition_end": 439,
+        "recognition_end_1based": 440,
+        "recognition_start": 434,
+        "recognition_start_1based": 435,
+        "top_cut": 439,
+        "top_cut_0based": 439,
+        "top_cut_1based": 440
+       },
+       "enzyme": "PstI",
+       "position": 439,
+       "position_0based": 439,
+       "position_1based": 440,
+       "site_position": 435,
+       "site_position_0based": 434,
+       "site_position_1based": 435,
+       "status": "CONFIRMED",
+       "top_cut": 440,
+       "top_cut_0based": 439,
+       "top_cut_1based": 440,
+       "wraps_origin": false
+      },
+      {
+       "bottom_cut": 452,
+       "bottom_cut_0based": 451,
+       "bottom_cut_1based": 452,
+       "cut_info": {
+        "bottom_cut": 451,
+        "bottom_cut_0based": 451,
+        "bottom_cut_1based": 452,
+        "overhang_length": 4,
+        "recognition_end": 451,
+        "recognition_end_1based": 452,
+        "recognition_start": 446,
+        "recognition_start_1based": 447,
+        "top_cut": 447,
+        "top_cut_0based": 447,
+        "top_cut_1based": 448
+       },
+       "enzyme": "HindIII",
+       "position": 447,
+       "position_0based": 447,
+       "position_1based": 448,
+       "site_position": 447,
+       "site_position_0based": 446,
+       "site_position_1based": 447,
+       "status": "CONFIRMED",
+       "top_cut": 448,
+       "top_cut_0based": 447,
+       "top_cut_1based": 448,
+       "wraps_origin": false
+      }
+     ],
+     "enzymes": [
+      "EcoRI",
+      "BamHI",
+      "HindIII",
+      "PstI",
+      "SmaI",
+      "KpnI",
+      "XbaI",
+      "SalI",
+      "NdeI",
+      "SacI"
+     ],
+     "fragment_count": 10,
+     "fragments": [
+      {
+       "cut_events": [
+        {
+         "enzyme": "NdeI",
+         "position_1based": 185
+        },
+        {
+         "enzyme": "EcoRI",
+         "position_1based": 397
+        }
+       ],
+       "end": 396,
+       "end_0based_exclusive": 396,
+       "enzymes": [
+        "EcoRI",
+        "NdeI"
+       ],
+       "fragment": 1,
+       "length": 212,
+       "start": 185,
+       "start_0based": 184,
+       "wraps_origin": false
+      },
+      {
+       "cut_events": [
+        {
+         "enzyme": "EcoRI",
+         "position_1based": 397
+        },
+        {
+         "enzyme": "SacI",
+         "position_1based": 407
+        }
+       ],
+       "end": 406,
+       "end_0based_exclusive": 406,
+       "enzymes": [
+        "EcoRI",
+        "SacI"
+       ],
+       "fragment": 2,
+       "length": 10,
+       "start": 397,
+       "start_0based": 396,
+       "wraps_origin": false
+      },
+      {
+       "cut_events": [
+        {
+         "enzyme": "SacI",
+         "position_1based": 407
+        },
+        {
+         "enzyme": "KpnI",
+         "position_1based": 413
+        }
+       ],
+       "end": 412,
+       "end_0based_exclusive": 412,
+       "enzymes": [
+        "KpnI",
+        "SacI"
+       ],
+       "fragment": 3,
+       "length": 6,
+       "start": 407,
+       "start_0based": 406,
+       "wraps_origin": false
+      },
+      {
+       "cut_events": [
+        {
+         "enzyme": "KpnI",
+         "position_1based": 413
+        },
+        {
+         "enzyme": "SmaI",
+         "position_1based": 415
+        }
+       ],
+       "end": 414,
+       "end_0based_exclusive": 414,
+       "enzymes": [
+        "KpnI",
+        "SmaI"
+       ],
+       "fragment": 4,
+       "length": 2,
+       "start": 413,
+       "start_0based": 412,
+       "wraps_origin": false
+      },
+      {
+       "cut_events": [
+        {
+         "enzyme": "SmaI",
+         "position_1based": 415
+        },
+        {
+         "enzyme": "BamHI",
+         "position_1based": 418
+        }
+       ],
+       "end": 417,
+       "end_0based_exclusive": 417,
+       "enzymes": [
+        "BamHI",
+        "SmaI"
+       ],
+       "fragment": 5,
+       "length": 3,
+       "start": 415,
+       "start_0based": 414,
+       "wraps_origin": false
+      },
+      {
+       "cut_events": [
+        {
+         "enzyme": "BamHI",
+         "position_1based": 418
+        },
+        {
+         "enzyme": "XbaI",
+         "position_1based": 424
+        }
+       ],
+       "end": 423,
+       "end_0based_exclusive": 423,
+       "enzymes": [
+        "BamHI",
+        "XbaI"
+       ],
+       "fragment": 6,
+       "length": 6,
+       "start": 418,
+       "start_0based": 417,
+       "wraps_origin": false
+      },
+      {
+       "cut_events": [
+        {
+         "enzyme": "XbaI",
+         "position_1based": 424
+        },
+        {
+         "enzyme": "SalI",
+         "position_1based": 430
+        }
+       ],
+       "end": 429,
+       "end_0based_exclusive": 429,
+       "enzymes": [
+        "SalI",
+        "XbaI"
+       ],
+       "fragment": 7,
+       "length": 6,
+       "start": 424,
+       "start_0based": 423,
+       "wraps_origin": false
+      },
+      {
+       "cut_events": [
+        {
+         "enzyme": "SalI",
+         "position_1based": 430
+        },
+        {
+         "enzyme": "PstI",
+         "position_1based": 440
+        }
+       ],
+       "end": 439,
+       "end_0based_exclusive": 439,
+       "enzymes": [
+        "PstI",
+        "SalI"
+       ],
+       "fragment": 8,
+       "length": 10,
+       "start": 430,
+       "start_0based": 429,
+       "wraps_origin": false
+      },
+      {
+       "cut_events": [
+        {
+         "enzyme": "PstI",
+         "position_1based": 440
+        },
+        {
+         "enzyme": "HindIII",
+         "position_1based": 448
+        }
+       ],
+       "end": 447,
+       "end_0based_exclusive": 447,
+       "enzymes": [
+        "HindIII",
+        "PstI"
+       ],
+       "fragment": 9,
+       "length": 8,
+       "start": 440,
+       "start_0based": 439,
+       "wraps_origin": false
+      },
+      {
+       "cut_events": [
+        {
+         "enzyme": "NdeI",
+         "position_1based": 185
+        },
+        {
+         "enzyme": "HindIII",
+         "position_1based": 448
+        }
+       ],
+       "end": 184,
+       "end_0based_exclusive": 184,
+       "enzymes": [
+        "HindIII",
+        "NdeI"
+       ],
+       "fragment": 10,
+       "length": 2423,
+       "start": 448,
+       "start_0based": 447,
+       "wraps_origin": true
+      }
+     ],
+     "has_cut": true,
+     "possible_cuts": [],
+     "possible_cuts_included": false,
+     "sequence_length": 2686,
+     "topology": "circular",
+     "unique_cut_count": 10
+    },
+    "enzyme_results": {
+     "BamHI": {
+      "confirmed_site_count": 1,
+      "cut_type": "Sticky",
+      "database_valid": true,
+      "enzyme": "BamHI",
+      "overhang_length": 4,
+      "overhang_type": "5_prime",
+      "possible_site_count": 0,
+      "recognition_sequence": "GGATCC",
+      "site_count": 1,
+      "sites": [
+       {
+        "ambiguity_dependent": false,
+        "bottom_cut": 422,
+        "bottom_cut_0based": 421,
+        "cut_type": "Sticky",
+        "enzyme": "BamHI",
+        "is_blunt": false,
+        "match_status": "CONFIRMED",
+        "overhang_length": 4,
+        "overhang_sequence": "GATC",
+        "overhang_type": "5_prime",
+        "recognition_sequence": "GGATCC",
+        "site_end": 422,
+        "site_end_1based": 422,
+        "site_position": 417,
+        "site_position_0based": 416,
+        "top_cut": 418,
+        "top_cut_0based": 417
+       }
+      ]
+     },
+     "EcoRI": {
+      "confirmed_site_count": 1,
+      "cut_type": "Sticky",
+      "database_valid": true,
+      "enzyme": "EcoRI",
+      "overhang_length": 4,
+      "overhang_type": "5_prime",
+      "possible_site_count": 0,
+      "recognition_sequence": "GAATTC",
+      "site_count": 1,
+      "sites": [
+       {
+        "ambiguity_dependent": false,
+        "bottom_cut": 401,
+        "bottom_cut_0based": 400,
+        "cut_type": "Sticky",
+        "enzyme": "EcoRI",
+        "is_blunt": false,
+        "match_status": "CONFIRMED",
+        "overhang_length": 4,
+        "overhang_sequence": "AATT",
+        "overhang_type": "5_prime",
+        "recognition_sequence": "GAATTC",
+        "site_end": 401,
+        "site_end_1based": 401,
+        "site_position": 396,
+        "site_position_0based": 395,
+        "top_cut": 397,
+        "top_cut_0based": 396
+       }
+      ]
+     },
+     "HindIII": {
+      "confirmed_site_count": 1,
+      "cut_type": "Sticky",
+      "database_valid": true,
+      "enzyme": "HindIII",
+      "overhang_length": 4,
+      "overhang_type": "5_prime",
+      "possible_site_count": 0,
+      "recognition_sequence": "AAGCTT",
+      "site_count": 1,
+      "sites": [
+       {
+        "ambiguity_dependent": false,
+        "bottom_cut": 452,
+        "bottom_cut_0based": 451,
+        "cut_type": "Sticky",
+        "enzyme": "HindIII",
+        "is_blunt": false,
+        "match_status": "CONFIRMED",
+        "overhang_length": 4,
+        "overhang_sequence": "AGCT",
+        "overhang_type": "5_prime",
+        "recognition_sequence": "AAGCTT",
+        "site_end": 452,
+        "site_end_1based": 452,
+        "site_position": 447,
+        "site_position_0based": 446,
+        "top_cut": 448,
+        "top_cut_0based": 447
+       }
+      ]
+     },
+     "KpnI": {
+      "confirmed_site_count": 1,
+      "cut_type": "Sticky",
+      "database_valid": true,
+      "enzyme": "KpnI",
+      "overhang_length": 4,
+      "overhang_type": "3_prime",
+      "possible_site_count": 0,
+      "recognition_sequence": "GGTACC",
+      "site_count": 1,
+      "sites": [
+       {
+        "ambiguity_dependent": false,
+        "bottom_cut": 409,
+        "bottom_cut_0based": 408,
+        "cut_type": "Sticky",
+        "enzyme": "KpnI",
+        "is_blunt": false,
+        "match_status": "CONFIRMED",
+        "overhang_length": 4,
+        "overhang_sequence": "GTAC",
+        "overhang_type": "3_prime",
+        "recognition_sequence": "GGTACC",
+        "site_end": 413,
+        "site_end_1based": 413,
+        "site_position": 408,
+        "site_position_0based": 407,
+        "top_cut": 413,
+        "top_cut_0based": 412
+       }
+      ]
+     },
+     "NdeI": {
+      "confirmed_site_count": 1,
+      "cut_type": "Sticky",
+      "database_valid": true,
+      "enzyme": "NdeI",
+      "overhang_length": 2,
+      "overhang_type": "5_prime",
+      "possible_site_count": 0,
+      "recognition_sequence": "CATATG",
+      "site_count": 1,
+      "sites": [
+       {
+        "ambiguity_dependent": false,
+        "bottom_cut": 187,
+        "bottom_cut_0based": 186,
+        "cut_type": "Sticky",
+        "enzyme": "NdeI",
+        "is_blunt": false,
+        "match_status": "CONFIRMED",
+        "overhang_length": 2,
+        "overhang_sequence": "TA",
+        "overhang_type": "5_prime",
+        "recognition_sequence": "CATATG",
+        "site_end": 188,
+        "site_end_1based": 188,
+        "site_position": 183,
+        "site_position_0based": 182,
+        "top_cut": 185,
+        "top_cut_0based": 184
+       }
+      ]
+     },
+     "PstI": {
+      "confirmed_site_count": 1,
+      "cut_type": "Sticky",
+      "database_valid": true,
+      "enzyme": "PstI",
+      "overhang_length": 4,
+      "overhang_type": "3_prime",
+      "possible_site_count": 0,
+      "recognition_sequence": "CTGCAG",
+      "site_count": 1,
+      "sites": [
+       {
+        "ambiguity_dependent": false,
+        "bottom_cut": 436,
+        "bottom_cut_0based": 435,
+        "cut_type": "Sticky",
+        "enzyme": "PstI",
+        "is_blunt": false,
+        "match_status": "CONFIRMED",
+        "overhang_length": 4,
+        "overhang_sequence": "TGCA",
+        "overhang_type": "3_prime",
+        "recognition_sequence": "CTGCAG",
+        "site_end": 440,
+        "site_end_1based": 440,
+        "site_position": 435,
+        "site_position_0based": 434,
+        "top_cut": 440,
+        "top_cut_0based": 439
+       }
+      ]
+     },
+     "SacI": {
+      "confirmed_site_count": 1,
+      "cut_type": "Sticky",
+      "database_valid": true,
+      "enzyme": "SacI",
+      "overhang_length": 4,
+      "overhang_type": "3_prime",
+      "possible_site_count": 0,
+      "recognition_sequence": "GAGCTC",
+      "site_count": 1,
+      "sites": [
+       {
+        "ambiguity_dependent": false,
+        "bottom_cut": 403,
+        "bottom_cut_0based": 402,
+        "cut_type": "Sticky",
+        "enzyme": "SacI",
+        "is_blunt": false,
+        "match_status": "CONFIRMED",
+        "overhang_length": 4,
+        "overhang_sequence": "AGCT",
+        "overhang_type": "3_prime",
+        "recognition_sequence": "GAGCTC",
+        "site_end": 407,
+        "site_end_1based": 407,
+        "site_position": 402,
+        "site_position_0based": 401,
+        "top_cut": 407,
+        "top_cut_0based": 406
+       }
+      ]
+     },
+     "SalI": {
+      "confirmed_site_count": 1,
+      "cut_type": "Sticky",
+      "database_valid": true,
+      "enzyme": "SalI",
+      "overhang_length": 4,
+      "overhang_type": "5_prime",
+      "possible_site_count": 0,
+      "recognition_sequence": "GTCGAC",
+      "site_count": 1,
+      "sites": [
+       {
+        "ambiguity_dependent": false,
+        "bottom_cut": 434,
+        "bottom_cut_0based": 433,
+        "cut_type": "Sticky",
+        "enzyme": "SalI",
+        "is_blunt": false,
+        "match_status": "CONFIRMED",
+        "overhang_length": 4,
+        "overhang_sequence": "TCGA",
+        "overhang_type": "5_prime",
+        "recognition_sequence": "GTCGAC",
+        "site_end": 434,
+        "site_end_1based": 434,
+        "site_position": 429,
+        "site_position_0based": 428,
+        "top_cut": 430,
+        "top_cut_0based": 429
+       }
+      ]
+     },
+     "SmaI": {
+      "confirmed_site_count": 1,
+      "cut_type": "Blunt",
+      "database_valid": true,
+      "enzyme": "SmaI",
+      "overhang_length": 0,
+      "overhang_type": "blunt",
+      "possible_site_count": 0,
+      "recognition_sequence": "CCCGGG",
+      "site_count": 1,
+      "sites": [
+       {
+        "ambiguity_dependent": false,
+        "bottom_cut": 415,
+        "bottom_cut_0based": 414,
+        "cut_type": "Blunt",
+        "enzyme": "SmaI",
+        "is_blunt": true,
+        "match_status": "CONFIRMED",
+        "overhang_length": 0,
+        "overhang_sequence": "",
+        "overhang_type": "blunt",
+        "recognition_sequence": "CCCGGG",
+        "site_end": 417,
+        "site_end_1based": 417,
+        "site_position": 412,
+        "site_position_0based": 411,
+        "top_cut": 415,
+        "top_cut_0based": 414
+       }
+      ]
+     },
+     "XbaI": {
+      "confirmed_site_count": 1,
+      "cut_type": "Sticky",
+      "database_valid": true,
+      "enzyme": "XbaI",
+      "overhang_length": 4,
+      "overhang_type": "5_prime",
+      "possible_site_count": 0,
+      "recognition_sequence": "TCTAGA",
+      "site_count": 1,
+      "sites": [
+       {
+        "ambiguity_dependent": false,
+        "bottom_cut": 428,
+        "bottom_cut_0based": 427,
+        "cut_type": "Sticky",
+        "enzyme": "XbaI",
+        "is_blunt": false,
+        "match_status": "CONFIRMED",
+        "overhang_length": 4,
+        "overhang_sequence": "CTAG",
+        "overhang_type": "5_prime",
+        "recognition_sequence": "TCTAGA",
+        "site_end": 428,
+        "site_end_1based": 428,
+        "site_position": 423,
+        "site_position_0based": 422,
+        "top_cut": 424,
+        "top_cut_0based": 423
+       }
+      ]
+     }
+    },
+    "enzymes": [
+     "EcoRI",
+     "BamHI",
+     "HindIII",
+     "PstI",
+     "SmaI",
+     "KpnI",
+     "XbaI",
+     "SalI",
+     "NdeI",
+     "SacI"
+    ],
+    "gel_bands": [
+     {
+      "copies": 1,
+      "fragments": [
+       10
+      ],
+      "relative_abundance": 1,
+      "size": 2423
+     },
+     {
+      "copies": 1,
+      "fragments": [
+       1
+      ],
+      "relative_abundance": 1,
+      "size": 212
+     },
+     {
+      "copies": 2,
+      "fragments": [
+       2,
+       8
+      ],
+      "relative_abundance": 2,
+      "size": 10
+     },
+     {
+      "copies": 1,
+      "fragments": [
+       9
+      ],
+      "relative_abundance": 1,
+      "size": 8
+     },
+     {
+      "copies": 3,
+      "fragments": [
+       3,
+       6,
+       7
+      ],
+      "relative_abundance": 3,
+      "size": 6
+     },
+     {
+      "copies": 1,
+      "fragments": [
+       5
+      ],
+      "relative_abundance": 1,
+      "size": 3
+     },
+     {
+      "copies": 1,
+      "fragments": [
+       4
+      ],
+      "relative_abundance": 1,
+      "size": 2
+     }
+    ],
+    "internal_sites": [],
+    "non_cutters": [],
+    "recommended_pairs": [
+     {
+      "cut_position_a_0based": 396,
+      "cut_position_b_0based": 417,
+      "distinct_cut_positions": true,
+      "enzyme_a": "EcoRI",
+      "enzyme_b": "BamHI",
+      "maximum": 16,
+      "reasons": [
+       "EcoRI cuts exactly once at a confirmed site",
+       "BamHI cuts exactly once at a confirmed site",
+       "Two distinct physical cut positions",
+       "Both enzymes generate sticky ends",
+       "Distinct recognition sequences",
+       "Both enzymes generate sticky ends of the same length"
+      ],
+      "score": 16,
+      "site_count_a": 1,
+      "site_count_b": 1,
+      "sticky_ends": true,
+      "warnings": []
+     },
+     {
+      "cut_position_a_0based": 396,
+      "cut_position_b_0based": 447,
+      "distinct_cut_positions": true,
+      "enzyme_a": "EcoRI",
+      "enzyme_b": "HindIII",
+      "maximum": 16,
+      "reasons": [
+       "EcoRI cuts exactly once at a confirmed site",
+       "HindIII cuts exactly once at a confirmed site",
+       "Two distinct physical cut positions",
+       "Both enzymes generate sticky ends",
+       "Distinct recognition sequences",
+       "Both enzymes generate sticky ends of the same length"
+      ],
+      "score": 16,
+      "site_count_a": 1,
+      "site_count_b": 1,
+      "sticky_ends": true,
+      "warnings": []
+     },
+     {
+      "cut_position_a_0based": 396,
+      "cut_position_b_0based": 439,
+      "distinct_cut_positions": true,
+      "enzyme_a": "EcoRI",
+      "enzyme_b": "PstI",
+      "maximum": 16,
+      "reasons": [
+       "EcoRI cuts exactly once at a confirmed site",
+       "PstI cuts exactly once at a confirmed site",
+       "Two distinct physical cut positions",
+       "Both enzymes generate sticky ends",
+       "Distinct recognition sequences",
+       "Both enzymes generate sticky ends of the same length"
+      ],
+      "score": 16,
+      "site_count_a": 1,
+      "site_count_b": 1,
+      "sticky_ends": true,
+      "warnings": []
+     },
+     {
+      "cut_position_a_0based": 396,
+      "cut_position_b_0based": 412,
+      "distinct_cut_positions": true,
+      "enzyme_a": "EcoRI",
+      "enzyme_b": "KpnI",
+      "maximum": 16,
+      "reasons": [
+       "EcoRI cuts exactly once at a confirmed site",
+       "KpnI cuts exactly once at a confirmed site",
+       "Two distinct physical cut positions",
+       "Both enzymes generate sticky ends",
+       "Distinct recognition sequences",
+       "Both enzymes generate sticky ends of the same length"
+      ],
+      "score": 16,
+      "site_count_a": 1,
+      "site_count_b": 1,
+      "sticky_ends": true,
+      "warnings": []
+     },
+     {
+      "cut_position_a_0based": 396,
+      "cut_position_b_0based": 423,
+      "distinct_cut_positions": true,
+      "enzyme_a": "EcoRI",
+      "enzyme_b": "XbaI",
+      "maximum": 16,
+      "reasons": [
+       "EcoRI cuts exactly once at a confirmed site",
+       "XbaI cuts exactly once at a confirmed site",
+       "Two distinct physical cut positions",
+       "Both enzymes generate sticky ends",
+       "Distinct recognition sequences",
+       "Both enzymes generate sticky ends of the same length"
+      ],
+      "score": 16,
+      "site_count_a": 1,
+      "site_count_b": 1,
+      "sticky_ends": true,
+      "warnings": []
+     }
+    ],
+    "restriction_map": [
+     {
+      "ambiguity_dependent": false,
+      "bottom_cut": 187,
+      "bottom_cut_0based": 186,
+      "cut_type": "Sticky",
+      "enzyme": "NdeI",
+      "is_blunt": false,
+      "match_status": "CONFIRMED",
+      "overhang_length": 2,
+      "overhang_sequence": "TA",
+      "overhang_type": "5_prime",
+      "recognition_sequence": "CATATG",
+      "site_end": 188,
+      "site_end_1based": 188,
+      "site_position": 183,
+      "site_position_0based": 182,
+      "top_cut": 185,
+      "top_cut_0based": 184,
+      "wraps_origin": false
+     },
+     {
+      "ambiguity_dependent": false,
+      "bottom_cut": 401,
+      "bottom_cut_0based": 400,
+      "cut_type": "Sticky",
+      "enzyme": "EcoRI",
+      "is_blunt": false,
+      "match_status": "CONFIRMED",
+      "overhang_length": 4,
+      "overhang_sequence": "AATT",
+      "overhang_type": "5_prime",
+      "recognition_sequence": "GAATTC",
+      "site_end": 401,
+      "site_end_1based": 401,
+      "site_position": 396,
+      "site_position_0based": 395,
+      "top_cut": 397,
+      "top_cut_0based": 396,
+      "wraps_origin": false
+     },
+     {
+      "ambiguity_dependent": false,
+      "bottom_cut": 403,
+      "bottom_cut_0based": 402,
+      "cut_type": "Sticky",
+      "enzyme": "SacI",
+      "is_blunt": false,
+      "match_status": "CONFIRMED",
+      "overhang_length": 4,
+      "overhang_sequence": "AGCT",
+      "overhang_type": "3_prime",
+      "recognition_sequence": "GAGCTC",
+      "site_end": 407,
+      "site_end_1based": 407,
+      "site_position": 402,
+      "site_position_0based": 401,
+      "top_cut": 407,
+      "top_cut_0based": 406,
+      "wraps_origin": false
+     },
+     {
+      "ambiguity_dependent": false,
+      "bottom_cut": 409,
+      "bottom_cut_0based": 408,
+      "cut_type": "Sticky",
+      "enzyme": "KpnI",
+      "is_blunt": false,
+      "match_status": "CONFIRMED",
+      "overhang_length": 4,
+      "overhang_sequence": "GTAC",
+      "overhang_type": "3_prime",
+      "recognition_sequence": "GGTACC",
+      "site_end": 413,
+      "site_end_1based": 413,
+      "site_position": 408,
+      "site_position_0based": 407,
+      "top_cut": 413,
+      "top_cut_0based": 412,
+      "wraps_origin": false
+     },
+     {
+      "ambiguity_dependent": false,
+      "bottom_cut": 415,
+      "bottom_cut_0based": 414,
+      "cut_type": "Blunt",
+      "enzyme": "SmaI",
+      "is_blunt": true,
+      "match_status": "CONFIRMED",
+      "overhang_length": 0,
+      "overhang_sequence": "",
+      "overhang_type": "blunt",
+      "recognition_sequence": "CCCGGG",
+      "site_end": 417,
+      "site_end_1based": 417,
+      "site_position": 412,
+      "site_position_0based": 411,
+      "top_cut": 415,
+      "top_cut_0based": 414,
+      "wraps_origin": false
+     },
+     {
+      "ambiguity_dependent": false,
+      "bottom_cut": 422,
+      "bottom_cut_0based": 421,
+      "cut_type": "Sticky",
+      "enzyme": "BamHI",
+      "is_blunt": false,
+      "match_status": "CONFIRMED",
+      "overhang_length": 4,
+      "overhang_sequence": "GATC",
+      "overhang_type": "5_prime",
+      "recognition_sequence": "GGATCC",
+      "site_end": 422,
+      "site_end_1based": 422,
+      "site_position": 417,
+      "site_position_0based": 416,
+      "top_cut": 418,
+      "top_cut_0based": 417,
+      "wraps_origin": false
+     },
+     {
+      "ambiguity_dependent": false,
+      "bottom_cut": 428,
+      "bottom_cut_0based": 427,
+      "cut_type": "Sticky",
+      "enzyme": "XbaI",
+      "is_blunt": false,
+      "match_status": "CONFIRMED",
+      "overhang_length": 4,
+      "overhang_sequence": "CTAG",
+      "overhang_type": "5_prime",
+      "recognition_sequence": "TCTAGA",
+      "site_end": 428,
+      "site_end_1based": 428,
+      "site_position": 423,
+      "site_position_0based": 422,
+      "top_cut": 424,
+      "top_cut_0based": 423,
+      "wraps_origin": false
+     },
+     {
+      "ambiguity_dependent": false,
+      "bottom_cut": 434,
+      "bottom_cut_0based": 433,
+      "cut_type": "Sticky",
+      "enzyme": "SalI",
+      "is_blunt": false,
+      "match_status": "CONFIRMED",
+      "overhang_length": 4,
+      "overhang_sequence": "TCGA",
+      "overhang_type": "5_prime",
+      "recognition_sequence": "GTCGAC",
+      "site_end": 434,
+      "site_end_1based": 434,
+      "site_position": 429,
+      "site_position_0based": 428,
+      "top_cut": 430,
+      "top_cut_0based": 429,
+      "wraps_origin": false
+     },
+     {
+      "ambiguity_dependent": false,
+      "bottom_cut": 436,
+      "bottom_cut_0based": 435,
+      "cut_type": "Sticky",
+      "enzyme": "PstI",
+      "is_blunt": false,
+      "match_status": "CONFIRMED",
+      "overhang_length": 4,
+      "overhang_sequence": "TGCA",
+      "overhang_type": "3_prime",
+      "recognition_sequence": "CTGCAG",
+      "site_end": 440,
+      "site_end_1based": 440,
+      "site_position": 435,
+      "site_position_0based": 434,
+      "top_cut": 440,
+      "top_cut_0based": 439,
+      "wraps_origin": false
+     },
+     {
+      "ambiguity_dependent": false,
+      "bottom_cut": 452,
+      "bottom_cut_0based": 451,
+      "cut_type": "Sticky",
+      "enzyme": "HindIII",
+      "is_blunt": false,
+      "match_status": "CONFIRMED",
+      "overhang_length": 4,
+      "overhang_sequence": "AGCT",
+      "overhang_type": "5_prime",
+      "recognition_sequence": "AAGCTT",
+      "site_end": 452,
+      "site_end_1based": 452,
+      "site_position": 447,
+      "site_position_0based": 446,
+      "top_cut": 448,
+      "top_cut_0based": 447,
+      "wraps_origin": false
+     }
+    ],
+    "sequence_length": 2686,
+    "sequence_status": {
+     "ambiguous_positions": [],
+     "invalid_positions": [],
+     "invalid_symbols": [],
+     "length": 2686,
+     "sequence": "TCGCGCGTTTCGGTGATGACGGTGAAAACCTCTGACACATGCAGCTCCCGGAGACGGTCACAGCTTGTCTGTAAGCGGATGCCGGGAGCAGACAAGCCCGTCAGGGCGCGTCAGCGGGTGTTGGCGGGTGTCGGGGCTGGCTTAACTATGCGGCATCAGAGCAGATTGTACTGAGAGTGCACCATATGCGGTGTGAAATACCGCACAGATGCGTAAGGAGAAAATACCGCATCAGGCGCCATTCGCCATTCAGGCTGCGCAACTGTTGGGAAGGGCGATCGGTGCGGGCCTCTTCGCTATTACGCCAGCTGGCGAAAGGGGGATGTGCTGCAAGGCGATTAAGTTGGGTAACGCCAGGGTTTTCCCAGTCACGACGTTGTAAAACGACGGCCAGTGAATTCGAGCTCGGTACCCGGGGATCCTCTAGAGTCGACCTGCAGGCATGCAAGCTTGGCGTAATCATGGTCATAGCTGTTTCCTGTGTGAAATTGTTATCCGCTCACAATTCCACACAACATACGAGCCGGAAGCATAAAGTGTAAAGCCTGGGGTGCCTAATGAGTGAGCTAACTCACATTAATTGCGTTGCGCTCACTGCCCGCTTTCCAGTCGGGAAACCTGTCGTGCCAGCTGCATTAATGAATCGGCCAACGCGCGGGGAGAGGCGGTTTGCGTATTGGGCGCTCTTCCGCTTCCTCGCTCACTGACTCGCTGCGCTCGGTCGTTCGGCTGCGGCGAGCGGTATCAGCTCACTCAAAGGCGGTAATACGGTTATCCACAGAATCAGGGGATAACGCAGGAAAGAACATGTGAGCAAAAGGCCAGCAAAAGGCCAGGAACCGTAAAAAGGCCGCGTTGCTGGCGTTTTTCCATAGGCTCCGCCCCCCTGACGAGCATCACAAAAATCGACGCTCAAGTCAGAGGTGGCGAAACCCGACAGGACTATAAAGATACCAGGCGTTTCCCCCTGGAAGCTCCCTCGTGCGCTCTCCTGTTCCGACCCTGCCGCTTACCGGATACCTGTCCGCCTTTCTCCCTTCGGGAAGCGTGGCGCTTTCTCATAGCTCACGCTGTAGGTATCTCAGTTCGGTGTAGGTCGTTCGCTCCAAGCTGGGCTGTGTGCACGAACCCCCCGTTCAGCCCGACCGCTGCGCCTTATCCGGTAACTATCGTCTTGAGTCCAACCCGGTAAGACACGACTTATCGCCACTGGCAGCAGCCACTGGTAACAGGATTAGCAGAGCGAGGTATGTAGGCGGTGCTACAGAGTTCTTGAAGTGGTGGCCTAACTACGGCTACACTAGAAGAACAGTATTTGGTATCTGCGCTCTGCTGAAGCCAGTTACCTTCGGAAAAAGAGTTGGTAGCTCTTGATCCGGCAAACAAACCACCGCTGGTAGCGGTGGTTTTTTTGTTTGCAAGCAGCAGATTACGCGCAGAAAAAAAGGATCTCAAGAAGATCCTTTGATCTTTTCTACGGGGTCTGACGCTCAGTGGAACGAAAACTCACGTTAAGGGATTTTGGTCATGAGATTATCAAAAAGGATCTTCACCTAGATCCTTTTAAATTAAAAATGAAGTTTTAAATCAATCTAAAGTATATATGAGTAAACTTGGTCTGACAGTTACCAATGCTTAATCAGTGAGGCACCTATCTCAGCGATCTGTCTATTTCGTTCATCCATAGTTGCCTGACTCCCCGTCGTGTAGATAACTACGATACGGGAGGGCTTACCATCTGGCCCCAGTGCTGCAATGATACCGCGAGACCCACGCTCACCGGCTCCAGATTTATCAGCAATAAACCAGCCAGCCGGAAGGGCCGAGCGCAGAAGTGGTCCTGCAACTTTATCCGCCTCCATCCAGTCTATTAATTGTTGCCGGGAAGCTAGAGTAAGTAGTTCGCCAGTTAATAGTTTGCGCAACGTTGTTGCCATTGCTACAGGCATCGTGGTGTCACGCTCGTCGTTTGGTATGGCTTCATTCAGCTCCGGTTCCCAACGATCAAGGCGAGTTACATGATCCCCCATGTTGTGCAAAAAAGCGGTTAGCTCCTTCGGTCCTCCGATCGTTGTCAGAAGTAAGTTGGCCGCAGTGTTATCACTCATGGTTATGGCAGCACTGCATAATTCTCTTACTGTCATGCCATCCGTAAGATGCTTTTCTGTGACTGGTGAGTACTCAACCAAGTCATTCTGAGAATAGTGTATGCGGCGACCGAGTTGCTCTTGCCCGGCGTCAATACGGGATAATACCGCGCCACATAGCAGAACTTTAAAAGTGCTCATCATTGGAAAACGTTCTTCGGGGCGAAAACTCTCAAGGATCTTACCGCTGTTGAGATCCAGTTCGATGTAACCCACTCGTGCACCCAACTGATCTTCAGCATCTTTTACTTTCACCAGCGTTTCTGGGTGAGCAAAAACAGGAAGGCAAAATGCCGCAAAAAAGGGAATAAGGGCGACACGGAAATGTTGAATACTCATACTCTTCCTTTTTCAATATTATTGAAGCATTTATCAGGGTTATTGTCTCATGAGCGGATACATATTTGAATGTATTTAGAAAAATAAACAAATAGGGGTTCCGCGCACATTTCCCCGAAAAGTGCCACCTGACGTCTAAGAAACCATTATTATCATGACATTAACCTATAAAAATAGGCGTATCACGAGGCCCTTTCGTC",
+     "valid": true
+    },
+    "site_statistics": {
+     "confirmed_site_events": 10,
+     "physical_cut_boundaries": 10,
+     "possible_site_events": 0,
+     "total_site_events": 10
+    },
+    "topology": "circular",
+    "unique_cutters": [
+     "EcoRI",
+     "BamHI",
+     "HindIII",
+     "PstI",
+     "SmaI",
+     "KpnI",
+     "XbaI",
+     "SalI",
+     "NdeI",
+     "SacI"
+    ]
+   },
+   "sequence_length": 2686,
+   "sequence_status": {
+    "ambiguous_positions": [],
+    "invalid_positions": [],
+    "invalid_symbols": [],
+    "length": 2686,
+    "sequence": "TCGCGCGTTTCGGTGATGACGGTGAAAACCTCTGACACATGCAGCTCCCGGAGACGGTCACAGCTTGTCTGTAAGCGGATGCCGGGAGCAGACAAGCCCGTCAGGGCGCGTCAGCGGGTGTTGGCGGGTGTCGGGGCTGGCTTAACTATGCGGCATCAGAGCAGATTGTACTGAGAGTGCACCATATGCGGTGTGAAATACCGCACAGATGCGTAAGGAGAAAATACCGCATCAGGCGCCATTCGCCATTCAGGCTGCGCAACTGTTGGGAAGGGCGATCGGTGCGGGCCTCTTCGCTATTACGCCAGCTGGCGAAAGGGGGATGTGCTGCAAGGCGATTAAGTTGGGTAACGCCAGGGTTTTCCCAGTCACGACGTTGTAAAACGACGGCCAGTGAATTCGAGCTCGGTACCCGGGGATCCTCTAGAGTCGACCTGCAGGCATGCAAGCTTGGCGTAATCATGGTCATAGCTGTTTCCTGTGTGAAATTGTTATCCGCTCACAATTCCACACAACATACGAGCCGGAAGCATAAAGTGTAAAGCCTGGGGTGCCTAATGAGTGAGCTAACTCACATTAATTGCGTTGCGCTCACTGCCCGCTTTCCAGTCGGGAAACCTGTCGTGCCAGCTGCATTAATGAATCGGCCAACGCGCGGGGAGAGGCGGTTTGCGTATTGGGCGCTCTTCCGCTTCCTCGCTCACTGACTCGCTGCGCTCGGTCGTTCGGCTGCGGCGAGCGGTATCAGCTCACTCAAAGGCGGTAATACGGTTATCCACAGAATCAGGGGATAACGCAGGAAAGAACATGTGAGCAAAAGGCCAGCAAAAGGCCAGGAACCGTAAAAAGGCCGCGTTGCTGGCGTTTTTCCATAGGCTCCGCCCCCCTGACGAGCATCACAAAAATCGACGCTCAAGTCAGAGGTGGCGAAACCCGACAGGACTATAAAGATACCAGGCGTTTCCCCCTGGAAGCTCCCTCGTGCGCTCTCCTGTTCCGACCCTGCCGCTTACCGGATACCTGTCCGCCTTTCTCCCTTCGGGAAGCGTGGCGCTTTCTCATAGCTCACGCTGTAGGTATCTCAGTTCGGTGTAGGTCGTTCGCTCCAAGCTGGGCTGTGTGCACGAACCCCCCGTTCAGCCCGACCGCTGCGCCTTATCCGGTAACTATCGTCTTGAGTCCAACCCGGTAAGACACGACTTATCGCCACTGGCAGCAGCCACTGGTAACAGGATTAGCAGAGCGAGGTATGTAGGCGGTGCTACAGAGTTCTTGAAGTGGTGGCCTAACTACGGCTACACTAGAAGAACAGTATTTGGTATCTGCGCTCTGCTGAAGCCAGTTACCTTCGGAAAAAGAGTTGGTAGCTCTTGATCCGGCAAACAAACCACCGCTGGTAGCGGTGGTTTTTTTGTTTGCAAGCAGCAGATTACGCGCAGAAAAAAAGGATCTCAAGAAGATCCTTTGATCTTTTCTACGGGGTCTGACGCTCAGTGGAACGAAAACTCACGTTAAGGGATTTTGGTCATGAGATTATCAAAAAGGATCTTCACCTAGATCCTTTTAAATTAAAAATGAAGTTTTAAATCAATCTAAAGTATATATGAGTAAACTTGGTCTGACAGTTACCAATGCTTAATCAGTGAGGCACCTATCTCAGCGATCTGTCTATTTCGTTCATCCATAGTTGCCTGACTCCCCGTCGTGTAGATAACTACGATACGGGAGGGCTTACCATCTGGCCCCAGTGCTGCAATGATACCGCGAGACCCACGCTCACCGGCTCCAGATTTATCAGCAATAAACCAGCCAGCCGGAAGGGCCGAGCGCAGAAGTGGTCCTGCAACTTTATCCGCCTCCATCCAGTCTATTAATTGTTGCCGGGAAGCTAGAGTAAGTAGTTCGCCAGTTAATAGTTTGCGCAACGTTGTTGCCATTGCTACAGGCATCGTGGTGTCACGCTCGTCGTTTGGTATGGCTTCATTCAGCTCCGGTTCCCAACGATCAAGGCGAGTTACATGATCCCCCATGTTGTGCAAAAAAGCGGTTAGCTCCTTCGGTCCTCCGATCGTTGTCAGAAGTAAGTTGGCCGCAGTGTTATCACTCATGGTTATGGCAGCACTGCATAATTCTCTTACTGTCATGCCATCCGTAAGATGCTTTTCTGTGACTGGTGAGTACTCAACCAAGTCATTCTGAGAATAGTGTATGCGGCGACCGAGTTGCTCTTGCCCGGCGTCAATACGGGATAATACCGCGCCACATAGCAGAACTTTAAAAGTGCTCATCATTGGAAAACGTTCTTCGGGGCGAAAACTCTCAAGGATCTTACCGCTGTTGAGATCCAGTTCGATGTAACCCACTCGTGCACCCAACTGATCTTCAGCATCTTTTACTTTCACCAGCGTTTCTGGGTGAGCAAAAACAGGAAGGCAAAATGCCGCAAAAAAGGGAATAAGGGCGACACGGAAATGTTGAATACTCATACTCTTCCTTTTTCAATATTATTGAAGCATTTATCAGGGTTATTGTCTCATGAGCGGATACATATTTGAATGTATTTAGAAAAATAAACAAATAGGGGTTCCGCGCACATTTCCCCGAAAAGTGCCACCTGACGTCTAAGAAACCATTATTATCATGACATTAACCTATAAAAATAGGCGTATCACGAGGCCCTTTCGTC",
+    "valid": true
+   },
+   "status": "OK",
+   "topology": "circular",
+   "valid": true
+  },
+  "analysis_linear": {
+   "analysis": {
+    "digest": {
+     "cut_count": 10,
+     "cut_positions": [
+      184,
+      396,
+      406,
+      412,
+      414,
+      417,
+      423,
+      429,
+      439,
+      447
+     ],
+     "cuts": [
+      {
+       "bottom_cut": 187,
+       "bottom_cut_0based": 186,
+       "bottom_cut_1based": 187,
+       "cut_info": {
+        "bottom_cut": 186,
+        "bottom_cut_0based": 186,
+        "bottom_cut_1based": 187,
+        "overhang_length": 2,
+        "recognition_end": 187,
+        "recognition_end_1based": 188,
+        "recognition_start": 182,
+        "recognition_start_1based": 183,
+        "top_cut": 184,
+        "top_cut_0based": 184,
+        "top_cut_1based": 185
+       },
+       "enzyme": "NdeI",
+       "position": 184,
+       "position_0based": 184,
+       "position_1based": 185,
+       "site_position": 183,
+       "site_position_0based": 182,
+       "site_position_1based": 183,
+       "status": "CONFIRMED",
+       "top_cut": 185,
+       "top_cut_0based": 184,
+       "top_cut_1based": 185,
+       "wraps_origin": false
+      },
+      {
+       "bottom_cut": 401,
+       "bottom_cut_0based": 400,
+       "bottom_cut_1based": 401,
+       "cut_info": {
+        "bottom_cut": 400,
+        "bottom_cut_0based": 400,
+        "bottom_cut_1based": 401,
+        "overhang_length": 4,
+        "recognition_end": 400,
+        "recognition_end_1based": 401,
+        "recognition_start": 395,
+        "recognition_start_1based": 396,
+        "top_cut": 396,
+        "top_cut_0based": 396,
+        "top_cut_1based": 397
+       },
+       "enzyme": "EcoRI",
+       "position": 396,
+       "position_0based": 396,
+       "position_1based": 397,
+       "site_position": 396,
+       "site_position_0based": 395,
+       "site_position_1based": 396,
+       "status": "CONFIRMED",
+       "top_cut": 397,
+       "top_cut_0based": 396,
+       "top_cut_1based": 397,
+       "wraps_origin": false
+      },
+      {
+       "bottom_cut": 403,
+       "bottom_cut_0based": 402,
+       "bottom_cut_1based": 403,
+       "cut_info": {
+        "bottom_cut": 402,
+        "bottom_cut_0based": 402,
+        "bottom_cut_1based": 403,
+        "overhang_length": 4,
+        "recognition_end": 406,
+        "recognition_end_1based": 407,
+        "recognition_start": 401,
+        "recognition_start_1based": 402,
+        "top_cut": 406,
+        "top_cut_0based": 406,
+        "top_cut_1based": 407
+       },
+       "enzyme": "SacI",
+       "position": 406,
+       "position_0based": 406,
+       "position_1based": 407,
+       "site_position": 402,
+       "site_position_0based": 401,
+       "site_position_1based": 402,
+       "status": "CONFIRMED",
+       "top_cut": 407,
+       "top_cut_0based": 406,
+       "top_cut_1based": 407,
+       "wraps_origin": false
+      },
+      {
+       "bottom_cut": 409,
+       "bottom_cut_0based": 408,
+       "bottom_cut_1based": 409,
+       "cut_info": {
+        "bottom_cut": 408,
+        "bottom_cut_0based": 408,
+        "bottom_cut_1based": 409,
+        "overhang_length": 4,
+        "recognition_end": 412,
+        "recognition_end_1based": 413,
+        "recognition_start": 407,
+        "recognition_start_1based": 408,
+        "top_cut": 412,
+        "top_cut_0based": 412,
+        "top_cut_1based": 413
+       },
+       "enzyme": "KpnI",
+       "position": 412,
+       "position_0based": 412,
+       "position_1based": 413,
+       "site_position": 408,
+       "site_position_0based": 407,
+       "site_position_1based": 408,
+       "status": "CONFIRMED",
+       "top_cut": 413,
+       "top_cut_0based": 412,
+       "top_cut_1based": 413,
+       "wraps_origin": false
+      },
+      {
+       "bottom_cut": 415,
+       "bottom_cut_0based": 414,
+       "bottom_cut_1based": 415,
+       "cut_info": {
+        "bottom_cut": 414,
+        "bottom_cut_0based": 414,
+        "bottom_cut_1based": 415,
+        "overhang_length": 0,
+        "recognition_end": 416,
+        "recognition_end_1based": 417,
+        "recognition_start": 411,
+        "recognition_start_1based": 412,
+        "top_cut": 414,
+        "top_cut_0based": 414,
+        "top_cut_1based": 415
+       },
+       "enzyme": "SmaI",
+       "position": 414,
+       "position_0based": 414,
+       "position_1based": 415,
+       "site_position": 412,
+       "site_position_0based": 411,
+       "site_position_1based": 412,
+       "status": "CONFIRMED",
+       "top_cut": 415,
+       "top_cut_0based": 414,
+       "top_cut_1based": 415,
+       "wraps_origin": false
+      },
+      {
+       "bottom_cut": 422,
+       "bottom_cut_0based": 421,
+       "bottom_cut_1based": 422,
+       "cut_info": {
+        "bottom_cut": 421,
+        "bottom_cut_0based": 421,
+        "bottom_cut_1based": 422,
+        "overhang_length": 4,
+        "recognition_end": 421,
+        "recognition_end_1based": 422,
+        "recognition_start": 416,
+        "recognition_start_1based": 417,
+        "top_cut": 417,
+        "top_cut_0based": 417,
+        "top_cut_1based": 418
+       },
+       "enzyme": "BamHI",
+       "position": 417,
+       "position_0based": 417,
+       "position_1based": 418,
+       "site_position": 417,
+       "site_position_0based": 416,
+       "site_position_1based": 417,
+       "status": "CONFIRMED",
+       "top_cut": 418,
+       "top_cut_0based": 417,
+       "top_cut_1based": 418,
+       "wraps_origin": false
+      },
+      {
+       "bottom_cut": 428,
+       "bottom_cut_0based": 427,
+       "bottom_cut_1based": 428,
+       "cut_info": {
+        "bottom_cut": 427,
+        "bottom_cut_0based": 427,
+        "bottom_cut_1based": 428,
+        "overhang_length": 4,
+        "recognition_end": 427,
+        "recognition_end_1based": 428,
+        "recognition_start": 422,
+        "recognition_start_1based": 423,
+        "top_cut": 423,
+        "top_cut_0based": 423,
+        "top_cut_1based": 424
+       },
+       "enzyme": "XbaI",
+       "position": 423,
+       "position_0based": 423,
+       "position_1based": 424,
+       "site_position": 423,
+       "site_position_0based": 422,
+       "site_position_1based": 423,
+       "status": "CONFIRMED",
+       "top_cut": 424,
+       "top_cut_0based": 423,
+       "top_cut_1based": 424,
+       "wraps_origin": false
+      },
+      {
+       "bottom_cut": 434,
+       "bottom_cut_0based": 433,
+       "bottom_cut_1based": 434,
+       "cut_info": {
+        "bottom_cut": 433,
+        "bottom_cut_0based": 433,
+        "bottom_cut_1based": 434,
+        "overhang_length": 4,
+        "recognition_end": 433,
+        "recognition_end_1based": 434,
+        "recognition_start": 428,
+        "recognition_start_1based": 429,
+        "top_cut": 429,
+        "top_cut_0based": 429,
+        "top_cut_1based": 430
+       },
+       "enzyme": "SalI",
+       "position": 429,
+       "position_0based": 429,
+       "position_1based": 430,
+       "site_position": 429,
+       "site_position_0based": 428,
+       "site_position_1based": 429,
+       "status": "CONFIRMED",
+       "top_cut": 430,
+       "top_cut_0based": 429,
+       "top_cut_1based": 430,
+       "wraps_origin": false
+      },
+      {
+       "bottom_cut": 436,
+       "bottom_cut_0based": 435,
+       "bottom_cut_1based": 436,
+       "cut_info": {
+        "bottom_cut": 435,
+        "bottom_cut_0based": 435,
+        "bottom_cut_1based": 436,
+        "overhang_length": 4,
+        "recognition_end": 439,
+        "recognition_end_1based": 440,
+        "recognition_start": 434,
+        "recognition_start_1based": 435,
+        "top_cut": 439,
+        "top_cut_0based": 439,
+        "top_cut_1based": 440
+       },
+       "enzyme": "PstI",
+       "position": 439,
+       "position_0based": 439,
+       "position_1based": 440,
+       "site_position": 435,
+       "site_position_0based": 434,
+       "site_position_1based": 435,
+       "status": "CONFIRMED",
+       "top_cut": 440,
+       "top_cut_0based": 439,
+       "top_cut_1based": 440,
+       "wraps_origin": false
+      },
+      {
+       "bottom_cut": 452,
+       "bottom_cut_0based": 451,
+       "bottom_cut_1based": 452,
+       "cut_info": {
+        "bottom_cut": 451,
+        "bottom_cut_0based": 451,
+        "bottom_cut_1based": 452,
+        "overhang_length": 4,
+        "recognition_end": 451,
+        "recognition_end_1based": 452,
+        "recognition_start": 446,
+        "recognition_start_1based": 447,
+        "top_cut": 447,
+        "top_cut_0based": 447,
+        "top_cut_1based": 448
+       },
+       "enzyme": "HindIII",
+       "position": 447,
+       "position_0based": 447,
+       "position_1based": 448,
+       "site_position": 447,
+       "site_position_0based": 446,
+       "site_position_1based": 447,
+       "status": "CONFIRMED",
+       "top_cut": 448,
+       "top_cut_0based": 447,
+       "top_cut_1based": 448,
+       "wraps_origin": false
+      }
+     ],
+     "enzymes": [
+      "EcoRI",
+      "BamHI",
+      "HindIII",
+      "PstI",
+      "SmaI",
+      "KpnI",
+      "XbaI",
+      "SalI",
+      "NdeI",
+      "SacI"
+     ],
+     "fragment_count": 11,
+     "fragments": [
+      {
+       "cut_events": [
+        {
+         "enzyme": "NdeI",
+         "position_1based": 185
+        }
+       ],
+       "end": 184,
+       "end_0based_exclusive": 184,
+       "enzymes": [
+        "NdeI"
+       ],
+       "fragment": 1,
+       "length": 184,
+       "start": 1,
+       "start_0based": 0,
+       "wraps_origin": false
+      },
+      {
+       "cut_events": [
+        {
+         "enzyme": "NdeI",
+         "position_1based": 185
+        },
+        {
+         "enzyme": "EcoRI",
+         "position_1based": 397
+        }
+       ],
+       "end": 396,
+       "end_0based_exclusive": 396,
+       "enzymes": [
+        "EcoRI",
+        "NdeI"
+       ],
+       "fragment": 2,
+       "length": 212,
+       "start": 185,
+       "start_0based": 184,
+       "wraps_origin": false
+      },
+      {
+       "cut_events": [
+        {
+         "enzyme": "EcoRI",
+         "position_1based": 397
+        },
+        {
+         "enzyme": "SacI",
+         "position_1based": 407
+        }
+       ],
+       "end": 406,
+       "end_0based_exclusive": 406,
+       "enzymes": [
+        "EcoRI",
+        "SacI"
+       ],
+       "fragment": 3,
+       "length": 10,
+       "start": 397,
+       "start_0based": 396,
+       "wraps_origin": false
+      },
+      {
+       "cut_events": [
+        {
+         "enzyme": "SacI",
+         "position_1based": 407
+        },
+        {
+         "enzyme": "KpnI",
+         "position_1based": 413
+        }
+       ],
+       "end": 412,
+       "end_0based_exclusive": 412,
+       "enzymes": [
+        "KpnI",
+        "SacI"
+       ],
+       "fragment": 4,
+       "length": 6,
+       "start": 407,
+       "start_0based": 406,
+       "wraps_origin": false
+      },
+      {
+       "cut_events": [
+        {
+         "enzyme": "KpnI",
+         "position_1based": 413
+        },
+        {
+         "enzyme": "SmaI",
+         "position_1based": 415
+        }
+       ],
+       "end": 414,
+       "end_0based_exclusive": 414,
+       "enzymes": [
+        "KpnI",
+        "SmaI"
+       ],
+       "fragment": 5,
+       "length": 2,
+       "start": 413,
+       "start_0based": 412,
+       "wraps_origin": false
+      },
+      {
+       "cut_events": [
+        {
+         "enzyme": "SmaI",
+         "position_1based": 415
+        },
+        {
+         "enzyme": "BamHI",
+         "position_1based": 418
+        }
+       ],
+       "end": 417,
+       "end_0based_exclusive": 417,
+       "enzymes": [
+        "BamHI",
+        "SmaI"
+       ],
+       "fragment": 6,
+       "length": 3,
+       "start": 415,
+       "start_0based": 414,
+       "wraps_origin": false
+      },
+      {
+       "cut_events": [
+        {
+         "enzyme": "BamHI",
+         "position_1based": 418
+        },
+        {
+         "enzyme": "XbaI",
+         "position_1based": 424
+        }
+       ],
+       "end": 423,
+       "end_0based_exclusive": 423,
+       "enzymes": [
+        "BamHI",
+        "XbaI"
+       ],
+       "fragment": 7,
+       "length": 6,
+       "start": 418,
+       "start_0based": 417,
+       "wraps_origin": false
+      },
+      {
+       "cut_events": [
+        {
+         "enzyme": "XbaI",
+         "position_1based": 424
+        },
+        {
+         "enzyme": "SalI",
+         "position_1based": 430
+        }
+       ],
+       "end": 429,
+       "end_0based_exclusive": 429,
+       "enzymes": [
+        "SalI",
+        "XbaI"
+       ],
+       "fragment": 8,
+       "length": 6,
+       "start": 424,
+       "start_0based": 423,
+       "wraps_origin": false
+      },
+      {
+       "cut_events": [
+        {
+         "enzyme": "SalI",
+         "position_1based": 430
+        },
+        {
+         "enzyme": "PstI",
+         "position_1based": 440
+        }
+       ],
+       "end": 439,
+       "end_0based_exclusive": 439,
+       "enzymes": [
+        "PstI",
+        "SalI"
+       ],
+       "fragment": 9,
+       "length": 10,
+       "start": 430,
+       "start_0based": 429,
+       "wraps_origin": false
+      },
+      {
+       "cut_events": [
+        {
+         "enzyme": "PstI",
+         "position_1based": 440
+        },
+        {
+         "enzyme": "HindIII",
+         "position_1based": 448
+        }
+       ],
+       "end": 447,
+       "end_0based_exclusive": 447,
+       "enzymes": [
+        "HindIII",
+        "PstI"
+       ],
+       "fragment": 10,
+       "length": 8,
+       "start": 440,
+       "start_0based": 439,
+       "wraps_origin": false
+      },
+      {
+       "cut_events": [
+        {
+         "enzyme": "HindIII",
+         "position_1based": 448
+        }
+       ],
+       "end": 2686,
+       "end_0based_exclusive": 2686,
+       "enzymes": [
+        "HindIII"
+       ],
+       "fragment": 11,
+       "length": 2239,
+       "start": 448,
+       "start_0based": 447,
+       "wraps_origin": false
+      }
+     ],
+     "has_cut": true,
+     "possible_cuts": [],
+     "possible_cuts_included": false,
+     "sequence_length": 2686,
+     "topology": "linear",
+     "unique_cut_count": 10
+    },
+    "enzyme_results": {
+     "BamHI": {
+      "confirmed_site_count": 1,
+      "cut_type": "Sticky",
+      "database_valid": true,
+      "enzyme": "BamHI",
+      "overhang_length": 4,
+      "overhang_type": "5_prime",
+      "possible_site_count": 0,
+      "recognition_sequence": "GGATCC",
+      "site_count": 1,
+      "sites": [
+       {
+        "ambiguity_dependent": false,
+        "bottom_cut": 422,
+        "bottom_cut_0based": 421,
+        "cut_type": "Sticky",
+        "enzyme": "BamHI",
+        "is_blunt": false,
+        "match_status": "CONFIRMED",
+        "overhang_length": 4,
+        "overhang_sequence": "GATC",
+        "overhang_type": "5_prime",
+        "recognition_sequence": "GGATCC",
+        "site_end": 422,
+        "site_end_1based": 422,
+        "site_position": 417,
+        "site_position_0based": 416,
+        "top_cut": 418,
+        "top_cut_0based": 417
+       }
+      ]
+     },
+     "EcoRI": {
+      "confirmed_site_count": 1,
+      "cut_type": "Sticky",
+      "database_valid": true,
+      "enzyme": "EcoRI",
+      "overhang_length": 4,
+      "overhang_type": "5_prime",
+      "possible_site_count": 0,
+      "recognition_sequence": "GAATTC",
+      "site_count": 1,
+      "sites": [
+       {
+        "ambiguity_dependent": false,
+        "bottom_cut": 401,
+        "bottom_cut_0based": 400,
+        "cut_type": "Sticky",
+        "enzyme": "EcoRI",
+        "is_blunt": false,
+        "match_status": "CONFIRMED",
+        "overhang_length": 4,
+        "overhang_sequence": "AATT",
+        "overhang_type": "5_prime",
+        "recognition_sequence": "GAATTC",
+        "site_end": 401,
+        "site_end_1based": 401,
+        "site_position": 396,
+        "site_position_0based": 395,
+        "top_cut": 397,
+        "top_cut_0based": 396
+       }
+      ]
+     },
+     "HindIII": {
+      "confirmed_site_count": 1,
+      "cut_type": "Sticky",
+      "database_valid": true,
+      "enzyme": "HindIII",
+      "overhang_length": 4,
+      "overhang_type": "5_prime",
+      "possible_site_count": 0,
+      "recognition_sequence": "AAGCTT",
+      "site_count": 1,
+      "sites": [
+       {
+        "ambiguity_dependent": false,
+        "bottom_cut": 452,
+        "bottom_cut_0based": 451,
+        "cut_type": "Sticky",
+        "enzyme": "HindIII",
+        "is_blunt": false,
+        "match_status": "CONFIRMED",
+        "overhang_length": 4,
+        "overhang_sequence": "AGCT",
+        "overhang_type": "5_prime",
+        "recognition_sequence": "AAGCTT",
+        "site_end": 452,
+        "site_end_1based": 452,
+        "site_position": 447,
+        "site_position_0based": 446,
+        "top_cut": 448,
+        "top_cut_0based": 447
+       }
+      ]
+     },
+     "KpnI": {
+      "confirmed_site_count": 1,
+      "cut_type": "Sticky",
+      "database_valid": true,
+      "enzyme": "KpnI",
+      "overhang_length": 4,
+      "overhang_type": "3_prime",
+      "possible_site_count": 0,
+      "recognition_sequence": "GGTACC",
+      "site_count": 1,
+      "sites": [
+       {
+        "ambiguity_dependent": false,
+        "bottom_cut": 409,
+        "bottom_cut_0based": 408,
+        "cut_type": "Sticky",
+        "enzyme": "KpnI",
+        "is_blunt": false,
+        "match_status": "CONFIRMED",
+        "overhang_length": 4,
+        "overhang_sequence": "GTAC",
+        "overhang_type": "3_prime",
+        "recognition_sequence": "GGTACC",
+        "site_end": 413,
+        "site_end_1based": 413,
+        "site_position": 408,
+        "site_position_0based": 407,
+        "top_cut": 413,
+        "top_cut_0based": 412
+       }
+      ]
+     },
+     "NdeI": {
+      "confirmed_site_count": 1,
+      "cut_type": "Sticky",
+      "database_valid": true,
+      "enzyme": "NdeI",
+      "overhang_length": 2,
+      "overhang_type": "5_prime",
+      "possible_site_count": 0,
+      "recognition_sequence": "CATATG",
+      "site_count": 1,
+      "sites": [
+       {
+        "ambiguity_dependent": false,
+        "bottom_cut": 187,
+        "bottom_cut_0based": 186,
+        "cut_type": "Sticky",
+        "enzyme": "NdeI",
+        "is_blunt": false,
+        "match_status": "CONFIRMED",
+        "overhang_length": 2,
+        "overhang_sequence": "TA",
+        "overhang_type": "5_prime",
+        "recognition_sequence": "CATATG",
+        "site_end": 188,
+        "site_end_1based": 188,
+        "site_position": 183,
+        "site_position_0based": 182,
+        "top_cut": 185,
+        "top_cut_0based": 184
+       }
+      ]
+     },
+     "PstI": {
+      "confirmed_site_count": 1,
+      "cut_type": "Sticky",
+      "database_valid": true,
+      "enzyme": "PstI",
+      "overhang_length": 4,
+      "overhang_type": "3_prime",
+      "possible_site_count": 0,
+      "recognition_sequence": "CTGCAG",
+      "site_count": 1,
+      "sites": [
+       {
+        "ambiguity_dependent": false,
+        "bottom_cut": 436,
+        "bottom_cut_0based": 435,
+        "cut_type": "Sticky",
+        "enzyme": "PstI",
+        "is_blunt": false,
+        "match_status": "CONFIRMED",
+        "overhang_length": 4,
+        "overhang_sequence": "TGCA",
+        "overhang_type": "3_prime",
+        "recognition_sequence": "CTGCAG",
+        "site_end": 440,
+        "site_end_1based": 440,
+        "site_position": 435,
+        "site_position_0based": 434,
+        "top_cut": 440,
+        "top_cut_0based": 439
+       }
+      ]
+     },
+     "SacI": {
+      "confirmed_site_count": 1,
+      "cut_type": "Sticky",
+      "database_valid": true,
+      "enzyme": "SacI",
+      "overhang_length": 4,
+      "overhang_type": "3_prime",
+      "possible_site_count": 0,
+      "recognition_sequence": "GAGCTC",
+      "site_count": 1,
+      "sites": [
+       {
+        "ambiguity_dependent": false,
+        "bottom_cut": 403,
+        "bottom_cut_0based": 402,
+        "cut_type": "Sticky",
+        "enzyme": "SacI",
+        "is_blunt": false,
+        "match_status": "CONFIRMED",
+        "overhang_length": 4,
+        "overhang_sequence": "AGCT",
+        "overhang_type": "3_prime",
+        "recognition_sequence": "GAGCTC",
+        "site_end": 407,
+        "site_end_1based": 407,
+        "site_position": 402,
+        "site_position_0based": 401,
+        "top_cut": 407,
+        "top_cut_0based": 406
+       }
+      ]
+     },
+     "SalI": {
+      "confirmed_site_count": 1,
+      "cut_type": "Sticky",
+      "database_valid": true,
+      "enzyme": "SalI",
+      "overhang_length": 4,
+      "overhang_type": "5_prime",
+      "possible_site_count": 0,
+      "recognition_sequence": "GTCGAC",
+      "site_count": 1,
+      "sites": [
+       {
+        "ambiguity_dependent": false,
+        "bottom_cut": 434,
+        "bottom_cut_0based": 433,
+        "cut_type": "Sticky",
+        "enzyme": "SalI",
+        "is_blunt": false,
+        "match_status": "CONFIRMED",
+        "overhang_length": 4,
+        "overhang_sequence": "TCGA",
+        "overhang_type": "5_prime",
+        "recognition_sequence": "GTCGAC",
+        "site_end": 434,
+        "site_end_1based": 434,
+        "site_position": 429,
+        "site_position_0based": 428,
+        "top_cut": 430,
+        "top_cut_0based": 429
+       }
+      ]
+     },
+     "SmaI": {
+      "confirmed_site_count": 1,
+      "cut_type": "Blunt",
+      "database_valid": true,
+      "enzyme": "SmaI",
+      "overhang_length": 0,
+      "overhang_type": "blunt",
+      "possible_site_count": 0,
+      "recognition_sequence": "CCCGGG",
+      "site_count": 1,
+      "sites": [
+       {
+        "ambiguity_dependent": false,
+        "bottom_cut": 415,
+        "bottom_cut_0based": 414,
+        "cut_type": "Blunt",
+        "enzyme": "SmaI",
+        "is_blunt": true,
+        "match_status": "CONFIRMED",
+        "overhang_length": 0,
+        "overhang_sequence": "",
+        "overhang_type": "blunt",
+        "recognition_sequence": "CCCGGG",
+        "site_end": 417,
+        "site_end_1based": 417,
+        "site_position": 412,
+        "site_position_0based": 411,
+        "top_cut": 415,
+        "top_cut_0based": 414
+       }
+      ]
+     },
+     "XbaI": {
+      "confirmed_site_count": 1,
+      "cut_type": "Sticky",
+      "database_valid": true,
+      "enzyme": "XbaI",
+      "overhang_length": 4,
+      "overhang_type": "5_prime",
+      "possible_site_count": 0,
+      "recognition_sequence": "TCTAGA",
+      "site_count": 1,
+      "sites": [
+       {
+        "ambiguity_dependent": false,
+        "bottom_cut": 428,
+        "bottom_cut_0based": 427,
+        "cut_type": "Sticky",
+        "enzyme": "XbaI",
+        "is_blunt": false,
+        "match_status": "CONFIRMED",
+        "overhang_length": 4,
+        "overhang_sequence": "CTAG",
+        "overhang_type": "5_prime",
+        "recognition_sequence": "TCTAGA",
+        "site_end": 428,
+        "site_end_1based": 428,
+        "site_position": 423,
+        "site_position_0based": 422,
+        "top_cut": 424,
+        "top_cut_0based": 423
+       }
+      ]
+     }
+    },
+    "enzymes": [
+     "EcoRI",
+     "BamHI",
+     "HindIII",
+     "PstI",
+     "SmaI",
+     "KpnI",
+     "XbaI",
+     "SalI",
+     "NdeI",
+     "SacI"
+    ],
+    "gel_bands": [
+     {
+      "copies": 1,
+      "fragments": [
+       11
+      ],
+      "relative_abundance": 1,
+      "size": 2239
+     },
+     {
+      "copies": 1,
+      "fragments": [
+       2
+      ],
+      "relative_abundance": 1,
+      "size": 212
+     },
+     {
+      "copies": 1,
+      "fragments": [
+       1
+      ],
+      "relative_abundance": 1,
+      "size": 184
+     },
+     {
+      "copies": 2,
+      "fragments": [
+       3,
+       9
+      ],
+      "relative_abundance": 2,
+      "size": 10
+     },
+     {
+      "copies": 1,
+      "fragments": [
+       10
+      ],
+      "relative_abundance": 1,
+      "size": 8
+     },
+     {
+      "copies": 3,
+      "fragments": [
+       4,
+       7,
+       8
+      ],
+      "relative_abundance": 3,
+      "size": 6
+     },
+     {
+      "copies": 1,
+      "fragments": [
+       6
+      ],
+      "relative_abundance": 1,
+      "size": 3
+     },
+     {
+      "copies": 1,
+      "fragments": [
+       5
+      ],
+      "relative_abundance": 1,
+      "size": 2
+     }
+    ],
+    "internal_sites": [],
+    "non_cutters": [],
+    "recommended_pairs": [
+     {
+      "cut_position_a_0based": 396,
+      "cut_position_b_0based": 417,
+      "distinct_cut_positions": true,
+      "enzyme_a": "EcoRI",
+      "enzyme_b": "BamHI",
+      "maximum": 16,
+      "reasons": [
+       "EcoRI cuts exactly once at a confirmed site",
+       "BamHI cuts exactly once at a confirmed site",
+       "Two distinct physical cut positions",
+       "Both enzymes generate sticky ends",
+       "Distinct recognition sequences",
+       "Both enzymes generate sticky ends of the same length"
+      ],
+      "score": 16,
+      "site_count_a": 1,
+      "site_count_b": 1,
+      "sticky_ends": true,
+      "warnings": []
+     },
+     {
+      "cut_position_a_0based": 396,
+      "cut_position_b_0based": 447,
+      "distinct_cut_positions": true,
+      "enzyme_a": "EcoRI",
+      "enzyme_b": "HindIII",
+      "maximum": 16,
+      "reasons": [
+       "EcoRI cuts exactly once at a confirmed site",
+       "HindIII cuts exactly once at a confirmed site",
+       "Two distinct physical cut positions",
+       "Both enzymes generate sticky ends",
+       "Distinct recognition sequences",
+       "Both enzymes generate sticky ends of the same length"
+      ],
+      "score": 16,
+      "site_count_a": 1,
+      "site_count_b": 1,
+      "sticky_ends": true,
+      "warnings": []
+     },
+     {
+      "cut_position_a_0based": 396,
+      "cut_position_b_0based": 439,
+      "distinct_cut_positions": true,
+      "enzyme_a": "EcoRI",
+      "enzyme_b": "PstI",
+      "maximum": 16,
+      "reasons": [
+       "EcoRI cuts exactly once at a confirmed site",
+       "PstI cuts exactly once at a confirmed site",
+       "Two distinct physical cut positions",
+       "Both enzymes generate sticky ends",
+       "Distinct recognition sequences",
+       "Both enzymes generate sticky ends of the same length"
+      ],
+      "score": 16,
+      "site_count_a": 1,
+      "site_count_b": 1,
+      "sticky_ends": true,
+      "warnings": []
+     },
+     {
+      "cut_position_a_0based": 396,
+      "cut_position_b_0based": 412,
+      "distinct_cut_positions": true,
+      "enzyme_a": "EcoRI",
+      "enzyme_b": "KpnI",
+      "maximum": 16,
+      "reasons": [
+       "EcoRI cuts exactly once at a confirmed site",
+       "KpnI cuts exactly once at a confirmed site",
+       "Two distinct physical cut positions",
+       "Both enzymes generate sticky ends",
+       "Distinct recognition sequences",
+       "Both enzymes generate sticky ends of the same length"
+      ],
+      "score": 16,
+      "site_count_a": 1,
+      "site_count_b": 1,
+      "sticky_ends": true,
+      "warnings": []
+     },
+     {
+      "cut_position_a_0based": 396,
+      "cut_position_b_0based": 423,
+      "distinct_cut_positions": true,
+      "enzyme_a": "EcoRI",
+      "enzyme_b": "XbaI",
+      "maximum": 16,
+      "reasons": [
+       "EcoRI cuts exactly once at a confirmed site",
+       "XbaI cuts exactly once at a confirmed site",
+       "Two distinct physical cut positions",
+       "Both enzymes generate sticky ends",
+       "Distinct recognition sequences",
+       "Both enzymes generate sticky ends of the same length"
+      ],
+      "score": 16,
+      "site_count_a": 1,
+      "site_count_b": 1,
+      "sticky_ends": true,
+      "warnings": []
+     }
+    ],
+    "restriction_map": [
+     {
+      "ambiguity_dependent": false,
+      "bottom_cut": 187,
+      "bottom_cut_0based": 186,
+      "cut_type": "Sticky",
+      "enzyme": "NdeI",
+      "is_blunt": false,
+      "match_status": "CONFIRMED",
+      "overhang_length": 2,
+      "overhang_sequence": "TA",
+      "overhang_type": "5_prime",
+      "recognition_sequence": "CATATG",
+      "site_end": 188,
+      "site_end_1based": 188,
+      "site_position": 183,
+      "site_position_0based": 182,
+      "top_cut": 185,
+      "top_cut_0based": 184,
+      "wraps_origin": false
+     },
+     {
+      "ambiguity_dependent": false,
+      "bottom_cut": 401,
+      "bottom_cut_0based": 400,
+      "cut_type": "Sticky",
+      "enzyme": "EcoRI",
+      "is_blunt": false,
+      "match_status": "CONFIRMED",
+      "overhang_length": 4,
+      "overhang_sequence": "AATT",
+      "overhang_type": "5_prime",
+      "recognition_sequence": "GAATTC",
+      "site_end": 401,
+      "site_end_1based": 401,
+      "site_position": 396,
+      "site_position_0based": 395,
+      "top_cut": 397,
+      "top_cut_0based": 396,
+      "wraps_origin": false
+     },
+     {
+      "ambiguity_dependent": false,
+      "bottom_cut": 403,
+      "bottom_cut_0based": 402,
+      "cut_type": "Sticky",
+      "enzyme": "SacI",
+      "is_blunt": false,
+      "match_status": "CONFIRMED",
+      "overhang_length": 4,
+      "overhang_sequence": "AGCT",
+      "overhang_type": "3_prime",
+      "recognition_sequence": "GAGCTC",
+      "site_end": 407,
+      "site_end_1based": 407,
+      "site_position": 402,
+      "site_position_0based": 401,
+      "top_cut": 407,
+      "top_cut_0based": 406,
+      "wraps_origin": false
+     },
+     {
+      "ambiguity_dependent": false,
+      "bottom_cut": 409,
+      "bottom_cut_0based": 408,
+      "cut_type": "Sticky",
+      "enzyme": "KpnI",
+      "is_blunt": false,
+      "match_status": "CONFIRMED",
+      "overhang_length": 4,
+      "overhang_sequence": "GTAC",
+      "overhang_type": "3_prime",
+      "recognition_sequence": "GGTACC",
+      "site_end": 413,
+      "site_end_1based": 413,
+      "site_position": 408,
+      "site_position_0based": 407,
+      "top_cut": 413,
+      "top_cut_0based": 412,
+      "wraps_origin": false
+     },
+     {
+      "ambiguity_dependent": false,
+      "bottom_cut": 415,
+      "bottom_cut_0based": 414,
+      "cut_type": "Blunt",
+      "enzyme": "SmaI",
+      "is_blunt": true,
+      "match_status": "CONFIRMED",
+      "overhang_length": 0,
+      "overhang_sequence": "",
+      "overhang_type": "blunt",
+      "recognition_sequence": "CCCGGG",
+      "site_end": 417,
+      "site_end_1based": 417,
+      "site_position": 412,
+      "site_position_0based": 411,
+      "top_cut": 415,
+      "top_cut_0based": 414,
+      "wraps_origin": false
+     },
+     {
+      "ambiguity_dependent": false,
+      "bottom_cut": 422,
+      "bottom_cut_0based": 421,
+      "cut_type": "Sticky",
+      "enzyme": "BamHI",
+      "is_blunt": false,
+      "match_status": "CONFIRMED",
+      "overhang_length": 4,
+      "overhang_sequence": "GATC",
+      "overhang_type": "5_prime",
+      "recognition_sequence": "GGATCC",
+      "site_end": 422,
+      "site_end_1based": 422,
+      "site_position": 417,
+      "site_position_0based": 416,
+      "top_cut": 418,
+      "top_cut_0based": 417,
+      "wraps_origin": false
+     },
+     {
+      "ambiguity_dependent": false,
+      "bottom_cut": 428,
+      "bottom_cut_0based": 427,
+      "cut_type": "Sticky",
+      "enzyme": "XbaI",
+      "is_blunt": false,
+      "match_status": "CONFIRMED",
+      "overhang_length": 4,
+      "overhang_sequence": "CTAG",
+      "overhang_type": "5_prime",
+      "recognition_sequence": "TCTAGA",
+      "site_end": 428,
+      "site_end_1based": 428,
+      "site_position": 423,
+      "site_position_0based": 422,
+      "top_cut": 424,
+      "top_cut_0based": 423,
+      "wraps_origin": false
+     },
+     {
+      "ambiguity_dependent": false,
+      "bottom_cut": 434,
+      "bottom_cut_0based": 433,
+      "cut_type": "Sticky",
+      "enzyme": "SalI",
+      "is_blunt": false,
+      "match_status": "CONFIRMED",
+      "overhang_length": 4,
+      "overhang_sequence": "TCGA",
+      "overhang_type": "5_prime",
+      "recognition_sequence": "GTCGAC",
+      "site_end": 434,
+      "site_end_1based": 434,
+      "site_position": 429,
+      "site_position_0based": 428,
+      "top_cut": 430,
+      "top_cut_0based": 429,
+      "wraps_origin": false
+     },
+     {
+      "ambiguity_dependent": false,
+      "bottom_cut": 436,
+      "bottom_cut_0based": 435,
+      "cut_type": "Sticky",
+      "enzyme": "PstI",
+      "is_blunt": false,
+      "match_status": "CONFIRMED",
+      "overhang_length": 4,
+      "overhang_sequence": "TGCA",
+      "overhang_type": "3_prime",
+      "recognition_sequence": "CTGCAG",
+      "site_end": 440,
+      "site_end_1based": 440,
+      "site_position": 435,
+      "site_position_0based": 434,
+      "top_cut": 440,
+      "top_cut_0based": 439,
+      "wraps_origin": false
+     },
+     {
+      "ambiguity_dependent": false,
+      "bottom_cut": 452,
+      "bottom_cut_0based": 451,
+      "cut_type": "Sticky",
+      "enzyme": "HindIII",
+      "is_blunt": false,
+      "match_status": "CONFIRMED",
+      "overhang_length": 4,
+      "overhang_sequence": "AGCT",
+      "overhang_type": "5_prime",
+      "recognition_sequence": "AAGCTT",
+      "site_end": 452,
+      "site_end_1based": 452,
+      "site_position": 447,
+      "site_position_0based": 446,
+      "top_cut": 448,
+      "top_cut_0based": 447,
+      "wraps_origin": false
+     }
+    ],
+    "sequence_length": 2686,
+    "sequence_status": {
+     "ambiguous_positions": [],
+     "invalid_positions": [],
+     "invalid_symbols": [],
+     "length": 2686,
+     "sequence": "TCGCGCGTTTCGGTGATGACGGTGAAAACCTCTGACACATGCAGCTCCCGGAGACGGTCACAGCTTGTCTGTAAGCGGATGCCGGGAGCAGACAAGCCCGTCAGGGCGCGTCAGCGGGTGTTGGCGGGTGTCGGGGCTGGCTTAACTATGCGGCATCAGAGCAGATTGTACTGAGAGTGCACCATATGCGGTGTGAAATACCGCACAGATGCGTAAGGAGAAAATACCGCATCAGGCGCCATTCGCCATTCAGGCTGCGCAACTGTTGGGAAGGGCGATCGGTGCGGGCCTCTTCGCTATTACGCCAGCTGGCGAAAGGGGGATGTGCTGCAAGGCGATTAAGTTGGGTAACGCCAGGGTTTTCCCAGTCACGACGTTGTAAAACGACGGCCAGTGAATTCGAGCTCGGTACCCGGGGATCCTCTAGAGTCGACCTGCAGGCATGCAAGCTTGGCGTAATCATGGTCATAGCTGTTTCCTGTGTGAAATTGTTATCCGCTCACAATTCCACACAACATACGAGCCGGAAGCATAAAGTGTAAAGCCTGGGGTGCCTAATGAGTGAGCTAACTCACATTAATTGCGTTGCGCTCACTGCCCGCTTTCCAGTCGGGAAACCTGTCGTGCCAGCTGCATTAATGAATCGGCCAACGCGCGGGGAGAGGCGGTTTGCGTATTGGGCGCTCTTCCGCTTCCTCGCTCACTGACTCGCTGCGCTCGGTCGTTCGGCTGCGGCGAGCGGTATCAGCTCACTCAAAGGCGGTAATACGGTTATCCACAGAATCAGGGGATAACGCAGGAAAGAACATGTGAGCAAAAGGCCAGCAAAAGGCCAGGAACCGTAAAAAGGCCGCGTTGCTGGCGTTTTTCCATAGGCTCCGCCCCCCTGACGAGCATCACAAAAATCGACGCTCAAGTCAGAGGTGGCGAAACCCGACAGGACTATAAAGATACCAGGCGTTTCCCCCTGGAAGCTCCCTCGTGCGCTCTCCTGTTCCGACCCTGCCGCTTACCGGATACCTGTCCGCCTTTCTCCCTTCGGGAAGCGTGGCGCTTTCTCATAGCTCACGCTGTAGGTATCTCAGTTCGGTGTAGGTCGTTCGCTCCAAGCTGGGCTGTGTGCACGAACCCCCCGTTCAGCCCGACCGCTGCGCCTTATCCGGTAACTATCGTCTTGAGTCCAACCCGGTAAGACACGACTTATCGCCACTGGCAGCAGCCACTGGTAACAGGATTAGCAGAGCGAGGTATGTAGGCGGTGCTACAGAGTTCTTGAAGTGGTGGCCTAACTACGGCTACACTAGAAGAACAGTATTTGGTATCTGCGCTCTGCTGAAGCCAGTTACCTTCGGAAAAAGAGTTGGTAGCTCTTGATCCGGCAAACAAACCACCGCTGGTAGCGGTGGTTTTTTTGTTTGCAAGCAGCAGATTACGCGCAGAAAAAAAGGATCTCAAGAAGATCCTTTGATCTTTTCTACGGGGTCTGACGCTCAGTGGAACGAAAACTCACGTTAAGGGATTTTGGTCATGAGATTATCAAAAAGGATCTTCACCTAGATCCTTTTAAATTAAAAATGAAGTTTTAAATCAATCTAAAGTATATATGAGTAAACTTGGTCTGACAGTTACCAATGCTTAATCAGTGAGGCACCTATCTCAGCGATCTGTCTATTTCGTTCATCCATAGTTGCCTGACTCCCCGTCGTGTAGATAACTACGATACGGGAGGGCTTACCATCTGGCCCCAGTGCTGCAATGATACCGCGAGACCCACGCTCACCGGCTCCAGATTTATCAGCAATAAACCAGCCAGCCGGAAGGGCCGAGCGCAGAAGTGGTCCTGCAACTTTATCCGCCTCCATCCAGTCTATTAATTGTTGCCGGGAAGCTAGAGTAAGTAGTTCGCCAGTTAATAGTTTGCGCAACGTTGTTGCCATTGCTACAGGCATCGTGGTGTCACGCTCGTCGTTTGGTATGGCTTCATTCAGCTCCGGTTCCCAACGATCAAGGCGAGTTACATGATCCCCCATGTTGTGCAAAAAAGCGGTTAGCTCCTTCGGTCCTCCGATCGTTGTCAGAAGTAAGTTGGCCGCAGTGTTATCACTCATGGTTATGGCAGCACTGCATAATTCTCTTACTGTCATGCCATCCGTAAGATGCTTTTCTGTGACTGGTGAGTACTCAACCAAGTCATTCTGAGAATAGTGTATGCGGCGACCGAGTTGCTCTTGCCCGGCGTCAATACGGGATAATACCGCGCCACATAGCAGAACTTTAAAAGTGCTCATCATTGGAAAACGTTCTTCGGGGCGAAAACTCTCAAGGATCTTACCGCTGTTGAGATCCAGTTCGATGTAACCCACTCGTGCACCCAACTGATCTTCAGCATCTTTTACTTTCACCAGCGTTTCTGGGTGAGCAAAAACAGGAAGGCAAAATGCCGCAAAAAAGGGAATAAGGGCGACACGGAAATGTTGAATACTCATACTCTTCCTTTTTCAATATTATTGAAGCATTTATCAGGGTTATTGTCTCATGAGCGGATACATATTTGAATGTATTTAGAAAAATAAACAAATAGGGGTTCCGCGCACATTTCCCCGAAAAGTGCCACCTGACGTCTAAGAAACCATTATTATCATGACATTAACCTATAAAAATAGGCGTATCACGAGGCCCTTTCGTC",
+     "valid": true
+    },
+    "site_statistics": {
+     "confirmed_site_events": 10,
+     "physical_cut_boundaries": 10,
+     "possible_site_events": 0,
+     "total_site_events": 10
+    },
+    "topology": "linear",
+    "unique_cutters": [
+     "EcoRI",
+     "BamHI",
+     "HindIII",
+     "PstI",
+     "SmaI",
+     "KpnI",
+     "XbaI",
+     "SalI",
+     "NdeI",
+     "SacI"
+    ]
+   },
+   "sequence_length": 2686,
+   "sequence_status": {
+    "ambiguous_positions": [],
+    "invalid_positions": [],
+    "invalid_symbols": [],
+    "length": 2686,
+    "sequence": "TCGCGCGTTTCGGTGATGACGGTGAAAACCTCTGACACATGCAGCTCCCGGAGACGGTCACAGCTTGTCTGTAAGCGGATGCCGGGAGCAGACAAGCCCGTCAGGGCGCGTCAGCGGGTGTTGGCGGGTGTCGGGGCTGGCTTAACTATGCGGCATCAGAGCAGATTGTACTGAGAGTGCACCATATGCGGTGTGAAATACCGCACAGATGCGTAAGGAGAAAATACCGCATCAGGCGCCATTCGCCATTCAGGCTGCGCAACTGTTGGGAAGGGCGATCGGTGCGGGCCTCTTCGCTATTACGCCAGCTGGCGAAAGGGGGATGTGCTGCAAGGCGATTAAGTTGGGTAACGCCAGGGTTTTCCCAGTCACGACGTTGTAAAACGACGGCCAGTGAATTCGAGCTCGGTACCCGGGGATCCTCTAGAGTCGACCTGCAGGCATGCAAGCTTGGCGTAATCATGGTCATAGCTGTTTCCTGTGTGAAATTGTTATCCGCTCACAATTCCACACAACATACGAGCCGGAAGCATAAAGTGTAAAGCCTGGGGTGCCTAATGAGTGAGCTAACTCACATTAATTGCGTTGCGCTCACTGCCCGCTTTCCAGTCGGGAAACCTGTCGTGCCAGCTGCATTAATGAATCGGCCAACGCGCGGGGAGAGGCGGTTTGCGTATTGGGCGCTCTTCCGCTTCCTCGCTCACTGACTCGCTGCGCTCGGTCGTTCGGCTGCGGCGAGCGGTATCAGCTCACTCAAAGGCGGTAATACGGTTATCCACAGAATCAGGGGATAACGCAGGAAAGAACATGTGAGCAAAAGGCCAGCAAAAGGCCAGGAACCGTAAAAAGGCCGCGTTGCTGGCGTTTTTCCATAGGCTCCGCCCCCCTGACGAGCATCACAAAAATCGACGCTCAAGTCAGAGGTGGCGAAACCCGACAGGACTATAAAGATACCAGGCGTTTCCCCCTGGAAGCTCCCTCGTGCGCTCTCCTGTTCCGACCCTGCCGCTTACCGGATACCTGTCCGCCTTTCTCCCTTCGGGAAGCGTGGCGCTTTCTCATAGCTCACGCTGTAGGTATCTCAGTTCGGTGTAGGTCGTTCGCTCCAAGCTGGGCTGTGTGCACGAACCCCCCGTTCAGCCCGACCGCTGCGCCTTATCCGGTAACTATCGTCTTGAGTCCAACCCGGTAAGACACGACTTATCGCCACTGGCAGCAGCCACTGGTAACAGGATTAGCAGAGCGAGGTATGTAGGCGGTGCTACAGAGTTCTTGAAGTGGTGGCCTAACTACGGCTACACTAGAAGAACAGTATTTGGTATCTGCGCTCTGCTGAAGCCAGTTACCTTCGGAAAAAGAGTTGGTAGCTCTTGATCCGGCAAACAAACCACCGCTGGTAGCGGTGGTTTTTTTGTTTGCAAGCAGCAGATTACGCGCAGAAAAAAAGGATCTCAAGAAGATCCTTTGATCTTTTCTACGGGGTCTGACGCTCAGTGGAACGAAAACTCACGTTAAGGGATTTTGGTCATGAGATTATCAAAAAGGATCTTCACCTAGATCCTTTTAAATTAAAAATGAAGTTTTAAATCAATCTAAAGTATATATGAGTAAACTTGGTCTGACAGTTACCAATGCTTAATCAGTGAGGCACCTATCTCAGCGATCTGTCTATTTCGTTCATCCATAGTTGCCTGACTCCCCGTCGTGTAGATAACTACGATACGGGAGGGCTTACCATCTGGCCCCAGTGCTGCAATGATACCGCGAGACCCACGCTCACCGGCTCCAGATTTATCAGCAATAAACCAGCCAGCCGGAAGGGCCGAGCGCAGAAGTGGTCCTGCAACTTTATCCGCCTCCATCCAGTCTATTAATTGTTGCCGGGAAGCTAGAGTAAGTAGTTCGCCAGTTAATAGTTTGCGCAACGTTGTTGCCATTGCTACAGGCATCGTGGTGTCACGCTCGTCGTTTGGTATGGCTTCATTCAGCTCCGGTTCCCAACGATCAAGGCGAGTTACATGATCCCCCATGTTGTGCAAAAAAGCGGTTAGCTCCTTCGGTCCTCCGATCGTTGTCAGAAGTAAGTTGGCCGCAGTGTTATCACTCATGGTTATGGCAGCACTGCATAATTCTCTTACTGTCATGCCATCCGTAAGATGCTTTTCTGTGACTGGTGAGTACTCAACCAAGTCATTCTGAGAATAGTGTATGCGGCGACCGAGTTGCTCTTGCCCGGCGTCAATACGGGATAATACCGCGCCACATAGCAGAACTTTAAAAGTGCTCATCATTGGAAAACGTTCTTCGGGGCGAAAACTCTCAAGGATCTTACCGCTGTTGAGATCCAGTTCGATGTAACCCACTCGTGCACCCAACTGATCTTCAGCATCTTTTACTTTCACCAGCGTTTCTGGGTGAGCAAAAACAGGAAGGCAAAATGCCGCAAAAAAGGGAATAAGGGCGACACGGAAATGTTGAATACTCATACTCTTCCTTTTTCAATATTATTGAAGCATTTATCAGGGTTATTGTCTCATGAGCGGATACATATTTGAATGTATTTAGAAAAATAAACAAATAGGGGTTCCGCGCACATTTCCCCGAAAAGTGCCACCTGACGTCTAAGAAACCATTATTATCATGACATTAACCTATAAAAATAGGCGTATCACGAGGCCCTTTCGTC",
+    "valid": true
+   },
+   "status": "OK",
+   "topology": "linear",
+   "valid": true
+  },
+  "boundaries_circular": [
+   184,
+   396,
+   439
+  ],
+  "boundaries_linear": [
+   184,
+   396,
+   439
+  ],
+  "compatible": {
+   "enzyme": "EcoRI",
+   "insert": {
+    "confirmed_site_count": 1,
+    "cut_type": "Sticky",
+    "database_valid": true,
+    "enzyme": "EcoRI",
+    "overhang_length": 4,
+    "overhang_type": "5_prime",
+    "possible_site_count": 0,
+    "recognition_sequence": "GAATTC",
+    "site_count": 1,
+    "sites": [
+     {
+      "ambiguity_dependent": false,
+      "bottom_cut": 401,
+      "bottom_cut_0based": 400,
+      "cut_type": "Sticky",
+      "enzyme": "EcoRI",
+      "is_blunt": false,
+      "match_status": "CONFIRMED",
+      "overhang_length": 4,
+      "overhang_sequence": "AATT",
+      "overhang_type": "5_prime",
+      "recognition_sequence": "GAATTC",
+      "site_end": 401,
+      "site_end_1based": 401,
+      "site_position": 396,
+      "site_position_0based": 395,
+      "top_cut": 397,
+      "top_cut_0based": 396
+     }
+    ]
+   },
+   "insert_unique": true,
+   "ready_for_cloning": true,
+   "vector": {
+    "confirmed_site_count": 1,
+    "cut_type": "Sticky",
+    "database_valid": true,
+    "enzyme": "EcoRI",
+    "overhang_length": 4,
+    "overhang_type": "5_prime",
+    "possible_site_count": 0,
+    "recognition_sequence": "GAATTC",
+    "site_count": 1,
+    "sites": [
+     {
+      "ambiguity_dependent": false,
+      "bottom_cut": 401,
+      "bottom_cut_0based": 400,
+      "cut_type": "Sticky",
+      "enzyme": "EcoRI",
+      "is_blunt": false,
+      "match_status": "CONFIRMED",
+      "overhang_length": 4,
+      "overhang_sequence": "AATT",
+      "overhang_type": "5_prime",
+      "recognition_sequence": "GAATTC",
+      "site_end": 401,
+      "site_end_1based": 401,
+      "site_position": 396,
+      "site_position_0based": 395,
+      "top_cut": 397,
+      "top_cut_0based": 396
+     }
+    ]
+   },
+   "vector_unique": true
+  },
+  "digest_circular": {
+   "cut_count": 3,
+   "cut_positions": [
+    184,
+    396,
+    439
+   ],
+   "cuts": [
+    {
+     "bottom_cut": 187,
+     "bottom_cut_0based": 186,
+     "bottom_cut_1based": 187,
+     "cut_info": {
+      "bottom_cut": 186,
+      "bottom_cut_0based": 186,
+      "bottom_cut_1based": 187,
+      "overhang_length": 2,
+      "recognition_end": 187,
+      "recognition_end_1based": 188,
+      "recognition_start": 182,
+      "recognition_start_1based": 183,
+      "top_cut": 184,
+      "top_cut_0based": 184,
+      "top_cut_1based": 185
+     },
+     "enzyme": "NdeI",
+     "position": 184,
+     "position_0based": 184,
+     "position_1based": 185,
+     "site_position": 183,
+     "site_position_0based": 182,
+     "site_position_1based": 183,
+     "status": "CONFIRMED",
+     "top_cut": 185,
+     "top_cut_0based": 184,
+     "top_cut_1based": 185,
+     "wraps_origin": false
+    },
+    {
+     "bottom_cut": 401,
+     "bottom_cut_0based": 400,
+     "bottom_cut_1based": 401,
+     "cut_info": {
+      "bottom_cut": 400,
+      "bottom_cut_0based": 400,
+      "bottom_cut_1based": 401,
+      "overhang_length": 4,
+      "recognition_end": 400,
+      "recognition_end_1based": 401,
+      "recognition_start": 395,
+      "recognition_start_1based": 396,
+      "top_cut": 396,
+      "top_cut_0based": 396,
+      "top_cut_1based": 397
+     },
+     "enzyme": "EcoRI",
+     "position": 396,
+     "position_0based": 396,
+     "position_1based": 397,
+     "site_position": 396,
+     "site_position_0based": 395,
+     "site_position_1based": 396,
+     "status": "CONFIRMED",
+     "top_cut": 397,
+     "top_cut_0based": 396,
+     "top_cut_1based": 397,
+     "wraps_origin": false
+    },
+    {
+     "bottom_cut": 436,
+     "bottom_cut_0based": 435,
+     "bottom_cut_1based": 436,
+     "cut_info": {
+      "bottom_cut": 435,
+      "bottom_cut_0based": 435,
+      "bottom_cut_1based": 436,
+      "overhang_length": 4,
+      "recognition_end": 439,
+      "recognition_end_1based": 440,
+      "recognition_start": 434,
+      "recognition_start_1based": 435,
+      "top_cut": 439,
+      "top_cut_0based": 439,
+      "top_cut_1based": 440
+     },
+     "enzyme": "PstI",
+     "position": 439,
+     "position_0based": 439,
+     "position_1based": 440,
+     "site_position": 435,
+     "site_position_0based": 434,
+     "site_position_1based": 435,
+     "status": "CONFIRMED",
+     "top_cut": 440,
+     "top_cut_0based": 439,
+     "top_cut_1based": 440,
+     "wraps_origin": false
+    }
+   ],
+   "enzymes": [
+    "EcoRI",
+    "PstI",
+    "NdeI"
+   ],
+   "fragment_count": 3,
+   "fragments": [
+    {
+     "cut_events": [
+      {
+       "enzyme": "NdeI",
+       "position_1based": 185
+      },
+      {
+       "enzyme": "EcoRI",
+       "position_1based": 397
+      }
+     ],
+     "end": 396,
+     "end_0based_exclusive": 396,
+     "enzymes": [
+      "EcoRI",
+      "NdeI"
+     ],
+     "fragment": 1,
+     "length": 212,
+     "start": 185,
+     "start_0based": 184,
+     "wraps_origin": false
+    },
+    {
+     "cut_events": [
+      {
+       "enzyme": "EcoRI",
+       "position_1based": 397
+      },
+      {
+       "enzyme": "PstI",
+       "position_1based": 440
+      }
+     ],
+     "end": 439,
+     "end_0based_exclusive": 439,
+     "enzymes": [
+      "EcoRI",
+      "PstI"
+     ],
+     "fragment": 2,
+     "length": 43,
+     "start": 397,
+     "start_0based": 396,
+     "wraps_origin": false
+    },
+    {
+     "cut_events": [
+      {
+       "enzyme": "NdeI",
+       "position_1based": 185
+      },
+      {
+       "enzyme": "PstI",
+       "position_1based": 440
+      }
+     ],
+     "end": 184,
+     "end_0based_exclusive": 184,
+     "enzymes": [
+      "NdeI",
+      "PstI"
+     ],
+     "fragment": 3,
+     "length": 2431,
+     "start": 440,
+     "start_0based": 439,
+     "wraps_origin": true
+    }
+   ],
+   "has_cut": true,
+   "possible_cuts": [],
+   "possible_cuts_included": false,
+   "sequence_length": 2686,
+   "topology": "circular",
+   "unique_cut_count": 3
+  },
+  "digest_linear": {
+   "cut_count": 3,
+   "cut_positions": [
+    184,
+    396,
+    439
+   ],
+   "cuts": [
+    {
+     "bottom_cut": 187,
+     "bottom_cut_0based": 186,
+     "bottom_cut_1based": 187,
+     "cut_info": {
+      "bottom_cut": 186,
+      "bottom_cut_0based": 186,
+      "bottom_cut_1based": 187,
+      "overhang_length": 2,
+      "recognition_end": 187,
+      "recognition_end_1based": 188,
+      "recognition_start": 182,
+      "recognition_start_1based": 183,
+      "top_cut": 184,
+      "top_cut_0based": 184,
+      "top_cut_1based": 185
+     },
+     "enzyme": "NdeI",
+     "position": 184,
+     "position_0based": 184,
+     "position_1based": 185,
+     "site_position": 183,
+     "site_position_0based": 182,
+     "site_position_1based": 183,
+     "status": "CONFIRMED",
+     "top_cut": 185,
+     "top_cut_0based": 184,
+     "top_cut_1based": 185,
+     "wraps_origin": false
+    },
+    {
+     "bottom_cut": 401,
+     "bottom_cut_0based": 400,
+     "bottom_cut_1based": 401,
+     "cut_info": {
+      "bottom_cut": 400,
+      "bottom_cut_0based": 400,
+      "bottom_cut_1based": 401,
+      "overhang_length": 4,
+      "recognition_end": 400,
+      "recognition_end_1based": 401,
+      "recognition_start": 395,
+      "recognition_start_1based": 396,
+      "top_cut": 396,
+      "top_cut_0based": 396,
+      "top_cut_1based": 397
+     },
+     "enzyme": "EcoRI",
+     "position": 396,
+     "position_0based": 396,
+     "position_1based": 397,
+     "site_position": 396,
+     "site_position_0based": 395,
+     "site_position_1based": 396,
+     "status": "CONFIRMED",
+     "top_cut": 397,
+     "top_cut_0based": 396,
+     "top_cut_1based": 397,
+     "wraps_origin": false
+    },
+    {
+     "bottom_cut": 436,
+     "bottom_cut_0based": 435,
+     "bottom_cut_1based": 436,
+     "cut_info": {
+      "bottom_cut": 435,
+      "bottom_cut_0based": 435,
+      "bottom_cut_1based": 436,
+      "overhang_length": 4,
+      "recognition_end": 439,
+      "recognition_end_1based": 440,
+      "recognition_start": 434,
+      "recognition_start_1based": 435,
+      "top_cut": 439,
+      "top_cut_0based": 439,
+      "top_cut_1based": 440
+     },
+     "enzyme": "PstI",
+     "position": 439,
+     "position_0based": 439,
+     "position_1based": 440,
+     "site_position": 435,
+     "site_position_0based": 434,
+     "site_position_1based": 435,
+     "status": "CONFIRMED",
+     "top_cut": 440,
+     "top_cut_0based": 439,
+     "top_cut_1based": 440,
+     "wraps_origin": false
+    }
+   ],
+   "enzymes": [
+    "EcoRI",
+    "PstI",
+    "NdeI"
+   ],
+   "fragment_count": 4,
+   "fragments": [
+    {
+     "cut_events": [
+      {
+       "enzyme": "NdeI",
+       "position_1based": 185
+      }
+     ],
+     "end": 184,
+     "end_0based_exclusive": 184,
+     "enzymes": [
+      "NdeI"
+     ],
+     "fragment": 1,
+     "length": 184,
+     "start": 1,
+     "start_0based": 0,
+     "wraps_origin": false
+    },
+    {
+     "cut_events": [
+      {
+       "enzyme": "NdeI",
+       "position_1based": 185
+      },
+      {
+       "enzyme": "EcoRI",
+       "position_1based": 397
+      }
+     ],
+     "end": 396,
+     "end_0based_exclusive": 396,
+     "enzymes": [
+      "EcoRI",
+      "NdeI"
+     ],
+     "fragment": 2,
+     "length": 212,
+     "start": 185,
+     "start_0based": 184,
+     "wraps_origin": false
+    },
+    {
+     "cut_events": [
+      {
+       "enzyme": "EcoRI",
+       "position_1based": 397
+      },
+      {
+       "enzyme": "PstI",
+       "position_1based": 440
+      }
+     ],
+     "end": 439,
+     "end_0based_exclusive": 439,
+     "enzymes": [
+      "EcoRI",
+      "PstI"
+     ],
+     "fragment": 3,
+     "length": 43,
+     "start": 397,
+     "start_0based": 396,
+     "wraps_origin": false
+    },
+    {
+     "cut_events": [
+      {
+       "enzyme": "PstI",
+       "position_1based": 440
+      }
+     ],
+     "end": 2686,
+     "end_0based_exclusive": 2686,
+     "enzymes": [
+      "PstI"
+     ],
+     "fragment": 4,
+     "length": 2247,
+     "start": 440,
+     "start_0based": 439,
+     "wraps_origin": false
+    }
+   ],
+   "has_cut": true,
+   "possible_cuts": [],
+   "possible_cuts_included": false,
+   "sequence_length": 2686,
+   "topology": "linear",
+   "unique_cut_count": 3
+  },
+  "double_circular": {
+   "digest": {
+    "cut_count": 2,
+    "cut_positions": [
+     396,
+     447
+    ],
+    "cuts": [
+     {
+      "bottom_cut": 401,
+      "bottom_cut_0based": 400,
+      "bottom_cut_1based": 401,
+      "cut_info": {
+       "bottom_cut": 400,
+       "bottom_cut_0based": 400,
+       "bottom_cut_1based": 401,
+       "overhang_length": 4,
+       "recognition_end": 400,
+       "recognition_end_1based": 401,
+       "recognition_start": 395,
+       "recognition_start_1based": 396,
+       "top_cut": 396,
+       "top_cut_0based": 396,
+       "top_cut_1based": 397
+      },
+      "enzyme": "EcoRI",
+      "position": 396,
+      "position_0based": 396,
+      "position_1based": 397,
+      "site_position": 396,
+      "site_position_0based": 395,
+      "site_position_1based": 396,
+      "status": "CONFIRMED",
+      "top_cut": 397,
+      "top_cut_0based": 396,
+      "top_cut_1based": 397,
+      "wraps_origin": false
+     },
+     {
+      "bottom_cut": 452,
+      "bottom_cut_0based": 451,
+      "bottom_cut_1based": 452,
+      "cut_info": {
+       "bottom_cut": 451,
+       "bottom_cut_0based": 451,
+       "bottom_cut_1based": 452,
+       "overhang_length": 4,
+       "recognition_end": 451,
+       "recognition_end_1based": 452,
+       "recognition_start": 446,
+       "recognition_start_1based": 447,
+       "top_cut": 447,
+       "top_cut_0based": 447,
+       "top_cut_1based": 448
+      },
+      "enzyme": "HindIII",
+      "position": 447,
+      "position_0based": 447,
+      "position_1based": 448,
+      "site_position": 447,
+      "site_position_0based": 446,
+      "site_position_1based": 447,
+      "status": "CONFIRMED",
+      "top_cut": 448,
+      "top_cut_0based": 447,
+      "top_cut_1based": 448,
+      "wraps_origin": false
+     }
+    ],
+    "enzymes": [
+     "EcoRI",
+     "HindIII"
+    ],
+    "fragment_count": 2,
+    "fragments": [
+     {
+      "cut_events": [
+       {
+        "enzyme": "EcoRI",
+        "position_1based": 397
+       },
+       {
+        "enzyme": "HindIII",
+        "position_1based": 448
+       }
+      ],
+      "end": 447,
+      "end_0based_exclusive": 447,
+      "enzymes": [
+       "EcoRI",
+       "HindIII"
+      ],
+      "fragment": 1,
+      "length": 51,
+      "start": 397,
+      "start_0based": 396,
+      "wraps_origin": false
+     },
+     {
+      "cut_events": [
+       {
+        "enzyme": "EcoRI",
+        "position_1based": 397
+       },
+       {
+        "enzyme": "HindIII",
+        "position_1based": 448
+       }
+      ],
+      "end": 396,
+      "end_0based_exclusive": 396,
+      "enzymes": [
+       "EcoRI",
+       "HindIII"
+      ],
+      "fragment": 2,
+      "length": 2635,
+      "start": 448,
+      "start_0based": 447,
+      "wraps_origin": true
+     }
+    ],
+    "has_cut": true,
+    "possible_cuts": [],
+    "possible_cuts_included": false,
+    "sequence_length": 2686,
+    "topology": "circular",
+    "unique_cut_count": 2
+   },
+   "gel_bands": [
+    {
+     "copies": 1,
+     "fragments": [
+      2
+     ],
+     "relative_abundance": 1,
+     "size": 2635
+    },
+    {
+     "copies": 1,
+     "fragments": [
+      1
+     ],
+     "relative_abundance": 1,
+     "size": 51
+    }
+   ],
+   "status": "OK",
+   "valid": true
+  },
+  "double_linear": {
+   "digest": {
+    "cut_count": 2,
+    "cut_positions": [
+     396,
+     447
+    ],
+    "cuts": [
+     {
+      "bottom_cut": 401,
+      "bottom_cut_0based": 400,
+      "bottom_cut_1based": 401,
+      "cut_info": {
+       "bottom_cut": 400,
+       "bottom_cut_0based": 400,
+       "bottom_cut_1based": 401,
+       "overhang_length": 4,
+       "recognition_end": 400,
+       "recognition_end_1based": 401,
+       "recognition_start": 395,
+       "recognition_start_1based": 396,
+       "top_cut": 396,
+       "top_cut_0based": 396,
+       "top_cut_1based": 397
+      },
+      "enzyme": "EcoRI",
+      "position": 396,
+      "position_0based": 396,
+      "position_1based": 397,
+      "site_position": 396,
+      "site_position_0based": 395,
+      "site_position_1based": 396,
+      "status": "CONFIRMED",
+      "top_cut": 397,
+      "top_cut_0based": 396,
+      "top_cut_1based": 397,
+      "wraps_origin": false
+     },
+     {
+      "bottom_cut": 452,
+      "bottom_cut_0based": 451,
+      "bottom_cut_1based": 452,
+      "cut_info": {
+       "bottom_cut": 451,
+       "bottom_cut_0based": 451,
+       "bottom_cut_1based": 452,
+       "overhang_length": 4,
+       "recognition_end": 451,
+       "recognition_end_1based": 452,
+       "recognition_start": 446,
+       "recognition_start_1based": 447,
+       "top_cut": 447,
+       "top_cut_0based": 447,
+       "top_cut_1based": 448
+      },
+      "enzyme": "HindIII",
+      "position": 447,
+      "position_0based": 447,
+      "position_1based": 448,
+      "site_position": 447,
+      "site_position_0based": 446,
+      "site_position_1based": 447,
+      "status": "CONFIRMED",
+      "top_cut": 448,
+      "top_cut_0based": 447,
+      "top_cut_1based": 448,
+      "wraps_origin": false
+     }
+    ],
+    "enzymes": [
+     "EcoRI",
+     "HindIII"
+    ],
+    "fragment_count": 3,
+    "fragments": [
+     {
+      "cut_events": [
+       {
+        "enzyme": "EcoRI",
+        "position_1based": 397
+       }
+      ],
+      "end": 396,
+      "end_0based_exclusive": 396,
+      "enzymes": [
+       "EcoRI"
+      ],
+      "fragment": 1,
+      "length": 396,
+      "start": 1,
+      "start_0based": 0,
+      "wraps_origin": false
+     },
+     {
+      "cut_events": [
+       {
+        "enzyme": "EcoRI",
+        "position_1based": 397
+       },
+       {
+        "enzyme": "HindIII",
+        "position_1based": 448
+       }
+      ],
+      "end": 447,
+      "end_0based_exclusive": 447,
+      "enzymes": [
+       "EcoRI",
+       "HindIII"
+      ],
+      "fragment": 2,
+      "length": 51,
+      "start": 397,
+      "start_0based": 396,
+      "wraps_origin": false
+     },
+     {
+      "cut_events": [
+       {
+        "enzyme": "HindIII",
+        "position_1based": 448
+       }
+      ],
+      "end": 2686,
+      "end_0based_exclusive": 2686,
+      "enzymes": [
+       "HindIII"
+      ],
+      "fragment": 3,
+      "length": 2239,
+      "start": 448,
+      "start_0based": 447,
+      "wraps_origin": false
+     }
+    ],
+    "has_cut": true,
+    "possible_cuts": [],
+    "possible_cuts_included": false,
+    "sequence_length": 2686,
+    "topology": "linear",
+    "unique_cut_count": 2
+   },
+   "gel_bands": [
+    {
+     "copies": 1,
+     "fragments": [
+      3
+     ],
+     "relative_abundance": 1,
+     "size": 2239
+    },
+    {
+     "copies": 1,
+     "fragments": [
+      1
+     ],
+     "relative_abundance": 1,
+     "size": 396
+    },
+    {
+     "copies": 1,
+     "fragments": [
+      2
+     ],
+     "relative_abundance": 1,
+     "size": 51
+    }
+   ],
+   "status": "OK",
+   "valid": true
+  },
+  "enzymes": [
+   "EcoRI",
+   "BamHI",
+   "HindIII",
+   "PstI",
+   "SmaI",
+   "KpnI",
+   "XbaI",
+   "SalI",
+   "NdeI",
+   "SacI"
+  ],
+  "gel_circular": [
+   {
+    "copies": 1,
+    "fragments": [
+     3
+    ],
+    "relative_abundance": 1,
+    "size": 2431
+   },
+   {
+    "copies": 1,
+    "fragments": [
+     1
+    ],
+    "relative_abundance": 1,
+    "size": 212
+   },
+   {
+    "copies": 1,
+    "fragments": [
+     2
+    ],
+    "relative_abundance": 1,
+    "size": 43
+   }
+  ],
+  "gel_linear": [
+   {
+    "copies": 1,
+    "fragments": [
+     4
+    ],
+    "relative_abundance": 1,
+    "size": 2247
+   },
+   {
+    "copies": 1,
+    "fragments": [
+     2
+    ],
+    "relative_abundance": 1,
+    "size": 212
+   },
+   {
+    "copies": 1,
+    "fragments": [
+     1
+    ],
+    "relative_abundance": 1,
+    "size": 184
+   },
+   {
+    "copies": 1,
+    "fragments": [
+     3
+    ],
+    "relative_abundance": 1,
+    "size": 43
+   }
+  ],
+  "iupac_circular": {
+   "cut_count": 2,
+   "cut_positions": [
+    396,
+    1201
+   ],
+   "cuts": [
+    {
+     "bottom_cut": 401,
+     "bottom_cut_0based": 400,
+     "bottom_cut_1based": 401,
+     "cut_info": {
+      "bottom_cut": 400,
+      "bottom_cut_0based": 400,
+      "bottom_cut_1based": 401,
+      "overhang_length": 4,
+      "recognition_end": 400,
+      "recognition_end_1based": 401,
+      "recognition_start": 395,
+      "recognition_start_1based": 396,
+      "top_cut": 396,
+      "top_cut_0based": 396,
+      "top_cut_1based": 397
+     },
+     "enzyme": "EcoRI",
+     "position": 396,
+     "position_0based": 396,
+     "position_1based": 397,
+     "site_position": 396,
+     "site_position_0based": 395,
+     "site_position_1based": 396,
+     "status": "CONFIRMED",
+     "top_cut": 397,
+     "top_cut_0based": 396,
+     "top_cut_1based": 397,
+     "wraps_origin": false
+    },
+    {
+     "bottom_cut": 1206,
+     "bottom_cut_0based": 1205,
+     "bottom_cut_1based": 1206,
+     "cut_info": {
+      "bottom_cut": 1205,
+      "bottom_cut_0based": 1205,
+      "bottom_cut_1based": 1206,
+      "overhang_length": 4,
+      "recognition_end": 1205,
+      "recognition_end_1based": 1206,
+      "recognition_start": 1200,
+      "recognition_start_1based": 1201,
+      "top_cut": 1201,
+      "top_cut_0based": 1201,
+      "top_cut_1based": 1202
+     },
+     "enzyme": "EcoRI",
+     "position": 1201,
+     "position_0based": 1201,
+     "position_1based": 1202,
+     "site_position": 1201,
+     "site_position_0based": 1200,
+     "site_position_1based": 1201,
+     "status": "POSSIBLE",
+     "top_cut": 1202,
+     "top_cut_0based": 1201,
+     "top_cut_1based": 1202,
+     "wraps_origin": false
+    }
+   ],
+   "enzymes": [
+    "EcoRI"
+   ],
+   "fragment_count": 2,
+   "fragments": [
+    {
+     "cut_events": [
+      {
+       "enzyme": "EcoRI",
+       "position_1based": 397
+      },
+      {
+       "enzyme": "EcoRI",
+       "position_1based": 1202
+      }
+     ],
+     "end": 1201,
+     "end_0based_exclusive": 1201,
+     "enzymes": [
+      "EcoRI"
+     ],
+     "fragment": 1,
+     "length": 805,
+     "start": 397,
+     "start_0based": 396,
+     "wraps_origin": false
+    },
+    {
+     "cut_events": [
+      {
+       "enzyme": "EcoRI",
+       "position_1based": 397
+      },
+      {
+       "enzyme": "EcoRI",
+       "position_1based": 1202
+      }
+     ],
+     "end": 396,
+     "end_0based_exclusive": 396,
+     "enzymes": [
+      "EcoRI"
+     ],
+     "fragment": 2,
+     "length": 701,
+     "start": 1202,
+     "start_0based": 1201,
+     "wraps_origin": true
+    }
+   ],
+   "has_cut": true,
+   "possible_cuts": [
+    {
+     "bottom_cut": 1206,
+     "bottom_cut_0based": 1205,
+     "bottom_cut_1based": 1206,
+     "cut_info": {
+      "bottom_cut": 1205,
+      "bottom_cut_0based": 1205,
+      "bottom_cut_1based": 1206,
+      "overhang_length": 4,
+      "recognition_end": 1205,
+      "recognition_end_1based": 1206,
+      "recognition_start": 1200,
+      "recognition_start_1based": 1201,
+      "top_cut": 1201,
+      "top_cut_0based": 1201,
+      "top_cut_1based": 1202
+     },
+     "enzyme": "EcoRI",
+     "position": 1201,
+     "position_0based": 1201,
+     "position_1based": 1202,
+     "site_position": 1201,
+     "site_position_0based": 1200,
+     "site_position_1based": 1201,
+     "status": "POSSIBLE",
+     "top_cut": 1202,
+     "top_cut_0based": 1201,
+     "top_cut_1based": 1202,
+     "wraps_origin": false
+    }
+   ],
+   "possible_cuts_included": true,
+   "sequence_length": 1506,
+   "topology": "circular",
+   "unique_cut_count": 2
+  },
+  "iupac_linear": {
+   "cut_count": 2,
+   "cut_positions": [
+    396,
+    1201
+   ],
+   "cuts": [
+    {
+     "bottom_cut": 401,
+     "bottom_cut_0based": 400,
+     "bottom_cut_1based": 401,
+     "cut_info": {
+      "bottom_cut": 400,
+      "bottom_cut_0based": 400,
+      "bottom_cut_1based": 401,
+      "overhang_length": 4,
+      "recognition_end": 400,
+      "recognition_end_1based": 401,
+      "recognition_start": 395,
+      "recognition_start_1based": 396,
+      "top_cut": 396,
+      "top_cut_0based": 396,
+      "top_cut_1based": 397
+     },
+     "enzyme": "EcoRI",
+     "position": 396,
+     "position_0based": 396,
+     "position_1based": 397,
+     "site_position": 396,
+     "site_position_0based": 395,
+     "site_position_1based": 396,
+     "status": "CONFIRMED",
+     "top_cut": 397,
+     "top_cut_0based": 396,
+     "top_cut_1based": 397,
+     "wraps_origin": false
+    },
+    {
+     "bottom_cut": 1206,
+     "bottom_cut_0based": 1205,
+     "bottom_cut_1based": 1206,
+     "cut_info": {
+      "bottom_cut": 1205,
+      "bottom_cut_0based": 1205,
+      "bottom_cut_1based": 1206,
+      "overhang_length": 4,
+      "recognition_end": 1205,
+      "recognition_end_1based": 1206,
+      "recognition_start": 1200,
+      "recognition_start_1based": 1201,
+      "top_cut": 1201,
+      "top_cut_0based": 1201,
+      "top_cut_1based": 1202
+     },
+     "enzyme": "EcoRI",
+     "position": 1201,
+     "position_0based": 1201,
+     "position_1based": 1202,
+     "site_position": 1201,
+     "site_position_0based": 1200,
+     "site_position_1based": 1201,
+     "status": "POSSIBLE",
+     "top_cut": 1202,
+     "top_cut_0based": 1201,
+     "top_cut_1based": 1202,
+     "wraps_origin": false
+    }
+   ],
+   "enzymes": [
+    "EcoRI"
+   ],
+   "fragment_count": 3,
+   "fragments": [
+    {
+     "cut_events": [
+      {
+       "enzyme": "EcoRI",
+       "position_1based": 397
+      }
+     ],
+     "end": 396,
+     "end_0based_exclusive": 396,
+     "enzymes": [
+      "EcoRI"
+     ],
+     "fragment": 1,
+     "length": 396,
+     "start": 1,
+     "start_0based": 0,
+     "wraps_origin": false
+    },
+    {
+     "cut_events": [
+      {
+       "enzyme": "EcoRI",
+       "position_1based": 397
+      },
+      {
+       "enzyme": "EcoRI",
+       "position_1based": 1202
+      }
+     ],
+     "end": 1201,
+     "end_0based_exclusive": 1201,
+     "enzymes": [
+      "EcoRI"
+     ],
+     "fragment": 2,
+     "length": 805,
+     "start": 397,
+     "start_0based": 396,
+     "wraps_origin": false
+    },
+    {
+     "cut_events": [
+      {
+       "enzyme": "EcoRI",
+       "position_1based": 1202
+      }
+     ],
+     "end": 1506,
+     "end_0based_exclusive": 1506,
+     "enzymes": [
+      "EcoRI"
+     ],
+     "fragment": 3,
+     "length": 305,
+     "start": 1202,
+     "start_0based": 1201,
+     "wraps_origin": false
+    }
+   ],
+   "has_cut": true,
+   "possible_cuts": [
+    {
+     "bottom_cut": 1206,
+     "bottom_cut_0based": 1205,
+     "bottom_cut_1based": 1206,
+     "cut_info": {
+      "bottom_cut": 1205,
+      "bottom_cut_0based": 1205,
+      "bottom_cut_1based": 1206,
+      "overhang_length": 4,
+      "recognition_end": 1205,
+      "recognition_end_1based": 1206,
+      "recognition_start": 1200,
+      "recognition_start_1based": 1201,
+      "top_cut": 1201,
+      "top_cut_0based": 1201,
+      "top_cut_1based": 1202
+     },
+     "enzyme": "EcoRI",
+     "position": 1201,
+     "position_0based": 1201,
+     "position_1based": 1202,
+     "site_position": 1201,
+     "site_position_0based": 1200,
+     "site_position_1based": 1201,
+     "status": "POSSIBLE",
+     "top_cut": 1202,
+     "top_cut_0based": 1201,
+     "top_cut_1based": 1202,
+     "wraps_origin": false
+    }
+   ],
+   "possible_cuts_included": true,
+   "sequence_length": 1506,
+   "topology": "linear",
+   "unique_cut_count": 2
+  },
+  "map_circular": [
+   {
+    "ambiguity_dependent": false,
+    "bottom_cut": 187,
+    "bottom_cut_0based": 186,
+    "cut_type": "Sticky",
+    "enzyme": "NdeI",
+    "is_blunt": false,
+    "match_status": "CONFIRMED",
+    "overhang_length": 2,
+    "overhang_sequence": "TA",
+    "overhang_type": "5_prime",
+    "recognition_sequence": "CATATG",
+    "site_end": 188,
+    "site_end_1based": 188,
+    "site_position": 183,
+    "site_position_0based": 182,
+    "top_cut": 185,
+    "top_cut_0based": 184,
+    "wraps_origin": false
+   },
+   {
+    "ambiguity_dependent": false,
+    "bottom_cut": 401,
+    "bottom_cut_0based": 400,
+    "cut_type": "Sticky",
+    "enzyme": "EcoRI",
+    "is_blunt": false,
+    "match_status": "CONFIRMED",
+    "overhang_length": 4,
+    "overhang_sequence": "AATT",
+    "overhang_type": "5_prime",
+    "recognition_sequence": "GAATTC",
+    "site_end": 401,
+    "site_end_1based": 401,
+    "site_position": 396,
+    "site_position_0based": 395,
+    "top_cut": 397,
+    "top_cut_0based": 396,
+    "wraps_origin": false
+   },
+   {
+    "ambiguity_dependent": false,
+    "bottom_cut": 403,
+    "bottom_cut_0based": 402,
+    "cut_type": "Sticky",
+    "enzyme": "SacI",
+    "is_blunt": false,
+    "match_status": "CONFIRMED",
+    "overhang_length": 4,
+    "overhang_sequence": "AGCT",
+    "overhang_type": "3_prime",
+    "recognition_sequence": "GAGCTC",
+    "site_end": 407,
+    "site_end_1based": 407,
+    "site_position": 402,
+    "site_position_0based": 401,
+    "top_cut": 407,
+    "top_cut_0based": 406,
+    "wraps_origin": false
+   },
+   {
+    "ambiguity_dependent": false,
+    "bottom_cut": 409,
+    "bottom_cut_0based": 408,
+    "cut_type": "Sticky",
+    "enzyme": "KpnI",
+    "is_blunt": false,
+    "match_status": "CONFIRMED",
+    "overhang_length": 4,
+    "overhang_sequence": "GTAC",
+    "overhang_type": "3_prime",
+    "recognition_sequence": "GGTACC",
+    "site_end": 413,
+    "site_end_1based": 413,
+    "site_position": 408,
+    "site_position_0based": 407,
+    "top_cut": 413,
+    "top_cut_0based": 412,
+    "wraps_origin": false
+   },
+   {
+    "ambiguity_dependent": false,
+    "bottom_cut": 415,
+    "bottom_cut_0based": 414,
+    "cut_type": "Blunt",
+    "enzyme": "SmaI",
+    "is_blunt": true,
+    "match_status": "CONFIRMED",
+    "overhang_length": 0,
+    "overhang_sequence": "",
+    "overhang_type": "blunt",
+    "recognition_sequence": "CCCGGG",
+    "site_end": 417,
+    "site_end_1based": 417,
+    "site_position": 412,
+    "site_position_0based": 411,
+    "top_cut": 415,
+    "top_cut_0based": 414,
+    "wraps_origin": false
+   },
+   {
+    "ambiguity_dependent": false,
+    "bottom_cut": 422,
+    "bottom_cut_0based": 421,
+    "cut_type": "Sticky",
+    "enzyme": "BamHI",
+    "is_blunt": false,
+    "match_status": "CONFIRMED",
+    "overhang_length": 4,
+    "overhang_sequence": "GATC",
+    "overhang_type": "5_prime",
+    "recognition_sequence": "GGATCC",
+    "site_end": 422,
+    "site_end_1based": 422,
+    "site_position": 417,
+    "site_position_0based": 416,
+    "top_cut": 418,
+    "top_cut_0based": 417,
+    "wraps_origin": false
+   },
+   {
+    "ambiguity_dependent": false,
+    "bottom_cut": 428,
+    "bottom_cut_0based": 427,
+    "cut_type": "Sticky",
+    "enzyme": "XbaI",
+    "is_blunt": false,
+    "match_status": "CONFIRMED",
+    "overhang_length": 4,
+    "overhang_sequence": "CTAG",
+    "overhang_type": "5_prime",
+    "recognition_sequence": "TCTAGA",
+    "site_end": 428,
+    "site_end_1based": 428,
+    "site_position": 423,
+    "site_position_0based": 422,
+    "top_cut": 424,
+    "top_cut_0based": 423,
+    "wraps_origin": false
+   },
+   {
+    "ambiguity_dependent": false,
+    "bottom_cut": 434,
+    "bottom_cut_0based": 433,
+    "cut_type": "Sticky",
+    "enzyme": "SalI",
+    "is_blunt": false,
+    "match_status": "CONFIRMED",
+    "overhang_length": 4,
+    "overhang_sequence": "TCGA",
+    "overhang_type": "5_prime",
+    "recognition_sequence": "GTCGAC",
+    "site_end": 434,
+    "site_end_1based": 434,
+    "site_position": 429,
+    "site_position_0based": 428,
+    "top_cut": 430,
+    "top_cut_0based": 429,
+    "wraps_origin": false
+   },
+   {
+    "ambiguity_dependent": false,
+    "bottom_cut": 436,
+    "bottom_cut_0based": 435,
+    "cut_type": "Sticky",
+    "enzyme": "PstI",
+    "is_blunt": false,
+    "match_status": "CONFIRMED",
+    "overhang_length": 4,
+    "overhang_sequence": "TGCA",
+    "overhang_type": "3_prime",
+    "recognition_sequence": "CTGCAG",
+    "site_end": 440,
+    "site_end_1based": 440,
+    "site_position": 435,
+    "site_position_0based": 434,
+    "top_cut": 440,
+    "top_cut_0based": 439,
+    "wraps_origin": false
+   },
+   {
+    "ambiguity_dependent": false,
+    "bottom_cut": 452,
+    "bottom_cut_0based": 451,
+    "cut_type": "Sticky",
+    "enzyme": "HindIII",
+    "is_blunt": false,
+    "match_status": "CONFIRMED",
+    "overhang_length": 4,
+    "overhang_sequence": "AGCT",
+    "overhang_type": "5_prime",
+    "recognition_sequence": "AAGCTT",
+    "site_end": 452,
+    "site_end_1based": 452,
+    "site_position": 447,
+    "site_position_0based": 446,
+    "top_cut": 448,
+    "top_cut_0based": 447,
+    "wraps_origin": false
+   }
+  ],
+  "map_linear": [
+   {
+    "ambiguity_dependent": false,
+    "bottom_cut": 187,
+    "bottom_cut_0based": 186,
+    "cut_type": "Sticky",
+    "enzyme": "NdeI",
+    "is_blunt": false,
+    "match_status": "CONFIRMED",
+    "overhang_length": 2,
+    "overhang_sequence": "TA",
+    "overhang_type": "5_prime",
+    "recognition_sequence": "CATATG",
+    "site_end": 188,
+    "site_end_1based": 188,
+    "site_position": 183,
+    "site_position_0based": 182,
+    "top_cut": 185,
+    "top_cut_0based": 184,
+    "wraps_origin": false
+   },
+   {
+    "ambiguity_dependent": false,
+    "bottom_cut": 401,
+    "bottom_cut_0based": 400,
+    "cut_type": "Sticky",
+    "enzyme": "EcoRI",
+    "is_blunt": false,
+    "match_status": "CONFIRMED",
+    "overhang_length": 4,
+    "overhang_sequence": "AATT",
+    "overhang_type": "5_prime",
+    "recognition_sequence": "GAATTC",
+    "site_end": 401,
+    "site_end_1based": 401,
+    "site_position": 396,
+    "site_position_0based": 395,
+    "top_cut": 397,
+    "top_cut_0based": 396,
+    "wraps_origin": false
+   },
+   {
+    "ambiguity_dependent": false,
+    "bottom_cut": 403,
+    "bottom_cut_0based": 402,
+    "cut_type": "Sticky",
+    "enzyme": "SacI",
+    "is_blunt": false,
+    "match_status": "CONFIRMED",
+    "overhang_length": 4,
+    "overhang_sequence": "AGCT",
+    "overhang_type": "3_prime",
+    "recognition_sequence": "GAGCTC",
+    "site_end": 407,
+    "site_end_1based": 407,
+    "site_position": 402,
+    "site_position_0based": 401,
+    "top_cut": 407,
+    "top_cut_0based": 406,
+    "wraps_origin": false
+   },
+   {
+    "ambiguity_dependent": false,
+    "bottom_cut": 409,
+    "bottom_cut_0based": 408,
+    "cut_type": "Sticky",
+    "enzyme": "KpnI",
+    "is_blunt": false,
+    "match_status": "CONFIRMED",
+    "overhang_length": 4,
+    "overhang_sequence": "GTAC",
+    "overhang_type": "3_prime",
+    "recognition_sequence": "GGTACC",
+    "site_end": 413,
+    "site_end_1based": 413,
+    "site_position": 408,
+    "site_position_0based": 407,
+    "top_cut": 413,
+    "top_cut_0based": 412,
+    "wraps_origin": false
+   },
+   {
+    "ambiguity_dependent": false,
+    "bottom_cut": 415,
+    "bottom_cut_0based": 414,
+    "cut_type": "Blunt",
+    "enzyme": "SmaI",
+    "is_blunt": true,
+    "match_status": "CONFIRMED",
+    "overhang_length": 0,
+    "overhang_sequence": "",
+    "overhang_type": "blunt",
+    "recognition_sequence": "CCCGGG",
+    "site_end": 417,
+    "site_end_1based": 417,
+    "site_position": 412,
+    "site_position_0based": 411,
+    "top_cut": 415,
+    "top_cut_0based": 414,
+    "wraps_origin": false
+   },
+   {
+    "ambiguity_dependent": false,
+    "bottom_cut": 422,
+    "bottom_cut_0based": 421,
+    "cut_type": "Sticky",
+    "enzyme": "BamHI",
+    "is_blunt": false,
+    "match_status": "CONFIRMED",
+    "overhang_length": 4,
+    "overhang_sequence": "GATC",
+    "overhang_type": "5_prime",
+    "recognition_sequence": "GGATCC",
+    "site_end": 422,
+    "site_end_1based": 422,
+    "site_position": 417,
+    "site_position_0based": 416,
+    "top_cut": 418,
+    "top_cut_0based": 417,
+    "wraps_origin": false
+   },
+   {
+    "ambiguity_dependent": false,
+    "bottom_cut": 428,
+    "bottom_cut_0based": 427,
+    "cut_type": "Sticky",
+    "enzyme": "XbaI",
+    "is_blunt": false,
+    "match_status": "CONFIRMED",
+    "overhang_length": 4,
+    "overhang_sequence": "CTAG",
+    "overhang_type": "5_prime",
+    "recognition_sequence": "TCTAGA",
+    "site_end": 428,
+    "site_end_1based": 428,
+    "site_position": 423,
+    "site_position_0based": 422,
+    "top_cut": 424,
+    "top_cut_0based": 423,
+    "wraps_origin": false
+   },
+   {
+    "ambiguity_dependent": false,
+    "bottom_cut": 434,
+    "bottom_cut_0based": 433,
+    "cut_type": "Sticky",
+    "enzyme": "SalI",
+    "is_blunt": false,
+    "match_status": "CONFIRMED",
+    "overhang_length": 4,
+    "overhang_sequence": "TCGA",
+    "overhang_type": "5_prime",
+    "recognition_sequence": "GTCGAC",
+    "site_end": 434,
+    "site_end_1based": 434,
+    "site_position": 429,
+    "site_position_0based": 428,
+    "top_cut": 430,
+    "top_cut_0based": 429,
+    "wraps_origin": false
+   },
+   {
+    "ambiguity_dependent": false,
+    "bottom_cut": 436,
+    "bottom_cut_0based": 435,
+    "cut_type": "Sticky",
+    "enzyme": "PstI",
+    "is_blunt": false,
+    "match_status": "CONFIRMED",
+    "overhang_length": 4,
+    "overhang_sequence": "TGCA",
+    "overhang_type": "3_prime",
+    "recognition_sequence": "CTGCAG",
+    "site_end": 440,
+    "site_end_1based": 440,
+    "site_position": 435,
+    "site_position_0based": 434,
+    "top_cut": 440,
+    "top_cut_0based": 439,
+    "wraps_origin": false
+   },
+   {
+    "ambiguity_dependent": false,
+    "bottom_cut": 452,
+    "bottom_cut_0based": 451,
+    "cut_type": "Sticky",
+    "enzyme": "HindIII",
+    "is_blunt": false,
+    "match_status": "CONFIRMED",
+    "overhang_length": 4,
+    "overhang_sequence": "AGCT",
+    "overhang_type": "5_prime",
+    "recognition_sequence": "AAGCTT",
+    "site_end": 452,
+    "site_end_1based": 452,
+    "site_position": 447,
+    "site_position_0based": 446,
+    "top_cut": 448,
+    "top_cut_0based": 447,
+    "wraps_origin": false
+   }
+  ],
+  "non_circular": [],
+  "non_linear": [],
+  "pairs_circular": [
+   {
+    "cut_position_a_0based": 396,
+    "cut_position_b_0based": 417,
+    "distinct_cut_positions": true,
+    "enzyme_a": "EcoRI",
+    "enzyme_b": "BamHI",
+    "maximum": 16,
+    "reasons": [
+     "EcoRI cuts exactly once at a confirmed site",
+     "BamHI cuts exactly once at a confirmed site",
+     "Two distinct physical cut positions",
+     "Both enzymes generate sticky ends",
+     "Distinct recognition sequences",
+     "Both enzymes generate sticky ends of the same length"
+    ],
+    "score": 16,
+    "site_count_a": 1,
+    "site_count_b": 1,
+    "sticky_ends": true,
+    "warnings": []
+   },
+   {
+    "cut_position_a_0based": 396,
+    "cut_position_b_0based": 447,
+    "distinct_cut_positions": true,
+    "enzyme_a": "EcoRI",
+    "enzyme_b": "HindIII",
+    "maximum": 16,
+    "reasons": [
+     "EcoRI cuts exactly once at a confirmed site",
+     "HindIII cuts exactly once at a confirmed site",
+     "Two distinct physical cut positions",
+     "Both enzymes generate sticky ends",
+     "Distinct recognition sequences",
+     "Both enzymes generate sticky ends of the same length"
+    ],
+    "score": 16,
+    "site_count_a": 1,
+    "site_count_b": 1,
+    "sticky_ends": true,
+    "warnings": []
+   },
+   {
+    "cut_position_a_0based": 396,
+    "cut_position_b_0based": 439,
+    "distinct_cut_positions": true,
+    "enzyme_a": "EcoRI",
+    "enzyme_b": "PstI",
+    "maximum": 16,
+    "reasons": [
+     "EcoRI cuts exactly once at a confirmed site",
+     "PstI cuts exactly once at a confirmed site",
+     "Two distinct physical cut positions",
+     "Both enzymes generate sticky ends",
+     "Distinct recognition sequences",
+     "Both enzymes generate sticky ends of the same length"
+    ],
+    "score": 16,
+    "site_count_a": 1,
+    "site_count_b": 1,
+    "sticky_ends": true,
+    "warnings": []
+   },
+   {
+    "cut_position_a_0based": 396,
+    "cut_position_b_0based": 412,
+    "distinct_cut_positions": true,
+    "enzyme_a": "EcoRI",
+    "enzyme_b": "KpnI",
+    "maximum": 16,
+    "reasons": [
+     "EcoRI cuts exactly once at a confirmed site",
+     "KpnI cuts exactly once at a confirmed site",
+     "Two distinct physical cut positions",
+     "Both enzymes generate sticky ends",
+     "Distinct recognition sequences",
+     "Both enzymes generate sticky ends of the same length"
+    ],
+    "score": 16,
+    "site_count_a": 1,
+    "site_count_b": 1,
+    "sticky_ends": true,
+    "warnings": []
+   }
+  ],
+  "pairs_linear": [
+   {
+    "cut_position_a_0based": 396,
+    "cut_position_b_0based": 417,
+    "distinct_cut_positions": true,
+    "enzyme_a": "EcoRI",
+    "enzyme_b": "BamHI",
+    "maximum": 16,
+    "reasons": [
+     "EcoRI cuts exactly once at a confirmed site",
+     "BamHI cuts exactly once at a confirmed site",
+     "Two distinct physical cut positions",
+     "Both enzymes generate sticky ends",
+     "Distinct recognition sequences",
+     "Both enzymes generate sticky ends of the same length"
+    ],
+    "score": 16,
+    "site_count_a": 1,
+    "site_count_b": 1,
+    "sticky_ends": true,
+    "warnings": []
+   },
+   {
+    "cut_position_a_0based": 396,
+    "cut_position_b_0based": 447,
+    "distinct_cut_positions": true,
+    "enzyme_a": "EcoRI",
+    "enzyme_b": "HindIII",
+    "maximum": 16,
+    "reasons": [
+     "EcoRI cuts exactly once at a confirmed site",
+     "HindIII cuts exactly once at a confirmed site",
+     "Two distinct physical cut positions",
+     "Both enzymes generate sticky ends",
+     "Distinct recognition sequences",
+     "Both enzymes generate sticky ends of the same length"
+    ],
+    "score": 16,
+    "site_count_a": 1,
+    "site_count_b": 1,
+    "sticky_ends": true,
+    "warnings": []
+   },
+   {
+    "cut_position_a_0based": 396,
+    "cut_position_b_0based": 439,
+    "distinct_cut_positions": true,
+    "enzyme_a": "EcoRI",
+    "enzyme_b": "PstI",
+    "maximum": 16,
+    "reasons": [
+     "EcoRI cuts exactly once at a confirmed site",
+     "PstI cuts exactly once at a confirmed site",
+     "Two distinct physical cut positions",
+     "Both enzymes generate sticky ends",
+     "Distinct recognition sequences",
+     "Both enzymes generate sticky ends of the same length"
+    ],
+    "score": 16,
+    "site_count_a": 1,
+    "site_count_b": 1,
+    "sticky_ends": true,
+    "warnings": []
+   },
+   {
+    "cut_position_a_0based": 396,
+    "cut_position_b_0based": 412,
+    "distinct_cut_positions": true,
+    "enzyme_a": "EcoRI",
+    "enzyme_b": "KpnI",
+    "maximum": 16,
+    "reasons": [
+     "EcoRI cuts exactly once at a confirmed site",
+     "KpnI cuts exactly once at a confirmed site",
+     "Two distinct physical cut positions",
+     "Both enzymes generate sticky ends",
+     "Distinct recognition sequences",
+     "Both enzymes generate sticky ends of the same length"
+    ],
+    "score": 16,
+    "site_count_a": 1,
+    "site_count_b": 1,
+    "sticky_ends": true,
+    "warnings": []
+   }
+  ],
+  "self_test": {
+   "all_passed": true,
+   "circular_fragment_total": true,
+   "database_validation_api": true,
+   "enzyme_database": true,
+   "gel_band_collapse": true,
+   "iupac": true,
+   "linear_digest_coordinate_regression": true,
+   "linear_fragments": true,
+   "public_api": true,
+   "reverse_complement": true,
+   "single_circular_cut": true,
+   "site_match_api": true,
+   "sticky_compatibility": true,
+   "validation": true
+  },
+  "sites_BamHI_circular": {
+   "confirmed_positions": [
+    417
+   ],
+   "confirmed_site_count": 1,
+   "enzyme": "BamHI",
+   "possible_positions": [],
+   "possible_site_count": 0,
+   "site_count": 1
+  },
+  "sites_BamHI_linear": {
+   "confirmed_positions": [
+    417
+   ],
+   "confirmed_site_count": 1,
+   "enzyme": "BamHI",
+   "possible_positions": [],
+   "possible_site_count": 0,
+   "site_count": 1
+  },
+  "sites_EcoRI_circular": {
+   "confirmed_positions": [
+    396
+   ],
+   "confirmed_site_count": 1,
+   "enzyme": "EcoRI",
+   "possible_positions": [],
+   "possible_site_count": 0,
+   "site_count": 1
+  },
+  "sites_EcoRI_linear": {
+   "confirmed_positions": [
+    396
+   ],
+   "confirmed_site_count": 1,
+   "enzyme": "EcoRI",
+   "possible_positions": [],
+   "possible_site_count": 0,
+   "site_count": 1
+  },
+  "sites_HindIII_circular": {
+   "confirmed_positions": [
+    447
+   ],
+   "confirmed_site_count": 1,
+   "enzyme": "HindIII",
+   "possible_positions": [],
+   "possible_site_count": 0,
+   "site_count": 1
+  },
+  "sites_HindIII_linear": {
+   "confirmed_positions": [
+    447
+   ],
+   "confirmed_site_count": 1,
+   "enzyme": "HindIII",
+   "possible_positions": [],
+   "possible_site_count": 0,
+   "site_count": 1
+  },
+  "sites_KpnI_circular": {
+   "confirmed_positions": [
+    408
+   ],
+   "confirmed_site_count": 1,
+   "enzyme": "KpnI",
+   "possible_positions": [],
+   "possible_site_count": 0,
+   "site_count": 1
+  },
+  "sites_KpnI_linear": {
+   "confirmed_positions": [
+    408
+   ],
+   "confirmed_site_count": 1,
+   "enzyme": "KpnI",
+   "possible_positions": [],
+   "possible_site_count": 0,
+   "site_count": 1
+  },
+  "sites_NdeI_circular": {
+   "confirmed_positions": [
+    183
+   ],
+   "confirmed_site_count": 1,
+   "enzyme": "NdeI",
+   "possible_positions": [],
+   "possible_site_count": 0,
+   "site_count": 1
+  },
+  "sites_NdeI_linear": {
+   "confirmed_positions": [
+    183
+   ],
+   "confirmed_site_count": 1,
+   "enzyme": "NdeI",
+   "possible_positions": [],
+   "possible_site_count": 0,
+   "site_count": 1
+  },
+  "sites_PstI_circular": {
+   "confirmed_positions": [
+    435
+   ],
+   "confirmed_site_count": 1,
+   "enzyme": "PstI",
+   "possible_positions": [],
+   "possible_site_count": 0,
+   "site_count": 1
+  },
+  "sites_PstI_linear": {
+   "confirmed_positions": [
+    435
+   ],
+   "confirmed_site_count": 1,
+   "enzyme": "PstI",
+   "possible_positions": [],
+   "possible_site_count": 0,
+   "site_count": 1
+  },
+  "sites_SacI_circular": {
+   "confirmed_positions": [
+    402
+   ],
+   "confirmed_site_count": 1,
+   "enzyme": "SacI",
+   "possible_positions": [],
+   "possible_site_count": 0,
+   "site_count": 1
+  },
+  "sites_SacI_linear": {
+   "confirmed_positions": [
+    402
+   ],
+   "confirmed_site_count": 1,
+   "enzyme": "SacI",
+   "possible_positions": [],
+   "possible_site_count": 0,
+   "site_count": 1
+  },
+  "sites_SalI_circular": {
+   "confirmed_positions": [
+    429
+   ],
+   "confirmed_site_count": 1,
+   "enzyme": "SalI",
+   "possible_positions": [],
+   "possible_site_count": 0,
+   "site_count": 1
+  },
+  "sites_SalI_linear": {
+   "confirmed_positions": [
+    429
+   ],
+   "confirmed_site_count": 1,
+   "enzyme": "SalI",
+   "possible_positions": [],
+   "possible_site_count": 0,
+   "site_count": 1
+  },
+  "sites_SmaI_circular": {
+   "confirmed_positions": [
+    412
+   ],
+   "confirmed_site_count": 1,
+   "enzyme": "SmaI",
+   "possible_positions": [],
+   "possible_site_count": 0,
+   "site_count": 1
+  },
+  "sites_SmaI_linear": {
+   "confirmed_positions": [
+    412
+   ],
+   "confirmed_site_count": 1,
+   "enzyme": "SmaI",
+   "possible_positions": [],
+   "possible_site_count": 0,
+   "site_count": 1
+  },
+  "sites_XbaI_circular": {
+   "confirmed_positions": [
+    423
+   ],
+   "confirmed_site_count": 1,
+   "enzyme": "XbaI",
+   "possible_positions": [],
+   "possible_site_count": 0,
+   "site_count": 1
+  },
+  "sites_XbaI_linear": {
+   "confirmed_positions": [
+    423
+   ],
+   "confirmed_site_count": 1,
+   "enzyme": "XbaI",
+   "possible_positions": [],
+   "possible_site_count": 0,
+   "site_count": 1
+  },
+  "summary_circular": {
+   "BamHI": {
+    "confirmed_site_count": 1,
+    "positions": [
+     417
+    ],
+    "possible_site_count": 0,
+    "site_count": 1
+   },
+   "EcoRI": {
+    "confirmed_site_count": 1,
+    "positions": [
+     396
+    ],
+    "possible_site_count": 0,
+    "site_count": 1
+   },
+   "HindIII": {
+    "confirmed_site_count": 1,
+    "positions": [
+     447
+    ],
+    "possible_site_count": 0,
+    "site_count": 1
+   },
+   "KpnI": {
+    "confirmed_site_count": 1,
+    "positions": [
+     408
+    ],
+    "possible_site_count": 0,
+    "site_count": 1
+   },
+   "NdeI": {
+    "confirmed_site_count": 1,
+    "positions": [
+     183
+    ],
+    "possible_site_count": 0,
+    "site_count": 1
+   },
+   "PstI": {
+    "confirmed_site_count": 1,
+    "positions": [
+     435
+    ],
+    "possible_site_count": 0,
+    "site_count": 1
+   },
+   "SacI": {
+    "confirmed_site_count": 1,
+    "positions": [
+     402
+    ],
+    "possible_site_count": 0,
+    "site_count": 1
+   },
+   "SalI": {
+    "confirmed_site_count": 1,
+    "positions": [
+     429
+    ],
+    "possible_site_count": 0,
+    "site_count": 1
+   },
+   "SmaI": {
+    "confirmed_site_count": 1,
+    "positions": [
+     412
+    ],
+    "possible_site_count": 0,
+    "site_count": 1
+   },
+   "XbaI": {
+    "confirmed_site_count": 1,
+    "positions": [
+     423
+    ],
+    "possible_site_count": 0,
+    "site_count": 1
+   }
+  },
+  "summary_linear": {
+   "BamHI": {
+    "confirmed_site_count": 1,
+    "positions": [
+     417
+    ],
+    "possible_site_count": 0,
+    "site_count": 1
+   },
+   "EcoRI": {
+    "confirmed_site_count": 1,
+    "positions": [
+     396
+    ],
+    "possible_site_count": 0,
+    "site_count": 1
+   },
+   "HindIII": {
+    "confirmed_site_count": 1,
+    "positions": [
+     447
+    ],
+    "possible_site_count": 0,
+    "site_count": 1
+   },
+   "KpnI": {
+    "confirmed_site_count": 1,
+    "positions": [
+     408
+    ],
+    "possible_site_count": 0,
+    "site_count": 1
+   },
+   "NdeI": {
+    "confirmed_site_count": 1,
+    "positions": [
+     183
+    ],
+    "possible_site_count": 0,
+    "site_count": 1
+   },
+   "PstI": {
+    "confirmed_site_count": 1,
+    "positions": [
+     435
+    ],
+    "possible_site_count": 0,
+    "site_count": 1
+   },
+   "SacI": {
+    "confirmed_site_count": 1,
+    "positions": [
+     402
+    ],
+    "possible_site_count": 0,
+    "site_count": 1
+   },
+   "SalI": {
+    "confirmed_site_count": 1,
+    "positions": [
+     429
+    ],
+    "possible_site_count": 0,
+    "site_count": 1
+   },
+   "SmaI": {
+    "confirmed_site_count": 1,
+    "positions": [
+     412
+    ],
+    "possible_site_count": 0,
+    "site_count": 1
+   },
+   "XbaI": {
+    "confirmed_site_count": 1,
+    "positions": [
+     423
+    ],
+    "possible_site_count": 0,
+    "site_count": 1
+   }
+  },
+  "unique_circular": [
+   "EcoRI",
+   "BamHI",
+   "HindIII",
+   "PstI",
+   "SmaI",
+   "KpnI",
+   "XbaI",
+   "SalI",
+   "NdeI",
+   "SacI"
+  ],
+  "unique_linear": [
+   "EcoRI",
+   "BamHI",
+   "HindIII",
+   "PstI",
+   "SmaI",
+   "KpnI",
+   "XbaI",
+   "SalI",
+   "NdeI",
+   "SacI"
+  ],
+  "validate_database": {
+   "invalid": [],
+   "invalid_count": 0,
+   "valid": [
+    "EcoRI",
+    "BamHI",
+    "HindIII",
+    "XhoI",
+    "SalI",
+    "PstI",
+    "KpnI",
+    "SacI",
+    "SphI",
+    "NdeI",
+    "NcoI",
+    "XbaI",
+    "SpeI",
+    "ClaI",
+    "EcoRV",
+    "SmaI",
+    "AluI",
+    "HaeIII",
+    "MspI",
+    "HpaII",
+    "TaqI",
+    "DpnI"
+   ],
+   "valid_count": 22
+  }
+ }
+}

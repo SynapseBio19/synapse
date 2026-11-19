@@ -468,6 +468,40 @@ def orf_scenarios() -> dict:
     return out
 
 
+# ---------------------------------------------------------------------------
+# Restriction analysis (added in Phase 9, recorded from 709f964 before its split)
+# ---------------------------------------------------------------------------
+
+def restriction_scenarios() -> dict:
+    from analyses import restriction as R
+
+    puc = _puc19()
+    enzymes = ["EcoRI", "BamHI", "HindIII", "PstI", "SmaI", "KpnI", "XbaI", "SalI", "NdeI", "BsaI", "SacI"]
+    enzymes = [name for name in enzymes if name in R.RESTRICTION_ENZYMES]
+    iupac = puc[:1200] + "GAANTC" + puc[1200:1500]
+    out: dict = {"enzymes": enzymes}
+    for topology in ("linear", "circular"):
+        out[f"analysis_{topology}"] = _plain(R.run_restriction_analysis(puc, enzymes, topology))
+        out[f"map_{topology}"] = _plain(R.create_restriction_map(puc, enzymes, topology))
+        out[f"summary_{topology}"] = _plain(R.summarize_restriction_map(puc, enzymes, topology))
+        digest = R.perform_digest(puc, ["EcoRI", "PstI", "NdeI"], topology=topology)
+        out[f"digest_{topology}"] = _plain(digest)
+        out[f"gel_{topology}"] = _plain(R.get_gel_band_prediction(digest))
+        out[f"boundaries_{topology}"] = _plain(R.get_physical_cut_boundaries(digest))
+        out[f"unique_{topology}"] = _plain(R.find_unique_cutters(puc, enzymes, topology))
+        out[f"non_{topology}"] = _plain(R.find_non_cutters(puc, enzymes, topology))
+        out[f"pairs_{topology}"] = _plain(R.recommend_enzyme_pairs(puc, enzymes, 4, topology))
+        out[f"double_{topology}"] = _plain(R.run_double_digest(puc, "EcoRI", "HindIII", topology))
+        for name in enzymes:
+            out[f"sites_{name}_{topology}"] = _plain(R.summarize_enzyme_sites(puc, name, topology))
+        out[f"iupac_{topology}"] = _plain(R.perform_digest(iupac, ["EcoRI"], topology=topology,
+                                                           include_possible=True))
+    out["validate_database"] = _plain(R.validate_enzyme_database())
+    out["compatible"] = _plain(R.get_cloning_compatible_sites(puc, puc[:900], "EcoRI"))
+    out["self_test"] = _plain(R.run_restriction_self_test())
+    return out
+
+
 SECTIONS = {
     SNAPSHOT: {"primer": primer_scenarios, "blast": blast_scenarios},
     PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "mutation.json": {"mutation": mutation_scenarios},
@@ -476,6 +510,8 @@ SECTIONS = {
     PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "variant.json": {"variant": variant_scenarios},
     PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "sequence.json": {"sequence": sequence_scenarios},
     PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "orf.json": {"orf": orf_scenarios},
+    PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "restriction.json": {
+        "restriction": restriction_scenarios},
 }
 
 

@@ -261,6 +261,28 @@ ORF_NAMES = (
     'calculate_orf_feature_summary', 'analyze_orfs_enhanced',
 )
 
+# Phase 9: analyses.restriction, recorded from 709f964 before its split.
+RESTRICTION_NAMES = (
+    'IUPAC_BASES', '_normalize_restriction_sequence', '_restriction_sequence_status',
+    'validate_restriction_sequence', '_require_valid_restriction_sequence', 'bases_match',
+    'recognition_site_matches', 'find_restriction_site_matches',
+    'find_recognition_site_matches', '_scan_recognition_sites', 'find_type_iis_sites',
+    'find_restriction_sites', 'calculate_cut_positions', 'reverse_complement',
+    'get_overhang_sequence', '_site_match_for_position', 'analyze_restriction_site',
+    'analyze_enzyme', 'create_restriction_map', 'get_cut_positions',
+    'calculate_linear_fragments', 'calculate_circular_fragments', 'perform_digest',
+    'calculate_gel_bands', 'summarize_restriction_map', 'find_unique_cutters',
+    'find_non_cutters', 'find_internal_sites', 'get_sticky_end_sequence',
+    '_site_overhang_polarity', 'sticky_ends_are_compatible',
+    'analyze_cloning_compatibility', 'recommend_enzyme_pairs', 'analyze_double_digest',
+    'analyze_restriction', 'summarize_enzyme_sites', 'validate_enzyme_database',
+    'compare_single_enzyme_digest', 'run_restriction_analysis', 'get_restriction_summary',
+    'get_restriction_sites_for_enzyme', 'get_restriction_map', 'get_digest_prediction',
+    'get_gel_band_prediction', 'get_unique_cutters', 'get_non_cutters',
+    'get_enzyme_pair_recommendations', 'run_double_digest', 'get_cloning_compatible_sites',
+    'run_restriction_self_test', 'get_physical_cut_boundaries',
+)
+
 REMOVED = {"analyses.primer": ("_V5_ACTIVE_CONFIG",)}
 
 # Phase 8 (2026-11-18): the historical _vN_ helpers were renamed; the old
@@ -332,6 +354,10 @@ class PublicModuleNamespaceTests(unittest.TestCase):
         from analyses import orf
         self._check(orf, ORF_NAMES)
 
+    def test_restriction_namespace(self):
+        from analyses import restriction
+        self._check(restriction, RESTRICTION_NAMES)
+
     def test_renamed_primer_helpers(self):
         from analyses import primer
         self._check(primer, tuple(RENAMED_PRIMER_NAMES.values()))
@@ -356,14 +382,16 @@ class InternalModuleIndependenceTests(unittest.TestCase):
 
     PROBE = textwrap.dedent('''
         import importlib, json, pkgutil, sys
-        import analyses._blast, analyses._cloning, analyses._mutation, analyses._primer, analyses._protein, analyses._variant, analyses._sequence, analyses._orf
+        import analyses._blast, analyses._cloning, analyses._mutation, analyses._primer, analyses._protein, analyses._variant, analyses._sequence, analyses._orf, analyses._restriction
         failures = {}
         OWN_PUBLIC = {"analyses._blast": "analyses.blast", "analyses._primer": "analyses.primer",
                       "analyses._mutation": "analyses.mutation", "analyses._cloning": "analyses.cloning",
                       "analyses._protein": "analyses.protein", "analyses._variant": "analyses.variant_analysis",
-                      "analyses._sequence": "analyses.sequence", "analyses._orf": "analyses.orf"}
+                      "analyses._sequence": "analyses.sequence", "analyses._orf": "analyses.orf",
+                      "analyses._restriction": "analyses.restriction"}
         for package in (analyses._blast, analyses._primer, analyses._mutation, analyses._cloning,
-                        analyses._protein, analyses._variant, analyses._sequence, analyses._orf):
+                        analyses._protein, analyses._variant, analyses._sequence, analyses._orf,
+                        analyses._restriction):
             for info in pkgutil.iter_modules(package.__path__):
                 name = package.__name__ + "." + info.name
                 for loaded in [m for m in sys.modules if m.startswith("analyses")]:

@@ -3253,3 +3253,27 @@ values). No defect found:
   `analyses.sequence`.
 - **Results.** Unchanged: ORFfinder comparison, the differential ORF test
   in all 27 codes, the golden master.
+
+### Package J: `analyses/restriction.py` split into `analyses/_restriction/`
+
+- **Characterization first.** The section `restriction`
+  (`tests/fixtures/characterization/restriction.json`) holds 46 scenarios
+  recorded from `709f964`. On pUC19, linear and circular, with 10 enzymes,
+  it covers:
+  - the analysis, maps, summaries, digests, gel bands, cut boundaries;
+  - unique and non-cutters, pair recommendations, double digests;
+  - every enzyme's sites;
+  - an IUPAC digest with possible sites, the enzyme-database check,
+    cloning-compatible sites and the self-test.
+
+  It is identical under two hash seeds and on 3.10.11. The 51 names are
+  frozen.
+- **After.** Five modules: `sites`, `digest`, `compatibility`, `api`,
+  `selftest`. No cycle; all 52 statements moved verbatim.
+- **Two adjustments, the same as for cloning.**
+  - `run_restriction_self_test` checked its public API with `globals()`;
+    it now asks `analyses.restriction`.
+  - `RESTRICTION_ENZYMES`, `get_restriction_enzyme` and
+    `get_type_iis_enzyme` stay importable from `analyses.restriction`.
+    The restriction menu imports them there; 31 tests failed until they
+    were re-exported.
