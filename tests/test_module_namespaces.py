@@ -222,6 +222,24 @@ VARIANT_NAMES = (
     'assert_variant_analysis_self_test', '__all__',
 )
 
+# Phase 9: analyses.sequence, recorded from 8906959 before its split.
+SEQUENCE_NAMES = (
+    'DNA_STANDARD_BASES', 'DNA_AMBIGUOUS_CODES', 'DNA_IUPAC_BASES', 'DNA_COMPLEMENT',
+    'DNA_NUCLEOTIDE_RESIDUE_MASSES', 'AVERAGE_DSDNA_BP_MASS', 'normalize_dna_sequence',
+    'calculate_sequence_statistics', 'describe_profile_availability', 'get_sequence_forms',
+    'DEFAULT_CPG_ISLAND_CRITERIA', 'create_sequence_interpretation', '_is_standard_base',
+    '_is_iupac_base', '_get_standard_bases', '_get_valid_iupac_bases',
+    '_calculate_gc_for_window', 'count_nucleotides', 'count_ambiguous_bases',
+    'get_complement', 'get_reverse_complement', 'analyze_sequence_quality',
+    'calculate_nucleotide_percentages', 'calculate_gc_content', 'calculate_at_content',
+    'calculate_dna_content_ranges', 'calculate_gc_skew', 'calculate_at_skew',
+    'calculate_gc_content_profile', 'calculate_sequence_complexity',
+    'calculate_complexity_profile', 'calculate_profile_statistics', 'analyze_gc_profile',
+    'analyze_complexity_profile', 'find_homopolymers', 'analyze_cpg', 'find_cpg_islands',
+    'calculate_dna_molecular_weight', 'calculate_average_dna_molecular_weight',
+    'create_sequence_summary', 'analyze_sequence', 'run_sequence_self_test',
+)
+
 REMOVED = {"analyses.primer": ("_V5_ACTIVE_CONFIG",)}
 
 # Phase 8 (2026-11-18): the historical _vN_ helpers were renamed; the old
@@ -285,6 +303,10 @@ class PublicModuleNamespaceTests(unittest.TestCase):
         from analyses import variant_analysis
         self._check(variant_analysis, VARIANT_NAMES)
 
+    def test_sequence_namespace(self):
+        from analyses import sequence
+        self._check(sequence, SEQUENCE_NAMES)
+
     def test_renamed_primer_helpers(self):
         from analyses import primer
         self._check(primer, tuple(RENAMED_PRIMER_NAMES.values()))
@@ -309,10 +331,10 @@ class InternalModuleIndependenceTests(unittest.TestCase):
 
     PROBE = textwrap.dedent('''
         import importlib, json, pkgutil, sys
-        import analyses._blast, analyses._cloning, analyses._mutation, analyses._primer, analyses._protein, analyses._variant
+        import analyses._blast, analyses._cloning, analyses._mutation, analyses._primer, analyses._protein, analyses._variant, analyses._sequence
         failures = {}
         for package in (analyses._blast, analyses._primer, analyses._mutation, analyses._cloning,
-                        analyses._protein, analyses._variant):
+                        analyses._protein, analyses._variant, analyses._sequence):
             for info in pkgutil.iter_modules(package.__path__):
                 name = package.__name__ + "." + info.name
                 for loaded in [m for m in sys.modules if m.startswith("analyses")]:
@@ -322,7 +344,7 @@ class InternalModuleIndependenceTests(unittest.TestCase):
                 except Exception as error:
                     failures[name] = repr(error)
                 if {"analyses.blast", "analyses.primer", "analyses.mutation", "analyses.cloning",
-                    "analyses.protein", "analyses.variant_analysis"} & set(sys.modules):
+                    "analyses.protein", "analyses.variant_analysis", "analyses.sequence"} & set(sys.modules):
                     failures[name] = "imports the public module"
         for loaded in [m for m in sys.modules if m.startswith("analyses")]:
             del sys.modules[loaded]

@@ -3219,3 +3219,12 @@ values). No defect found:
     including IUPAC, CpG-rich and homopolymer cases, every overview
     function, the profiles, the self-test) was recorded after the fix. It
     is identical under four further hash seeds and on 3.10.11.
+
+### Package H: `analyses/sequence.py` split into `analyses/_sequence/`
+
+- **After.** Six modules in strict layer order: `bases`, `composition`,
+  `profiles`, `cpg`, `summary`, `selftest`. All 43 statements moved
+  verbatim; the 42 names are frozen.
+- **Results.** The snapshot recorded after package G is unchanged; so are
+  the golden master and the rendered menus. Suite OK on 3.14.6 and
+  3.10.11.
