@@ -1,8 +1,8 @@
 # Citation metadata for Synapse (Citation File Format 1.2.0,
 # https://citation-file-format.github.io/). GitHub shows it as
 # "Cite this repository". When the project is published, add
-# "repository-code", "license" and "date-released" (see
-# docs/RELEASE_NOTES.md, "Before the first release").
+# "repository-code" and "date-released" (see docs/RELEASE_NOTES.md,
+# "Before the first release").
 cff-version: 1.2.0
 message: "If you use Synapse in your research or teaching, please cite it as below."
 type: software
@@ -19,9 +19,10 @@ abstract: >-
   Escherichia coli K-12 and ClinVar). Synapse is research and teaching
   software and is not experimentally or clinically validated.
 authors:
-  - given-names: Onur
+  - given-names: Ali Onur
     family-names: Bayraktar
 version: 0.2.0.dev0
+license: AGPL-3.0-or-later
 url: "https://synapse-gen.com"
 keywords:
   - bioinformatics

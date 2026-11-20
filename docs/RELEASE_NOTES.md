@@ -83,9 +83,9 @@ Selected from docs/CHANGES.md; each fix has a test that failed before it.
 
 ### Before the first release (owner)
 
-1. Choose the licence (docs/LICENSING_AND_GOVERNANCE.md). Then add the
-   `LICENSE` file, set `license` in `pyproject.toml` and add `license` to
-   `CITATION.cff`.
+1. ~~Choose the licence.~~ Done 2026-11-20: AGPL-3.0-or-later, copyright
+   Ali Onur Bayraktar (`LICENSE`, `pyproject.toml`, `CITATION.cff`,
+   README).
 2. Create the GitHub repository and push `main`. The workflow
    `.github/workflows/ci.yml` then runs the tests on Linux (Python
    3.10-3.14) and Windows. Fix what the first run finds before tagging.

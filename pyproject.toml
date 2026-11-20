@@ -11,8 +11,9 @@ version = "0.2.0.dev0"
 description = "Transparent, sequence-centric DNA analysis workbench (research/teaching software, not experimentally validated)."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "Proprietary - all rights reserved (decision pending)" }
-authors = [{ name = "Onur Bayraktar" }]
+# Owner decision of 2026-11-20 (docs/LICENSING_AND_GOVERNANCE.md); full text in LICENSE.
+license = { text = "AGPL-3.0-or-later" }
+authors = [{ name = "Ali Onur Bayraktar" }]
 keywords = ["bioinformatics", "DNA", "sequence analysis", "primer design", "BLAST", "ORF", "HGVS", "cloning"]
 classifiers = [
     "Programming Language :: Python :: 3",
@@ -22,6 +23,7 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
 ]
 # The scientific core deliberately uses only the Python standard library.
 dependencies = []

@@ -73,6 +73,7 @@ what is verified, and external sources decide scientific claims.
 | 2026-11-13 | Communicate with the owner in German; all code, comments, output and technical documentation in English | Master Execution Prompt §2.1 |
 | 2026-11-17 | **CRISPR-related work is excluded from the continuation and deferred**: no investigation, testing, research or change of the CRISPR guide design, its off-target analysis, CFD scoring or the sourcing and licensing of CRISPR scoring resources. The research step that was interrupted by a model safety mechanism on 2026-11-13 is not retried or reworded. Requirements that depend on it are recorded as deferred | owner's Safe Continuation Prompt, 2026-11-17 |
 | 2026-11-18 | Broad mandate (Phase 8): in the copy, Claude may restructure code, correct defects that are backed by evidence, delete dead code, rename internal names and drop the ReadOnly protection. CRISPR and the AI Experiment Planner stay excluded for now. The name **Synapse** stays; the owner's domain is `synapse-gen.com` | owner, chat of 2026-11-18 |
+| 2026-11-20 | **Licence: GNU AGPL-3.0-or-later.** Copyright holder Ali Onur Bayraktar (privately developed). Goal: open use, no closed derivatives or closed web services; the owner may still license on other terms. Outside contributions need the contributor's consent to that before merging | owner, chat of 2026-11-20 (`docs/LICENSING_AND_GOVERNANCE.md`, section 6) |
 
 ### Engineering decisions recorded in the repository
 
@@ -145,7 +146,8 @@ From section J of the final report, re-assessed for this run:
   UI §9 remainders, the `complexity` field name, large modules, legacy
   primer names, pyright diagnostics.
 - Owner decisions still pending: the project licence
-  (`pyproject.toml`: "Proprietary - all rights reserved (decision
+  (decided 2026-11-20: AGPL-3.0-or-later, see §4; before:
+  `pyproject.toml`: "Proprietary - all rights reserved (decision
   pending)") and whether to keep `blast_results/TEST_8_REFERENCE_blast.json`.
 
 Status after the continuation run (2026-11-13 to 2026-11-17):

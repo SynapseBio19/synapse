@@ -3,8 +3,14 @@
 Synapse is research and teaching software whose results must be
 traceable. These rules come from the project's history
 (`docs/PROJECT_HISTORY_AND_DECISIONS.md`) and are checked by the test
-suite where possible. The licence has not been chosen yet
-(`docs/LICENSING_AND_GOVERNANCE.md`).
+suite where possible.
+
+**Licence.** Synapse is licensed under the GNU Affero General Public
+License, version 3 or later (`LICENSE`). Contributions are accepted under
+the same licence. The copyright holder also offers Synapse under other
+terms; before an outside contribution is merged, the contributor may be
+asked to agree that it can be included under those terms as well
+(`docs/LICENSING_AND_GOVERNANCE.md`, section 6).
 
 ## Setup
 

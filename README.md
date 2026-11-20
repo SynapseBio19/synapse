@@ -245,9 +245,23 @@ The full list, per module, is in `docs/METHODS.md`. The most important:
 
 ## Licence
 
-No licence has been chosen yet; until the owner decides, all rights are
-reserved. The options and the decisions they need are in
-`docs/LICENSING_AND_GOVERNANCE.md`. How to contribute: `CONTRIBUTING.md`.
+Copyright (C) 2026 Ali Onur Bayraktar.
+
+Synapse is free software: you can redistribute it and/or modify it under
+the terms of the GNU Affero General Public License as published by the
+Free Software Foundation, either version 3 of the License, or (at your
+option) any later version (`AGPL-3.0-or-later`, full text in `LICENSE`).
+It is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+FOR A PARTICULAR PURPOSE.
+
+In short: anyone may use, study, change and share Synapse. Whoever
+distributes a changed version, or offers one to users over a network
+(for example as a web service), must publish its source code under the
+same licence. Licences on other terms (for example for a closed
+commercial product) are available from the copyright holder. Why this
+licence was chosen: `docs/LICENSING_AND_GOVERNANCE.md`. How to
+contribute: `CONTRIBUTING.md`.
 
 ## Documentation
 

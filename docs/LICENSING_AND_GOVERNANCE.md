@@ -1,9 +1,10 @@
 # Licensing and governance
 
-Prepared in Phase 7 (2026-11-17) for an owner decision. Nothing here
-selects a licence: `pyproject.toml` still says "Proprietary - all rights
-reserved (decision pending)", and no LICENSE file is added until the owner
-chooses one. This is an engineering summary, not legal advice.
+Prepared in Phase 7 (2026-11-17) for an owner decision. **Decided on
+2026-11-20 by the owner: GNU Affero General Public License, version 3 or
+later (`AGPL-3.0-or-later`); copyright holder Ali Onur Bayraktar,
+privately developed** (section 6). This is an engineering summary, not
+legal advice.
 
 ## 1. Why the project needs a licence
 
@@ -57,9 +58,9 @@ Practical notes:
 1. **Licence.** Which of the families above, and which licence in it.
    After the choice: add `LICENSE`, set `license` in `pyproject.toml` to
    the SPDX identifier, and add a short licence section to the README.
-2. **Copyright holder.** `pyproject.toml` names "Onur Bayraktar" as
-   author. Confirm the name and year for the copyright line, or name an
-   institution if one holds the rights.
+2. **Copyright holder.** Settled on 2026-11-20: Ali Onur Bayraktar, who
+   developed Synapse privately (no university or employer holds rights).
+   Copyright line: "Copyright (C) 2026 Ali Onur Bayraktar".
 3. **Citation.** Whether to add a `CITATION.cff` so the software can be
    cited (recommended for research software).
 4. **Two unused legacy files.** Settled on 2026-11-18 (Phase 8, owner
@@ -88,3 +89,38 @@ Practical notes:
   the local skills.
 - **Continuous integration.** `.github/workflows/ci.yml`. It has not run
   yet because the repository has no remote.
+
+## 6. The decision (2026-11-20)
+
+- **Licence:** `AGPL-3.0-or-later`, full text in `LICENSE` (the Free
+  Software Foundation's text, SHA-256
+  `8486a10c4393cee1c25392769ddd3b2d6c242d6ec7928e1414efff7dfb2f07ef`,
+  taken from GitHub's licence API because gnu.org refused automated
+  downloads). Declared in `pyproject.toml` (licence and classifier),
+  `CITATION.cff` and the README.
+- **Owner's goal:** Synapse may become a business later, for example a web
+  version on synapse-gen.com. The AGPL lets everyone use, study and change
+  Synapse, but whoever distributes a changed version or runs it as a
+  network service must publish the source under the same licence. Nobody
+  can therefore turn it into a closed product or a closed competing web
+  service.
+- **The owner keeps every option.** As the only copyright holder, the owner
+  can also license Synapse on other terms (for example a paid commercial
+  licence) and can choose a different licence for future versions. Copies
+  already released under the AGPL stay under the AGPL.
+- **Outside contributions.** The owner's freedom to license on other terms
+  covers only code the owner holds the rights to. Before merging
+  contributions from others, ask the contributor to agree in writing (for
+  example a contributor licence agreement, or a statement in the pull
+  request) that the owner may also license their contribution on other
+  terms. Without that, a contribution can only be used under the AGPL.
+- **Compatibility of the material in section 2:** Biopython (BSD-style),
+  the bcftools test vectors (MIT/Expat) and BLAST+ (public domain) are
+  compatible. primer3-py (GPL-2.0-or-later) is used only by tests and may be
+  combined with AGPL-3.0 code under GPL-3.0. ViennaRNA stays optional and is
+  not distributed with Synapse.
+- **Not done, not required:** licence headers in every source file (the
+  `LICENSE` file and `pyproject.toml` declare the licence for the whole
+  project; SPDX headers can be added later).
+- This summary is not legal advice; for concrete commercial plans a
+  lawyer for IT law should review the setup.
