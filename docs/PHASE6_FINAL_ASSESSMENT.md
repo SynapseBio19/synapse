@@ -6,7 +6,7 @@ documentation only: no application code, feature, refactoring or external
 validation was changed or run for it.
 
 - Repository: `C:\Users\bayra\OneDrive\Desktop\Project Snyapse - Kopie`,
-  branch `main`, HEAD `19f7ef8`, working tree clean.
+  branch `main`, HEAD `cf04ead`, working tree clean.
 - Reference specification: the Phase 6 Master Prompt
   (`Project_Synapse_Phase_6_Master_Prompt_Skills_Integrated.txt`), with
   the owner's later decisions: the **AI Experiment Planner stays Coming
@@ -15,7 +15,7 @@ validation was changed or run for it.
 
 **Method.**
 
-- Git history read from the start of the completion run (`68e59d1`,
+- Git history read from the start of the completion run (`8546347`,
   2026-11-11) to HEAD.
 - Every completed work package checked for its code and its tests, and
   each test module run.
@@ -33,17 +33,17 @@ validation was changed or run for it.
 
 | Item | Value |
 |---|---|
-| HEAD | `19f7ef8` (2026-11-17), working tree clean, no untracked files |
-| Commits | 154 in total; 143 in Phase 6 (from `824ca5f`, inclusive) |
-| Completion run | `68e59d1`-`ea9612b`, 2026-11-11 to 11-13, 32 commits |
-| Continuation run | `224f7d2`-`19f7ef8`, 2026-11-13 to 11-17, 12 commits: 45 files changed, about 3,900 lines added |
+| HEAD | `cf04ead` (2026-11-17), working tree clean, no untracked files |
+| Commits | 154 in total; 143 in Phase 6 (from `8a10cdc`, inclusive) |
+| Completion run | `8546347`-`b6e1e6a`, 2026-11-11 to 11-13, 32 commits |
+| Continuation run | `8f3238d`-`cf04ead`, 2026-11-13 to 11-17, 12 commits: 45 files changed, about 3,900 lines added |
 | Authors | 150 commits by the owner's Git identity, 4 by "Synapse audit" (the previous cycle); 138 Phase 6 commits carry a `Co-Authored-By` line |
 | Integrity | no reset, rebase, force-push or remote push; the original folder `Project Synapse` was only read |
 | ReadOnly | 15 of 15 protected files set |
 
 Known record errors (not corrected, because history is not rewritten):
 
-- The test totals in the messages of `70ff2b0` (484) and `a1e3520` (488)
+- The test totals in the messages of `115b1d9` (484) and `83c9c42` (488)
   are one too high; the real totals were 483 and 487. This is recorded
   in `docs/CHANGES.md`.
 
@@ -56,24 +56,24 @@ test module that was run now.
 
 | Package | Commit | Code | Tests (run 2026-11-17) |
 |---|---|---|---|
-| AI Experiment Planner "Coming Soon" | `a2f671b` | `ui/menu.py` entry, `main.py` message | `PlannerPlaceholderTests` 2/2 OK |
-| Optional MFE structure (ViennaRNA) | `c5ee3b2` | `analyses/rna_structure.py` | `test_rna_secondary_structure` 12/12 OK |
-| bcftools norm comparison; reference-only records reported | `70ff2b0` | `parse_vcf(skipped=)` | `test_bcftools_norm_reference` 7/7 OK |
-| ORFfinder comparison | `a1e3520` | fixture with 69 ORFs | `test_orffinder_reference` 4/4 OK |
-| HGVS DNA descriptions (Mutalyzer) | `f6f12ed` | `hgvs_c_allele`, `mutation_hgvs_c` | `test_hgvs_mutalyzer_reference` 5/5 OK |
-| Instability weights vs ExPASy | `b928fef` | probe fixture | `test_instability_expasy_reference` 3/3 OK |
-| `core_nt` | `4a4bb05` | `DATABASES`, catalog | `test_blast_core_nt` 4/4 OK |
-| Dialog paths | `c24159f` | – | `test_dialog_paths` 17/17 OK |
-| Type IIS enzymes (P2-7) | `4939688` | `data/restriction_enzymes.py` | `test_type_iis` 10/10 OK |
-| Circular and 5′-partial ORFs (P1-9) | `f020a1d` | `_origin_spanning_orfs` | `test_orf_partial_circular` 15/15 OK |
-| HGVS protein notation | `b7eb1de` | `mutation_hgvs_p` | `test_hgvs_notation` 4/4 OK |
-| G·U count (P2-5) | `fedb750` | `hairpin_count_with_gu` | `test_rna_wobble` 3/3 OK |
-| Restriction-site primers (10.2) | `99150da` | `design_primers_for_restriction_site` | `test_integration_workflows` 10/10 OK |
-| Variant cross-check (P2-4, T12) | `2c68e61`, `cdbf69c` | `cross_check_variants` | `test_variant_crosscheck` 14/14 OK |
-| Dialogs moved to `ui/` (P2-2) | `50dea66` | 11 `ui/*_menu.py` | `test_terminal_ui` 34/34 OK (includes `LayeringTests`) |
-| BLAST polling resilience (D25) | `a5e5a94` | `await_ready` retries | `test_blast_polling` 5/5 OK |
-| Cloning planner cache (P2-6) | `b4b16bb` | search cache | `test_planner_cache` 3/3 OK |
-| Primer design speed (P2-6) | `aba3fb0` | screen equivalence | `test_primer_screen_equivalence` 10/10 OK (benchmark opt-in) |
+| AI Experiment Planner "Coming Soon" | `94982a8` | `ui/menu.py` entry, `main.py` message | `PlannerPlaceholderTests` 2/2 OK |
+| Optional MFE structure (ViennaRNA) | `b316c5a` | `analyses/rna_structure.py` | `test_rna_secondary_structure` 12/12 OK |
+| bcftools norm comparison; reference-only records reported | `115b1d9` | `parse_vcf(skipped=)` | `test_bcftools_norm_reference` 7/7 OK |
+| ORFfinder comparison | `83c9c42` | fixture with 69 ORFs | `test_orffinder_reference` 4/4 OK |
+| HGVS DNA descriptions (Mutalyzer) | `820982a` | `hgvs_c_allele`, `mutation_hgvs_c` | `test_hgvs_mutalyzer_reference` 5/5 OK |
+| Instability weights vs ExPASy | `3634bad` | probe fixture | `test_instability_expasy_reference` 3/3 OK |
+| `core_nt` | `6011f3c` | `DATABASES`, catalog | `test_blast_core_nt` 4/4 OK |
+| Dialog paths | `5283604` | – | `test_dialog_paths` 17/17 OK |
+| Type IIS enzymes (P2-7) | `38850fd` | `data/restriction_enzymes.py` | `test_type_iis` 10/10 OK |
+| Circular and 5′-partial ORFs (P1-9) | `7e61baf` | `_origin_spanning_orfs` | `test_orf_partial_circular` 15/15 OK |
+| HGVS protein notation | `e9c7878` | `mutation_hgvs_p` | `test_hgvs_notation` 4/4 OK |
+| G·U count (P2-5) | `9fe9582` | `hairpin_count_with_gu` | `test_rna_wobble` 3/3 OK |
+| Restriction-site primers (10.2) | `045a46a` | `design_primers_for_restriction_site` | `test_integration_workflows` 10/10 OK |
+| Variant cross-check (P2-4, T12) | `80a900b`, `b4d1681` | `cross_check_variants` | `test_variant_crosscheck` 14/14 OK |
+| Dialogs moved to `ui/` (P2-2) | `cb47321` | 11 `ui/*_menu.py` | `test_terminal_ui` 34/34 OK (includes `LayeringTests`) |
+| BLAST polling resilience (D25) | `2393a12` | `await_ready` retries | `test_blast_polling` 5/5 OK |
+| Cloning planner cache (P2-6) | `16ec933` | search cache | `test_planner_cache` 3/3 OK |
+| Primer design speed (P2-6) | `2069be5` | screen equivalence | `test_primer_screen_equivalence` 10/10 OK (benchmark opt-in) |
 | P0 regressions | Stage 1 | – | `test_p0_regressions` 22/22 OK |
 | Golden master | Stage 0 | 12 snapshots | `test_golden_master` 12/12 OK |
 

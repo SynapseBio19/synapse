@@ -4,7 +4,7 @@ Phase 7.1 moves the implementation of ``analyses/blast.py`` and
 ``analyses/primer.py`` into internal packages. These scenarios record what
 the modules return *before* that move: the snapshot in
 ``tests/fixtures/characterization/blast_primer.json`` was written from the
-code at commit 9077f1e. ``tests/test_characterization.py`` compares the
+code at commit af7cd0a. ``tests/test_characterization.py`` compares the
 current code with it, so a refactoring that changes a result, a report text
 or an exported file fails.
 
@@ -15,7 +15,7 @@ To rewrite the snapshots (only with a reason in docs/CHANGES.md):
 ``SYNAPSE_UPDATE_CHARACTERIZATION=1 python -m unittest tests.test_characterization``;
 a section name instead of ``1`` (for example ``mutation``) rewrites only
 the file of that section. Later phases add sections (``mutation.json``,
-recorded from 727208a before the mutation module was split).
+recorded from a7249fa before the mutation module was split).
 """
 
 from __future__ import annotations
@@ -184,7 +184,7 @@ def blast_scenarios() -> dict:
 
 
 # ---------------------------------------------------------------------------
-# Mutation (added in Phase 8, recorded from 727208a before its split)
+# Mutation (added in Phase 8, recorded from a7249fa before its split)
 # ---------------------------------------------------------------------------
 
 def _variants(reference: str) -> dict:
@@ -245,7 +245,7 @@ def mutation_scenarios() -> dict:
 
 
 # ---------------------------------------------------------------------------
-# Cloning (added in Phase 8, recorded from 8e1f6d2 before its split)
+# Cloning (added in Phase 8, recorded from 6d4c216 before its split)
 # ---------------------------------------------------------------------------
 
 def cloning_scenarios() -> dict:
@@ -292,7 +292,7 @@ def cloning_scenarios() -> dict:
 
 
 # ---------------------------------------------------------------------------
-# Protein (added in Phase 9, recorded from ee8203d before its split)
+# Protein (added in Phase 9, recorded from bf1a25b before its split)
 # ---------------------------------------------------------------------------
 
 PROTEINS = (
@@ -337,7 +337,7 @@ def protein_scenarios() -> dict:
 
 
 # ---------------------------------------------------------------------------
-# Variant analysis (added in Phase 9, recorded from 6e52ca7 before its split)
+# Variant analysis (added in Phase 9, recorded from fa4e47e before its split)
 # ---------------------------------------------------------------------------
 
 def _fasta_contigs(path: Path) -> dict:
@@ -393,7 +393,7 @@ def variant_scenarios() -> dict:
 
 
 # ---------------------------------------------------------------------------
-# Sequence overview (added in Phase 9, recorded from 94c2c0d before its split)
+# Sequence overview (added in Phase 9, recorded from f3ddcae before its split)
 # ---------------------------------------------------------------------------
 
 def sequence_scenarios() -> dict:
@@ -430,7 +430,7 @@ def sequence_scenarios() -> dict:
 
 
 # ---------------------------------------------------------------------------
-# ORF finder (added in Phase 9, recorded from b46ed3d before its split)
+# ORF finder (added in Phase 9, recorded from 30a5461 before its split)
 # ---------------------------------------------------------------------------
 
 def orf_scenarios() -> dict:
@@ -469,7 +469,7 @@ def orf_scenarios() -> dict:
 
 
 # ---------------------------------------------------------------------------
-# Restriction analysis (added in Phase 9, recorded from 709f964 before its split)
+# Restriction analysis (added in Phase 9, recorded from f9e1887 before its split)
 # ---------------------------------------------------------------------------
 
 def restriction_scenarios() -> dict:
@@ -503,7 +503,7 @@ def restriction_scenarios() -> dict:
 
 
 # ---------------------------------------------------------------------------
-# RNA analysis (added in Phase 9, recorded from 8dff342 before its split)
+# RNA analysis (added in Phase 9, recorded from 5963f79 before its split)
 # ---------------------------------------------------------------------------
 
 def rna_scenarios() -> dict:
@@ -543,7 +543,7 @@ def rna_scenarios() -> dict:
 
 
 # ----------------------------------------------------------------------
-# Literature (Phase 10, recorded from 713a1d4 before the split)
+# Literature (Phase 10, recorded from 51fbba4 before the split)
 # ----------------------------------------------------------------------
 # The network is replaced at urllib.request.urlopen, below every Synapse
 # function, so the same scenarios run before and after the module is split

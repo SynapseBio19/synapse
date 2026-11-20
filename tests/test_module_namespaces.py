@@ -3,7 +3,7 @@
 Phase 7.1 moves the implementation of both modules into the internal
 packages ``analyses/_blast`` and ``analyses/_primer``; ``analyses/blast.py``
 and ``analyses/primer.py`` remain as the public modules. Every name either
-module defined at top level at commit 9077f1e, private helpers included
+module defined at top level at commit af7cd0a, private helpers included
 (the menus and tests use some of them), must still be reachable through
 the public module.
 
@@ -116,7 +116,7 @@ PRIMER_NAMES = (
     'design_primers_for_restriction_site',
 )
 
-# Phase 8: analyses.mutation, recorded from 727208a before its split.
+# Phase 8: analyses.mutation, recorded from a7249fa before its split.
 MUTATION_NAMES = (
     'DNA_ALPHABET', 'IUPAC_CODES', 'IUPAC_FROM_BASES', 'IUPAC_COMPLEMENT', 'CODON_TABLE',
     'AA_NAMES', 'PURINES', 'PYRIMIDINES', 'SequencePromptCancelled',
@@ -148,7 +148,7 @@ MUTATION_NAMES = (
     'assert_mutation_self_test', 'analyze_mutations', 'mutation_report', '__all__',
 )
 
-# Phase 8: analyses.cloning, recorded from 8e1f6d2 before its split.
+# Phase 8: analyses.cloning, recorded from 6d4c216 before its split.
 CLONING_NAMES = (
     '_STRATEGY_SEARCH_CACHE', '_strategy_search_cache', '_IMMUTABLE', '_T', '_copy_result',
     '_cached', 'IUPAC_BASES', 'normalize_sequence', '_normalize_topology',
@@ -170,7 +170,7 @@ CLONING_NAMES = (
     'run_cloning_self_test', '_cloning_ui_normalize_choice',
 )
 
-# Phase 9: analyses.protein, recorded from ee8203d before its split.
+# Phase 9: analyses.protein, recorded from bf1a25b before its split.
 PROTEIN_NAMES = (
     'STANDARD_AMINO_ACIDS', 'AA_ORDER', 'NONSTANDARD_RESIDUES', 'AMBIGUOUS_RESIDUE_OPTIONS',
     'UNRESOLVED_RESIDUES', 'STOP_SYMBOL', 'RNA_IUPAC', 'AMINO_ACID_RESIDUE_MASSES',
@@ -192,7 +192,7 @@ PROTEIN_NAMES = (
     'create_protein_preview',
 )
 
-# Phase 9: analyses.variant_analysis, recorded from 6e52ca7 before its split.
+# Phase 9: analyses.variant_analysis, recorded from fa4e47e before its split.
 VARIANT_NAMES = (
     'DNA_BASES', 'VALID_FILTER_STATUS', 'VALID_VARIANT_TYPES', 'CONSEQUENCE_PRIORITY',
     'GT_ALLELE_SEPARATOR_RE', 'VariantAnalysisError', 'Variant', 'RESERVED_INFO_NUMBER',
@@ -222,7 +222,7 @@ VARIANT_NAMES = (
     'assert_variant_analysis_self_test', '__all__',
 )
 
-# Phase 9: analyses.sequence, recorded from 8906959 before its split.
+# Phase 9: analyses.sequence, recorded from 6479c0a before its split.
 SEQUENCE_NAMES = (
     'DNA_STANDARD_BASES', 'DNA_AMBIGUOUS_CODES', 'DNA_IUPAC_BASES', 'DNA_COMPLEMENT',
     'DNA_NUCLEOTIDE_RESIDUE_MASSES', 'AVERAGE_DSDNA_BP_MASS', 'normalize_dna_sequence',
@@ -240,7 +240,7 @@ SEQUENCE_NAMES = (
     'create_sequence_summary', 'analyze_sequence', 'run_sequence_self_test',
 )
 
-# Phase 9: analyses.orf, recorded from b46ed3d before its split.
+# Phase 9: analyses.orf, recorded from 30a5461 before its split.
 ORF_NAMES = (
     'STANDARD_START_CODONS', 'ALTERNATIVE_START_CODONS', 'ALL_START_CODONS',
     'STANDARD_STOP_CODONS', 'DEFAULT_MIN_ORF_LENGTH', 'START_CODON_POLICIES',
@@ -261,7 +261,7 @@ ORF_NAMES = (
     'calculate_orf_feature_summary', 'analyze_orfs_enhanced',
 )
 
-# Phase 9: analyses.restriction, recorded from 709f964 before its split.
+# Phase 9: analyses.restriction, recorded from f9e1887 before its split.
 RESTRICTION_NAMES = (
     'IUPAC_BASES', '_normalize_restriction_sequence', '_restriction_sequence_status',
     'validate_restriction_sequence', '_require_valid_restriction_sequence', 'bases_match',
@@ -283,7 +283,7 @@ RESTRICTION_NAMES = (
     'run_restriction_self_test', 'get_physical_cut_boundaries',
 )
 
-# Phase 9: analyses.rna, recorded from 8dff342 before its split.
+# Phase 9: analyses.rna, recorded from 5963f79 before its split.
 RNA_NAMES = (
     'RNA_STANDARD_BASES', 'RNA_IUPAC_BASES', 'RNA_AMBIGUOUS_CODES', 'RNA_COMPLEMENT',
     'RNA_NUCLEOTIDE_RESIDUE_MASSES', 'RNA_CODON_TABLE', 'rna_codon_table',
@@ -334,7 +334,7 @@ RENAMED_PRIMER_NAMES = {
 }
 
 
-# Recorded from 713a1d4 (Phase 10) before analyses/literature.py was split.
+# Recorded from 51fbba4 (Phase 10) before analyses/literature.py was split.
 # (The standard modules urllib and time, which tests reached through it,
 # are patched directly since the split.)
 LITERATURE_NAMES = (

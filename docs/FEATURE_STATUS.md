@@ -1,6 +1,6 @@
 # Feature verification matrix
 
-State as of the Phase 6 initial audit, 2026-10-30, commit `0dad3bb`,
+State as of the Phase 6 initial audit, 2026-10-30, commit `0c48a96`,
 updated through 2026-11-13 (the completion run; `docs/CHANGES.md`). Since
 P2-2 (2026-11-12) the dialog functions named in this matrix live in
 `ui/<module>_menu.py`; the science functions stay in `analyses/<module>.py`.
@@ -9,7 +9,7 @@ corrected names the date; the evidence is in `docs/CHANGES.md` and
 `docs/PHASE6_PROGRESS.md`.
 Menu numbers are those of the code at the end of Stage F (2026-11-03);
 the line and definition counts in the section headings are those of the
-initial audit (non-blank lines at `0dad3bb`).
+initial audit (non-blank lines at `0c48a96`).
 Companion to `docs/PHASE6_INITIAL_AUDIT.md`, which holds the evidence for
 every defect referenced here as `D…` (confirmed) or `S…` (suspected).
 
@@ -142,7 +142,7 @@ Test coverage: 19 test references — the best-covered module.
 | — | Source resolution (ORF vs whole sequence) | `resolve_rna_source` | Implemented | Integration-tested | Not applicable | **Confirmed intact**: `mode="orf"`/label "Selected ORF" with a selection, whole sequence and "Selected DNA" without. |
 | — | Transcription | `transcribe_rna` | Implemented | Execution-tested | Not applicable | T→U on the given strand. |
 | 1 | RNA Overview | `print_rna_overview`, `analyze_rna` | Implemented | Execution-tested | Not applicable | |
-| 2 | Translation & Codon Analysis | `translate_rna_frame`, `analyze_rna_three_frames`, `analyze_rna_codon_usage` | Implemented | Execution-tested | Biopython (genetic codes) | Since P1-9 (`8d28586`, 2026-10-31) the three-frame view uses the selected ORF's genetic code (`ui/rna_menu.py` passes `genetic_code`; test in `test_phase6_tier2`); without a selected ORF it uses table 1. The row said "Always NCBI table 1" until 2026-11-17 (verified 2026-11-17, Phase 7). |
+| 2 | Translation & Codon Analysis | `translate_rna_frame`, `analyze_rna_three_frames`, `analyze_rna_codon_usage` | Implemented | Execution-tested | Biopython (genetic codes) | Since P1-9 (`027000d`, 2026-10-31) the three-frame view uses the selected ORF's genetic code (`ui/rna_menu.py` passes `genetic_code`; test in `test_phase6_tier2`); without a selected ORF it uses table 1. The row said "Always NCBI table 1" until 2026-11-17 (verified 2026-11-17, Phase 7). |
 | 3 | RNA Features | `find_rna_hairpins`, `summarize_rna_structure`, `find_rna_start_stop_landscape`, `find_rna_homopolymers` | Implemented | Execution-tested | Not applicable | Hairpins are a complementarity proxy, **not** a folding model. G·U pairs are counted as a separate figure since 2026-11-11 (P2-5). Compared with RNAfold MFE structures on 2026-11-13: sensitive (86 % of MFE hairpins found), not specific (35 % of candidates favorable alone). |
 | 6 | Secondary Structure (ViennaRNA, optional) | `analyses.rna_structure.predict_secondary_structure`, `ui.rna_menu.print_rna_secondary_structure`, `core.api.rna_secondary_structure` | Implemented (optional dependency) | Execution-tested | Not applicable | Independently validated against ViennaRNA's own known values (GGGGAAAACCCC, −5.4 kcal/mol) | MFE prediction with ViennaRNA 2.8.0 when installed; reports "not available" otherwise. 3,000 nt default limit. Not stored in the pipeline report. `tests/test_rna_secondary_structure.py`. |
 | 4 | Complete RNA Report | `print_rna_report` | Implemented | Execution-tested | Not applicable | Every RNA view is drawn and checked by `test_execution_coverage.py` (2026-11-12). |
@@ -499,7 +499,7 @@ explicitly not implemented.
 | 24 | Local custom BLAST database | BLAST+ 2.17.0 `makeblastdb` and `blastp` | Built and searched in the suite |
 | 25 | ORF calls against curated gene models | RefSeq annotation of *E. coli* K-12 MG1655, NC_000913.3, 4,294 CDS (2026-11-20, `scripts/benchmarks/orf_refseq.py`) | 4,250 found at their stop codon (98.98 %); all 44 misses shorter than the 90-nt minimum |
 | 26 | HGVS on curated variants | 1,500 ClinVar names on 6 RefSeq transcripts (2026-11-20, `test_hgvs_clinvar_benchmark`) | c. 1,489 identical, 11 equivalent split delins; p. 1,186/1,186 |
-| 27 | Genome-length input | *E. coli* K-12 genome, every analysis (2026-11-20, `scripts/benchmarks/genome_scale.py`, docs/BENCHMARKS.md) | All complete; results identical to the code of `ca6d941` on 400-kb segments |
+| 27 | Genome-length input | *E. coli* K-12 genome, every analysis (2026-11-20, `scripts/benchmarks/genome_scale.py`, docs/BENCHMARKS.md) | All complete; results identical to the code of `a2898aa` on 400-kb segments |
 | 28 | Live remote BLAST against `refseq_rna` | NCBI, public GAPDH NM_002046.7 nt 301-700 (2026-11-20, RID FZ5HPRV0014) | Not completed: still queued at NCBI after 45 minutes; the time-out and RID resume behaved as designed (docs/BENCHMARKS.md) |
 
 ### Still open (2026-11-20)

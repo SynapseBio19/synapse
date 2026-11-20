@@ -197,10 +197,10 @@ behavior, not by tests written for the percentage:
 
 Same tool and command (`--branch`, sources `analyses,core,ui,fileio,data,synapse_gen`),
 CPython 3.14.6. Suite: 722 tests, all passing, 5 opt-in skips. For a fair
-comparison the code of `ca6d941` (end of Phase 9) was measured again with
+comparison the code of `a2898aa` (end of Phase 9) was measured again with
 the same command on the same day.
 
-| Scope | `ca6d941` | Phase 10 |
+| Scope | `a2898aa` | Phase 10 |
 |---|---:|---:|
 | `ui/cloning_menu.py` | 74 % | 82 % |
 | `ui/restriction_menu.py` | 75 % | 85 % |

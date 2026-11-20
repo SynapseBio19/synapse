@@ -9,7 +9,7 @@
 
 | Item | Value |
 |---|---|
-| HEAD | the commit that adds this record (after `ea27258`) |
+| HEAD | the commit that adds this record (after `b3ba026`) |
 | Tests | 608, 0 failures on CPython 3.14.6 and 3.10.11 |
 | Characterization | 182 scenarios in `tests/fixtures/characterization/`, unchanged |
 | Golden master | 12/12 |

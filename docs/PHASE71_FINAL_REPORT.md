@@ -1,7 +1,7 @@
 # Phase 7.1 final report: architectural modularization
 
 Date: 2026-11-18. Governed by the owner's Phase 7.1 prompt. Start:
-`9077f1e`. The commits are listed in section L.
+`af7cd0a`. The commits are listed in section L.
 
 ## A. Executive summary
 
@@ -17,7 +17,7 @@ Date: 2026-11-18. Governed by the owner's Phase 7.1 prompt. Start:
   lookups that now name the `analyses` directory explicitly; the paths
   themselves are unchanged.
 - **Results unchanged.** A characterization snapshot of 78 scenarios was
-  recorded from `9077f1e` before any move and is compared exactly. The
+  recorded from `af7cd0a` before any move and is compared exactly. The
   golden master, the external reference comparisons and the
   byte-identical rendered menus are unchanged too.
 - **A hidden global removed.** The primer screen read its configuration
@@ -45,7 +45,7 @@ Date: 2026-11-18. Governed by the owner's Phase 7.1 prompt. Start:
 
 | Item | Value |
 |---|---|
-| Git | `main`, HEAD `9077f1e`, 167 commits, clean, no remote |
+| Git | `main`, HEAD `af7cd0a`, 167 commits, clean, no remote |
 | Python | 3.14.6 (`.venv`), 3.10.11 (`.tools/python-3.10.11`) |
 | Tests | 565, 0 failures; 3.14.6: 1 skipped; 3.10.11: 23 skipped |
 | primer3-py | loads again; its four comparisons **ran and passed** (they skipped on 2026-11-17 because Windows application control blocked the module) |
@@ -153,7 +153,7 @@ Risks identified before moving, each handled:
 
 ## F. Testing
 
-| Metric | Before (`9077f1e`) | After |
+| Metric | Before (`af7cd0a`) | After |
 |---|---:|---:|
 | Tests | 565 | 601 |
 | Failures | 0 | 0 |
@@ -298,10 +298,10 @@ are real.
 
 | Commit | Content |
 |---|---|
-| `cd23f74` | A: baseline, audit, characterization tests |
-| `153a287` | B: BLAST split |
-| `c625040` | C1: explicit primer screen configuration |
-| `285e770` | C2: primer split |
-| `e4cb5e5` | G: CI import check against the installed package |
-| `56e9796` | D: component tests |
+| `0bd2ace` | A: baseline, audit, characterization tests |
+| `a45b8f2` | B: BLAST split |
+| `c2dc998` | C1: explicit primer screen configuration |
+| `61a8ba3` | C2: primer split |
+| `d096e8e` | G: CI import check against the installed package |
+| `f629add` | D: component tests |
 | final | F/J: architecture documentation, reports |

@@ -25,7 +25,7 @@ All large analysis modules except `literature` now have a structure by
 responsibility. Every split was frozen first in a characterization
 snapshot. Test coverage reached the 85 % target.
 
-| Metric | Start of Phase 8 (`9fad47e`) | End of Phase 9 |
+| Metric | Start of Phase 8 (`3915d94`) | End of Phase 9 |
 |---|---:|---:|
 | Tests | 601 | 659, all passing |
 | Coverage | 82.3 % | 85.0 % |

@@ -9,7 +9,7 @@ SHA-256 `c4a38c83…07346`) and the owner's Master Execution Prompt of
 2026-11-17 (CRISPR-related work excluded). Work by Claude Opus 5 and
 Claude Opus 5.5.
 
-This report replaces the version of 2026-11-13 (`ea9612b`, structure
+This report replaces the version of 2026-11-13 (`b6e1e6a`, structure
 A-K). It uses the A-L structure of the Master Execution Prompt (§21).
 Status labels: **COMPLETE**, **PARTIALLY COMPLETE**, **NOT COMPLETED**,
 **BLOCKED**, **DEFERRED** (intentionally, by owner decision). COMPLETE is
@@ -93,7 +93,7 @@ Two short setup sessions (2026-10-30) contain no project decisions.
 
 **Not accessible.** The conversations in the claude.ai Project and the
 pre-Phase-6 "Claude Cowork" cycle. That cycle is known only from Git
-(`e4395ed`-`0dad3bb`, 2026-10-29), `docs/AUDIT_STATUS.md`,
+(`05222ea`-`0c48a96`, 2026-10-29), `docs/AUDIT_STATUS.md`,
 `docs/CHANGES.md` and Master Prompt §0.
 
 **Major decisions recovered** (full list with sources in
@@ -136,9 +136,9 @@ honesty requirement. The others:
 |---|---|
 | Project directory | `C:\Users\bayra\OneDrive\Desktop\Project Snyapse - Kopie` |
 | Branch | `main` |
-| HEAD | the commit that adds this report (preceded by `c74d03a`) |
-| Commits | 154 in total after this report; 143 in Phase 6 (from `824ca5f`, inclusive) |
-| Since the previous report (`ea9612b`) | 12 commits; 45 files changed, 3,916 insertions, 99 deletions before this report |
+| HEAD | the commit that adds this report (preceded by `23bcd70`) |
+| Commits | 154 in total after this report; 143 in Phase 6 (from `8a10cdc`, inclusive) |
+| Since the previous report (`b6e1e6a`) | 12 commits; 45 files changed, 3,916 insertions, 99 deletions before this report |
 | Working tree | clean after the commit of this report |
 | ReadOnly | 15 of 15 protected files set (`main.py`, ten analysis modules, `core/pipeline.py`, two data modules, `ui/menu.py`) |
 | History | no rewrite, reset, force-push or remote push |
@@ -150,7 +150,7 @@ honesty requirement. The others:
 The P0 defects of the previous cycle were re-inspected and keep 22
 known-answer tests (`tests/test_p0_regressions.py`).
 
-### Corrections made before the continuation run (Phase 6, up to `ea9612b`)
+### Corrections made before the continuation run (Phase 6, up to `b6e1e6a`)
 
 | Item | Module | Previous behavior | Corrected behavior | Reference | Evidence |
 |---|---|---|---|---|---|
@@ -172,13 +172,13 @@ known-answer tests (`tests/test_p0_regressions.py`).
 
 | Item | Module | Previous behavior | Corrected behavior / result | Reference | Evidence | Validation |
 |---|---|---|---|---|---|---|
-| HGVS c. (`f6f12ed`) | Mutation | Report printed Synapse notation behind "c.": `11insTT` (no flanking positions; actually a dup), `18delA`, `20_21GT>CC`; no 3′ rule | HGVS syntax, 3′ rule, dup recognition, delins, one allele description `c.[…;…]` | den Dunnen et al. 2016; Mutalyzer 3 | `test_hgvs_mutalyzer_reference` (5) | Live, Mutalyzer 3.2.0.dev0: 11/11 identical; p. forms parse |
-| Reference-only VCF records (`70ff2b0`) | Variants | Records with ALT `.` dropped silently | Not counted as variants, but reported (API warning, data, menu NOTE) | Master Prompt 10.8 | `test_bcftools_norm_reference` | – |
-| Normalization (`70ff2b0`) | Variants | Not compared with bcftools | Unchanged behavior; compared | bcftools 1.25 test vectors | 29/29 split-and-normalized alleles; REF check as `-cx` | Offline, against published outputs |
-| ORF calls (`a1e3520`) | ORF | Not compared with ORFfinder; METHODS overstated the default's equivalence | Unchanged behavior; claim corrected (ORFfinder excludes the stop codon; `min_length = L + 3` reproduces it) | NCBI ORFfinder | `test_orffinder_reference` (4) | Live 2026-11-13, stored: 69/69 ORFs identical |
-| Hairpin screen vs RNAfold (`c5ee3b2`) | RNA | No energy model; RNAfold "BLOCKED" | Optional MFE view; screen characterized | ViennaRNA 2.8.0 (Turner 2004) | `test_rna_secondary_structure` (12) | Offline reference: 86 % of MFE hairpins found; 35 % of candidates favorable alone |
-| Instability weights (`b928fef`) | Protein | Checked against Biopython only | Unchanged; KQ difference recorded | ExPASy ProtParam | `test_instability_expasy_reference` (3) | Live, 420 probes: 399/400 identical; KQ 24.68 vs 24.64 undecided without the paper |
-| `core_nt` (`4a4bb05`) | BLAST | Not offered | Offered first among nucleotide databases | NCBI | `test_blast_core_nt` (4) | Live 2026-11-17, RID FR8EK6FN014 |
+| HGVS c. (`820982a`) | Mutation | Report printed Synapse notation behind "c.": `11insTT` (no flanking positions; actually a dup), `18delA`, `20_21GT>CC`; no 3′ rule | HGVS syntax, 3′ rule, dup recognition, delins, one allele description `c.[…;…]` | den Dunnen et al. 2016; Mutalyzer 3 | `test_hgvs_mutalyzer_reference` (5) | Live, Mutalyzer 3.2.0.dev0: 11/11 identical; p. forms parse |
+| Reference-only VCF records (`115b1d9`) | Variants | Records with ALT `.` dropped silently | Not counted as variants, but reported (API warning, data, menu NOTE) | Master Prompt 10.8 | `test_bcftools_norm_reference` | – |
+| Normalization (`115b1d9`) | Variants | Not compared with bcftools | Unchanged behavior; compared | bcftools 1.25 test vectors | 29/29 split-and-normalized alleles; REF check as `-cx` | Offline, against published outputs |
+| ORF calls (`83c9c42`) | ORF | Not compared with ORFfinder; METHODS overstated the default's equivalence | Unchanged behavior; claim corrected (ORFfinder excludes the stop codon; `min_length = L + 3` reproduces it) | NCBI ORFfinder | `test_orffinder_reference` (4) | Live 2026-11-13, stored: 69/69 ORFs identical |
+| Hairpin screen vs RNAfold (`b316c5a`) | RNA | No energy model; RNAfold "BLOCKED" | Optional MFE view; screen characterized | ViennaRNA 2.8.0 (Turner 2004) | `test_rna_secondary_structure` (12) | Offline reference: 86 % of MFE hairpins found; 35 % of candidates favorable alone |
+| Instability weights (`3634bad`) | Protein | Checked against Biopython only | Unchanged; KQ difference recorded | ExPASy ProtParam | `test_instability_expasy_reference` (3) | Live, 420 probes: 399/400 identical; KQ 24.68 vs 24.64 undecided without the paper |
+| `core_nt` (`6011f3c`) | BLAST | Not offered | Offered first among nucleotide databases | NCBI | `test_blast_core_nt` (4) | Live 2026-11-17, RID FR8EK6FN014 |
 
 ---
 
@@ -221,7 +221,7 @@ module.
 
 ## F. Architecture
 
-The layout is unchanged since the P2-2 move (`50dea66`):
+The layout is unchanged since the P2-2 move (`cb47321`):
 
 ```
 main.py     session; imports dialogs from ui/
@@ -260,9 +260,9 @@ broad rewrite.
 
 | Measurement | Before | After | Conditions |
 |---|---|---|---|
-| Cloning planner search | 21.7 s | 3.2 s | `b4b16bb`, results byte-identical |
-| Mutation alignment memory | ~46 B/cell | ~1.1 B/cell | `f9d4356` |
-| Banded alignment, 10 kb similar | ~23 s | 0.18 s | `e5bb456` |
+| Cloning planner search | 21.7 s | 3.2 s | `16ec933`, results byte-identical |
+| Mutation alignment memory | ~46 B/cell | ~1.1 B/cell | `90a62ed` |
+| Banded alignment, 10 kb similar | ~23 s | 0.18 s | `2dbd863` |
 | Primer design, 10 kb | 135.6 s | 9.62 s CPU (2026-11-13, background load); **4.39 s CPU (2026-11-17)** | `tests/test_primer_screen_equivalence.py`, `SYNAPSE_BENCHMARK=1`, same results as before the optimization |
 | RNA MFE folding (ViennaRNA) | – | 2,000 nt ≈ 2 s, 4,000 nt ≈ 14 s, 8,000 nt ≈ 90 s | cubic; default limit 3,000 nt |
 
@@ -274,7 +274,7 @@ documented.
 
 ## H. Testing
 
-| Item | Result (2026-11-17, HEAD `c74d03a`) |
+| Item | Result (2026-11-17, HEAD `23bcd70`) |
 |---|---|
 | Total tests | 516 |
 | Passed / failed | 516 run, 0 failed on CPython 3.14.6 |
@@ -284,7 +284,7 @@ documented.
 | Self-tests | all module self-tests pass inside the suite |
 | Rendered menus and dialogs | `test_rendered_menus`, `test_terminal_ui`, `test_dialog_paths`: every menu rendered; four dialogs driven to the end of their branches |
 | Coverage | 75 % combined line/branch (coverage.py 7.10.7; was 70.9 % on 2026-11-12). Weakest: `ui/report.py` 12 % (driven only via a subprocess), the protein and BLAST dialogs 47 % / 51 % |
-| Pyright | 1.1.414 at Python 3.10: 58 errors; baseline `ab4bd2a` 134; nothing new in the continuation run |
+| Pyright | 1.1.414 at Python 3.10: 58 errors; baseline `f302b7a` 134; nothing new in the continuation run |
 | Ruff | pyflakes rules clean on every file changed in the continuation run |
 | Line endings | CRLF files kept as CRLF (one accidental conversion was found before commit and reverted, 2026-11-13) |
 

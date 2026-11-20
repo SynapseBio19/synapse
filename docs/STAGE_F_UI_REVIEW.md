@@ -3,7 +3,7 @@
 Requested by the owner on 2026-11-02. The question: was Stage F completed,
 or were mainly separators, prefixes and some navigation conventions
 standardized? This review changes nothing. Every figure below was
-measured on `fc13aad`:
+measured on `1d029c5`:
 
 - source scans of `main.py`, `analyses/`, `ui/` and `core/pipeline.py`
   (AST and text);
@@ -394,7 +394,7 @@ For the owner's decision. Nothing here was started.
 
 ## 10. Follow-up: the six modules converted (2026-11-02)
 
-On the owner's instruction ("start with six"), commits `2e47ff9`, `e7eaf58`, `5cb4c9a`, `b181ae3`, `fb4070a`, `fdc968d`, `b80fd37`
+On the owner's instruction ("start with six"), commits `f90daaa`, `13a07e3`, `a3335b8`, `c6b8769`, `d70d3ad`, `4ee31cf`, `6b22723`
 route the ORF, CRISPR, BLAST, literature, primer and variant screens
 through `ui/style.py`:
 
@@ -421,7 +421,7 @@ confirmation notation.
 ## 11. Follow-up: the remaining ten files converted (2026-11-02)
 
 On the owner's instruction the other ten interface files were converted
-(`1ac77a4`, `bf6ae87`, `9b7f2ef`, `85c22ac`, `a4df3d4`, `3853d87`, `69e3f0f`, `7970e5a`, `7ecb88d`): `main.py`, `ui/menu.py`, `ui/report.py`, sequence overview,
+(`6e27e5c`, `4e39c3f`, `5841b94`, `2f1f852`, `eb71ecd`, `26c301f`, `ce3e488`, `a6796d2`, `8401657`): `main.py`, `ui/menu.py`, `ui/report.py`, sequence overview,
 RNA, protein, restriction, cloning, mutation and `core/pipeline.py`.
 
 | Finding | State in all sixteen interface files |
@@ -467,7 +467,7 @@ The independent closing review (`docs/STAGE_F_FINAL_REVIEW.md`,
 - **Test coverage.** The rendered tests drive the first screen of every
   menu, which is 17 of the 38 `style.menu` call sites. The source rule
   matched literal keys only.
-- **Behavior.** It was not preserved from round 1 until `1516339`
+- **Behavior.** It was not preserved from round 1 until `21deb2a`
   (section 12 below).
 - **`core/pipeline.py`.** It still depends on `ui/` at call time. The
   function-local imports only defer the dependency.
@@ -477,7 +477,7 @@ not yet a unified interface. Section 12 records what followed.
 
 ## 12. Enter regression and closing review (2026-11-03)
 
-**Enter regression (`1516339`).** The rewriting pass had turned
+**Enter regression (`21deb2a`).** The rewriting pass had turned
 `Label [hint]: ` prompts into `ask(label, default=hint)`, so Enter
 returned the hint text instead of an empty answer. Fifteen prompts were
 affected; four dialogs broke:
@@ -487,12 +487,12 @@ affected; four dialogs broke:
 - the BLAST word size and filter;
 - the cloning strategy count, which looped endlessly.
 
-The defect came in with `5cb4c9a`, `b181ae3`, `fb4070a` and `85c22ac`.
-Until `1516339` the claim "the workflow is preserved" was false for
+The defect came in with `a3335b8`, `c6b8769`, `d70d3ad` and `2f1f852`.
+Until `21deb2a` the claim "the workflow is preserved" was false for
 those dialogs. `EmptyAnswerTests` now drive them with an empty answer.
 
 **Closing review.** `docs/STAGE_F_FINAL_REVIEW.md` checks the history
-`623a0a8..1516339` and records the open points:
+`4becb63..21deb2a` and records the open points:
 
 - the 59 direct prints;
 - the deferred core→ui dependency;

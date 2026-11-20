@@ -1,7 +1,7 @@
 """The faster primer screens give the results of the algorithms they replace (P2-6).
 
 The reference functions below are the implementations as they were before
-the optimization (commit bd91a24). Each optimized function must return the
+the optimization (commit f5503c9). Each optimized function must return the
 same value on every input; the tiered candidate screen must return the same
 candidates, in the same order, as measuring every window.
 

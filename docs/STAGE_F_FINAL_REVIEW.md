@@ -1,7 +1,7 @@
 # Stage F – Independent Closing Review
 
-Date: 2026-11-03. Scope: git history `623a0a8..1516339` (11 commits: the ten
-commits of the second Stage F round plus the Enter-key fix `1516339`), all
+Date: 2026-11-03. Scope: git history `4becb63..21deb2a` (11 commits: the ten
+commits of the second Stage F round plus the Enter-key fix `21deb2a`), all
 sixteen interface files, `tests/test_terminal_ui.py`, and the Stage F
 documents. No source code was changed for this review. Nothing was sent to
 an external service.
@@ -16,7 +16,7 @@ module was only added to `SHARED_UI_MODULES`. What remains:
 - rendered tests that reach less than half of the menus.
 
 A behavior regression (Enter on bracketed prompts) existed from round 1
-until `1516339`. Earlier statements that "behavior is preserved" were
+until `21deb2a`. Earlier statements that "behavior is preserved" were
 therefore wrong for that period.
 
 ## 1. Renderer adoption (question 1)
@@ -31,7 +31,7 @@ therefore wrong for that period.
 - All 11 entries in `SHARED_UI_MODULES` are actually converted. The
   other five files (`main.py`, `ui/report.py`, `core/pipeline.py`,
   `sequence.py`, `cloning.py`) are covered through `INTERFACE_SOURCES`.
-- All 25 files changed since `623a0a8` keep their line endings: CRLF
+- All 25 files changed since `4becb63` keep their line endings: CRLF
   sources, LF tests and docs. `orf.py` keeps its two intentional bare-LF
   lines.
 - `git diff --check` is clean.
@@ -106,7 +106,7 @@ Recommendation:
 
 ## 4. Behavior preservation (question 4)
 
-The static comparison of all menu entries between `623a0a8` and `HEAD`
+The static comparison of all menu entries between `4becb63` and `HEAD`
 shows these differences:
 
 - **From the variant renumbering:** all of them are intended.
@@ -118,7 +118,7 @@ shows these differences:
   - topology `[1] Linear`, `[2] Circular` (`restriction.py:2372`);
   - several `[0] Back` (the default `zero`).
 
-Earlier in Stage F, compared with `fc13aad`, there were also these
+Earlier in Stage F, compared with `1d029c5`, there were also these
 changes:
 
 - the ORF settings keys moved;
@@ -136,7 +136,7 @@ Both are intentional and documented.
 - standardized prompt texts ("Selection:" instead of "Select ORF:" /
   "Select topology:").
 
-**Unintended change: the Enter regression, fixed in `1516339`.**
+**Unintended change: the Enter regression, fixed in `21deb2a`.**
 
 - **Cause:** the automatic rewrite turned `Label [hint]:` prompts into
   `ask(label, default=hint)`, so pressing Enter returned the hint text
@@ -146,9 +146,9 @@ Both are intentional and documented.
   - primer Na⁺, Mg²⁺ and primer concentration;
   - BLAST word size and filter;
   - the cloning strategy count, which looped endlessly.
-- **Introduced in:** `5cb4c9a`, `b181ae3`, `fb4070a` and `85c22ac`.
+- **Introduced in:** `a3335b8`, `c6b8769`, `d70d3ad` and `2f1f852`.
 - **Also:** round 1 contained four wrong yes/no conversions
-  (`default='y/N'`), fixed in `3853d87`.
+  (`default='y/N'`), fixed in `26c301f`.
 - **Status at `HEAD`:** all 15 prompts are restored. The tests in
   `EmptyAnswerTests` fail on the earlier code. A source rule forbids
   `style.ask(..., default=` outside `main.py`.
@@ -252,10 +252,10 @@ The environment:
 | `python -m unittest discover -s tests -t .`, run 1 | 326 tests, OK, 34.9 s |
 | same, run 2 | 326 tests, OK, 35.2 s |
 | Golden master (`tests.test_golden_master`) | 12 tests, OK |
-| Golden reference files changed since `623a0a8` | none (`git log 623a0a8..HEAD -- tests/golden tests/golden_scenarios.py` is empty) |
+| Golden reference files changed since `4becb63` | none (`git log 4becb63..HEAD -- tests/golden tests/golden_scenarios.py` is empty) |
 | Built-in self-tests | `blast.run_self_test`, `crispr.run_self_test`, `literature.self_test`: all `True` |
 | pyright | 112 errors; baseline 134; 0 new diagnostics (compared by file, rule and message, ignoring line numbers) |
-| `git diff --check 623a0a8 HEAD` (cr-at-eol) | clean |
+| `git diff --check 4becb63 HEAD` (cr-at-eol) | clean |
 | Working tree after all runs | clean |
 
 All the figures in the reports could be reproduced. The suite runs no
@@ -266,7 +266,7 @@ network test. The figures do not show that the external services work.
 1. **Correct the claims.**
    - Do not call Stage F "fully unified" until items 2–4 below are done.
    - State in `PHASE6_FINAL_REPORT.md` and `CHANGES.md` that the
-     behavior of round 1 and round 2 was not preserved until `1516339`.
+     behavior of round 1 and round 2 was not preserved until `21deb2a`.
 2. **Convert the 31 messages, 19 headings and 9 dynamic lists** to
    `style.error`/`warning`/`note`, `style.section` and `style.menu`.
    - Extend enforcement item 8 to catch `print(f"[{…}] …")` and plain
@@ -293,12 +293,12 @@ coverage) are deferred. Commits:
 
 | Commit | Package |
 |---|---|
-| `46710cd` | 1. Claims corrected in the final report, the change log, the UI review and the progress log; this review committed |
-| `4e2cace` | 2a. Messages through the message helpers |
-| `e559255` | 2b. Headings through `section()` |
-| `b9ec344` | 2c. Dynamic option lists through `menu()` |
-| `73a1d93`, `ccc987b` | 2d. `DirectOutputTests` |
-| `163c54d` | 3. `FEATURE_STATUS.md` menu numbers and summary |
+| `4124477` | 1. Claims corrected in the final report, the change log, the UI review and the progress log; this review committed |
+| `52ec39e` | 2a. Messages through the message helpers |
+| `2367194` | 2b. Headings through `section()` |
+| `f519934` | 2c. Dynamic option lists through `menu()` |
+| `7f8f4db`, `bae1c70` | 2d. `DirectOutputTests` |
+| `f7aa657` | 3. `FEATURE_STATUS.md` menu numbers and summary |
 
 **Each site checked individually.** The three counts of section 1 came
 from a regular expression. Read in context, they come to this:
@@ -370,18 +370,18 @@ through the AST. It reports:
 - plain headings, also as the start of an f-string;
 - dashes drawn inside a printed text.
 
-A sample test pins each rule. Against `1516339` the rules report 68
+A sample test pins each rule. Against `21deb2a` the rules report 68
 sites; against `HEAD`, none.
 
-**Verification at `ccc987b`:**
+**Verification at `bae1c70`:**
 
 | Check | Result |
 |---|---|
 | Full suite | 328 tests, OK, 0 skipped |
-| Golden master | 12 tests, OK; no golden file changed since `1516339` |
+| Golden master | 12 tests, OK; no golden file changed since `21deb2a` |
 | Built-in self-tests | BLAST 33/33, CRISPR 28/28, literature 64/64, mutation 44/44, variant 27/27 |
-| pyright 1.1.414 (`--pythonversion 3.10`) | 112, no new diagnostic. The first test commit had added two; `ccc987b` removed them. |
-| `git diff --check 1516339 HEAD` | clean; line endings unchanged in every file (CRLF sources, LF tests and docs, the two bare-LF lines of `orf.py`) |
+| pyright 1.1.414 (`--pythonversion 3.10`) | 112, no new diagnostic. The first test commit had added two; `bae1c70` removed them. |
+| `git diff --check 21deb2a HEAD` | clean; line endings unchanged in every file (CRLF sources, LF tests and docs, the two bare-LF lines of `orf.py`) |
 | ReadOnly | restored on all 15 files |
 
 **What remains, and is documented in `TERMINAL_UI_STANDARD.md` §9:**
@@ -405,12 +405,12 @@ architecturally complete (recommendation 4) or fully tested as rendered
 
 | Commit | Package |
 |---|---|
-| `b25e800` | 4. core hands the status to a renderer; `ui.report.print_pipeline_status` draws it |
-| `b4e5a53` | 4. `LayeringTests`: core imports and runs with `ui` refused |
-| `c78800e` | Found: Enter in the Tm model dialog (Stage F regression) |
-| `61d0d38` | Found: three more input-check messages as ERROR lines |
-| `8eddc72` | Found: the single-enzyme cloning analysis always crashed |
-| `a39c39f` | 5. `tests/test_rendered_menus.py` |
+| `acd8923` | 4. core hands the status to a renderer; `ui.report.print_pipeline_status` draws it |
+| `615ff7b` | 4. `LayeringTests`: core imports and runs with `ui` refused |
+| `069c39f` | Found: Enter in the Tm model dialog (Stage F regression) |
+| `cdc0648` | Found: three more input-check messages as ERROR lines |
+| `82b7842` | Found: the single-enzyme cloning analysis always crashed |
+| `cadd3c6` | 5. `tests/test_rendered_menus.py` |
 
 ### Recommendation 4: core and ui
 
@@ -483,17 +483,17 @@ label, screen title and the text on screen.
 
 **What the tests found:**
 
-1. **Single-Enzyme Analysis had never worked** (`8eddc72`). Every enzyme
-   raised `KeyError: 'left'`, already at the audit commit `0dad3bb`;
+1. **Single-Enzyme Analysis had never worked** (`82b7842`). Every enzyme
+   raised `KeyError: 'left'`, already at the audit commit `0c48a96`;
    FEATURE_STATUS had listed the entry as "Reachable". The cause:
    `print_cloning_report()` sent the single-enzyme result to the
    two-enzyme report. It now has a report of its own, built from the
    fields `analyze_cloning()` returns. No calculation changed.
-2. **The Tm model dialog** (`c78800e`). Enter at "Selection [1]" had
-   chosen nearest-neighbor until `fb4070a` dropped that key, so both
+2. **The Tm model dialog** (`069c39f`). Enter at "Selection [1]" had
+   chosen nearest-neighbor until `d70d3ad` dropped that key, so both
    primer dialogs now answered "Invalid selection.". The empty answer
    maps to nearest-neighbor again.
-3. **Three plain messages** became ERROR lines (`61d0d38`): the two
+3. **Three plain messages** became ERROR lines (`cdc0648`): the two
    duplicate-enzyme errors in cloning and the wrong CRISPR export
    extension. The direct-output rule did not match their wording.
 
@@ -505,7 +505,7 @@ label, screen title and the text on screen.
   list index out of range".
 - An unknown key at the BLAST query-type question cancels like `0`.
 
-### Verification at `a39c39f`
+### Verification at `cadd3c6`
 
 | Check | Result |
 |---|---|
@@ -513,9 +513,9 @@ label, screen title and the text on screen.
 | Golden master | 12 tests, OK; no golden file changed |
 | Module self-tests | BLAST, CRISPR, literature: pass; mutation 44/44; variant 27/27 |
 | pyright 1.1.414 (`--pythonversion 3.10`) | 111, no new diagnostic (baseline 134) |
-| `git diff --check 228b800 HEAD` | clean; line endings unchanged |
+| `git diff --check 5e17e10 HEAD` | clean; line endings unchanged |
 | ReadOnly | restored on all 15 files |
-| Count in the commit message of `a39c39f` | it says 186 drawn menus; the committed scenarios draw 185 (one redundant answer was removed before the commit) |
+| Count in the commit message of `cadd3c6` | it says 186 drawn menus; the committed scenarios draw 185 (one redundant answer was removed before the commit) |
 | Instrumented coverage | `menu` 47/47, `ask_choice` 33/33, `ask` 41/72, `header` 46/101, `confirm` 2/7 |
 
 ### Verdict

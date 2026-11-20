@@ -1,6 +1,6 @@
 # Phase 8 report: consolidation under the owner's mandate
 
-Date: 2026-11-18. Start: `9fad47e` (end of Phase 7.1).
+Date: 2026-11-18. Start: `3915d94` (end of Phase 7.1).
 
 **Mandate** (owner, chat of 2026-11-18). In the copy, Claude may:
 - restructure code;
@@ -39,11 +39,11 @@ published.
 
 | Commit | Package | Content |
 |---|---|---|
-| `6fceee2` | A | ReadOnly dropped (42 files). Deleted `print_protein_report` (599 lines), `print_primer_report` (39) and the root file `blast_test.json`. The legacy BLAST record moved to `tests/fixtures/legacy_blast/`, because a test reads it (its README had said none did). Two names that do not exist removed from `PRIMER_V3_PUBLIC_API`; a test now checks the list |
-| `727208a` | B | 24 `_vN_` primer names made descriptive; public functions defined directly instead of bound by assignment |
-| `8e1f6d2` | C | `mutation.py` (4,670 lines) -> `analyses/_mutation/` (11 modules), after a 79-scenario snapshot; float tolerance for the 3.10/3.14 `math.log2` difference |
-| `b9d9d6e`, `b586468` | D | `cloning.py` (3,972 lines) -> `analyses/_cloning/` (7 modules), after a 25-scenario snapshot |
-| `ea27258` | E | pip distribution `synapse-gen`, homepage `https://synapse-gen.com`; the CI import check covers all four packages |
+| `80ae423` | A | ReadOnly dropped (42 files). Deleted `print_protein_report` (599 lines), `print_primer_report` (39) and the root file `blast_test.json`. The legacy BLAST record moved to `tests/fixtures/legacy_blast/`, because a test reads it (its README had said none did). Two names that do not exist removed from `PRIMER_V3_PUBLIC_API`; a test now checks the list |
+| `a7249fa` | B | 24 `_vN_` primer names made descriptive; public functions defined directly instead of bound by assignment |
+| `6d4c216` | C | `mutation.py` (4,670 lines) -> `analyses/_mutation/` (11 modules), after a 79-scenario snapshot; float tolerance for the 3.10/3.14 `math.log2` difference |
+| `4395a4a`, `962f7ee` | D | `cloning.py` (3,972 lines) -> `analyses/_cloning/` (7 modules), after a 25-scenario snapshot |
+| `b3ba026` | E | pip distribution `synapse-gen`, homepage `https://synapse-gen.com`; the CI import check covers all four packages |
 | final | F | `docs/ARCHITECTURE.md` (living document), `scripts/refactor/` (the splitting tools and plans), status documents, this report |
 
 ## 3. Defects and risks found

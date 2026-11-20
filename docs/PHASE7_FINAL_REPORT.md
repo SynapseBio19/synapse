@@ -24,7 +24,7 @@ Phase 7 made Synapse measurably more reliable to change. The scientific
 behavior did not change; every refactoring was checked with byte-identical
 output or the golden master.
 
-| Measure | Start (`cf930cf`) | End | |
+| Measure | Start (`091fc66`) | End | |
 |---|---|---|---|
 | Tests | 516 | 565 | all passing on Python 3.14.6 and 3.10.11 |
 | Coverage (combined line/branch) | 75 % | 81 % | `main.py` 34 % -> 84 %, BLAST dialog 51 % -> 80 % |
@@ -61,7 +61,7 @@ by a test that failed before the fix:
 
 ## B. Initial engineering baseline
 
-Measured 2026-11-17 at `cf930cf`, before any change. Recorded in
+Measured 2026-11-17 at `091fc66`, before any change. Recorded in
 `docs/PHASE7_CONTINUATION.md`.
 
 | Item | Value |
@@ -86,7 +86,7 @@ environment and were not read.
 
 ---
 
-## C. Documentation corrections (package A, `96d0f07`)
+## C. Documentation corrections (package A, `82e6deb`)
 
 **Method.** Every one of the 271 FEATURE_STATUS rows was checked in two
 ways:
@@ -117,7 +117,7 @@ AUDIT_STATUS, CHANGES, TERMINAL_UI_STANDARD and TEST_COVERAGE.
 
 ---
 
-## D. Pyright and type safety (package B, `2f8f6e6`)
+## D. Pyright and type safety (package B, `95f93c5`)
 
 58 -> 11 errors. No check was disabled, no setting weakened and no broad
 `Any` added.
@@ -142,8 +142,8 @@ any other.
 
 | Change | Commit | Evidence |
 |---|---|---|
-| `main()` 632 -> 383 lines: `compute_sequence_overview()` replaces 16 separate values passed twice through a 20-argument call; ORF step, protein step, no-ORF message and planner message are functions; the CRISPR branch is unchanged | `895fc5e` | Two scripted sessions byte-identical before and after (64,706 and 26,122 characters); golden master; session tests |
-| Ruff default rule set clean (one-line statements, a redundant mid-module import, ambiguous names); `[tool.ruff]` configured | `c97695d` | Suite and golden master unchanged |
+| `main()` 632 -> 383 lines: `compute_sequence_overview()` replaces 16 separate values passed twice through a 20-argument call; ORF step, protein step, no-ORF message and planner message are functions; the CRISPR branch is unchanged | `46f6851` | Two scripted sessions byte-identical before and after (64,706 and 26,122 characters); golden master; session tests |
+| Ruff default rule set clean (one-line statements, a redundant mid-module import, ambiguous names); `[tool.ruff]` configured | `fe97907` | Suite and golden master unchanged |
 
 **Not changed, and why:**
 
@@ -211,7 +211,7 @@ No test was weakened or removed.
 
 ---
 
-## G. CI implementation (packages E/F, `37986d7`)
+## G. CI implementation (packages E/F, `29bca7c`)
 
 `.github/workflows/ci.yml` (GitHub Actions; no paid service) has three
 jobs:
@@ -235,7 +235,7 @@ so no run on GitHub exists. Local verification:
 
 ---
 
-## H. Dependencies and installation (package F, `37986d7`)
+## H. Dependencies and installation (package F, `29bca7c`)
 
 - **Runtime dependencies:** none (unchanged).
 - **The `dev` extra** now lists the tools in use: pyright 1.1.414,
@@ -262,13 +262,13 @@ so no run on GitHub exists. Local verification:
 
 ## I. Error handling and user experience (package G)
 
-- **Escaping of the BibTeX export** (`ca5d53a`):
+- **Escaping of the BibTeX export** (`ae986a3`):
   - `&`, `%`, `$`, `#`, `_`, `~` and `^` are escaped in title, authors,
     journal, abstract and note;
   - the DOI is left as it is.
 - **The BLAST database manager** removes the `.njs`/`.pjs` metadata file,
-  and Database Information counts it (`cdbb7ac`).
-- **Messages** (`3f48f1f`):
+  and Database Information counts it (`948a19f`).
+- **Messages** (`38c73db`):
   - Five hand-padded single-primer lines use `style.field()`.
     TERMINAL_UI_STANDARD had wrongly said none remained; it is corrected.
   - Three BLAST prompts no longer start with a carriage return.
@@ -277,11 +277,11 @@ so no run on GitHub exists. Local verification:
   - "No hits were returned" and the no-fallback remark are NOTEs.
   - `test_message_rules` keeps these forms from returning.
 - **Five messages** in the mutation and literature dialogs were already
-  fixed at the end of Phase 6 (`c24159f`).
+  fixed at the end of Phase 6 (`5283604`).
 
 ---
 
-## J. Reproducibility and traceability (package H, `22d0abb`)
+## J. Reproducibility and traceability (package H, `e8fe2f6`)
 
 A session report already recorded:
 
@@ -336,15 +336,15 @@ Run on 2026-11-17 after the last code change:
 | Coverage | 81 % |
 | Import check | `core.api`, `analyses.orf`, `analyses.rna_structure`, `ui.style`, from a clean install |
 | Packaging | wheel built and installed in a clean environment; analysis ran from it |
-| `git diff --check cf930cf..HEAD` | clean (CRLF files keep CRLF; `orf.py` keeps its original mixed endings) |
+| `git diff --check 091fc66..HEAD` | clean (CRLF files keep CRLF; `orf.py` keeps its original mixed endings) |
 | ReadOnly | 15/15 restored |
 | Background processes | none |
 
 **Git.**
 
 - `main`, working tree clean after the commit of this report.
-- Phase 7 commits: `96d0f07`, `2f8f6e6`, `cdbb7ac`, `bedcd42`, `ca5d53a`,
-  `c97695d`, `895fc5e`, `37986d7`, `3f48f1f`, `22d0abb`, `236008f`, and
+- Phase 7 commits: `82e6deb`, `95f93c5`, `948a19f`, `8a98830`, `ae986a3`,
+  `fe97907`, `46f6851`, `29bca7c`, `38c73db`, `e8fe2f6`, `30f81f3`, and
   the commit of this report.
 - No history rewrite, reset or force-push.
 

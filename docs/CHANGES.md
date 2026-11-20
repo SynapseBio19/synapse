@@ -1013,7 +1013,7 @@ interrupted the Opus 5.5 session at the start of this investigation.
   exactly the code object they had. Module-level lookups resolve at call
   time, so every existing call site reaches the adapter as before.
 - pyright: the `reportRedeclaration` diagnostic is gone (134 -> 131 against
-  the `ab4bd2a` baseline, together with the two S15 diagnostics).
+  the `f302b7a` baseline, together with the two S15 diagnostics).
 - Test changed deliberately:
   `test_primer_has_single_live_definition_per_name` asserted
   `duplicates == {"calculate_tm_nearest_neighbor"}`, i.e. it recorded the
@@ -1078,7 +1078,7 @@ interrupted the Opus 5.5 session at the start of this investigation.
   instead of only saying that memory "grows". The algorithm is unchanged;
   a banded or linear-space alignment remains open as P2-6.
 - **S12 is resolved.** pyright was not run during the audit. It is now run
-  against the 134-diagnostic baseline of `ab4bd2a` for every work package.
+  against the 134-diagnostic baseline of `f302b7a` for every work package.
   Note for future sessions: `pyright.exe` is blocked by a Windows
   application control policy (WinError 4551), so it must be invoked as
   `python -m pyright --pythonversion 3.10`.
@@ -1113,7 +1113,7 @@ interrupted the Opus 5.5 session at the start of this investigation.
   callable was compared before and after. 129 -> 105 callables, **nothing
   added, nothing changed**, 24 removed - every surviving function keeps its
   exact code object. The four live bindings are unchanged.
-- pyright: 134 -> 112 against the `ab4bd2a` baseline. The 22 removed
+- pyright: 134 -> 112 against the `f302b7a` baseline. The 22 removed
   diagnostics all belonged to the deleted code; no new diagnostic appeared.
 - A reading guide above the ranking section now states which public name is
   bound to which implementation and that an older `_vN_` prefix on a
@@ -1641,7 +1641,7 @@ Biopython/Primer3 at three Mg²⁺ levels") was shown as not run. The Phase 6
 initial audit had in fact run 40 comparisons against primer3-py 2.4.0
 (max 0.003 °C, `FEATURE_STATUS.md` validation ledger), but neither
 document was updated and no test kept the check. (The commit message of
-`2851e11` says the criterion "had never been run"; that is corrected
+`f2f640d` says the criterion "had never been run"; that is corrected
 here.) The comparison was now extended and run locally, with no network
 access:
 
@@ -1727,7 +1727,7 @@ functions:
   analysis and the Synapse version.
 
 All seven passed on their first run: they found no new defect, and
-the restriction-parameter check passes only since `81ccc55`. The BLAST
+the restriction-parameter check passes only since `ef84127`. The BLAST
 (10.5) and literature (10.6) workflows remain covered by the stubbed
 client, the offline fixtures and the BLAST+ tests, because a live run
 needs external services.
@@ -1764,13 +1764,13 @@ tokenizer cannot see inside f-strings.
 
 ### Documentation corrections after the closing review
 
-`docs/PHASE6_INDEPENDENT_REVIEW.md` (`fc77ff4`) found statements in the
+`docs/PHASE6_INDEPENDENT_REVIEW.md` (`6524ca3`) found statements in the
 Phase 6 documents that did not match the repository. Corrected, without
 any source change:
 
 | Where | Was | Now |
 |---|---|---|
-| this file (Stage H spelling), `PHASE6_PROGRESS.md` row 35, final report G | 92 words in 10 documents, 6 code sites | 86 words in 8 documents, 9 text sites in 4 source files, 6 in tests (word-level diff of `1a8f2bc`) |
+| this file (Stage H spelling), `PHASE6_PROGRESS.md` row 35, final report G | 92 words in 10 documents, 6 code sites | 86 words in 8 documents, 9 text sites in 4 source files, 6 in tests (word-level diff of `b315a6f`) |
 | final report A | Stage I found three defects | items 25-27 come from Stage G (primer coordinates) and Stage I (IG weight, Python 3.10) |
 | final report A | 109 tests "at the start" of the previous cycle | at the end |
 | final report A | confirmed S items "are corrected" | S9 quantified only, S14 resolved for the API only, S5 addressed |
@@ -1795,7 +1795,7 @@ ubiquitin from the audit.
 The Stage F re-examination (`docs/STAGE_F_UI_REVIEW.md`) found that
 Stage F had shared the rules, the `[0]` meanings and the prefix spelling,
 but that no module called the renderers in `ui/style.py`. On the owner's
-instruction the six modules it compared were converted (`2e47ff9`, `e7eaf58`, `5cb4c9a`, `b181ae3`, `fb4070a`, `fdc968d`, `b80fd37`).
+instruction the six modules it compared were converted (`f90daaa`, `13a07e3`, `a3335b8`, `c6b8769`, `d70d3ad`, `4ee31cf`, `6b22723`).
 
 **Method.** Two AST-guided rewriting passes (kept outside the
 repository) replaced recurring print patterns at their source positions,
@@ -1852,9 +1852,9 @@ had missed. The BLAST numbering test now reads the `style.menu()` entries.
 
 ## Stage F completion, round 2: the remaining ten interface files (2026-11-02)
 
-The first round (`2e47ff9` ... `623a0a8`) put the six modules named in the
+The first round (`f90daaa` ... `4becb63`) put the six modules named in the
 re-examination on the shared renderers. This round does the same for
-the other ten interface files (`1ac77a4`, `bf6ae87`, `9b7f2ef`, `85c22ac`, `a4df3d4`, `3853d87`, `69e3f0f`, `7970e5a`, `7ecb88d`). It uses the same rewriting
+the other ten interface files (`6e27e5c`, `4e39c3f`, `5841b94`, `2f1f852`, `eb71ecd`, `26c301f`, `ce3e488`, `a6796d2`, `8401657`). It uses the same rewriting
 passes, plus a third one for report line lists. Each commit lists its
 visible changes. In summary:
 
@@ -1904,14 +1904,14 @@ checks cover all eleven menus, the sequence overview and the pipeline
 status, and the source rule covers all sixteen files. On the code before
 this round they give 11 failures. The extended tests found what the
 passes had left: the protein module's own header helper and four
-"SYNAPSE ... SELF-TEST" titles, fixed in `7970e5a`. Suite 322/322.
+"SYNAPSE ... SELF-TEST" titles, fixed in `a6796d2`. Suite 322/322.
 
 **Correction (closing review, 2026-11-03).** The summary above
 overstated round 2 in two points:
 
 - **"Data, API, golden master and the scientific results are
   unchanged" is true, but the workflow was not.** From round 1 until
-  `1516339`, Enter on fifteen bracketed prompts returned the hint text
+  `21deb2a`, Enter on fifteen bracketed prompts returned the hint text
   (next entry).
 - **"All sixteen files on the shared renderers" is true for adoption,
   not for completeness.** 59 direct prints remained, none of them
@@ -1941,8 +1941,8 @@ the dialog broke:
 | BLAST (local): word size `[default]`, filtering `[default/none]` | the hint | an error instead of the default settings |
 | Cloning planner: strategies `[default 5]` | `default 5` | an endless "Please enter a positive integer." |
 
-Introduced in `5cb4c9a` (BLAST), `b181ae3` (literature), `fb4070a`
-(primer) and `85c22ac` (cloning). All fifteen converted prompts keep
+Introduced in `a3335b8` (BLAST), `c6b8769` (literature), `d70d3ad`
+(primer) and `2f1f852` (cloning). All fifteen converted prompts keep
 the bracket in the label again, so Enter returns `""` and the caller
 applies its default, as before Stage F; the prompt text is unchanged.
 `main.py`'s report path keeps a real default, which the caller
@@ -1960,12 +1960,12 @@ in the modules. All four fail on the previous code.
 `docs/STAGE_F_FINAL_REVIEW.md` measured what the completion rounds had
 left; the owner released recommendations 1-3.
 
-- **Claims (`46710cd`).** The final report, the UI review and the
+- **Claims (`4124477`).** The final report, the UI review and the
   progress log no longer call Stage F "unified" for round 2. They now
   separate three things: the partial standardization of Stage F, the
   adoption reached in the completion rounds, and what was still open.
-  They also state that the workflow was not preserved until `1516339`.
-- **Messages (`4e2cace`).** 44 plain prints go through the helpers of
+  They also state that the workflow was not preserved until `21deb2a`.
+- **Messages (`52ec39e`).** 44 plain prints go through the helpers of
   section 5 of the standard:
   - an invalid choice gets `invalid_selection()`;
   - a failed input check is an ERROR;
@@ -1974,12 +1974,12 @@ left; the owner released recommendations 1-3.
   - BLAST's "IMPORTANT:" is a WARNING.
 
   Control flow is unchanged.
-- **Headings (`e559255`).** The primer report sections, the literature
+- **Headings (`2367194`).** The primer report sections, the literature
   WARNINGS / SOURCE ERRORS / ABSTRACT / KEYWORDS, the CRISPR ranking and
   the BLAST privacy and resume blocks go through `section()`. Each now
   carries a rule under the title; blank lines are kept. "BLAST SEARCH
   COMPLETED" is an OK message.
-- **Option lists (`b9ec344`).** Six BLAST lists and three CRISPR lists
+- **Option lists (`f519934`).** Six BLAST lists and three CRISPR lists
   go through `style.menu(zero="Cancel")`. They gain a group label, the
   blank line before `[0]` and the closing rule. The hit and record lists
   show `[0] Cancel` instead of "(0 cancel)" in the prompt. The BLAST
@@ -1988,9 +1988,9 @@ left; the owner released recommendations 1-3.
   - three group labels with a stray `"\r\n"`;
   - the pointer to "[3] BLAST Database Manager", which is [4];
   - the CRISPR batch entry label.
-- **Tests (`73a1d93`, `ccc987b`).** `DirectOutputTests`; 68 sites on
-  `1516339`, none now.
-- **`FEATURE_STATUS.md` (`163c54d`).** Variant, ORF-settings and BLAST
+- **Tests (`7f8f4db`, `bae1c70`).** `DirectOutputTests`; 68 sites on
+  `21deb2a`, none now.
+- **`FEATURE_STATUS.md` (`f7aa657`).** Variant, ORF-settings and BLAST
   menu numbers as in the code; the summary gives 328 tests and the final
   defect status.
 
@@ -1999,7 +1999,7 @@ Suite 328/328, golden master 12/12, pyright 112 with no new diagnostic.
 
 ## Stage F closing review, recommendations 4 and 5 (2026-11-03)
 
-- **core/ui (`b25e800`, `b4e5a53`).**
+- **core/ui (`acd8923`, `615ff7b`).**
   - `PipelineContext.status_report()` returns the status as data.
   - `print_status(render)` takes a `StatusRenderer`; `[P]` passes
     `ui.report.print_pipeline_status`.
@@ -2007,20 +2007,20 @@ Suite 328/328, golden master 12/12, pyright 112 with no new diagnostic.
   - `LayeringTests` runs core in an interpreter that refuses `ui`.
   - API change: `print_status()` now needs the renderer argument. Its
     only callers were `main.py`, `SynapsePipeline` and a test.
-- **Single-Enzyme Analysis (`8eddc72`).**
+- **Single-Enzyme Analysis (`82b7842`).**
   - Previous behavior: every enzyme raised `KeyError: 'left'`, since at
     least the audit commit, because the result went to the two-enzyme
     report.
   - Corrected behavior: a report of its own from the fields
     `analyze_cloning()` returns. No calculation changed.
-- **Tm model dialog (`c78800e`).**
-  - Previous behavior (since `fb4070a`): Enter answered "Invalid
+- **Tm model dialog (`069c39f`).**
+  - Previous behavior (since `d70d3ad`): Enter answered "Invalid
     selection.".
   - Corrected behavior: Enter chooses nearest-neighbor, as the prompt
     says.
-- **Messages (`61d0d38`).** Two duplicate-enzyme errors in cloning and the
+- **Messages (`cdc0648`).** Two duplicate-enzyme errors in cloning and the
   CRISPR export-extension error are ERROR lines.
-- **Rendered menus (`a39c39f`).** `tests/test_rendered_menus.py` drives all
+- **Rendered menus (`cadd3c6`).** `tests/test_rendered_menus.py` drives all
   47 menus: entries, numbering, `0`, invalid input, error states and
   result views. The NCBI client is mocked.
 
@@ -2032,53 +2032,53 @@ diagnostic.
 Each commit message holds the measurements and the tests that fail on the
 previous code.
 
-- **HTTP error responses (`68e59d1`).** The literature and BLAST clients
+- **HTTP error responses (`8546347`).** The literature and BLAST clients
   left the response an `HTTPError` carries open (the ResourceWarning in a
   retry test); they close it now.
-- **Mutation prompt and messages (`8379ac2`).** The sequence prompt has
+- **Mutation prompt and messages (`1617c01`).** The sequence prompt has
   `[0] Cancel` (`SequencePromptCancelled`); ten messages that were drawn as
   fields are ERROR/NOTE lines, with a rule that finds them; `MissingFileTests`
   (Master Prompt 11.4).
-- **Cloning planner (`b4b16bb`, P2-6).** Each enzyme analysis is computed
+- **Cloning planner (`16ec933`, P2-6).** Each enzyme analysis is computed
   once per search: 21.7 s -> 3.2 s, results byte-identical.
-- **Type IIS (`4939688`, P2-7).** BsaI, BsmBI, BbsI and SapI are searched on
+- **Type IIS (`38850fd`, P2-7).** BsaI, BsmBI, BbsI and SapI are searched on
   both strands and cut outside their sites; 140 cuts against Biopython 1.88,
   0 differences. Not used in cloning; Golden Gate planning not implemented.
-- **HGVS-style notation (`b7eb1de`).** Predicted protein changes are written
+- **HGVS-style notation (`e9c7878`).** Predicted protein changes are written
   `p.(R12C)`, `p.(R12=)`, `p.(W24*)`, `p.(M1?)`, `p.(*110Qext*?)`; used in the
   mutation report and in the variant field `protein_change` (it held the
   consequence class). Not checked with an HGVS validator.
-- **Restriction coordinates (`1ae2833`).** Unsuffixed `site_position`,
+- **Restriction coordinates (`7d3c6b5`).** Unsuffixed `site_position`,
   `top_cut`, `bottom_cut` are 1-based in every record; `*_0based` keys give
   0-based values (maps used 1-based, digests 0-based before).
-- **RNA hairpins (`fedb750`, P2-5).** G·U pairs are counted as a separate
+- **RNA hairpins (`9fe9582`, P2-5).** G·U pairs are counted as a separate
   figure (golden reference: 58 Watson-Crick, 260 with G·U).
-- **ORFs (`f020a1d`, P1-9).** ORFs across the origin of circular sequences
+- **ORFs (`7e61baf`, P1-9).** ORFs across the origin of circular sequences
   and optional 5'-partial ORFs; rotation-invariance test.
-- **Primer structure screens (`27255df`).** Compared with primer3-py ΔG:
+- **Primer structure screens (`e00c4cb`).** Compared with primer3-py ΔG:
   Spearman ρ −0.78 / −0.74 / −0.51; classes overlap (METHODS).
-- **Variant cross-check (`2c68e61`, P2-4).** `core.api.cross_check_variants`.
-- **Alignment (`f9d4356`, `e5bb456`, `15e2ff1`, P2-6).** One traceback byte
+- **Variant cross-check (`80a900b`, P2-4).** `core.api.cross_check_variants`.
+- **Alignment (`90a62ed`, `2dbd863`, `073f377`, P2-6).** One traceback byte
   per cell (46 -> 1.1 bytes); exact banded alignment of similar sequences
   (10 kb 23 s -> 0.18 s); banded Levenshtein similarity (10 kb 0.10 s);
   faster hairpin screen (primer design 10 kb 135.6 s -> 25.6 s). Results
   identical.
-- **Records (`b8e92d8`, `690c9e8`, `bd91a24`).** Continuation record and the
+- **Records (`3d8dfce`, `2f24498`, `f5503c9`).** Continuation record and the
   complete handover.
 
 ## Phase 6 completion run, second part (2026-11-12 and 2026-11-13)
 
-- **Approval policy (`bf4d096`).** The owner adopted the Master Prompt's
+- **Approval policy (`9657d58`).** The owner adopted the Master Prompt's
   approval rules (1.3, 14.5). The handover quoted a commit subject with
-  British spelling, which made the suite fail at `bd91a24` (420/421); fixed.
-- **Primer design 10 kb (`aba3fb0`, P2-6).** 71 s -> 10 s CPU time on the
+  British spelling, which made the suite fail at `f5503c9` (420/421); fixed.
+- **Primer design 10 kb (`2069be5`, P2-6).** 71 s -> 10 s CPU time on the
   same machine under the same load, results identical: a Tm-tier screen
   with an exact upper bound of the screening score decides which windows
   are measured in full; the dimer stem is a longest common substring; the
   hairpin, repeat and 3' screens use string operations; pure functions are
   cached. Evidence: `tests/test_primer_screen_equivalence.py` (the replaced
   algorithms as references, screen vs. full measurement, the bound).
-- **D20, D21 (`c6f0df9`).**
+- **D20, D21 (`faba007`).**
   - D20, previous: `_v5_candidate_quality` read hairpin and self-dimer
     stems from fields the thermodynamic profile does not have, so its
     documented structural penalty was always 0. Corrected: the stems come
@@ -2086,12 +2086,12 @@ previous code.
     template); golden master unchanged.
   - D21, previous: `tm_method="nearest-neighbor"` passed validation and
     then raised "Unknown Tm method". Corrected: one alias set.
-- **Primers around a restriction site (`99150da`, Master Prompt 10.2).**
+- **Primers around a restriction site (`045a46a`, Master Prompt 10.2).**
   `restriction_site_choices`, `design_primers_for_restriction_site`,
   `core.api.design_primers_for_restriction_site`, primer menu entry 2
   (Single Primer Analysis moved to 3), pipeline parameters. Each pair
   carries the predicted digest of its amplicon.
-- **P2-2 (`50dea66`).** The dialogs of eleven analysis modules (130
+- **P2-2 (`cb47321`).** The dialogs of eleven analysis modules (130
   definitions, 7 aliases) moved byte for byte to `ui/<module>_menu.py`;
   `core/textformat.py` holds the string builders, re-exported by
   `ui.style`; `SynapsePipeline.select_orf(chooser=...)` replaces
@@ -2099,9 +2099,9 @@ previous code.
   imported from `ui.<module>_menu`, no longer from `analyses.<module>`.
   Evidence: 55 rendered screens byte-identical; no analysis module imports
   `ui`, checked in a subprocess with `ui` unimportable.
-- **Pipeline parameters (`b1a012f`, T4).** The sequence overview and the
+- **Pipeline parameters (`7fe9be4`, T4).** The sequence overview and the
   three cloning dialogs record their parameters.
-- **D22, D23, typing (`757958f`).**
+- **D22, D23, typing (`2baa175`).**
   - D22, previous: `mutation.orf_reference_cds` raised AttributeError for
     an ORF without a sequence. Corrected: MutationAnalysisError.
   - D23, previous: the ranking's risk flags, structural warnings,
@@ -2109,35 +2109,35 @@ previous code.
     dataclass fields and never reached JSON or Markdown exports. Corrected:
     dataclass fields with the defaults the ranking assumed.
   - `calculate_tm_nearest_neighbor` overloads; pyright 108 -> 58.
-- **Coverage, D24 (`ae87adb`).** coverage.py measured 68 % -> 70.9 %
+- **Coverage, D24 (`aab284f`).** coverage.py measured 68 % -> 70.9 %
   (`docs/TEST_COVERAGE.md`); the protein and RNA views and eleven
   never-called functions are executed with output checks.
   D24, previous: the BLAST text export and the local query FASTA were
   written with CR CR LF line ends. Corrected: `newline=""`.
-- **Ledger, Python 3.10, pUC19 (`bf4b9ee`).** `docs/TOOL_AND_DATA_LEDGER.md`;
+- **Ledger, Python 3.10, pUC19 (`df3a3a9`).** `docs/TOOL_AND_DATA_LEDGER.md`;
   the suite runs on Python 3.10.11 (project-local embeddable package);
   pUC19 L09137.2 is a fixture and its 132-digest comparison with Biopython
   runs in the suite.
-- **BLAST dialogs (`dabc2f1`, T11).** Previous: the hit selector answered
+- **BLAST dialogs (`341e07a`, T11).** Previous: the hit selector answered
   2 of 1 with "list index out of range" and showed a hit from the end of
   the list for −1; the query-type question cancelled on an unknown key.
   Corrected: only listed numbers; unknown keys are answered and re-asked.
   The literature limitation line is a NOTE.
-- **README and records (`a65cb04`).**
-- **D25 (`a5e5a94`).** Previous: one network error while polling a
+- **README and records (`bcae385`).**
+- **D25 (`2393a12`).** Previous: one network error while polling a
   submitted NCBI search ended it, and the message did not name the RID.
   Corrected: up to 3 consecutive transient errors are retried; a failed
   submitted search names its RID. Found in a live search; the repeated
   live search (pUC19 401-700 against `nt`) succeeded. The primer3-py
   comparisons are skipped with the reason when Windows application
   control blocks its compiled module (observed on 2026-11-13, temporarily).
-- **Variant check in the menus (`cdbf69c`, T12, P2-4).** The variant
+- **Variant check in the menus (`b4d1681`, T12, P2-4).** The variant
   dialog keeps the variants of the contig mapped onto the loaded sequence;
   the primer and CRISPR designs show "Variants in binding sites".
 
 Golden master unchanged throughout; suite 463 tests, all passing (the
 opt-in benchmark skipped); pyright 58 errors, nothing new against the
-`ab4bd2a` baseline.
+`f302b7a` baseline.
 
 ## Continuation run (Master Execution Prompt, from 2026-11-13)
 
@@ -2220,8 +2220,8 @@ Prompt of 2026-11-13. History and binding decisions:
   parse in Mutalyzer. Mutation positions, types, effects and the golden
   master are unchanged; only the printed notation changed.
 - Tests: `tests/test_hgvs_mutalyzer_reference.py` (5).
-- Record: the test totals in the commit messages of `70ff2b0` (484) and
-  `a1e3520` (488) are one too high; the suites had 483 and 487 tests.
+- Record: the test totals in the commit messages of `115b1d9` (484) and
+  `83c9c42` (488) are one too high; the suites had 483 and 487 tests.
 
 ### Instability-index weights compared with ExPASy ProtParam
 
@@ -2473,7 +2473,7 @@ Each finding was traced to its cause; no check was disabled, no broad
 - New `tests/test_message_rules.py` (3): no hand-padded "Label:   value"
   print and no prompt beginning with a line break in the dialogs (CRISPR
   excluded); both rules fail on the previous code.
-- BibTeX export escaping (earlier in Phase 7, `ca5d53a`) belongs to this
+- BibTeX export escaping (earlier in Phase 7, `ae986a3`) belongs to this
   package as well.
 
 ### Package H: the genetic code in the RNA and protein report entries
@@ -2526,15 +2526,15 @@ Governed by the owner's Phase 7.1 prompt (internal architecture only; no
 new scientific features; CRISPR/CFD excluded; the AI Experiment Planner
 stays Coming Soon). Audit: `docs/PHASE71_ARCHITECTURE_AUDIT.md`.
 
-### Package A: baseline and characterization tests (`cd23f74`)
+### Package A: baseline and characterization tests (`0bd2ace`)
 
-- Baseline at `9077f1e` verified again (565 tests; primer3-py now loads on
+- Baseline at `af7cd0a` verified again (565 tests; primer3-py now loads on
   this machine, so its four comparisons ran and passed).
 - `tests/test_module_namespaces.py`: the 264 top-level names of
   `analyses.blast` and `analyses.primer` stay reachable.
 - `tests/test_characterization.py` with
   `tests/fixtures/characterization/blast_primer.json`: 78 scenarios
-  recorded from `9077f1e` and compared exactly (floats by `repr`).
+  recorded from `af7cd0a` and compared exactly (floats by `repr`).
 - Code: unchanged.
 
 ### Package B: `analyses/blast.py` split into `analyses/_blast/`
@@ -2813,7 +2813,7 @@ reference tests decide whether a change alters a result.
 - **Characterization first.** New section `mutation` in
   `tests/characterization.py` with the snapshot
   `tests/fixtures/characterization/mutation.json` (79 scenarios, recorded
-  from `727208a` before the split). It covers:
+  from `a7249fa` before the split). It covers:
   - five variant types and their reports, JSON, HGVS and alleles;
   - context, restriction and primer impact, regions;
   - variant sets, spectrum, hotspots, statistics, quality;
@@ -2832,7 +2832,7 @@ reference tests decide whether a change alters a result.
   - CPython 3.10.11 and 3.14.6 on Windows differ in the last digit of
     `math.log2`.
   - `sequence_complexity` of one variant gives 98.82341858018908 on 3.10
-    and 98.82341858018907 on 3.14, with the unchanged code of `727208a`
+    and 98.82341858018907 on 3.14, with the unchanged code of `a7249fa`
     on both.
   - `tests/test_characterization.py` now compares floats with a relative
     tolerance of 1e-12. Everything else is still compared exactly, and a
@@ -2845,16 +2845,16 @@ reference tests decide whether a change alters a result.
 
 ### Package D: `analyses/cloning.py` split into `analyses/_cloning/`
 
-- **Characterization first** (`b9d9d6e`).
+- **Characterization first** (`4395a4a`).
   `tests/fixtures/characterization/cloning.json` holds 25 scenarios
-  recorded from `8e1f6d2`:
+  recorded from `6d4c216`:
   - planner and best strategies on linear and circular vectors;
   - restriction maps; directional and mismatched strategies;
   - single-enzyme cloning with summary, junctions, reasons and ranking;
   - suitability, compatibility, run modes, overhangs, end compatibility;
   - validation and the self-test.
   `test_module_namespaces` freezes the 61 top-level names. (The commit
-  message of `b9d9d6e` says 58; the list has 61.)
+  message of `4395a4a` says 58; the list has 61.)
 - **After.** `analyses/cloning.py` is the public module. The code is in
   seven modules of `analyses/_cloning/`: `cache`, `sites`, `ends`,
   `strategy`, `search`, `summary`, `selftest`. They form a strict layer
@@ -3152,7 +3152,7 @@ values). No defect found:
 
 - **Characterization first.** The section `protein`
   (`tests/fixtures/characterization/protein.json`) holds 103 scenarios
-  recorded from `ee8203d`:
+  recorded from `bf1a25b`:
   - four proteins (one with ambiguous residues and a stop), with every
     property function, the combined analyses and the charge at four pH
     values;
@@ -3175,7 +3175,7 @@ values). No defect found:
 
 - **Characterization first.** The section `variant`
   (`tests/fixtures/characterization/variant.json`) holds 45 scenarios
-  recorded from `6e52ca7`. It runs four VCFs (the two module samples and
+  recorded from `fa4e47e`. It runs four VCFs (the two module samples and
   two of the bcftools test vectors) through:
   - analysis, report, VCF and TSV export;
   - statistics, cohort summary, prioritization;
@@ -3233,7 +3233,7 @@ values). No defect found:
 
 - **Characterization first.** The section `orf`
   (`tests/fixtures/characterization/orf.json`) holds 27 scenarios
-  recorded from `b46ed3d`:
+  recorded from `30a5461`:
   - pUC19, linear and circular, under five settings: default, legacy,
     code 11 with table starts, nested ORFs under code 2, 5'-partial ORFs;
   - the enhanced analysis, relationships, ranking, comparison, the feature
@@ -3258,7 +3258,7 @@ values). No defect found:
 
 - **Characterization first.** The section `restriction`
   (`tests/fixtures/characterization/restriction.json`) holds 46 scenarios
-  recorded from `709f964`. On pUC19, linear and circular, with 10 enzymes,
+  recorded from `f9e1887`. On pUC19, linear and circular, with 10 enzymes,
   it covers:
   - the analysis, maps, summaries, digests, gel bands, cut boundaries;
   - unique and non-cutters, pair recommendations, double digests;
@@ -3282,7 +3282,7 @@ values). No defect found:
 
 - **Characterization first.** The section `rna`
   (`tests/fixtures/characterization/rna.json`) holds 101 scenarios
-  recorded from `8dff342`: four sequences (one with IUPAC symbols, one
+  recorded from `5963f79`: four sequences (one with IUPAC symbols, one
   hairpin-rich, one with homopolymers) under codes 1 and 2, every
   analysis function, the profiles and the pipeline source.
 - **Determinism.** The exact comparison under three hash seeds now covers
@@ -3318,11 +3318,11 @@ values). No defect found:
 
 The owner's mandate of 2026-11-18 holds (fix every defect, complete the
 project; CRISPR and the AI Experiment Planner stay excluded; the licence
-and the GitHub repository are the owner's). Seven commits from `6d41d8a`
-to `5b1dc8b`, then the documentation. Measurements are in
+and the GitHub repository are the owner's). Seven commits from `fb5f978`
+to `66554aa`, then the documentation. Measurements are in
 `docs/BENCHMARKS.md`.
 
-### A. Genome-length input (`6d41d8a`)
+### A. Genome-length input (`fb5f978`)
 
 *E. coli* K-12 MG1655 (NC_000913.3, 4,641,652 bp) through every analysis
 (`scripts/benchmarks/genome_scale.py`). Four analyses did not scale:
@@ -3348,12 +3348,12 @@ to `5b1dc8b`, then the documentation. Measurements are in
 Every change returns the former result: differential tests against the
 former loops (`test_window_scans`, `test_rna_window_scans`,
 `test_orf_relationship_sweep`, `test_restriction_fragment_index`), and an
-end-to-end comparison with the code of `ca6d941` on *E. coli* segments
+end-to-end comparison with the code of `a2898aa` on *E. coli* segments
 (overview, three ORF settings, RNA, two digests): bit-identical results,
 3-23 times faster. Behavior change for long input only: the thinned
 stored profiles (documented in `docs/METHODS.md`).
 
-### B. HGVS benchmark on ClinVar; allele fix (`1fd914f`)
+### B. HGVS benchmark on ClinVar; allele fix (`28d4db9`)
 
 1,500 ClinVar variant names on six RefSeq transcripts
 (`tests/fixtures/clinvar/`, public domain, SHA-256 checked). c.: 1,489
@@ -3366,26 +3366,26 @@ identical, 11 split delins equivalent; p.: 1,186/1,186.
   one unchanged base before the next change (`shift_limit`). Single
   changes are unchanged.
 
-### C. Per-ORF features (`f6a5d92`)
+### C. Per-ORF features (`870c91c`)
 
 Codon usage is counted once per candidate without a per-codon loop, the
 diversity reuses it, the ambiguity check returns at once for plain ACGT,
 and the scan caches codon status. Genome, default settings: 35 s → 11 s;
 alternative starts at 90 nt: 276 s → 87 s. Same ORFs.
 
-### D. Dialog tests (`8696b1f`)
+### D. Dialog tests (`b3f9f5c`)
 
 16 scenarios for the protein, restriction and cloning dialogs. Two
 defects: three protein errors lacked the ERROR prefix; Back inside a
 cloning analysis left the cloning menu.
 
-### E. Literature authors (`713a1d4`)
+### E. Literature authors (`51fbba4`)
 
 Europe PMC's "Smith A" did not match PubMed's "Ann Smith", so merged
 records listed authors twice in results and exports. A trailing token of
 one to three capital initials is now also read as initials.
 
-### F. `analyses/literature.py` split (`4bb71d0`, `5b1dc8b`)
+### F. `analyses/literature.py` split (`f70e665`, `66554aa`)
 
 Snapshot with the network replaced at `urlopen`, then ten modules in
 `analyses/_literature/`; stand-ins moved to the calling modules. The
@@ -3409,9 +3409,22 @@ actions, `data/examples/pUC19.fasta`. Updated: README, METHODS,
 FEATURE_STATUS, ARCHITECTURE, TOOL_AND_DATA_LEDGER, TEST_COVERAGE,
 PROJECT_HISTORY_AND_DECISIONS, `scripts/refactor/README.md`.
 
-Correction to the commit message of `6d41d8a`: it says the RNA analysis
+Correction to the commit message of `fb5f978`: it says the RNA analysis
 became "about 7x faster on 300 kb". Measured without a profiler, a
 300-kb RNA analysis took 29.4 s after the early stop and 10.7 s after the
 outward extension; the time of the unchanged code was not measured
 without a profiler, so the factor is not established. The genome figure
 in `docs/BENCHMARKS.md` (more than 600 s before, 137 s after) is measured.
+
+### History rewrite before publication (2026-11-20, owner decision)
+
+- Before the first push to GitHub, the author and committer e-mail of the
+  203 commits made on the owner's PC was replaced by the owner's GitHub
+  no-reply address, so no private address is published. Author names were
+  not changed.
+- Every file tree is identical to before; only the commit metadata and
+  therefore every commit ID changed. Commit IDs quoted in commit messages
+  (37 references) and in tracked files (849 references in 32 files) were
+  translated to the new IDs with the one-to-one map of old and new
+  commits; no old ID remains.
+- From here on the rule "no history rewrite" applies again.

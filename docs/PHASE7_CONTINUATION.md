@@ -49,17 +49,17 @@ Execution Prompt (2026-11-17). **Finished on 2026-11-17.** Final report:
 
 | Commit | Package | Content |
 |---|---|---|
-| `96d0f07` | A | FEATURE_STATUS checked row by row; 8 overclaimed functions tested; documentation-consistency test |
-| `2f8f6e6` | B | Pyright 58 -> 11 |
-| `cdbb7ac` | D/G | BLAST dialog tests; `.njs` left behind by Remove Database fixed |
-| `bedcd42` | D | `main()` driven in-process; single-primer and overview tests |
-| `ca5d53a` | D/G | Literature pipeline tests; BibTeX escaping fixed |
-| `c97695d` | C | Ruff default rules clean, Ruff configured |
-| `895fc5e` | C | `main()` split into session steps, output byte-identical |
-| `37986d7` | E/F | GitHub Actions workflow, gate scripts, `dev` extra, clean install |
-| `3f48f1f` | G | Message prefixes and rules |
-| `22d0abb` | H | Genetic code and input mode in RNA and protein report entries |
-| `236008f` | I | Licence recommendation, CONTRIBUTING |
+| `82e6deb` | A | FEATURE_STATUS checked row by row; 8 overclaimed functions tested; documentation-consistency test |
+| `95f93c5` | B | Pyright 58 -> 11 |
+| `948a19f` | D/G | BLAST dialog tests; `.njs` left behind by Remove Database fixed |
+| `8a98830` | D | `main()` driven in-process; single-primer and overview tests |
+| `ae986a3` | D/G | Literature pipeline tests; BibTeX escaping fixed |
+| `fe97907` | C | Ruff default rules clean, Ruff configured |
+| `46f6851` | C | `main()` split into session steps, output byte-identical |
+| `29bca7c` | E/F | GitHub Actions workflow, gate scripts, `dev` extra, clean install |
+| `38c73db` | G | Message prefixes and rules |
+| `e8fe2f6` | H | Genetic code and input mode in RNA and protein report entries |
+| `30f81f3` | I | Licence recommendation, CONTRIBUTING |
 | (final) | J | Final verification and reports |
 
 ## Next actions (only on the owner's request)

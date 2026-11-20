@@ -8,11 +8,11 @@ prompt (2026-11-18). **Finished on 2026-11-18.** Final report:
 
 | Item | Value |
 |---|---|
-| HEAD | the commit that adds this record (after `56e9796`) |
+| HEAD | the commit that adds this record (after `f629add`) |
 | Working tree | clean (ignored: `build/`, `synapse.egg-info/` from the install check) |
 | Tests | 601, 0 failures on CPython 3.14.6 (1 skipped) and 3.10.11 (23 skipped) |
 | Golden master | 12/12 |
-| Characterization snapshot | 78 scenarios, unchanged since `9077f1e` |
+| Characterization snapshot | 78 scenarios, unchanged since `af7cd0a` |
 | Pyright | 11 errors, all in `analyses/crispr.py` (allow-list) |
 | Ruff | clean |
 | Coverage | 82.3 % (BLAST 84.9 %, primer 91.7 %) |

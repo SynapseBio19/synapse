@@ -256,7 +256,7 @@ subprocess in which `ui` cannot be imported.
     start of an f-string, outside `section()`; no heading drawn with its
     own dashes. The one named exception is the invalid-character list
     under the sequence validation error, which is a result line. On
-    `1516339` the rule reports 68 sites. No message is drawn as a field
+    `21deb2a` the rule reports 68 sites. No message is drawn as a field
     (`style.field("Error", ...)`, `"... failed"`, `"... error"`); ten such
     lines in mutation, restriction and literature became ERROR and NOTE
     lines on 2026-11-11.

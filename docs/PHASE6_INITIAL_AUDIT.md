@@ -1,7 +1,7 @@
 # Phase 6 – independent initial audit
 
 Audit period: 2026-10-30. Scope: the complete project copy
-`Project Synapse - Kopie` at commit `0dad3bb` on branch `main`.
+`Project Synapse - Kopie` at commit `0c48a96` on branch `main`.
 
 This document records what was inspected, what was executed, what was
 compared against external reference implementations, and what is defective
@@ -36,7 +36,7 @@ model was switched back.
 | Item | Finding |
 |---|---|
 | Project root | `C:\Users\bayra\OneDrive\Desktop\Project Snyapse - Kopie` – confirmed the copy, not the original. |
-| Branch / HEAD | `main` / `0dad3bb85b597539bb1db067348129738332b0cd` ("Add docs/AUDIT_STATUS.md"). |
+| Branch / HEAD | `main` / `0c48a963bb92aa52f50f271c13c13dd972ceeebd` ("Add docs/AUDIT_STATUS.md"). |
 | History | 9 commits, read directly from `.git/logs/HEAD`. Stage 0 baseline through Stage 5 all present. Confirmed with `git log` after Git was installed. |
 | Working tree | **Not clean at audit start.** `pyproject.toml` carried an uncommitted previous-cycle change and `.claude/` was untracked. An earlier version of this document said "clean"; that was an unverified assumption and is withdrawn. See "Repository state: assumed versus verified" below. |
 | **Git executable** | Not available on PATH while the audit was carried out; `.git` was read directly, so no `git diff` review or commit was possible during the audit. **Installed afterwards, on 2026-10-30 (Git for Windows 2.56.0.windows.4), and verified before any commit was made.** |
@@ -57,7 +57,7 @@ disagree, and only the second is evidence.
 | | Assumed before Git was available | Verified with Git 2.56.0.windows.4 on 2026-10-30 |
 |---|---|---|
 | Source | Status reported by the session environment at start-up. No Git binary existed, so it could not have been computed. | `git log`, `git status`, `git diff`, `git stash list`, run once Git for Windows was installed. |
-| HEAD | `0dad3bb`, read from `.git/refs/heads/main` | `0dad3bb` — confirmed |
+| HEAD | `0c48a96`, read from `.git/refs/heads/main` | `0c48a96` — confirmed |
 | Tracked files | Reported "clean" | **`pyproject.toml` modified** (+10/−1): adds `pyright[nodejs]==1.1.414` to the `dev` extras and a `[tool.pyright]` table targeting Python 3.10. Last written 2026-10-30 02:11:17, before this session began, and already present at this session's first read of the file. Previous-cycle work, not Phase 6 work. Runtime dependencies (`dependencies = []`) and the `reference` extras unchanged. |
 | Untracked files | Not reported | **`.claude/`** — 101 files (1.21 MB), consisting only of the eleven K-Dense skills under `.claude/skills/`. Present at this session's first file listing. Plus the two Phase 6 documents. |
 | Staged changes / stash / deleted files | Not reported | None / none / none |
@@ -71,8 +71,8 @@ test discovery (`tests/`) and pyright's `include` list read.
 Resolution, 2026-10-30 (approved repository housekeeping; no application
 source file touched):
 
-- `5242fcb` commits the pre-existing `pyproject.toml` change, unchanged and on its own.
-- `5d8c73a` adds `/.claude/skills/` to `.gitignore`. All eleven skills remain on disk; the anchored rule leaves other `.claude/` content visible to Git.
+- `4aa23ce` commits the pre-existing `pyproject.toml` change, unchanged and on its own.
+- `87603fb` adds `/.claude/skills/` to `.gitignore`. All eleven skills remain on disk; the anchored rule leaves other `.claude/` content visible to Git.
 - This document and `docs/FEATURE_STATUS.md` are then committed together.
 
 ### Project structure actually present
@@ -599,7 +599,7 @@ fixed list of twelve labels. Not a crash; an inconsistent contract.
 | S9 | `analyses/mutation.py` | CONFIRMED and quantified 2026-10-31 (Opus 5); ~45 bytes per matrix cell measured, note now states the figures; algorithm unchanged (P2-6) | The global Needleman–Wunsch alignment is O(n·m) in time *and memory*; the only mitigation is a note above 2,000 nt (P1-10). P2-6 records the 10 kb target as unmet. For a 10 kb × 10 kb comparison the DP matrix is ~10⁸ cells, which will exhaust memory on a typical machine rather than merely being slow. The note should state the limit, not just flag it. |
 | S10 | `fileio/genbank.py` | CONFIRMED, corrected 2026-10-31 (Opus 5) | Location parsing covers simple spans, `complement()` and `join()`; other forms keep only the raw string. A record using `order()`, `<`/`>` partial bounds or a remote accession reference therefore yields a feature with no usable interval, silently. The limitation is documented in METHODS but not surfaced as a per-record note. |
 | S11 | `analyses/literature.py` | STILL UNVERIFIED by choice 2026-10-31 (Opus 5); live provider behavior needs external requests, which require approval | Four providers (PubMed, Europe PMC, OpenAlex, Crossref) each fail independently, and `_enrich_missing_metadata` fills gaps across sources. Dedup (`deduplicate_articles`) and relevance ranking were exercised only through the module's offline fixtures. No live call was made in this audit, by design. Real-world behavior on rate limits, partial outages and cross-source duplicate DOIs is therefore unverified. |
-| S12 | project-wide | RESOLVED 2026-10-31 (Opus 5); pyright runs against the `ab4bd2a` baseline for every work package, invoked as `python -m pyright` because `pyright.exe` is blocked by a Windows application control policy | `pyproject.toml` sets `[tool.pyright] pythonVersion = "3.10"`, `typeCheckingMode = "standard"`. `pyright` is installed but **was not run** in this audit (read-only scope; it writes caches). Running it is the cheapest available check for the 3.10 compatibility risk in §1. |
+| S12 | project-wide | RESOLVED 2026-10-31 (Opus 5); pyright runs against the `f302b7a` baseline for every work package, invoked as `python -m pyright` because `pyright.exe` is blocked by a Windows application control policy | `pyproject.toml` sets `[tool.pyright] pythonVersion = "3.10"`, `typeCheckingMode = "standard"`. `pyright` is installed but **was not run** in this audit (read-only scope; it writes caches). Running it is the cheapest available check for the 3.10 compatibility risk in §1. |
 | S13 | `main.py` | CONFIRMED, corrected 2026-10-31 (Opus 5): the session is `main()` behind a `__main__` guard; `git diff -w` shows only the 12 added lines | `main.py` is a top-level script with module-level control flow (`sequences = choose_sequence_file()` at import, `while True:` loops at module scope) and no `if __name__ == "__main__":` guard. `tests/test_main_smoke.py` therefore has to drive it by patching `builtins.input`. Any import of `main` starts the application. |
 | S14 | `analyses/*` | PARTLY RESOLVED 2026-10-31 (Opus 5): the API now covers every analysis (cloning, variant filtering, mutation reporting, BLAST, literature); the modules still own their menus, which belongs with Stage F | Eleven of twelve analysis modules own their terminal menus (`run_*_ui`, `*_menu`), so `print()`/`input()` and scientific computation live in the same file: 1,966 `print(` and 126 `input(` calls across `analyses/`. `core/api.py` provides a clean non-interactive layer for ten analyses, which is the P2-2 compromise, but the modules themselves are not UI-free and `core/api.py` does not yet cover cloning, variant filtering, mutation reporting, BLAST or literature. |
 
@@ -608,7 +608,7 @@ scope and neither was changed:
 
 | ID | Location | Level | Finding |
 |---|---|---|---|
-| S15 | `analyses/variant_analysis.py`, `annotate_from_mutation_analysis` (call at lines 2026–2027 after D12) | CONFIRMED, corrected 2026-10-31 (the import also failed, so the function never worked) | pyright reports `No parameter named "reference_cds"` and `"variant_cds"` on a call into the mutation module. If that call path is reached it would raise `TypeError`. Present identically at `824ca5f`; not reproduced by execution. |
+| S15 | `analyses/variant_analysis.py`, `annotate_from_mutation_analysis` (call at lines 2026–2027 after D12) | CONFIRMED, corrected 2026-10-31 (the import also failed, so the function never worked) | pyright reports `No parameter named "reference_cds"` and `"variant_cds"` on a call into the mutation module. If that call path is reached it would raise `TypeError`. Present identically at `8a10cdc`; not reproduced by execution. |
 | S16 | `analyses/variant_analysis.py`, `left_normalize_variant` | CONFIRMED, corrected 2026-10-31 | The normalized copy is built with `annotation=dict(variant.annotation)`, a shallow copy, and `REF_MISMATCH` is then added with `setdefault(...).append`, so the flag is also written into the *input* variant's `validation_flags` list when that list already exists. Reproduced: input flags `["PRE_EXISTING"]` become `["PRE_EXISTING", "REF_MISMATCH"]` after `left_normalize_variant(Variant("chr1", 1, "TTT", "T"), "GGGAAAAAGGG")`; an input without a pre-existing list stays clean. D12's new flags use copy-on-write and do not have this problem; the pre-existing `REF_MISMATCH` path was left unchanged. (Listed here with the S-items because it was found after the audit; it is a confirmed defect.) |
 
 Found during the D4 work (2026-10-31); outside D4's scope and not changed:
@@ -813,9 +813,9 @@ numbers before defects that merely block a feature.
 
 ### Gate 0 — prerequisite, blocking all implementation — completed 2026-10-30
 - **Git for Windows installed and verified** (2.56.0.windows.4). `git
-  status`, `git diff` and `git commit` work; HEAD was `0dad3bb`; the two
-  pre-existing working-tree differences were resolved by `5242fcb` and
-  `5d8c73a` (§1). Gate 0 is a prerequisite only: Tier 1 still requires
+  status`, `git diff` and `git commit` work; HEAD was `0c48a96`; the two
+  pre-existing working-tree differences were resolved by `4aa23ce` and
+  `87603fb` (§1). Gate 0 is a prerequisite only: Tier 1 still requires
   explicit approval before any application source file is changed.
 
 ### Tier 1 — silent scientific errors (do first)
@@ -909,7 +909,7 @@ numbers before defects that merely block a feature.
    only tracked change in the working tree was the pre-existing
    `pyproject.toml` modification (§1). The Phase 6 files in the project are
    this document, `docs/FEATURE_STATUS.md`, and one added `.gitignore`
-   line; the two housekeeping commits `5242fcb` and `5d8c73a` touch only
+   line; the two housekeeping commits `4aa23ce` and `87603fb` touch only
    `pyproject.toml` and `.gitignore`.
 3. **Python 3.10 was not exercised** and **pyright was not run** (S12).
 4. **No live network calls** were made to NCBI BLAST or to any literature

@@ -54,7 +54,7 @@ under 3.14.6 skips only the benchmark.
 Evaluated on 2026-11-13:
 
 - **pyright** (in use): type checking at Python 3.10 on every package;
-  134 errors at the `ab4bd2a` baseline, 58 now, none new.
+  134 errors at the `f302b7a` baseline, 58 now, none new.
 - **Ruff** (used once): `ruff check --select F` (the pyflakes rules) over
   the application and the tests found no undefined name and 41 unused or
   duplicated imports (three of them added by the P2-2 move tool); 40 were

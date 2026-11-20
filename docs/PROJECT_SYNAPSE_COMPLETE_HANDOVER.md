@@ -198,15 +198,15 @@ Git shows this cycle as one day of commits (2026-10-29):
 
 | Commit | Content |
 |---|---|
-| `e4395ed` | Baseline, the state before the audit-driven changes |
-| `f4a2ac0` | Stage 0: test suite, golden master, P0 reproduction tests |
-| `08fdce2` | Python 3.10/3.11 import fix in `protein.py` |
-| `59d1997` | Stage 1: the nine P0 fixes (see Part V) |
-| `b99e63d` | Stage 2: shared data model, visible result storage, file input, logging |
-| `5171926` | Stage 3: P1 scientific improvements, reproducible report |
-| `dd15af5` | Stage 4: consolidation, shared tables, core API, methods documentation |
-| `88cc4ae` | Stage 5: unresolved protein residues keep their position |
-| `0dad3bb` | `docs/AUDIT_STATUS.md` |
+| `05222ea` | Baseline, the state before the audit-driven changes |
+| `6ad87a0` | Stage 0: test suite, golden master, P0 reproduction tests |
+| `d80d1c5` | Python 3.10/3.11 import fix in `protein.py` |
+| `7e541ff` | Stage 1: the nine P0 fixes (see Part V) |
+| `68380f1` | Stage 2: shared data model, visible result storage, file input, logging |
+| `047bdb5` | Stage 3: P1 scientific improvements, reproducible report |
+| `0b01664` | Stage 4: consolidation, shared tables, core API, methods documentation |
+| `8f55a30` | Stage 5: unresolved protein residues keep their position |
+| `0c48a96` | `docs/AUDIT_STATUS.md` |
 
 The detail of that work is known only from these commits and documents
 [NOT VERIFIABLE beyond them].
@@ -214,32 +214,32 @@ The detail of that work is known only from these commits and documents
 ### Phase 6 (2026-10-30 to now)
 
 **2026-10-30.**
-- Pyright configuration recorded (`5242fcb`).
-- Local skills ignored in Git (`5d8c73a`).
-- **Phase 6 initial audit and feature matrix** (`824ca5f`): 19 confirmed
+- Pyright configuration recorded (`4aa23ce`).
+- Local skills ignored in Git (`87603fb`).
+- **Phase 6 initial audit and feature matrix** (`8a10cdc`): 19 confirmed
   defects D1-D19 and suspected items S1-S14. Items S15-S24 came later.
 
 **2026-10-31: Stages B, C, D and E work.**
 - D1-D19 corrections, one commit each, among them:
-  - `dc780f6` D1 initiator Met;
-  - `ab4bd2a` D2 an ORF is translated with its own genetic code. This
+  - `8128e94` D1 initiator Met;
+  - `f302b7a` D2 an ORF is translated with its own genetic code. This
     commit is also the **pyright baseline: 134 errors**;
-  - `d057ac1` central alphabets and the type classifier (D13, D14);
-  - `162ca16` one input contract for menu and API.
+  - `2a6a979` central alphabets and the type classifier (D13, D14);
+  - `c13d156` one input contract for menu and API.
 - Suspected items S1-S24 assessed.
-- The superseded primer generations removed (D16 part 2, `dfe773d`).
-- RNA codon view with the ORF's genetic code (`8d28586`).
-- Scan cache S18 (`87c3fb0`).
-- API entry points S14 (`6a8c00c`).
-- BLAST RID resume (`ad843c5`).
-- `main()` entry point S13 (`7008cd8`).
+- The superseded primer generations removed (D16 part 2, `54622e3`).
+- RNA codon view with the ORF's genetic code (`027000d`).
+- Scan cache S18 (`7ab4410`).
+- API entry points S14 (`d295fd4`).
+- BLAST RID resume (`3b3919c`).
+- `main()` entry point S13 (`f071d2a`).
 - Several handover updates.
 
 **2026-11-01: Stage F begins.**
-- One separator width (D17, `5db21ab`).
-- One meaning of `[0]` and one message prefix (`b1fa927`).
-- BLAST menu renumbered (`10431d6`).
-- XML exposure measured (S24, `f803577`).
+- One separator width (D17, `57a250c`).
+- One meaning of `[0]` and one message prefix (`c996922`).
+- BLAST menu renumbered (`5177b1c`).
+- XML exposure measured (S24, `d7250e1`).
 
 **2026-11-02: Stages G, H and I.**
 - No more "confidence" for heuristic scores (D18).
@@ -248,28 +248,28 @@ The detail of that work is known only from these commits and documents
 - Restriction parameters recorded.
 - Editorial pass and `docs/STYLE_GUIDE.md` (Stage H).
 - README rewrite.
-- Primer Tm compared with primer3-py (`2851e11`).
+- Primer Tm compared with primer3-py (`f2f640d`).
 - IG instability weight corrected from a Biopython reference test
-  (`835744e`).
-- Workflow tests (`999f77a`).
+  (`16acff9`).
+- Workflow tests (`17c25d3`).
 - AUDIT_STATUS and FEATURE_STATUS updates.
-- Python 3.10 f-string fix in CRISPR (`db74504`).
-- Final report (`1f0c0f5`) and independent review (`fc77ff4`, `fc13aad`).
+- Python 3.10 f-string fix in CRISPR (`9d54b3a`).
+- Final report (`4845a5c`) and independent review (`6524ca3`, `1d029c5`).
 
 **2026-11-02 and 2026-11-03: Stage F completion and its review.** Part IX
 gives the detail.
 - Re-examination; two conversion rounds covering 16 interface files
-  (`2e47ff9` to `f9ed98e`).
-- Enter-key regression found by the owner and fixed (`1516339`).
-- Closing review and recommendations 1-5 (`46710cd` to `12949f3`):
+  (`f90daaa` to `f94cf4b`).
+- Enter-key regression found by the owner and fixed (`21deb2a`).
+- Closing review and recommendations 1-5 (`4124477` to `95ca111`):
   - direct prints removed;
   - core no longer imports `ui`;
   - every menu rendered and driven;
-  - the single-enzyme cloning crash fixed (`8eddc72`; it had existed
+  - the single-enzyme cloning crash fixed (`82b7842`; it had existed
     since the audit commit).
 
-**2026-11-11: autonomous completion run, packages A and B** (`68e59d1` to
-`690c9e8`). Part XII describes it; the owner stopped it after package B.
+**2026-11-11: autonomous completion run, packages A and B** (`8546347` to
+`2f24498`). Part XII describes it; the owner stopped it after package B.
 
 ---
 
@@ -360,10 +360,10 @@ has **not yet** been updated for the commits of 2026-11-11 (Part XI).
   Without one it is the whole selected DNA sequence. The menu shows which
   source it uses ("Input source").
 - **Codon view.** It uses the selected ORF's genetic code (P1-9 part,
-  `8d28586`).
+  `027000d`).
 - **Hairpins.** `find_rna_hairpins(rna, min_stem=4, min_loop=3, max_loop=12, allow_gu=False)`
   screens stems of 4-7 nt that pair at 75 % or more, Watson-Crick only.
-  Since `fedb750`, `summarize_rna_structure()` adds
+  Since `9fe9582`, `summarize_rna_structure()` adds
   `hairpin_count_with_gu`, and the screen shows "Including G-U pairs"
   (58 → 260 on the golden reference).
 - **API.** `core.api.analyze_rna`.
@@ -400,7 +400,7 @@ has **not yet** been updated for the commits of 2026-11-11 (Part XI).
 
 - **Enzyme database.** 22 palindromic enzymes in `RESTRICTION_ENZYMES`
   (`ENZYME_DATABASE_VERSION = "synapse-2026-10-29"`).
-- **Type IIS (`4939688`).** `TYPE_IIS_ENZYMES` (BsaI, BsmBI, BbsI, SapI;
+- **Type IIS (`38850fd`).** `TYPE_IIS_ENZYMES` (BsaI, BsmBI, BbsI, SapI;
   `TYPE_IIS_DATABASE_VERSION = "synapse-2026-11-11"`) is a separate table.
 - **Matcher.** `find_recognition_site_matches()` with the cached
   `_scan_recognition_sites()`. A site is CONFIRMED (exact bases) or
@@ -418,7 +418,7 @@ has **not yet** been updated for the commits of 2026-11-11 (Part XI).
 - **Menus.** `run_restriction_cloning_ui` → `run_restriction_analysis_ui`
   (overview, map, digest and gel, complete report).
 - **Topology.** Linear and circular; origin-spanning sites (D3).
-- **Coordinates (`1ae2833`).** In site and cut records, unsuffixed
+- **Coordinates (`7d3c6b5`).** In site and cut records, unsuffixed
   `site_position`, `top_cut` and `bottom_cut` are 1-based (for a cut, the
   first base after it). `*_0based` keys give the 0-based start or the cut
   boundary. `cut_positions` lists boundaries.
@@ -444,13 +444,13 @@ has **not yet** been updated for the commits of 2026-11-11 (Part XI).
   - `automatic_cloning_planner`;
   - `find_best_cloning_strategies`;
   - `ends_compatible`;
-  - `print_cloning_report` with `_print_single_enzyme_report` (`8eddc72`)
+  - `print_cloning_report` with `_print_single_enzyme_report` (`82b7842`)
     and `_print_single_strategy_report`.
 - **Science.** End compatibility requires the same overhang sequence and
   the same polarity (5′ vs 3′); blunt ends are compatible with blunt ends
   (P0-3). Ambiguous sites never define ends (D4). Vector and insert
   topology are respected (D5).
-- **Performance (`b4b16bb`).** A search-scoped cache
+- **Performance (`16ec933`).** A search-scoped cache
   `_strategy_search_cache()` with `_cached()` and `_copy_result()`. The
   planner went from 21.7 s to 3.2 s with byte-identical results.
 - **Type IIS.** Deliberately excluded from the fixed-overhang model.
@@ -480,14 +480,14 @@ has **not yet** been updated for the commits of 2026-11-11 (Part XI).
   is MODERATE / HIGH / VERY HIGH, together with 3′ complementarity
   (`_v8_structure_severity`). This is a **heuristic**. Against primer3-py
   ΔG the Spearman ρ is −0.78 (hairpin), −0.74 (self-dimer) and −0.51
-  (heterodimer), and the classes overlap (`27255df`,
+  (heterodimer), and the classes overlap (`e00c4cb`,
   `tests/test_primer_structure_reference.py`).
 - **Coordinates.** `PrimerCandidate.start` and `end` are 0-based half-open
   on the template. The menu shows 1-based positions.
 - **Since 2026-11-11.**
   - `primer_pair_binding_sites()` (P2-4).
   - The hairpin search slices one reverse complement and stops at the
-    first match (`15e2ff1`): 10 kb design went from 135.6 s to 25.6 s.
+    first match (`073f377`): 10 kb design went from 135.6 s to 25.6 s.
 - **Open.** The 10 kb design is still above the 10 s target (T1). The
   v5–v11 ranking chain is kept (P2-1 partial). There is no
   restriction-site-driven primer design (T2).
@@ -510,19 +510,19 @@ has **not yet** been updated for the commits of 2026-11-11 (Part XI).
   - `build_mutation_report`;
   - the menus `run_mutation_variant_ui` and `run_mutation_analysis_ui`.
 - **Alignment.** Needleman–Wunsch with match 2, mismatch −1 and gap −2.
-  Ties are broken diagonal > up > left. Since `f9d4356` it keeps two score
-  rows and a one-byte traceback per cell. Since `e5bb456`, above 1,000,000
+  Ties are broken diagonal > up > left. Since `90a62ed` it keeps two score
+  rows and a one-byte traceback per cell. Since `2dbd863`, above 1,000,000
   cells it uses an exact banded alignment with an optimality bound
   (Part VI).
 - **Similarity.** Levenshtein distance, exactly banded above 1,000,000
-  cells (`15e2ff1`).
+  cells (`073f377`).
 - **Coding consequences.** Position 1 is assumed to be codon 1, and the
   CDS can come from the selected ORF. Start-loss is reported only for
   codon 1 (P0-6).
-- **HGVS (`b7eb1de`).** Predicted changes are written `p.(R12C)`,
+- **HGVS (`e9c7878`).** Predicted changes are written `p.(R12C)`,
   `p.(R12=)`, `p.(W24*)`, `p.(M1?)` and `p.(*110Qext*?)`; they appear in
   report lines. This is HGVS-style, not validated with a validator.
-- **Navigation (`8379ac2`).** `_prompt_sequence` offers `[0] Cancel`, which
+- **Navigation (`1617c01`).** `_prompt_sequence` offers `[0] Cancel`, which
   raises `SequencePromptCancelled`.
 
 ### 9. Variant analysis – `analyses/variant_analysis.py` (2,910)
@@ -542,9 +542,9 @@ has **not yet** been updated for the commits of 2026-11-11 (Part XI).
 - **Contig matching.** Exact by default; `chr_prefix` is opt-in. A missing
   reference is flagged (D12).
 - **Bridge.** `annotate_from_mutation_analysis()` stores the class in
-  `consequence` and, since `b7eb1de`, the `p.(...)` notation in
+  `consequence` and, since `e9c7878`, the `p.(...)` notation in
   `protein_change`.
-- **P2-4 (`2c68e61`).** `check_features_against_variants()` compares
+- **P2-4 (`80a900b`).** `check_features_against_variants()` compares
   variants with primer and guide sites. The API entry point is
   `core.api.cross_check_variants`. It is **not** wired into the menus,
   because the pipeline does not record which VCF contig was mapped to the
@@ -596,7 +596,7 @@ has **not yet** been updated for the commits of 2026-11-11 (Part XI).
   length (P0-1).
 - **Evidence profile.** Bands are gated at E ≤ 1e-3; an insignificant hit
   is not treated as evidence.
-- **Since 2026-11-11.** HTTPError responses are closed (`68e59d1`).
+- **Since 2026-11-11.** HTTPError responses are closed (`8546347`).
 - **Not done.** No live remote run in Phase 6 (approval needed). The file
   `blast_results/TEST_8_REFERENCE_blast.json` is a labeled legacy record
   (D7); deleting it is the owner's decision.
@@ -607,7 +607,7 @@ has **not yet** been updated for the commits of 2026-11-11 (Part XI).
   deduplication.
 - **Requests.** Per-host throttling and bounded retry on 429/5xx with
   `Retry-After` (`_request_text`, `_retry_delay`). The HTTPError response
-  is closed (`68e59d1`).
+  is closed (`8546347`).
 - **Data.** `LiteratureQuery` and `LiteratureSearchRun`; the date
   validation flags future dates. The menu is `_interactive_menu`.
 - **Rule.** No fabricated publications.
@@ -629,7 +629,7 @@ code exists for it [VERIFIED].
 - **Storage.** `store(module, data, parameters, warnings)` keeps
   `AnalysisResult` objects per module.
 - **Status.** `status_report()` returns data, and `print_status(render)`
-  hands it to a `StatusRenderer` (`b25e800`). The terminal renderer is
+  hands it to a `StatusRenderer` (`acd8923`). The terminal renderer is
   `ui.report.print_pipeline_status`.
 - **Rules.** Selecting an ORF changes the sources of RNA and protein. Stale
   dependent results are invalidated (`ORF_DEPENDENT_MODULES`). The protein
@@ -814,7 +814,7 @@ data needs approval.
 
 ### Corrections (what was wrong, what changed, how validated, what remains)
 
-**P0 (previous cycle, Stage 1 `59d1997`) [DOCUMENTED].** The nine P0
+**P0 (previous cycle, Stage 1 `7e541ff`) [DOCUMENTED].** The nine P0
 defects of the Master Prompt §3.1:
 
 1. BLAST query coverage;
@@ -873,16 +873,16 @@ the suite [VERIFIED]; the measurements are [MEASURED IN SESSION].
 
 | Commit | Was wrong | What changed and how it was validated | Limitation |
 |---|---|---|---|
-| `8eddc72` | Single-Enzyme Analysis crashed (`KeyError: 'left'`) since the audit | Own report from existing fields | – |
-| `1516339`, `c78800e` | Stage F rewriting broke Enter defaults in 15 prompts and the Tm dialog | Restored; `EmptyAnswerTests` | – |
-| `68e59d1` | HTTPError responses (literature, BLAST) were never closed | Closed; the tests fail on the old code | – |
-| `8379ac2` | The mutation prompt had no `[0]`; ten errors were drawn as fields | `[0] Cancel`; ERROR lines; a rule finds all 10 old sites | – |
-| `4939688` | No Type IIS enzymes; forward-only search | Both strands; Biopython: 140 cuts, 0 differences | No Golden Gate planning; not in cloning |
-| `b7eb1de` | `p.R2C`, "Ter" mixed into one-letter code; helper unused; variant `protein_change` held the class | `p.(R2C)` etc.; used in reports and variants | Not validated with an HGVS validator |
-| `1ae2833` | `site_position` 1-based in maps, 0-based in digests | Unsuffixed keys are 1-based everywhere | – |
-| `fedb750` | G·U pairs ignored in RNA hairpins | Separate count (58 → 260); screen unchanged | No energy model |
-| `f020a1d` | No origin-spanning or 5′-partial ORFs | Implemented; rotation-invariance test | No ORFfinder comparison |
-| `2c68e61` | No primer or guide checks against variants | API-level check | Not in the menus |
+| `82b7842` | Single-Enzyme Analysis crashed (`KeyError: 'left'`) since the audit | Own report from existing fields | – |
+| `21deb2a`, `069c39f` | Stage F rewriting broke Enter defaults in 15 prompts and the Tm dialog | Restored; `EmptyAnswerTests` | – |
+| `8546347` | HTTPError responses (literature, BLAST) were never closed | Closed; the tests fail on the old code | – |
+| `1617c01` | The mutation prompt had no `[0]`; ten errors were drawn as fields | `[0] Cancel`; ERROR lines; a rule finds all 10 old sites | – |
+| `38850fd` | No Type IIS enzymes; forward-only search | Both strands; Biopython: 140 cuts, 0 differences | No Golden Gate planning; not in cloning |
+| `e9c7878` | `p.R2C`, "Ter" mixed into one-letter code; helper unused; variant `protein_change` held the class | `p.(R2C)` etc.; used in reports and variants | Not validated with an HGVS validator |
+| `7d3c6b5` | `site_position` 1-based in maps, 0-based in digests | Unsuffixed keys are 1-based everywhere | – |
+| `9fe9582` | G·U pairs ignored in RNA hairpins | Separate count (58 → 260); screen unchanged | No energy model |
+| `7e61baf` | No origin-spanning or 5′-partial ORFs | Implemented; rotation-invariance test | No ORFfinder comparison |
+| `80a900b` | No primer or guide checks against variants | API-level check | Not in the menus |
 
 ### Established, heuristic, predicted
 
@@ -904,12 +904,12 @@ handover. Results stayed identical in every case.
 
 | Item | Before | After | Evidence of identical results |
 |---|---|---|---|
-| Recognition-site scan cache (S18, `87c3fb0`, 2026-10-31) [DOCUMENTED] | 10 enzymes 100–110 s | 0.57 s | Scan-cache test |
-| Cloning planner, 912 bp vector, 252 bp insert, 22 enzymes (`b4b16bb`) | 21.7 s (circular 24.0, ambiguous 23.8, no sites 4.9) | 3.2 s (3.8 / 4.3 / 2.7) | Canonical JSON of 5 planner runs plus 2 evaluations byte-identical; `test_planner_cache.py` |
-| Mutation alignment memory (`f9d4356`) | 46.0 bytes/cell, 184 MB at 2,000 nt | 1.1 bytes/cell, 4.4 MB | 49 alignments identical |
-| Mutation alignment time, similar sequences (`e5bb456`) | 2 kb 0.71 s; 5 kb 4.8 s; 10 kb 23 s (2 kb was 1.56 s before `f9d4356`) | 0.03 / 0.08 / 0.18 s | 300 random pairs during development plus 150 in tests identical; exactness bound |
-| Sequence similarity at 10 kb (`15e2ff1`) | ~40 s under profiling (100 million cells); `compare_sequences` 10.2 s | 0.10 s | 1,200 band checks exact |
-| Primer design at 10 kb (`15e2ff1`) | 135.6 s | **25.6 s** (3 kb: 9.6 s) | 3,008 hairpin results and 3 full designs identical |
+| Recognition-site scan cache (S18, `7ab4410`, 2026-10-31) [DOCUMENTED] | 10 enzymes 100–110 s | 0.57 s | Scan-cache test |
+| Cloning planner, 912 bp vector, 252 bp insert, 22 enzymes (`16ec933`) | 21.7 s (circular 24.0, ambiguous 23.8, no sites 4.9) | 3.2 s (3.8 / 4.3 / 2.7) | Canonical JSON of 5 planner runs plus 2 evaluations byte-identical; `test_planner_cache.py` |
+| Mutation alignment memory (`90a62ed`) | 46.0 bytes/cell, 184 MB at 2,000 nt | 1.1 bytes/cell, 4.4 MB | 49 alignments identical |
+| Mutation alignment time, similar sequences (`2dbd863`) | 2 kb 0.71 s; 5 kb 4.8 s; 10 kb 23 s (2 kb was 1.56 s before `90a62ed`) | 0.03 / 0.08 / 0.18 s | 300 random pairs during development plus 150 in tests identical; exactness bound |
+| Sequence similarity at 10 kb (`073f377`) | ~40 s under profiling (100 million cells); `compare_sequences` 10.2 s | 0.10 s | 1,200 band checks exact |
+| Primer design at 10 kb (`073f377`) | 135.6 s | **25.6 s** (3 kb: 9.6 s) | 3,008 hairpin results and 3 full designs identical |
 
 **How the bands are exact.**
 
@@ -933,7 +933,7 @@ handover. Results stayed identical in every case.
   10 kb).
 
 **10 kb benchmark of all modules** (MEASURED IN SESSION, before
-`15e2ff1`):
+`073f377`):
 
 | Module | Time |
 |---|---|
@@ -962,7 +962,7 @@ stability measure (Part III.7).
 | Automated tests | **421**, all passing. Run with `.venv/Scripts/python.exe -m unittest discover -s tests -t .` in about 35 s. 409 `def test_` methods plus 12 generated golden-master tests. |
 | Golden master | `tests.test_golden_master` passes (12 scenarios, 13 snapshot files in `tests/golden/`). No snapshot was updated in this session. |
 | Module self-tests | Run inside the suite (`test_builtin_selftests.py`). Last individual run (2026-11-03): BLAST 33/33, CRISPR 28/28, literature 64/64, mutation 44/44, variant 27/27. |
-| Pyright 1.1.414 (`--pythonversion 3.10`, standard mode) | **111 errors**, no new diagnostic against the baseline of `ab4bd2a` (134) |
+| Pyright 1.1.414 (`--pythonversion 3.10`, standard mode) | **111 errors**, no new diagnostic against the baseline of `f302b7a` (134) |
 | Working tree | Clean |
 | ReadOnly attributes | 15/15 set |
 
@@ -1016,7 +1016,7 @@ stability measure (Part III.7).
 
 ### Gaps
 
-- **Dialogs.** Instrumented on 2026-11-03 at `12949f3`, not re-measured:
+- **Dialogs.** Instrumented on 2026-11-03 at `95ca111`, not re-measured:
   46 of 101 `header`, 41 of 72 `ask` and 2 of 7 `confirm` calls execute in
   the suite. The rest are export, NCBI-download, removal and
   remote-submit dialogs.
@@ -1031,7 +1031,7 @@ stability measure (Part III.7).
 - Pyright runs only as `python -m pyright` (the `.exe` is blocked by
   application control).
 - The baseline file is not in the repository. To reproduce it:
-  1. Check out `ab4bd2a` in a temporary worktree.
+  1. Check out `f302b7a` in a temporary worktree.
   2. Set its `pyproject.toml` `venvPath` to the project folder.
   3. Run `python -m pyright --pythonversion 3.10 --outputjson`.
   4. Count the `file|rule|first message line` entries of severity
@@ -1073,15 +1073,15 @@ stability measure (Part III.7).
 
 | Stage | Objective | Done | Partial or open | Evidence |
 |---|---|---|---|---|
-| A Baseline | Verify copy, Git, tests; record the baseline | Done (Stage 0; initial audit `824ca5f`) | – | `docs/PHASE6_INITIAL_AUDIT.md` |
+| A Baseline | Verify copy, Git, tests; record the baseline | Done (Stage 0; initial audit `8a10cdc`) | – | `docs/PHASE6_INITIAL_AUDIT.md` |
 | B Critical corrections | P0 and critical defects | P0 1–9 (previous cycle); D1–D19 corrected | – | `test_p0_regressions`, tier tests, FINAL_REPORT §B |
 | C P1/P2 | Resolve outstanding improvements | P1-9 (origin-spanning, 5′-partial); P2-4 (API); P2-5 (G·U count); P2-6 (planner, alignment, similarity); P2-7 (Type IIS digests) | P2-1 merge of primer generations not done; P2-2 analyses import `ui`; P2-3 CFD blocked; P2-5 "complexity" rename and RNAfold not done; P2-6 primer 10 kb at 25.6 s; P2-4 not in menus; P3 deferred | AUDIT_STATUS (not yet updated for 2026-11-11), commit messages |
 | D Functional completeness | Every feature works; invalid inputs handled | Feature matrix; single-enzyme crash fixed; every menu rendered; missing files tested | Many export, download and remote dialogs not driven; restriction-site-driven primer design (10.2) absent | FEATURE_STATUS, `test_rendered_menus` |
 | E Core architecture | Shared logic, API, pipeline, data models | API for every analysis; one input contract; status as data | P2-2, P2-1, pipeline menu-path parameters | LayeringTests |
 | F Terminal UI | One design language | 16 interface files on `ui/style`; navigation; messages; tests | TERMINAL_UI_STANDARD §9 items | Part IX |
-| G Output standardization | Results, units, exports | D18; units; 1-based positions; warnings in exports; restriction provenance | Documentation reconciliation for 2026-11-11 | Commits `317097d`..`81ccc55` |
-| H Language and docs | Editorial pass, STYLE_GUIDE, README | Done on 2026-11-02 | Docs not reconciled for the 16 latest commits | `1a8f2bc`, `97086ad`, `ccf4ccb` |
-| I Final verification | All tests, comparisons, final report | Performed on 2026-11-02 (`1f0c0f5`) | **Superseded**: must be redone after the remaining work; final report A–K must be rewritten | – |
+| G Output standardization | Results, units, exports | D18; units; 1-based positions; warnings in exports; restriction provenance | Documentation reconciliation for 2026-11-11 | Commits `d0b84bd`..`ef84127` |
+| H Language and docs | Editorial pass, STYLE_GUIDE, README | Done on 2026-11-02 | Docs not reconciled for the 16 latest commits | `b315a6f`, `93ebe86`, `f20d600` |
+| I Final verification | All tests, comparisons, final report | Performed on 2026-11-02 (`4845a5c`) | **Superseded**: must be redone after the remaining work; final report A–K must be rewritten | – |
 
 Phase 6 may be declared complete only after every applicable mandatory
 requirement has been checked against the Master Prompt (§16) and
@@ -1095,35 +1095,35 @@ PARTIALLY COMPLETE, UNVERIFIED and BLOCKED.
 ### History
 
 1. **2026-11-01.**
-   - `5db21ab`: 389 separator literals in 11 widths replaced by
+   - `57a250c`: 389 separator literals in 11 widths replaced by
      `major_rule()` and `minor_rule()` at 70 columns.
-   - `b1fa927`: `[0]` means only Back, Cancel or Exit; one message prefix
+   - `c996922`: `[0]` means only Back, Cancel or Exit; one message prefix
      per category.
-   - `10431d6`: BLAST menu renumbered.
+   - `5177b1c`: BLAST menu renumbered.
 2. **2026-11-02, re-examination** (`docs/STAGE_F_UI_REVIEW.md`). It found
    that no module actually used the shared renderers.
-   - Round 1 (`2e47ff9`–`623a0a8`): ORF, CRISPR, BLAST, literature, primer,
+   - Round 1 (`f90daaa`–`4becb63`): ORF, CRISPR, BLAST, literature, primer,
      variant.
-   - Round 2 (`1ac77a4`–`f9ed98e`): session, overview, RNA, protein,
+   - Round 2 (`6e27e5c`–`f94cf4b`): session, overview, RNA, protein,
      restriction and cloning, mutation, pipeline. Also tables, report
      lines, prompts, yes/no questions, and the variant menu in §5.3 order.
 3. **2026-11-03, regressions.**
    - The automatic rewrite had turned `Label [hint]:` prompts into
      `ask(default=hint)`, so Enter returned the hint and broke four
      dialogs (literature dates, primer conditions, BLAST options, cloning
-     count). Fixed in `1516339`.
-   - The Tm dialog lost its Enter default. Fixed in `c78800e`.
+     count). Fixed in `21deb2a`.
+   - The Tm dialog lost its Enter default. Fixed in `069c39f`.
 4. **2026-11-03, closing review** (`docs/STAGE_F_FINAL_REVIEW.md`) and
    recommendations:
-   1. Claims corrected (`46710cd`).
-   2. Direct prints converted (`4e2cace`, `e559255`, `b9ec344`):
+   1. Claims corrected (`4124477`).
+   2. Direct prints converted (`52ec39e`, `2367194`, `f519934`):
       - 44 messages;
       - 18 headings;
       - 9 dynamic lists.
-   3. FEATURE_STATUS numbers corrected (`163c54d`).
-   4. Core/UI separation (`b25e800`, `b4e5a53`).
-   5. Every menu rendered (`a39c39f`); this found the single-enzyme crash
-      (`8eddc72`).
+   3. FEATURE_STATUS numbers corrected (`f7aa657`).
+   4. Core/UI separation (`acd8923`, `615ff7b`).
+   5. Every menu rendered (`cadd3c6`); this found the single-enzyme crash
+      (`82b7842`).
 5. **2026-11-11.**
    - Mutation `[0] Cancel`.
    - Field-messages rule.
@@ -1343,40 +1343,40 @@ The remaining reports are historical snapshots.
 | Item | Value |
 |---|---|
 | Branch | `main` |
-| HEAD at the start of this documentation task | `690c9e8` "Correct the test count in the continuation record (421)". The commit that adds this file follows it; check with `git log --oneline -3`. Neither `12949f3` nor `690c9e8` is the HEAD after this file is committed. |
+| HEAD at the start of this documentation task | `2f24498` "Correct the test count in the continuation record (421)". The commit that adds this file follows it; check with `git log --oneline -3`. Neither `95ca111` nor `2f24498` is the HEAD after this file is committed. |
 | Commits | 125 before this file (Appendix A) |
 | Working tree | Clean before this file |
 | Tests | 421 run, OK |
 | Golden master | OK |
 | Pyright | 111 errors, no new diagnostic against the 134 baseline |
 | ReadOnly | 15/15 |
-| Latest continuation record | `docs/PHASE6_CONTINUATION.md` (commits `b8e92d8`, `690c9e8`) |
+| Latest continuation record | `docs/PHASE6_CONTINUATION.md` (commits `3d8dfce`, `2f24498`) |
 | Latest progress row | `docs/PHASE6_PROGRESS.md` row 52 (2026-11-03) |
 
 ### Package A – test gaps and navigation (2026-11-11)
 
 | Commit | Content | Validation |
 |---|---|---|
-| `68e59d1` | HTTPError responses closed in `literature._request_text` and `NCBIBlastClient._request` | Two tests keep the errors alive; both fail on the old code; no ResourceWarning remains |
-| `8379ac2` | Mutation `[0] Cancel` via `SequencePromptCancelled`; 10 field-messages converted to ERROR/NOTE lines; new rule `test_no_message_is_drawn_as_a_field`; `MissingFileTests` (loaders and five dialogs) | The rule finds all 10 sites in the old code; rendered scenario `mutation_cancel` |
+| `8546347` | HTTPError responses closed in `literature._request_text` and `NCBIBlastClient._request` | Two tests keep the errors alive; both fail on the old code; no ResourceWarning remains |
+| `1617c01` | Mutation `[0] Cancel` via `SequencePromptCancelled`; 10 field-messages converted to ERROR/NOTE lines; new rule `test_no_message_is_drawn_as_a_field`; `MissingFileTests` (loaders and five dialogs) | The rule finds all 10 sites in the old code; rendered scenario `mutation_cancel` |
 
 ### Package B – science and performance (2026-11-11)
 
 | Commit | Content |
 |---|---|
-| `b4b16bb` | Cloning planner search cache. The S18 test now expects 0 repeated scan requests. |
-| `4939688` | Type IIS enzymes; digest dialog shows them |
-| `b7eb1de` | HGVS `p.(...)` notation |
-| `1ae2833` | Restriction coordinate convention |
-| `fedb750` | G·U wobble count |
-| `f020a1d` | Origin-spanning and 5′-partial ORFs |
-| `27255df` | primer3-py structure comparison |
-| `2c68e61` | P2-4 variant cross-check |
-| `f9d4356` | One-byte traceback in the alignment |
-| `e5bb456` | Exact banded alignment |
-| `15e2ff1` | Banded Levenshtein and faster hairpin screen |
+| `16ec933` | Cloning planner search cache. The S18 test now expects 0 repeated scan requests. |
+| `38850fd` | Type IIS enzymes; digest dialog shows them |
+| `e9c7878` | HGVS `p.(...)` notation |
+| `7d3c6b5` | Restriction coordinate convention |
+| `9fe9582` | G·U wobble count |
+| `7e61baf` | Origin-spanning and 5′-partial ORFs |
+| `e00c4cb` | primer3-py structure comparison |
+| `80a900b` | P2-4 variant cross-check |
+| `90a62ed` | One-byte traceback in the alignment |
+| `2dbd863` | Exact banded alignment |
+| `073f377` | Banded Levenshtein and faster hairpin screen |
 
-Then the stop record: `b8e92d8`, `690c9e8`.
+Then the stop record: `3d8dfce`, `2f24498`.
 
 ### The next task (the plan is still current)
 
@@ -1525,7 +1525,7 @@ Fresh runs: suite, golden master, pyright, ReadOnly count, `git status`.
 **Contradictions resolved:**
 - the plan item "create tool and data directories" means the tool and
   data ledger;
-- HEAD is newer than both `12949f3` and `690c9e8`.
+- HEAD is newer than both `95ca111` and `2f24498`.
 
 ---
 
@@ -1535,131 +1535,131 @@ All 125 commits, oldest first. The commit that adds this file follows them.
 
 | # | Commit | Date | Subject |
 |---:|---|---|---|
-| 1 | `e4395ed` | 2026-10-29 | Baseline: project state before audit-driven changes |
-| 2 | `f4a2ac0` | 2026-10-29 | Stage 0: automated test suite, golden master, P0 reproduction tests |
-| 3 | `08fdce2` | 2026-10-29 | Fix Python 3.10/3.11 import error in protein.py |
-| 4 | `59d1997` | 2026-10-29 | Stage 1: fix the nine P0 audit findings |
-| 5 | `b99e63d` | 2026-10-29 | Stage 2: shared data model, visible result storage, file input, logging |
-| 6 | `5171926` | 2026-10-29 | Stage 3: P1 scientific improvements and reproducible report |
-| 7 | `dd15af5` | 2026-10-29 | Stage 4: consolidation, shared tables, core API, methods documentation |
-| 8 | `88cc4ae` | 2026-10-29 | Stage 5: unresolved residues keep their position in protein analysis |
-| 9 | `0dad3bb` | 2026-10-29 | Add docs/AUDIT_STATUS.md: assessment of every audit recommendation |
-| 10 | `5242fcb` | 2026-10-30 | Record pyright type-checking configuration from the previous cycle |
-| 11 | `5d8c73a` | 2026-10-30 | Ignore locally installed Claude skills (/.claude/skills/) |
-| 12 | `824ca5f` | 2026-10-30 | Add Phase 6 initial audit and feature verification matrix |
-| 13 | `d4544ad` | 2026-10-31 | Flag variants whose contig has no reference instead of skipping them (D12) |
-| 14 | `5c098e3` | 2026-10-31 | Use one restriction-site matcher; ambiguity never makes a cloning site (D4) |
-| 15 | `47146b0` | 2026-10-31 | Honor circular topology in the restriction map and site results (D3) |
-| 16 | `7334296` | 2026-10-31 | Honor vector and insert topology in cloning analysis (D5) |
-| 17 | `dc780f6` | 2026-10-31 | Decode initiator Met only for initiation codons of the genetic code (D1) |
-| 18 | `ab4bd2a` | 2026-10-31 | Translate an ORF with its own genetic code (D2) |
-| 19 | `02d2899` | 2026-10-31 | Add Phase 6 progress record and the D14 sub-findings |
-| 20 | `b8f5ea8` | 2026-10-31 | Use one BLAST query-type vocabulary (D14-F2) |
-| 21 | `d057ac1` | 2026-10-31 | Add central sequence alphabets and a type classifier (D14, D13) |
-| 22 | `776de4a` | 2026-10-31 | Read, keep and report the declared molecule type (D14-F3, F11) |
-| 23 | `7c716a2` | 2026-10-31 | Take the BLAST query type from the central classifier (D14-F1, S20) |
-| 24 | `162ca16` | 2026-10-31 | One input contract for menu and API; route protein records (D13, D14) |
-| 25 | `343ffb7` | 2026-10-31 | Keep IUPAC protein codes in place and give them meaning (D14-F6) |
-| 26 | `d40d328` | 2026-10-31 | Normalize and check input in ORF search, transcription, GC count (D14) |
-| 27 | `5b120ec` | 2026-10-31 | Address a local BLAST database by its path prefix (D6, S7) |
-| 28 | `e1a48c6` | 2026-10-31 | Label the stale BLAST result file as a legacy record (D7) |
-| 29 | `7a4a718` | 2026-10-31 | Add handover notes to the Phase 6 progress record |
-| 30 | `3514617` | 2026-10-31 | Do not count a guide's own site as an off-target (D9) |
-| 31 | `ca2ec39` | 2026-10-31 | Report the modeled CRISPR cut site with its source (D8) (subject written in American spelling here; the commit itself uses the British double-l form) |
-| 32 | `8145556` | 2026-10-31 | Make the CRISPR config fields act; keep exports in the project (D10, D11) |
-| 33 | `e47cb85` | 2026-10-31 | Let the pipeline's ORF runner take the menu's search settings (D19) |
-| 34 | `f3a09c1` | 2026-10-31 | Label the unimplemented AI Experiment Planner as such (D15) |
-| 35 | `c71963b` | 2026-10-31 | Fix the variant-to-mutation bridge and a flag leak (S15, S16) |
-| 36 | `c743beb` | 2026-10-31 | Cut the cloning digest at the enzyme's cut, not its site start (S17) |
-| 37 | `6c20e69` | 2026-10-31 | Classify and score ORF start codons with the genetic code (S19) |
-| 38 | `642f31b` | 2026-10-31 | Add Phase 6 handover report for the planned pause |
-| 39 | `6f7987b` | 2026-10-31 | Correct the guide seed end and the RTT coverage check (S23, S3, S4, S5) |
-| 40 | `bff3c7d` | 2026-10-31 | Record the restricted CRISPR assignment in the handover report |
-| 41 | `c52f9bb` | 2026-10-31 | Give the primer Tm model one name instead of shadowing it (D16) |
-| 42 | `5a3220e` | 2026-10-31 | Report what the GenBank reader, the serializer and the REF check discard (S8, S10, S21, S22) |
-| 43 | `8c47b17` | 2026-10-31 | Assess five suspected findings; quantify the alignment cost (S1, S2, S9, S11, S12) |
-| 44 | `edbc28f` | 2026-10-31 | Update the handover report for the second Opus 5 assignment |
-| 45 | `dfe773d` | 2026-10-31 | Remove the superseded primer generations after a reachability review (D16 part 2) |
-| 46 | `8d28586` | 2026-10-31 | Use the selected ORF's genetic code in the RNA codon view (P1-9) |
-| 47 | `87c3fb0` | 2026-10-31 | Cache recognition-site scans so the planner stops rescanning (S18) |
-| 48 | `6a8c00c` | 2026-10-31 | Give the API entry points for the remaining analyses (S14) |
-| 49 | `ad843c5` | 2026-10-31 | Resume an NCBI BLAST search from its request ID (S6, P1-7) |
-| 50 | `7008cd8` | 2026-10-31 | Run the session from main() instead of at import (S13) |
-| 51 | `692cb20` | 2026-10-31 | Update the handover report for the third Opus 5 assignment |
-| 52 | `5db21ab` | 2026-11-01 | Draw every terminal separator at one width through ui.style (Stage F, D17) |
-| 53 | `b1fa927` | 2026-11-01 | Give [0] one meaning and messages one prefix; document and enforce the UI standard (Stage F, D17) |
-| 54 | `10431d6` | 2026-11-01 | Renumber the BLAST menu so its groups read in order (Stage F) |
-| 55 | `f803577` | 2026-11-01 | Measure the XML parsing exposure and classify every outstanding item (S24) |
-| 56 | `aa5703b` | 2026-11-01 | Update the handover report for Stage F |
-| 57 | `317097d` | 2026-11-02 | Stop calling heuristic scores "confidence" in data and exports (Stage G, D18) |
-| 58 | `bc89394` | 2026-11-02 | Report the sequence-type outcome as an evidence level (Stage G, D18) |
-| 59 | `ebf4d52` | 2026-11-02 | Use one notation per unit and show primer positions 1-based (Stage G) |
-| 60 | `cef464a` | 2026-11-02 | Carry a result's own warnings into the exported summary (Stage G, 6.4) |
-| 61 | `81ccc55` | 2026-11-02 | Record restriction parameters and the enzyme data version (Stage G, 6.4) |
-| 62 | `1a8f2bc` | 2026-11-02 | Edit text for one spelling, one wording per message and a sober tone (Stage H) |
-| 63 | `4e5dbdc` | 2026-11-02 | Print every BLAST E-value with three significant figures (Stage G/H) |
-| 64 | `97086ad` | 2026-11-02 | Add the style guide and check its enforcement table (Stage H) |
-| 65 | `ccf4ccb` | 2026-11-02 | Rewrite the README to cover what section 15.1 asks for (Stage H) |
-| 66 | `1269335` | 2026-11-02 | State what "sequence complexity" measures and where it fails (Stage H, P2-5) |
-| 67 | `4c31602` | 2026-11-02 | Record the Stage G and H checkpoint in the handover |
-| 68 | `2851e11` | 2026-11-02 | Compare primer Tm with primer3-py and record the result (Stage I, P1-3) |
-| 69 | `835744e` | 2026-11-02 | Correct the IG instability weight found by new Biopython reference tests (Stage I) |
-| 70 | `999f77a` | 2026-11-02 | Test the cross-module workflows end to end (Stage I, 10.1-10.4, 10.7) |
-| 71 | `82ae2e9` | 2026-11-02 | Bring AUDIT_STATUS up to date for the end of Phase 6 (Stage I, 15.4) |
-| 72 | `70cf362` | 2026-11-02 | Bring the feature matrix to the end-of-Phase-6 state (Stage I) |
-| 73 | `db74504` | 2026-11-02 | Make the CRISPR module importable on Python 3.10 again (Stage I, 11.8) |
-| 74 | `1f0c0f5` | 2026-11-02 | Add the Phase 6 final report and close the handover (Stage I) |
-| 75 | `fc77ff4` | 2026-11-02 | Add the Phase 6 closing review |
-| 76 | `fc13aad` | 2026-11-02 | Correct the Phase 6 documents where the closing review found errors |
-| 77 | `2e47ff9` | 2026-11-02 | Route the ORF screens through ui.style (Stage F completion, part 1) |
-| 78 | `e7eaf58` | 2026-11-02 | Route the CRISPR screens through ui.style (Stage F completion, part 2) |
-| 79 | `5cb4c9a` | 2026-11-02 | Route the BLAST screens through ui.style (Stage F completion, part 3) |
-| 80 | `b181ae3` | 2026-11-02 | Route the literature screens through ui.style (Stage F completion, part 4) |
-| 81 | `fb4070a` | 2026-11-02 | Route the primer screens through ui.style (Stage F completion, part 5) |
-| 82 | `fdc968d` | 2026-11-02 | Route the variant screens through ui.style (Stage F completion, part 6) |
-| 83 | `b80fd37` | 2026-11-02 | Wait for Enter after CRISPR precondition messages (Stage F completion) |
-| 84 | `623a0a8` | 2026-11-02 | Test the rendered screens and record the Stage F completion |
-| 85 | `1ac77a4` | 2026-11-02 | Route the session screens through ui.style (Stage F completion, part 7) |
-| 86 | `bf6ae87` | 2026-11-02 | Route the sequence overview through ui.style (Stage F completion, part 8) |
-| 87 | `9b7f2ef` | 2026-11-02 | Route the RNA and protein screens through ui.style (Stage F completion, part 9) |
-| 88 | `85c22ac` | 2026-11-02 | Route the restriction and cloning screens through ui.style (Stage F completion, part 10) |
-| 89 | `a4df3d4` | 2026-11-02 | Route the mutation screens and pipeline status through ui.style (Stage F completion, part 11) |
-| 90 | `3853d87` | 2026-11-02 | One form for result tables, report lines, prompts and yes/no questions (Stage F completion, part 12) |
-| 91 | `69e3f0f` | 2026-11-02 | Order the variant menu as the work is done (Stage F completion, part 13) |
-| 92 | `7970e5a` | 2026-11-02 | Test every interface screen as rendered (Stage F completion, part 14) |
-| 93 | `7ecb88d` | 2026-11-02 | Draw the ORF selection and topology lists through style.menu (Stage F completion, part 15) |
-| 94 | `f9ed98e` | 2026-11-02 | Record the second Stage F round in the standard, the review and the reports |
-| 95 | `1516339` | 2026-11-03 | Let Enter keep the default in six dialogs again (Stage F regression) |
-| 96 | `46710cd` | 2026-11-03 | Record the Stage F closing review and correct the overstated UI claims |
-| 97 | `4e2cace` | 2026-11-03 | Print the remaining validation and status messages through ui/style (Stage F, recommendation 2a) |
-| 98 | `e559255` | 2026-11-03 | Draw the remaining directly printed headings through style.section (Stage F, recommendation 2b) |
-| 99 | `b9ec344` | 2026-11-03 | Draw the dynamic BLAST and CRISPR option lists through style.menu (Stage F, recommendation 2c) |
-| 100 | `73a1d93` | 2026-11-03 | Detect computed menu keys, plain messages and plain headings in every interface file |
-| 101 | `163c54d` | 2026-11-03 | Bring the menu numbers and summary figures in FEATURE_STATUS in line with the code |
-| 102 | `ccc987b` | 2026-11-03 | Type the f-string walk in the direct-output rule so pyright reports nothing new |
-| 103 | `228b800` | 2026-11-03 | Record recommendations 1-3 of the Stage F closing review in the standard and the reports |
-| 104 | `b25e800` | 2026-11-03 | Let core hand the pipeline status to a renderer instead of importing ui (Stage F, recommendation 4) |
-| 105 | `b4e5a53` | 2026-11-03 | Test that core imports and runs with the ui package unavailable |
-| 106 | `c78800e` | 2026-11-03 | Let Enter choose the nearest-neighbor Tm model again (Stage F regression) |
-| 107 | `61d0d38` | 2026-11-03 | Print three more input-check messages as ERROR lines |
-| 108 | `8eddc72` | 2026-11-03 | Give the single-enzyme cloning analysis a report of its own (it always crashed) |
-| 109 | `a39c39f` | 2026-11-03 | Render and drive every menu of the interface (Stage F, recommendation 5) |
-| 110 | `12949f3` | 2026-11-03 | Record recommendations 4 and 5 in the standard, the reviews and the reports |
-| 111 | `68e59d1` | 2026-11-11 | Close the response an HTTPError carries in the literature and BLAST clients |
-| 112 | `8379ac2` | 2026-11-11 | Give the mutation sequence prompt a cancel, report errors as ERROR lines, test missing files |
-| 113 | `b4b16bb` | 2026-11-11 | Compute each enzyme analysis once per cloning-planner search (P2-6) |
-| 114 | `4939688` | 2026-11-11 | Digest with Type IIS enzymes on both strands (P2-7) |
-| 115 | `b7eb1de` | 2026-11-11 | Write predicted protein changes as HGVS p.(...) and use them in reports and variants |
-| 116 | `1ae2833` | 2026-11-11 | Use one coordinate convention for restriction site and cut records |
-| 117 | `fedb750` | 2026-11-11 | Count G·U wobble pairs in the RNA hairpin screen as a separate figure (P2-5) |
-| 118 | `f020a1d` | 2026-11-11 | Report ORFs across the origin of circular sequences and 5'-partial ORFs (P1-9) |
-| 119 | `27255df` | 2026-11-11 | Compare the primer hairpin and dimer screens with primer3-py |
-| 120 | `2c68e61` | 2026-11-11 | Check designed primers and guides against variants (P2-4) |
-| 121 | `f9d4356` | 2026-11-11 | Keep the mutation alignment to one traceback byte per cell (P2-6) |
-| 122 | `e5bb456` | 2026-11-11 | Align large similar sequences in an exact band (P2-6, 10 kb under 10 s) |
-| 123 | `15e2ff1` | 2026-11-11 | Speed up sequence similarity and the primer hairpin screen without changing results (P2-6) |
-| 124 | `b8e92d8` | 2026-11-11 | Record where the Phase 6 completion run stopped and what remains |
-| 125 | `690c9e8` | 2026-11-11 | Correct the test count in the continuation record (421) |
+| 1 | `05222ea` | 2026-10-29 | Baseline: project state before audit-driven changes |
+| 2 | `6ad87a0` | 2026-10-29 | Stage 0: automated test suite, golden master, P0 reproduction tests |
+| 3 | `d80d1c5` | 2026-10-29 | Fix Python 3.10/3.11 import error in protein.py |
+| 4 | `7e541ff` | 2026-10-29 | Stage 1: fix the nine P0 audit findings |
+| 5 | `68380f1` | 2026-10-29 | Stage 2: shared data model, visible result storage, file input, logging |
+| 6 | `047bdb5` | 2026-10-29 | Stage 3: P1 scientific improvements and reproducible report |
+| 7 | `0b01664` | 2026-10-29 | Stage 4: consolidation, shared tables, core API, methods documentation |
+| 8 | `8f55a30` | 2026-10-29 | Stage 5: unresolved residues keep their position in protein analysis |
+| 9 | `0c48a96` | 2026-10-29 | Add docs/AUDIT_STATUS.md: assessment of every audit recommendation |
+| 10 | `4aa23ce` | 2026-10-30 | Record pyright type-checking configuration from the previous cycle |
+| 11 | `87603fb` | 2026-10-30 | Ignore locally installed Claude skills (/.claude/skills/) |
+| 12 | `8a10cdc` | 2026-10-30 | Add Phase 6 initial audit and feature verification matrix |
+| 13 | `fd2fab1` | 2026-10-31 | Flag variants whose contig has no reference instead of skipping them (D12) |
+| 14 | `0a22bcb` | 2026-10-31 | Use one restriction-site matcher; ambiguity never makes a cloning site (D4) |
+| 15 | `67671ae` | 2026-10-31 | Honor circular topology in the restriction map and site results (D3) |
+| 16 | `a71f17b` | 2026-10-31 | Honor vector and insert topology in cloning analysis (D5) |
+| 17 | `8128e94` | 2026-10-31 | Decode initiator Met only for initiation codons of the genetic code (D1) |
+| 18 | `f302b7a` | 2026-10-31 | Translate an ORF with its own genetic code (D2) |
+| 19 | `15451ae` | 2026-10-31 | Add Phase 6 progress record and the D14 sub-findings |
+| 20 | `1e0df94` | 2026-10-31 | Use one BLAST query-type vocabulary (D14-F2) |
+| 21 | `2a6a979` | 2026-10-31 | Add central sequence alphabets and a type classifier (D14, D13) |
+| 22 | `fb95b4a` | 2026-10-31 | Read, keep and report the declared molecule type (D14-F3, F11) |
+| 23 | `cd73093` | 2026-10-31 | Take the BLAST query type from the central classifier (D14-F1, S20) |
+| 24 | `c13d156` | 2026-10-31 | One input contract for menu and API; route protein records (D13, D14) |
+| 25 | `0e1efd4` | 2026-10-31 | Keep IUPAC protein codes in place and give them meaning (D14-F6) |
+| 26 | `dc16f6e` | 2026-10-31 | Normalize and check input in ORF search, transcription, GC count (D14) |
+| 27 | `c35a98e` | 2026-10-31 | Address a local BLAST database by its path prefix (D6, S7) |
+| 28 | `9ac02aa` | 2026-10-31 | Label the stale BLAST result file as a legacy record (D7) |
+| 29 | `d9fbe40` | 2026-10-31 | Add handover notes to the Phase 6 progress record |
+| 30 | `ba0c238` | 2026-10-31 | Do not count a guide's own site as an off-target (D9) |
+| 31 | `9576fe1` | 2026-10-31 | Report the modeled CRISPR cut site with its source (D8) (subject written in American spelling here; the commit itself uses the British double-l form) |
+| 32 | `85b4162` | 2026-10-31 | Make the CRISPR config fields act; keep exports in the project (D10, D11) |
+| 33 | `4c626c6` | 2026-10-31 | Let the pipeline's ORF runner take the menu's search settings (D19) |
+| 34 | `6fd7c45` | 2026-10-31 | Label the unimplemented AI Experiment Planner as such (D15) |
+| 35 | `5e1c73e` | 2026-10-31 | Fix the variant-to-mutation bridge and a flag leak (S15, S16) |
+| 36 | `eb71dd7` | 2026-10-31 | Cut the cloning digest at the enzyme's cut, not its site start (S17) |
+| 37 | `86e22b5` | 2026-10-31 | Classify and score ORF start codons with the genetic code (S19) |
+| 38 | `10091b2` | 2026-10-31 | Add Phase 6 handover report for the planned pause |
+| 39 | `492d92a` | 2026-10-31 | Correct the guide seed end and the RTT coverage check (S23, S3, S4, S5) |
+| 40 | `2c6c88a` | 2026-10-31 | Record the restricted CRISPR assignment in the handover report |
+| 41 | `4edda2d` | 2026-10-31 | Give the primer Tm model one name instead of shadowing it (D16) |
+| 42 | `f91050c` | 2026-10-31 | Report what the GenBank reader, the serializer and the REF check discard (S8, S10, S21, S22) |
+| 43 | `60150de` | 2026-10-31 | Assess five suspected findings; quantify the alignment cost (S1, S2, S9, S11, S12) |
+| 44 | `5412421` | 2026-10-31 | Update the handover report for the second Opus 5 assignment |
+| 45 | `54622e3` | 2026-10-31 | Remove the superseded primer generations after a reachability review (D16 part 2) |
+| 46 | `027000d` | 2026-10-31 | Use the selected ORF's genetic code in the RNA codon view (P1-9) |
+| 47 | `7ab4410` | 2026-10-31 | Cache recognition-site scans so the planner stops rescanning (S18) |
+| 48 | `d295fd4` | 2026-10-31 | Give the API entry points for the remaining analyses (S14) |
+| 49 | `3b3919c` | 2026-10-31 | Resume an NCBI BLAST search from its request ID (S6, P1-7) |
+| 50 | `f071d2a` | 2026-10-31 | Run the session from main() instead of at import (S13) |
+| 51 | `db535f0` | 2026-10-31 | Update the handover report for the third Opus 5 assignment |
+| 52 | `57a250c` | 2026-11-01 | Draw every terminal separator at one width through ui.style (Stage F, D17) |
+| 53 | `c996922` | 2026-11-01 | Give [0] one meaning and messages one prefix; document and enforce the UI standard (Stage F, D17) |
+| 54 | `5177b1c` | 2026-11-01 | Renumber the BLAST menu so its groups read in order (Stage F) |
+| 55 | `d7250e1` | 2026-11-01 | Measure the XML parsing exposure and classify every outstanding item (S24) |
+| 56 | `739c235` | 2026-11-01 | Update the handover report for Stage F |
+| 57 | `d0b84bd` | 2026-11-02 | Stop calling heuristic scores "confidence" in data and exports (Stage G, D18) |
+| 58 | `7169bda` | 2026-11-02 | Report the sequence-type outcome as an evidence level (Stage G, D18) |
+| 59 | `48a01b9` | 2026-11-02 | Use one notation per unit and show primer positions 1-based (Stage G) |
+| 60 | `1e52111` | 2026-11-02 | Carry a result's own warnings into the exported summary (Stage G, 6.4) |
+| 61 | `ef84127` | 2026-11-02 | Record restriction parameters and the enzyme data version (Stage G, 6.4) |
+| 62 | `b315a6f` | 2026-11-02 | Edit text for one spelling, one wording per message and a sober tone (Stage H) |
+| 63 | `2760c0c` | 2026-11-02 | Print every BLAST E-value with three significant figures (Stage G/H) |
+| 64 | `93ebe86` | 2026-11-02 | Add the style guide and check its enforcement table (Stage H) |
+| 65 | `f20d600` | 2026-11-02 | Rewrite the README to cover what section 15.1 asks for (Stage H) |
+| 66 | `47ddea3` | 2026-11-02 | State what "sequence complexity" measures and where it fails (Stage H, P2-5) |
+| 67 | `8815363` | 2026-11-02 | Record the Stage G and H checkpoint in the handover |
+| 68 | `f2f640d` | 2026-11-02 | Compare primer Tm with primer3-py and record the result (Stage I, P1-3) |
+| 69 | `16acff9` | 2026-11-02 | Correct the IG instability weight found by new Biopython reference tests (Stage I) |
+| 70 | `17c25d3` | 2026-11-02 | Test the cross-module workflows end to end (Stage I, 10.1-10.4, 10.7) |
+| 71 | `6df65cb` | 2026-11-02 | Bring AUDIT_STATUS up to date for the end of Phase 6 (Stage I, 15.4) |
+| 72 | `54fb37d` | 2026-11-02 | Bring the feature matrix to the end-of-Phase-6 state (Stage I) |
+| 73 | `9d54b3a` | 2026-11-02 | Make the CRISPR module importable on Python 3.10 again (Stage I, 11.8) |
+| 74 | `4845a5c` | 2026-11-02 | Add the Phase 6 final report and close the handover (Stage I) |
+| 75 | `6524ca3` | 2026-11-02 | Add the Phase 6 closing review |
+| 76 | `1d029c5` | 2026-11-02 | Correct the Phase 6 documents where the closing review found errors |
+| 77 | `f90daaa` | 2026-11-02 | Route the ORF screens through ui.style (Stage F completion, part 1) |
+| 78 | `13a07e3` | 2026-11-02 | Route the CRISPR screens through ui.style (Stage F completion, part 2) |
+| 79 | `a3335b8` | 2026-11-02 | Route the BLAST screens through ui.style (Stage F completion, part 3) |
+| 80 | `c6b8769` | 2026-11-02 | Route the literature screens through ui.style (Stage F completion, part 4) |
+| 81 | `d70d3ad` | 2026-11-02 | Route the primer screens through ui.style (Stage F completion, part 5) |
+| 82 | `4ee31cf` | 2026-11-02 | Route the variant screens through ui.style (Stage F completion, part 6) |
+| 83 | `6b22723` | 2026-11-02 | Wait for Enter after CRISPR precondition messages (Stage F completion) |
+| 84 | `4becb63` | 2026-11-02 | Test the rendered screens and record the Stage F completion |
+| 85 | `6e27e5c` | 2026-11-02 | Route the session screens through ui.style (Stage F completion, part 7) |
+| 86 | `4e39c3f` | 2026-11-02 | Route the sequence overview through ui.style (Stage F completion, part 8) |
+| 87 | `5841b94` | 2026-11-02 | Route the RNA and protein screens through ui.style (Stage F completion, part 9) |
+| 88 | `2f1f852` | 2026-11-02 | Route the restriction and cloning screens through ui.style (Stage F completion, part 10) |
+| 89 | `eb71ecd` | 2026-11-02 | Route the mutation screens and pipeline status through ui.style (Stage F completion, part 11) |
+| 90 | `26c301f` | 2026-11-02 | One form for result tables, report lines, prompts and yes/no questions (Stage F completion, part 12) |
+| 91 | `ce3e488` | 2026-11-02 | Order the variant menu as the work is done (Stage F completion, part 13) |
+| 92 | `a6796d2` | 2026-11-02 | Test every interface screen as rendered (Stage F completion, part 14) |
+| 93 | `8401657` | 2026-11-02 | Draw the ORF selection and topology lists through style.menu (Stage F completion, part 15) |
+| 94 | `f94cf4b` | 2026-11-02 | Record the second Stage F round in the standard, the review and the reports |
+| 95 | `21deb2a` | 2026-11-03 | Let Enter keep the default in six dialogs again (Stage F regression) |
+| 96 | `4124477` | 2026-11-03 | Record the Stage F closing review and correct the overstated UI claims |
+| 97 | `52ec39e` | 2026-11-03 | Print the remaining validation and status messages through ui/style (Stage F, recommendation 2a) |
+| 98 | `2367194` | 2026-11-03 | Draw the remaining directly printed headings through style.section (Stage F, recommendation 2b) |
+| 99 | `f519934` | 2026-11-03 | Draw the dynamic BLAST and CRISPR option lists through style.menu (Stage F, recommendation 2c) |
+| 100 | `7f8f4db` | 2026-11-03 | Detect computed menu keys, plain messages and plain headings in every interface file |
+| 101 | `f7aa657` | 2026-11-03 | Bring the menu numbers and summary figures in FEATURE_STATUS in line with the code |
+| 102 | `bae1c70` | 2026-11-03 | Type the f-string walk in the direct-output rule so pyright reports nothing new |
+| 103 | `5e17e10` | 2026-11-03 | Record recommendations 1-3 of the Stage F closing review in the standard and the reports |
+| 104 | `acd8923` | 2026-11-03 | Let core hand the pipeline status to a renderer instead of importing ui (Stage F, recommendation 4) |
+| 105 | `615ff7b` | 2026-11-03 | Test that core imports and runs with the ui package unavailable |
+| 106 | `069c39f` | 2026-11-03 | Let Enter choose the nearest-neighbor Tm model again (Stage F regression) |
+| 107 | `cdc0648` | 2026-11-03 | Print three more input-check messages as ERROR lines |
+| 108 | `82b7842` | 2026-11-03 | Give the single-enzyme cloning analysis a report of its own (it always crashed) |
+| 109 | `cadd3c6` | 2026-11-03 | Render and drive every menu of the interface (Stage F, recommendation 5) |
+| 110 | `95ca111` | 2026-11-03 | Record recommendations 4 and 5 in the standard, the reviews and the reports |
+| 111 | `8546347` | 2026-11-11 | Close the response an HTTPError carries in the literature and BLAST clients |
+| 112 | `1617c01` | 2026-11-11 | Give the mutation sequence prompt a cancel, report errors as ERROR lines, test missing files |
+| 113 | `16ec933` | 2026-11-11 | Compute each enzyme analysis once per cloning-planner search (P2-6) |
+| 114 | `38850fd` | 2026-11-11 | Digest with Type IIS enzymes on both strands (P2-7) |
+| 115 | `e9c7878` | 2026-11-11 | Write predicted protein changes as HGVS p.(...) and use them in reports and variants |
+| 116 | `7d3c6b5` | 2026-11-11 | Use one coordinate convention for restriction site and cut records |
+| 117 | `9fe9582` | 2026-11-11 | Count G·U wobble pairs in the RNA hairpin screen as a separate figure (P2-5) |
+| 118 | `7e61baf` | 2026-11-11 | Report ORFs across the origin of circular sequences and 5'-partial ORFs (P1-9) |
+| 119 | `e00c4cb` | 2026-11-11 | Compare the primer hairpin and dimer screens with primer3-py |
+| 120 | `80a900b` | 2026-11-11 | Check designed primers and guides against variants (P2-4) |
+| 121 | `90a62ed` | 2026-11-11 | Keep the mutation alignment to one traceback byte per cell (P2-6) |
+| 122 | `2dbd863` | 2026-11-11 | Align large similar sequences in an exact band (P2-6, 10 kb under 10 s) |
+| 123 | `073f377` | 2026-11-11 | Speed up sequence similarity and the primer hairpin screen without changing results (P2-6) |
+| 124 | `3d8dfce` | 2026-11-11 | Record where the Phase 6 completion run stopped and what remains |
+| 125 | `2f24498` | 2026-11-11 | Correct the test count in the continuation record (421) |
 
 ## Appendix B – Source files and sizes [VERIFIED 2026-11-11]
 
@@ -1766,7 +1766,7 @@ $f='main.py','analyses\blast.py','analyses\cloning.py','analyses\crispr.py','ana
 
 **Rebuild the pyright baseline (134)**
 
-1. `git worktree add --detach <tmp> ab4bd2a`.
+1. `git worktree add --detach <tmp> f302b7a`.
 2. In `<tmp>/pyproject.toml`, set `venvPath` to the project folder.
 3. Run `python -m pyright --pythonversion 3.10 --outputjson` there.
 4. Write the `file|rule|first message line` entries of severity "error"

@@ -1,6 +1,6 @@
 # Phase 10 report: genome scale, curated benchmarks, release preparation
 
-**Date:** 2026-11-20. **Start:** `ca6d941` (end of Phase 9).
+**Date:** 2026-11-20. **Start:** `a2898aa` (end of Phase 9).
 **Owner's request:** do everything that can still be done in the project,
 as professionally as possible, and report when Synapse is finished on the
 AI side; the licence and GitHub follow from the owner. The mandate of
@@ -18,13 +18,13 @@ old code. Nothing in the excluded areas was touched.
 
 | Package | Commit | Content |
 |---|---|---|
-| A | `6d41d8a` | Genome-length input: ORF relationships, restriction annotation and site search, sequence and RNA window scans, hairpin screen, profile thinning above 200,000 windows |
-| B | `1fd914f` | HGVS benchmark on 1,500 ClinVar variants; allele 3' shift fix |
-| C | `f6a5d92` | Per-ORF features computed once |
-| D | `8696b1f` | Dialog tests for protein, restriction, cloning; two dialog fixes |
-| E | `713a1d4` | Literature author de-duplication across PubMed and Europe PMC |
-| F | `4bb71d0`, `5b1dc8b` | Literature snapshot, then the split into `analyses/_literature/`; splitting-tool fix |
-| G | `c8e1bc9` | User guide, pUC19 example, release notes, `CITATION.cff`, GitHub templates |
+| A | `fb5f978` | Genome-length input: ORF relationships, restriction annotation and site search, sequence and RNA window scans, hairpin screen, profile thinning above 200,000 windows |
+| B | `28d4db9` | HGVS benchmark on 1,500 ClinVar variants; allele 3' shift fix |
+| C | `870c91c` | Per-ORF features computed once |
+| D | `b3f9f5c` | Dialog tests for protein, restriction, cloning; two dialog fixes |
+| E | `51fbba4` | Literature author de-duplication across PubMed and Europe PMC |
+| F | `f70e665`, `66554aa` | Literature snapshot, then the split into `analyses/_literature/`; splitting-tool fix |
+| G | `cf30674` | User guide, pUC19 example, release notes, `CITATION.cff`, GitHub templates |
 | H | this commit | Benchmarks document, method and status documentation, this report |
 
 ## C. Defects found and fixed
@@ -51,7 +51,7 @@ results, bit for bit (section D).
 - Differential tests against the former implementations (five new test
   modules).
 - End to end: seven analyses on *E. coli* segments give identical SHA-256
-  digests of their complete output with the code of `ca6d941` and with
+  digests of their complete output with the code of `a2898aa` and with
   the current code (docs/BENCHMARKS.md).
 - Characterization: 636 scenarios in eleven sections, unchanged; golden
   master 12/12 unchanged.

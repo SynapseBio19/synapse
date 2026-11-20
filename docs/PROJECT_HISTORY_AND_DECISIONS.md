@@ -18,7 +18,7 @@ chat analysis, Phase 6 completion and final audit).
 | Claude Code session "Project Synapse Phase 6" (`local_3b57cea9`, 2026-10-30 to 2026-11-11, about 1,600 messages, several context summaries) | Phase 6 audit, Stages B-I, Stage F re-examination, completion run packages A and B, handover dossier | Yes: all 47 owner messages extracted from the exported transcript and read; assistant replies read at the decision points (approvals, Stage F review, the literature-search fault) |
 | Claude Code session "Project Synapse Handover Setup" (`local_c073d91f`, 2026-11-11 to 2026-11-13) | Approval policy, completion run T1-T12, D20-D25, final report A-K, comparison with the Master Prompt PDF | Yes: all 11 owner messages and the closing answers |
 | Claude Code sessions "Reload skills", "Available plugins, skills, hooks, and tools" (2026-10-30) | Tool setup only | Titles and scope checked; no project decisions |
-| Conversations in the claude.ai Project, and the earlier "Claude Cowork" development cycle | Original vision, the pre-Phase-6 audit, P0 fixes, Stages 0-5 | **Not accessible from this environment.** Reconstructed only from Git (`e4395ed`-`0dad3bb`, 2026-10-29), `docs/AUDIT_STATUS.md`, `docs/CHANGES.md` and Master Prompt §0 |
+| Conversations in the claude.ai Project, and the earlier "Claude Cowork" development cycle | Original vision, the pre-Phase-6 audit, P0 fixes, Stages 0-5 | **Not accessible from this environment.** Reconstructed only from Git (`05222ea`-`0c48a96`, 2026-10-29), `docs/AUDIT_STATUS.md`, `docs/CHANGES.md` and Master Prompt §0 |
 | Git history (142 commits, 2026-10-29 to 2026-11-13) | What was actually changed | Yes |
 | Phase 6 Master Prompt, `Project_Synapse_Phase_6_Master_Prompt_Skills_Integrated.txt` (2,344 lines, SHA-256 `c4a38c83…07346`, in the owner's Downloads folder) | Governing technical specification | Yes, in full. A shorter "Revised" text (2,256 lines) differs only by the skills/MCP section §1.3.1 and five cross-references to it; the PDF in the original folder was compared with the text version in an earlier session |
 
@@ -47,13 +47,13 @@ what is verified, and external sources decide scientific claims.
 
 | Period | Stage | Key commits |
 |---|---|---|
-| 2026-10-29 | Previous cycle (Claude Cowork): baseline, test suite and golden master, nine P0 fixes, shared data model, P1 improvements, core API, METHODS, AUDIT_STATUS; 109 tests | `e4395ed`-`0dad3bb` |
-| 2026-10-30 | Phase 6 start: pyright configuration, skills ignored in Git, initial audit D1-D19 / S1-S14 and feature matrix | `5242fcb`, `5d8c73a`, `824ca5f` |
-| 2026-10-31 | Stages B-E: D1-D19 corrections one commit each; S-findings; superseded primer generations removed; RID resume; API entry points | `dc780f6`, `ab4bd2a` (pyright baseline 134), `dfe773d`, `ad843c5` |
-| 2026-11-01 to 11-03 | Stage F (terminal UI), re-examined after the owner judged it incomplete; 16 interface files converted; core no longer imports ui; every menu rendered and driven | `5db21ab`-`12949f3` |
-| 2026-11-02 | Stages G-I: heuristic scores renamed (D18), evidence levels, editorial pass, STYLE_GUIDE, primer Tm vs primer3-py, IG instability weight, first final report | `835744e`, `2851e11`, `1f0c0f5` |
-| 2026-11-11 | Completion run packages A and B: Type IIS, HGVS-style notation, circular and 5'-partial ORFs, G·U count, alignment memory and speed, cloning planner cache | `68e59d1`-`15e2ff1` |
-| 2026-11-12 to 11-13 | Completion run T1-T12, D20-D25: primer 10 kb in about 10 s, restriction-site primers (10.2), P2-2 dialogs moved to `ui/`, coverage, ledger, Python 3.10 run, final report A-K | `aba3fb0`-`ea9612b` |
+| 2026-10-29 | Previous cycle (Claude Cowork): baseline, test suite and golden master, nine P0 fixes, shared data model, P1 improvements, core API, METHODS, AUDIT_STATUS; 109 tests | `05222ea`-`0c48a96` |
+| 2026-10-30 | Phase 6 start: pyright configuration, skills ignored in Git, initial audit D1-D19 / S1-S14 and feature matrix | `4aa23ce`, `87603fb`, `8a10cdc` |
+| 2026-10-31 | Stages B-E: D1-D19 corrections one commit each; S-findings; superseded primer generations removed; RID resume; API entry points | `8128e94`, `f302b7a` (pyright baseline 134), `54622e3`, `3b3919c` |
+| 2026-11-01 to 11-03 | Stage F (terminal UI), re-examined after the owner judged it incomplete; 16 interface files converted; core no longer imports ui; every menu rendered and driven | `57a250c`-`95ca111` |
+| 2026-11-02 | Stages G-I: heuristic scores renamed (D18), evidence levels, editorial pass, STYLE_GUIDE, primer Tm vs primer3-py, IG instability weight, first final report | `16acff9`, `f2f640d`, `4845a5c` |
+| 2026-11-11 | Completion run packages A and B: Type IIS, HGVS-style notation, circular and 5'-partial ORFs, G·U count, alignment memory and speed, cloning planner cache | `8546347`-`073f377` |
+| 2026-11-12 to 11-13 | Completion run T1-T12, D20-D25: primer 10 kb in about 10 s, restriction-site primers (10.2), P2-2 dialogs moved to `ui/`, coverage, ledger, Python 3.10 run, final report A-K | `2069be5`-`b6e1e6a` |
 
 ## 4. Binding decisions (do not reverse without the owner)
 
@@ -74,16 +74,17 @@ what is verified, and external sources decide scientific claims.
 | 2026-11-17 | **CRISPR-related work is excluded from the continuation and deferred**: no investigation, testing, research or change of the CRISPR guide design, its off-target analysis, CFD scoring or the sourcing and licensing of CRISPR scoring resources. The research step that was interrupted by a model safety mechanism on 2026-11-13 is not retried or reworded. Requirements that depend on it are recorded as deferred | owner's Safe Continuation Prompt, 2026-11-17 |
 | 2026-11-18 | Broad mandate (Phase 8): in the copy, Claude may restructure code, correct defects that are backed by evidence, delete dead code, rename internal names and drop the ReadOnly protection. CRISPR and the AI Experiment Planner stay excluded for now. The name **Synapse** stays; the owner's domain is `synapse-gen.com` | owner, chat of 2026-11-18 |
 | 2026-11-20 | **Licence: GNU AGPL-3.0-or-later.** Copyright holder Ali Onur Bayraktar (privately developed). Goal: open use, no closed derivatives or closed web services; the owner may still license on other terms. Outside contributions need the contributor's consent to that before merging | owner, chat of 2026-11-20 (`docs/LICENSING_AND_GOVERNANCE.md`, section 6) |
+| 2026-11-20 | **One-time history rewrite before the first publication.** The author e-mail of all commits was replaced by the owner's GitHub no-reply address, so no private address becomes public. File contents are unchanged (identical trees); every commit ID changed, and the IDs in commit messages and documents were translated. It replaces the rule "no history rewrite" for this one occasion only; after the first push the rule applies again. Future commits: Ali Onur Bayraktar with the no-reply address | owner, chat of 2026-11-20 |
 
 ### Engineering decisions recorded in the repository
 
 - Science lives in `analyses/` and `core/`; dialogs live in `ui/`
-  (`50dea66`). `LayeringTests` enforce that core and analyses run with
+  (`cb47321`). `LayeringTests` enforce that core and analyses run with
   `ui` unimportable.
 - One terminal renderer, `ui/style.py`; no second UI framework.
 - User-facing positions are 1-based inclusive; API coordinates are
   documented per structure; restriction site and cut records share one
-  convention (`1ae2833`).
+  convention (`7d3c6b5`).
 - Pipeline rule: a selected ORF feeds RNA and protein; without a
   selection RNA analyzes the whole selected sequence; the ORF's genetic
   code travels with it (D1, D2).
@@ -104,7 +105,7 @@ what is verified, and external sources decide scientific claims.
 - **The literature search returned nothing** (2026-11-03). The Stage F
   conversion had turned the hint "[none]" into a value; six prompts
   (literature dates, primer conditions, local BLAST options, cloning
-  strategy count) broke on Enter. Fixed in `1516339` with tests that
+  strategy count) broke on Enter. Fixed in `21deb2a` with tests that
   drive the dialogs with empty input and a source rule against the fault.
 - **Final reports were too optimistic** twice (2026-11-02, 2026-11-13).
   The owner asked for independent final controls; the reports were
@@ -117,7 +118,7 @@ what is verified, and external sources decide scientific claims.
 
 | Topic | Statements | Resolution |
 |---|---|---|
-| AI Experiment Planner label | Initial audit D15 (2026-10-30): "coming soon" advertises a feature that does not exist; relabeled "not implemented" (`f3a09c1`). Final report 2026-11-13: BLOCKED, "needs the owner's specification". Master Execution Prompt (2026-11-13): status must be COMING SOON, keep the entry, do not implement | The later explicit owner instruction wins. The entry reads "Coming Soon" and its message says that the feature is planned but not yet available and that nothing is run or stored, which keeps D15's honesty requirement. It is counted neither as a completed module nor as a blocked requirement but as **intentionally deferred** |
+| AI Experiment Planner label | Initial audit D15 (2026-10-30): "coming soon" advertises a feature that does not exist; relabeled "not implemented" (`6fd7c45`). Final report 2026-11-13: BLOCKED, "needs the owner's specification". Master Execution Prompt (2026-11-13): status must be COMING SOON, keep the entry, do not implement | The later explicit owner instruction wins. The entry reads "Coming Soon" and its message says that the feature is planned but not yet available and that nothing is run or stored, which keeps D15's honesty requirement. It is counted neither as a completed module nor as a blocked requirement but as **intentionally deferred** |
 | Approval for installs and requests | Handover 2026-11-11: install nothing, no external requests. Master Prompt §1.3 and owner 2026-11-12: routine project-local installs and public sources allowed | Owner decision of 2026-11-12 applies (§4) |
 | Historical figures | Earlier records: 109, 228, 267, 283, 314, 326, 421 tests; pyright 134 -> 132 -> 112 -> 111 -> 58 | Each is a snapshot of its date. Current values are measured, not copied (§7) |
 | "Phase 6 complete" | Final report of 2026-11-02 declared completion; the independent review the owner requested found it overstated | Superseded; the report of 2026-11-13 says PARTIALLY COMPLETE |
@@ -125,10 +126,10 @@ what is verified, and external sources decide scientific claims.
 
 ## 7. State at the start of this run (measured 2026-11-13)
 
-- `main` at `ea9612b`, working tree clean, 142 commits.
+- `main` at `b6e1e6a`, working tree clean, 142 commits.
 - 463 tests, all passing on CPython 3.14.6 (1 skipped: the opt-in 10 kb
   benchmark); golden master 12/12 unchanged.
-- pyright 1.1.414 at Python 3.10: 58 errors (baseline `ab4bd2a`: 134).
+- pyright 1.1.414 at Python 3.10: 58 errors (baseline `f302b7a`: 134).
 - ReadOnly set on all 15 protected files.
 - `.venv`: biopython 1.88, primer3-py 2.4.0, numpy 2.5.4, coverage
   7.10.7, ruff 0.14.4, pyright 1.1.414. Project-local CPython 3.10.11 in
@@ -239,7 +240,7 @@ and `docs/PHASE6_CONTINUATION.md`.
   Experiment Planner) are unchanged.
 - **Done:** every analysis runs on the 4.6 Mb *E. coli* genome (four
   scaling defects removed, results bit-identical to the code of
-  `ca6d941`); benchmarks against the RefSeq annotation (every CDS of at
+  `a2898aa`); benchmarks against the RefSeq annotation (every CDS of at
   least 90 nt found) and 1,500 ClinVar variants (one allele defect fixed);
   dialog tests for protein, restriction and cloning (two defects fixed);
   the literature author de-duplication fixed; `analyses/literature.py`

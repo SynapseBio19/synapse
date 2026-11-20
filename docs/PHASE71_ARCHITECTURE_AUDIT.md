@@ -1,6 +1,6 @@
 # Phase 7.1 architecture audit
 
-Written on 2026-11-18, before any Phase 7.1 refactoring, at HEAD `9077f1e`.
+Written on 2026-11-18, before any Phase 7.1 refactoring, at HEAD `af7cd0a`.
 The numbers come from an AST scan of `main.py`, `analyses/`, `core/`,
 `ui/`, `fileio/` and `data/` (CRISPR code is measured, not examined), from
 the import graph, and from reading the BLAST and primer modules.
@@ -9,7 +9,7 @@ the import graph, and from reading the BLAST and primer modules.
 
 | Item | Value (2026-11-18) |
 |---|---|
-| Branch, HEAD | `main`, `9077f1e`, 167 commits, working tree clean, no Git remote |
+| Branch, HEAD | `main`, `af7cd0a`, 167 commits, working tree clean, no Git remote |
 | Python | CPython 3.14.6 (`.venv`), CPython 3.10.11 (`.tools/python-3.10.11`) |
 | Tests, 3.14.6 | 565 run, 0 failures, 1 skipped (the opt-in benchmark) |
 | Tests, 3.10.11 | 565 run, 0 failures, 23 skipped (optional packages not installed there) |
@@ -303,7 +303,7 @@ caller. They stay until the owner decides
    - `tests/test_module_namespaces.py` (264 names);
    - `tests/test_characterization.py` with the snapshot
      `tests/fixtures/characterization/blast_primer.json` (78 scenarios,
-     written from `9077f1e`).
+     written from `af7cd0a`).
 2. F1, BLAST: create `analyses/_blast/`. The code moves unchanged, except:
    - `Path(__file__)` lookups go through a constant for the `analyses`
      directory, so every path stays the same;

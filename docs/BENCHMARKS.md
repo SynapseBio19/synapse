@@ -31,7 +31,7 @@ whole genome in its own process with a time limit, and reports wall time,
 CPU time and the peak working set of that process. Wall times vary by a
 few percent between runs.
 
-| Analysis | Setting | Before (code of `ca6d941`) | After (Phase 10) | Peak memory after |
+| Analysis | Setting | Before (code of `a2898aa`) | After (Phase 10) | Peak memory after |
 |---|---|---:|---:|---:|
 | Load FASTA | 4.6 Mb record | 0.3 s | 0.3 s | 42 MB |
 | Sequence overview | defaults (100-nt profiles, step 1) | 154 s | 41 s | 0.64 GB (3.5 GB before) |
@@ -51,7 +51,7 @@ code returned. Evidence:
   sizes, float for float and in order: `tests/test_window_scans.py`,
   `test_rna_window_scans.py`, `test_orf_relationship_sweep.py`,
   `test_orf_feature_speed.py`, `test_restriction_fragment_index.py`.
-- End to end, the code of `ca6d941` and the current code give
+- End to end, the code of `a2898aa` and the current code give
   bit-identical results (SHA-256 of the complete output) on *E. coli*
   segments:
 

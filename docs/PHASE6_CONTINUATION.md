@@ -23,9 +23,9 @@ CFD and the AI Experiment Planner excluded):
 
 | Commit | Item |
 |---|---|
-| `4a4bb05` | Package A: NCBI `core_nt` offered for remote BLAST (first among nucleotide databases, also in the `update_blastdb.pl` catalog); live search RID FR8EK6FN014 confirmed it; FEATURE_STATUS no longer says the remote search was never live-checked |
-| `c24159f` | Package B: `tests/test_dialog_paths.py` (17) drives the variant, mutation, ORF and literature dialogs to the end of their branches (23-38 % -> 72-87 % coverage); five messages given their ERROR/NOTE/WARNING prefix; ORF settings note on the stop-codon difference to ORFfinder |
-| `c74d03a` | Package C: README, FEATURE_STATUS, AUDIT_STATUS and the decision record reconciled; CFD items marked deferred |
+| `6011f3c` | Package A: NCBI `core_nt` offered for remote BLAST (first among nucleotide databases, also in the `update_blastdb.pl` catalog); live search RID FR8EK6FN014 confirmed it; FEATURE_STATUS no longer says the remote search was never live-checked |
+| `5283604` | Package B: `tests/test_dialog_paths.py` (17) drives the variant, mutation, ORF and literature dialogs to the end of their branches (23-38 % -> 72-87 % coverage); five messages given their ERROR/NOTE/WARNING prefix; ORF settings note on the stop-codon difference to ORFfinder |
+| `23bcd70` | Package C: README, FEATURE_STATUS, AUDIT_STATUS and the decision record reconciled; CFD items marked deferred |
 | (final report commit) | Package D: final report A-L |
 
 Next work, only on the owner's request: section K of the final report
@@ -41,22 +41,22 @@ completion, final audit; **AI Experiment Planner stays COMING SOON**).
 Recovered history and binding decisions:
 `docs/PROJECT_HISTORY_AND_DECISIONS.md`.
 
-**State at this entry.** `main` at `b928fef`, working tree clean; suite
+**State at this entry.** `main` at `3634bad`, working tree clean; suite
 495 tests, all passing on CPython 3.14.6 (1 skipped: the opt-in 10 kb
 benchmark); golden master 12/12 unchanged; pyright 58 errors (baseline
-`ab4bd2a`: 134, nothing new); ReadOnly set on all 15 protected files.
+`f302b7a`: 134, nothing new); ReadOnly set on all 15 protected files.
 
 ### Done in this run
 
 | Commit | Item |
 |---|---|
-| `224f7d2` | `docs/PROJECT_HISTORY_AND_DECISIONS.md`: history reconstructed from the two Claude Code sessions (every owner message read from the exported transcripts), the Git history and the repository records; binding decisions, contradictions and their resolution, and what was not accessible (the claude.ai Project chats and the pre-Phase-6 "Claude Cowork" cycle) |
-| `a2f671b` | AI Experiment Planner kept as **Coming Soon** (owner decision): menu entry `[11] AI Experiment Planner (Coming Soon)`, message "planned but not yet available. Nothing is run or stored", nothing implemented behind it; D15's honesty requirement preserved |
-| `c5ee3b2` | **RNAfold is no longer blocked**: ViennaRNA 2.8.0 installs as a wheel into the project `.venv`, so no system-wide install is needed. New `analyses/rna_structure.py`, `core.api.rna_secondary_structure`, RNA menu entry 6: MFE structure (Turner 2004, 37 °C) and, per hairpin-screen candidate, its free energy alone and its support in the MFE structure. Without the package everything reports "not available" with the reason; optional extra `structure`. Comparison on 16 sequences: the screen finds 64 of 74 MFE hairpins (86 %), but only 35 % of its 3,307 candidates are favorable alone |
-| `70ff2b0` | **bcftools norm comparison** without bcftools: the published input/reference/expected files of the bcftools 1.25 test suite (MIT/Expat, SHA-256 checked) are the reference. Split-then-normalize: 29 of 29 alleles identical; the record `-cx` excludes for a REF mismatch is the one Synapse flags. The only difference was a reference-only record (ALT `.`), which Synapse dropped silently; it is now reported (`parse_vcf(skipped=)`, API warning, NOTE in the variant menu) |
-| `a1e3520` | **ORFfinder comparison** (web service, live): pUC19 L09137.2, code 11, four settings; all 69 ORFs identical in strand, start, stop, length and partial status, including CTG/ATT/ATC/ATA starts and two 3′-partial ORFs. Found and corrected a documentation claim: ORFfinder's minimal length excludes the stop codon, Synapse's includes it, so `min_length = L + 3` reproduces ORFfinder's `L` |
-| `f6f12ed` | **HGVS DNA descriptions** (checked with Mutalyzer 3): the report wrote Synapse's own notation behind a "c." prefix (`11insTT`, `18delA`, `20_21GT>CC`). `mutation_hgvs_c` now writes HGVS syntax and, with the reference, applies the 3′ rule and recognizes duplications; `hgvs_c_allele` gives one allele description and merges touching changes into a delins. 11 of 11 synthetic cases identical to Mutalyzer's `description_extract`; the `p.(...)` forms parse there as predicted changes |
-| `b928fef` | **Instability-index weights vs ExPASy ProtParam**: all 400 weights recovered from 420 probe measurements (no table copied). 399 agree; KQ differs (ProtParam 24.68, Synapse and Biopython 24.64). Table unchanged, difference recorded; effect bounded (0.004 per KQ in a 100-residue protein) |
+| `8f3238d` | `docs/PROJECT_HISTORY_AND_DECISIONS.md`: history reconstructed from the two Claude Code sessions (every owner message read from the exported transcripts), the Git history and the repository records; binding decisions, contradictions and their resolution, and what was not accessible (the claude.ai Project chats and the pre-Phase-6 "Claude Cowork" cycle) |
+| `94982a8` | AI Experiment Planner kept as **Coming Soon** (owner decision): menu entry `[11] AI Experiment Planner (Coming Soon)`, message "planned but not yet available. Nothing is run or stored", nothing implemented behind it; D15's honesty requirement preserved |
+| `b316c5a` | **RNAfold is no longer blocked**: ViennaRNA 2.8.0 installs as a wheel into the project `.venv`, so no system-wide install is needed. New `analyses/rna_structure.py`, `core.api.rna_secondary_structure`, RNA menu entry 6: MFE structure (Turner 2004, 37 °C) and, per hairpin-screen candidate, its free energy alone and its support in the MFE structure. Without the package everything reports "not available" with the reason; optional extra `structure`. Comparison on 16 sequences: the screen finds 64 of 74 MFE hairpins (86 %), but only 35 % of its 3,307 candidates are favorable alone |
+| `115b1d9` | **bcftools norm comparison** without bcftools: the published input/reference/expected files of the bcftools 1.25 test suite (MIT/Expat, SHA-256 checked) are the reference. Split-then-normalize: 29 of 29 alleles identical; the record `-cx` excludes for a REF mismatch is the one Synapse flags. The only difference was a reference-only record (ALT `.`), which Synapse dropped silently; it is now reported (`parse_vcf(skipped=)`, API warning, NOTE in the variant menu) |
+| `83c9c42` | **ORFfinder comparison** (web service, live): pUC19 L09137.2, code 11, four settings; all 69 ORFs identical in strand, start, stop, length and partial status, including CTG/ATT/ATC/ATA starts and two 3′-partial ORFs. Found and corrected a documentation claim: ORFfinder's minimal length excludes the stop codon, Synapse's includes it, so `min_length = L + 3` reproduces ORFfinder's `L` |
+| `820982a` | **HGVS DNA descriptions** (checked with Mutalyzer 3): the report wrote Synapse's own notation behind a "c." prefix (`11insTT`, `18delA`, `20_21GT>CC`). `mutation_hgvs_c` now writes HGVS syntax and, with the reference, applies the 3′ rule and recognizes duplications; `hgvs_c_allele` gives one allele description and merges touching changes into a delins. 11 of 11 synthetic cases identical to Mutalyzer's `description_extract`; the `p.(...)` forms parse there as predicted changes |
+| `3634bad` | **Instability-index weights vs ExPASy ProtParam**: all 400 weights recovered from 420 probe measurements (no table copied). 399 agree; KQ differs (ProtParam 24.68, Synapse and Biopython 24.64). Table unchanged, difference recorded; effect bounded (0.004 per KQ in a 100-residue protein) |
 
 Every commit carries its evidence; `docs/CHANGES.md` has one entry per
 item with before, after and reason.
@@ -113,25 +113,25 @@ complete.** Start the next session from this file.
 State at stop: `main` at the commit that adds this file, working tree
 clean, ReadOnly restored on the 15 files, suite 421 tests OK, golden master
 unchanged, pyright 111 errors with no new diagnostic against the baseline
-of `ab4bd2a` (134).
+of `f302b7a` (134).
 
 ## Done in this run
 
 | Commit | Package | Item |
 |---|---|---|
-| `68e59d1` | A | Literature and BLAST clients close the response an HTTPError carries (the "ResourceWarning in a retry test" was a client leak) |
-| `8379ac2` | A | Mutation sequence prompt gets `[0] Cancel` (`SequencePromptCancelled`); ten messages drawn as fields become ERROR/NOTE lines, with a rule; `MissingFileTests` (11.4) |
-| `b4b16bb` | A/B | Cloning planner search cache (P2-6): 21.7 s -> 3.2 s, results byte-identical |
-| `4939688` | B | Type IIS enzymes BsaI, BsmBI, BbsI, SapI on both strands in digests (P2-7); 140 cuts vs Biopython 1.88, 0 differences |
-| `b7eb1de` | B | HGVS `p.(...)` predicted notation, used in the mutation report and variant `protein_change` |
-| `1ae2833` | B | One coordinate convention for restriction site and cut records |
-| `fedb750` | B | G·U wobble count in the RNA hairpin screen as a separate figure (P2-5) |
-| `f020a1d` | B | ORFs across the origin of circular sequences and 5'-partial ORFs (P1-9) |
-| `27255df` | B | Primer hairpin/dimer screens compared with primer3-py (rho -0.78 / -0.74 / -0.51) |
-| `2c68e61` | B | Primers and guides checked against variants, `core.api.cross_check_variants` (P2-4) |
-| `f9d4356` | B | Mutation alignment: one traceback byte per cell (46 -> 1.1 bytes) |
-| `e5bb456` | B | Exact banded alignment: 10 kb similar sequences 23 s -> 0.18 s |
-| `15e2ff1` | B | Banded Levenshtein similarity (10 kb 0.10 s); hairpin screen 135.6 s -> 25.6 s at 10 kb primer design |
+| `8546347` | A | Literature and BLAST clients close the response an HTTPError carries (the "ResourceWarning in a retry test" was a client leak) |
+| `1617c01` | A | Mutation sequence prompt gets `[0] Cancel` (`SequencePromptCancelled`); ten messages drawn as fields become ERROR/NOTE lines, with a rule; `MissingFileTests` (11.4) |
+| `16ec933` | A/B | Cloning planner search cache (P2-6): 21.7 s -> 3.2 s, results byte-identical |
+| `38850fd` | B | Type IIS enzymes BsaI, BsmBI, BbsI, SapI on both strands in digests (P2-7); 140 cuts vs Biopython 1.88, 0 differences |
+| `e9c7878` | B | HGVS `p.(...)` predicted notation, used in the mutation report and variant `protein_change` |
+| `7d3c6b5` | B | One coordinate convention for restriction site and cut records |
+| `9fe9582` | B | G·U wobble count in the RNA hairpin screen as a separate figure (P2-5) |
+| `7e61baf` | B | ORFs across the origin of circular sequences and 5'-partial ORFs (P1-9) |
+| `e00c4cb` | B | Primer hairpin/dimer screens compared with primer3-py (rho -0.78 / -0.74 / -0.51) |
+| `80a900b` | B | Primers and guides checked against variants, `core.api.cross_check_variants` (P2-4) |
+| `90a62ed` | B | Mutation alignment: one traceback byte per cell (46 -> 1.1 bytes) |
+| `2dbd863` | B | Exact banded alignment: 10 kb similar sequences 23 s -> 0.18 s |
+| `073f377` | B | Banded Levenshtein similarity (10 kb 0.10 s); hairpin screen 135.6 s -> 25.6 s at 10 kb primer design |
 
 Each commit message holds the evidence (before/after measurements,
 byte-identical comparisons, tests that fail on the previous code).
@@ -140,25 +140,25 @@ byte-identical comparisons, tests that fail on the previous code).
 
 | Commit | Item |
 |---|---|
-| `bf4d096` | Approval policy of the Master Prompt adopted (owner decision); handover spelling fixed (the suite failed at `bd91a24`, 420/421) |
-| `aba3fb0` | T1: primer design 10 kb 71 s -> 10 s CPU time (same machine and load), results identical (tier screen with an exact upper bound, faster stem/hairpin/repeat screens, caches) |
-| `c6f0df9` | D20: the V5 structural penalty read missing fields and was always 0; D21: tm_method "nearest-neighbor" crashed candidate generation |
-| `99150da` | T2: primer design around a chosen restriction site (10.2) in primer.py, `core.api`, the primer menu (entry 2; Single Primer Analysis is now 3) and the pipeline parameters |
-| `50dea66` | T3/P2-2: the dialogs of eleven analysis modules moved to `ui/<module>_menu.py` (55 screens byte-identical); `core/textformat.py`; `SynapsePipeline.select_orf(chooser=...)`; no analysis module imports `ui` |
-| `b1a012f` | T4: the sequence overview and the three cloning dialogs record their parameters (mode, enzymes, topologies, thresholds) in the pipeline and the report |
-| `757958f` | T6: pyright 108 -> 58; D22 (orf_reference_cds AttributeError), D23 (pair risk assessment missing from exports) |
-| `ae87adb` | T7: coverage 68 % -> 70.9 % (`docs/TEST_COVERAGE.md`); D24 (BLAST text export and query file written with CR CR LF) |
-| `bf4b9ee` | T9: `docs/TOOL_AND_DATA_LEDGER.md`; suite on Python 3.10.11 (452 OK); pUC19 L09137.2 fixture with Biopython comparison in the suite |
-| `dabc2f1` | T11: BLAST hit selector accepts only listed numbers; query-type question re-asks |
+| `9657d58` | Approval policy of the Master Prompt adopted (owner decision); handover spelling fixed (the suite failed at `f5503c9`, 420/421) |
+| `2069be5` | T1: primer design 10 kb 71 s -> 10 s CPU time (same machine and load), results identical (tier screen with an exact upper bound, faster stem/hairpin/repeat screens, caches) |
+| `faba007` | D20: the V5 structural penalty read missing fields and was always 0; D21: tm_method "nearest-neighbor" crashed candidate generation |
+| `045a46a` | T2: primer design around a chosen restriction site (10.2) in primer.py, `core.api`, the primer menu (entry 2; Single Primer Analysis is now 3) and the pipeline parameters |
+| `cb47321` | T3/P2-2: the dialogs of eleven analysis modules moved to `ui/<module>_menu.py` (55 screens byte-identical); `core/textformat.py`; `SynapsePipeline.select_orf(chooser=...)`; no analysis module imports `ui` |
+| `7fe9be4` | T4: the sequence overview and the three cloning dialogs record their parameters (mode, enzymes, topologies, thresholds) in the pipeline and the report |
+| `2baa175` | T6: pyright 108 -> 58; D22 (orf_reference_cds AttributeError), D23 (pair risk assessment missing from exports) |
+| `aab284f` | T7: coverage 68 % -> 70.9 % (`docs/TEST_COVERAGE.md`); D24 (BLAST text export and query file written with CR CR LF) |
+| `df3a3a9` | T9: `docs/TOOL_AND_DATA_LEDGER.md`; suite on Python 3.10.11 (452 OK); pUC19 L09137.2 fixture with Biopython comparison in the suite |
+| `341e07a` | T11: BLAST hit selector accepts only listed numbers; query-type question re-asks |
 | (this commit) | README brought up to date; live literature check recorded in METHODS; `max_results` per provider documented in `core.api` |
 
 ## Resumed on 2026-11-13 and finished
 
 | Commit | Item |
 |---|---|
-| `a5e5a94` | D25: BLAST polling survives brief network failures and names the RID; primer3-py comparisons skip when Windows application control blocks the package |
-| `cdbf69c` | T12: variant check in the primer and CRISPR menus |
-| `f58d866` | T8: CHANGES, FEATURE_STATUS, AUDIT_STATUS, progress record |
+| `2393a12` | D25: BLAST polling survives brief network failures and names the RID; primer3-py comparisons skip when Windows application control blocks the package |
+| `b4d1681` | T12: variant check in the primer and CRISPR menus |
+| `67d0744` | T8: CHANGES, FEATURE_STATUS, AUDIT_STATUS, progress record |
 | final commits | Last padded labels; Ruff pyflakes pass (40 unused imports removed); REBASE 611 comparison 26/26; tool evaluation (7.4); final report A-K with requirement matrix and independent audit |
 
 ## Paused here on 2026-11-12 (owner asked to stop, historical)
@@ -268,7 +268,7 @@ Several rows below were therefore re-assessed in the handover, Part XIII.
 - Helper scripts lived in the session scratchpad and are not in the
   repository; `patchlib.apply()` (exact, CRLF-preserving replacements),
   `eol.py`, `pyright_diff.py`. The pyright baseline is reproducible:
-  check out `ab4bd2a` in a worktree, point `venvPath` at this project and
+  check out `f302b7a` in a worktree, point `venvPath` at this project and
   write `file|rule|message` lines of `python -m pyright --pythonversion 3.10
   --outputjson` (134 errors).
 - Run pyright as `python -m pyright` (the `.exe` is blocked by application

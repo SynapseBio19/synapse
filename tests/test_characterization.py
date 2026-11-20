@@ -17,7 +17,7 @@ from tests import characterization as C
 # 1e-12. CPython 3.10.11 and 3.14.6 on Windows return results of math.log2
 # that differ in the last digit: sequence_complexity of the "deletion"
 # variant is 98.82341858018908 on 3.10 and 98.82341858018907 on 3.14, with
-# the unchanged code of 727208a on both (checked 2026-11-18). That is the
+# the unchanged code of a7249fa on both (checked 2026-11-18). That is the
 # interpreter's math library, not a change of Synapse. Since Python 3.12,
 # sum() of floats is compensated (more exact), so sums that should be 0
 # differ around 1e-17 between 3.10 and 3.14 (protein hydropathy windows,

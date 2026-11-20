@@ -18,11 +18,11 @@ verification and report) have not been started. The running record is
 | Item | State |
 |---|---|
 | Branch | `main` |
-| HEAD | `f803577` (see section 10; `642f31b` was the state at the original pause) |
+| HEAD | `d7250e1` (see section 10; `10091b2` was the state at the original pause) |
 | Working tree | clean |
 | Tests | 283/283 pass, 0 skipped (`python -m unittest discover -s tests -t .`, ~26 s) |
 | Golden master | unchanged since the audit; no snapshot was regenerated |
-| pyright 1.1.414 (`python -m pyright --pythonversion 3.10`) | 112 errors; baseline at `ab4bd2a` was 134; no new diagnostic in any package. 22 of the removals came with the dead primer code in D16 part 2. `pyright.exe` is blocked by a Windows application control policy (WinError 4551); use `python -m pyright`. |
+| pyright 1.1.414 (`python -m pyright --pythonversion 3.10`) | 112 errors; baseline at `f302b7a` was 134; no new diagnostic in any package. 22 of the removals came with the dead primer code in D16 part 2. `pyright.exe` is blocked by a Windows application control policy (WinError 4551); use `python -m pyright`. |
 | ReadOnly attributes | restored on all 15 files (see the handover notes in `PHASE6_PROGRESS.md`) |
 | Optional/test-only tools present | Biopython 1.88, primer3-py 2.4.0, BLAST+ 2.17.0; bcftools absent |
 
@@ -38,29 +38,29 @@ owner can still revert any single commit with `git revert <hash>`. No
 work was started after the instruction was seen: D16, D17, D18, the
 remaining S-findings and Stages F–I are untouched.
 
-## 3. Commits of this execution (oldest first, after `ab4bd2a`)
+## 3. Commits of this execution (oldest first, after `f302b7a`)
 
 | Commit | Package | Validation |
 |---|---|---|
-| `02d2899` | Progress record; D14 sub-findings F1–F12, S20–S22 recorded | docs |
-| `b8f5ea8` | D14-F2 one BLAST query-type vocabulary (protein BLAST was unusable) | internal tests; external tool execution (makeblastdb + blastp) |
-| `d057ac1` | Central `core/alphabets.py` classifier (CONFIRMED / PROBABLE / AMBIGUOUS / INVALID, no frequency threshold) | internal tests; Biopython `IUPACData`; PubMed-checked sources |
-| `776de4a` | D14-F3, F11 molecule type from GenBank/FASTA; type in `SequenceRecord`, provenance, report | internal tests; NCBI `[moltype=]` documentation |
-| `7c716a2` | D14-F1, S20 BLAST uses the classifier; J/U/O accepted | internal tests; blastp run; BLAST+ U/O/J acceptance checked |
-| `162ca16` | D13 + D14-F4/F5/F7 one input contract; menu type gate with user declaration; API type checks; protein-record route | internal tests; end-to-end `main.py` |
-| `343ffb7` | D14-F6 protein codes keep position; Sec/Pyl masses; B/Z/J ranges | internal tests; Biopython masses; one Stage 5 assertion updated (it encoded the deletion) |
-| `d40d328` | D14-F8/F9/F10 ORF search, transcription, GC counting | internal tests; probe re-run |
-| `5b120ec` | D6 + S7 local BLAST by database prefix, with provenance | external tool execution (bundled database) |
-| `e1a48c6` | D7 stale BLAST artifact labeled as legacy (file kept) | docs |
-| `7a4a718` | Handover notes (working practice) | docs |
-| `3514617` | D9 CRISPR on-target site not an off-target | internal tests |
-| `ca2ec39` | D8 CRISPR cut site per system, cited | internal tests; PubMed (PMIDs 22745249, 25830891, 30166441, 26422227) |
-| `8145556` | D10 CRISPR config fields act; D11 exports in `exports/crispr` | internal tests (defaults unchanged) |
-| `e47cb85` | D19 pipeline `run_orf` search settings; fixed `completed` shape | internal tests (equal to `core.api.find_orfs`) |
-| `f3a09c1` | D15 planner entry labeled "not implemented" | end-to-end `main.py` |
-| `c71963b` | S15 variant→mutation bridge works; S16 flag leak | internal tests; pyright −2 |
-| `c743beb` | S17 cloning digest uses the top-strand cut | agreement with `restriction.perform_digest` for 231 pairs, linear and circular |
-| `6c20e69` | S19 start-codon classification and scores use the genetic code | internal tests; golden unchanged |
+| `15451ae` | Progress record; D14 sub-findings F1–F12, S20–S22 recorded | docs |
+| `1e0df94` | D14-F2 one BLAST query-type vocabulary (protein BLAST was unusable) | internal tests; external tool execution (makeblastdb + blastp) |
+| `2a6a979` | Central `core/alphabets.py` classifier (CONFIRMED / PROBABLE / AMBIGUOUS / INVALID, no frequency threshold) | internal tests; Biopython `IUPACData`; PubMed-checked sources |
+| `fb95b4a` | D14-F3, F11 molecule type from GenBank/FASTA; type in `SequenceRecord`, provenance, report | internal tests; NCBI `[moltype=]` documentation |
+| `cd73093` | D14-F1, S20 BLAST uses the classifier; J/U/O accepted | internal tests; blastp run; BLAST+ U/O/J acceptance checked |
+| `c13d156` | D13 + D14-F4/F5/F7 one input contract; menu type gate with user declaration; API type checks; protein-record route | internal tests; end-to-end `main.py` |
+| `0e1efd4` | D14-F6 protein codes keep position; Sec/Pyl masses; B/Z/J ranges | internal tests; Biopython masses; one Stage 5 assertion updated (it encoded the deletion) |
+| `dc16f6e` | D14-F8/F9/F10 ORF search, transcription, GC counting | internal tests; probe re-run |
+| `c35a98e` | D6 + S7 local BLAST by database prefix, with provenance | external tool execution (bundled database) |
+| `9ac02aa` | D7 stale BLAST artifact labeled as legacy (file kept) | docs |
+| `d9fbe40` | Handover notes (working practice) | docs |
+| `ba0c238` | D9 CRISPR on-target site not an off-target | internal tests |
+| `9576fe1` | D8 CRISPR cut site per system, cited | internal tests; PubMed (PMIDs 22745249, 25830891, 30166441, 26422227) |
+| `85b4162` | D10 CRISPR config fields act; D11 exports in `exports/crispr` | internal tests (defaults unchanged) |
+| `4c626c6` | D19 pipeline `run_orf` search settings; fixed `completed` shape | internal tests (equal to `core.api.find_orfs`) |
+| `6fd7c45` | D15 planner entry labeled "not implemented" | end-to-end `main.py` |
+| `5e1c73e` | S15 variant→mutation bridge works; S16 flag leak | internal tests; pyright −2 |
+| `eb71dd7` | S17 cloning digest uses the top-strand cut | agreement with `restriction.perform_digest` for 231 pairs, linear and circular |
+| `86e22b5` | S19 start-codon classification and scores use the genetic code | internal tests; golden unchanged |
 
 ## 4. Findings status
 
@@ -111,7 +111,7 @@ S16, S17, S19, S20.
 
 1. Read `docs/PHASE6_PROGRESS.md` (handover notes: ReadOnly files, line
    endings, `orf.py` bare-LF lines, pyright comparison) and this file.
-2. Verify: `git status` clean at `6f7987b`; run the suite (expect 228 OK);
+2. Verify: `git status` clean at `492d92a`; run the suite (expect 228 OK);
    pyright 132 errors.
 3. Resume with item 4.1 (D16, safe step only), then the remaining
    S-findings of item 4.4 (S1–S6, S8–S14, S18, S21, S22), then agree on
@@ -207,9 +207,9 @@ sort or schedule work by expected classifier behavior.
 
 | Commit | Work | Evidence |
 |---|---|---|
-| `c52f9bb` | **D16 part 1.** The Tm model is defined under its private name instead of carrying the public name and being shadowed by the compatibility adapter, so no module-level name is defined twice. | SHA-256 fingerprint of the compiled bytecode of all 129 module-level callables: no name added or removed, no entry changed. pyright's `reportRedeclaration` gone. |
-| `5a3220e` | **S21, S10, S8, S22.** Four paths that discarded information or swallowed a failure without saying so now report it: symbols dropped from GenBank ORIGIN, feature locations the reader cannot parse, a failing `to_dict()` during report serialization, and a variant reference that is not DNA. | 7 regression tests; the bundled GenBank fixture produces no new notes. |
-| `8c47b17` | **S1, S2, S9, S11, S12.** Two suspected findings assessed as not defects and locked by tests, one quantified by measurement, two resolved in documentation. | Execution on constructed minus-strand cases; `tracemalloc` at three sizes. |
+| `4edda2d` | **D16 part 1.** The Tm model is defined under its private name instead of carrying the public name and being shadowed by the compatibility adapter, so no module-level name is defined twice. | SHA-256 fingerprint of the compiled bytecode of all 129 module-level callables: no name added or removed, no entry changed. pyright's `reportRedeclaration` gone. |
+| `f91050c` | **S21, S10, S8, S22.** Four paths that discarded information or swallowed a failure without saying so now report it: symbols dropped from GenBank ORIGIN, feature locations the reader cannot parse, a failing `to_dict()` during report serialization, and a variant reference that is not DNA. | 7 regression tests; the bundled GenBank fixture produces no new notes. |
+| `60150de` | **S1, S2, S9, S11, S12.** Two suspected findings assessed as not defects and locked by tests, one quantified by measurement, two resolved in documentation. | Execution on constructed minus-strand cases; `tracemalloc` at three sizes. |
 
 ### Findings resolved, with the honest outcome
 
@@ -251,7 +251,7 @@ sort or schedule work by expected classifier behavior.
 
 ### State at the end of this assignment
 
-HEAD `8c47b17`, working tree clean, 240/240 tests pass, pyright 131 against
+HEAD `60150de`, working tree clean, 240/240 tests pass, pyright 131 against
 the 134 baseline with no new diagnostics, golden master unchanged, ReadOnly
 restored on all 15 protected files.
 
@@ -269,12 +269,12 @@ complete: stages F to I have not been started.
 
 | Commit | Package | Evidence |
 |---|---|---|
-| `dfe773d` | **D16 part 2.** The superseded primer generations are gone. | Investigation first, as the audit required: AST pass over every module-level binding in source order, project-wide reference scan, `sys.settrace` on a real design run. Bytecode fingerprint of all module-level callables: 129 -> 105, **nothing added, nothing changed**. 1,326 lines removed; pyright 134 -> 112. |
-| `8d28586` | **P1-9.** The RNA codon view uses the selected ORF's genetic code. | For a table-2 ORF the +1 frame preview now equals `translate_orf_sequence(orf)` exactly. |
-| `87c3fb0` | **S18.** Recognition-site scans are cached. | cProfile: 5,002 scans for 16 distinct combinations. Measured 11.8 s -> 0.24 s at 8 enzymes; 10 enzymes, timed at 100-110 s in the audit, 0.57 s. |
-| `6a8c00c` | **S14.** The API covers cloning, variant filtering, mutation reports, BLAST and literature. | 16 entry points. The two that make external requests refuse to run without an explicit confirmation argument. |
-| `ad843c5` | **S6 / P1-7.** An NCBI search can be resumed from its request ID. | Tested against a stubbed client that asserts `submit()` is never called, so no request left the machine. |
-| `7008cd8` | **S13.** The session runs from `main()` behind a `__main__` guard. | `git diff -w` reduces the whole change to the 12 added lines. |
+| `54622e3` | **D16 part 2.** The superseded primer generations are gone. | Investigation first, as the audit required: AST pass over every module-level binding in source order, project-wide reference scan, `sys.settrace` on a real design run. Bytecode fingerprint of all module-level callables: 129 -> 105, **nothing added, nothing changed**. 1,326 lines removed; pyright 134 -> 112. |
+| `027000d` | **P1-9.** The RNA codon view uses the selected ORF's genetic code. | For a table-2 ORF the +1 frame preview now equals `translate_orf_sequence(orf)` exactly. |
+| `7ab4410` | **S18.** Recognition-site scans are cached. | cProfile: 5,002 scans for 16 distinct combinations. Measured 11.8 s -> 0.24 s at 8 enzymes; 10 enzymes, timed at 100-110 s in the audit, 0.57 s. |
+| `d295fd4` | **S14.** The API covers cloning, variant filtering, mutation reports, BLAST and literature. | 16 entry points. The two that make external requests refuse to run without an explicit confirmation argument. |
+| `3b3919c` | **S6 / P1-7.** An NCBI search can be resumed from its request ID. | Tested against a stubbed client that asserts `submit()` is never called, so no request left the machine. |
+| `f071d2a` | **S13.** The session runs from `main()` behind a `__main__` guard. | `git diff -w` reduces the whole change to the 12 added lines. |
 
 ### Decisions worth knowing
 
@@ -337,10 +337,10 @@ Stage F is done and verified. Stages G, H and I have not been started.
 
 | Commit | Work |
 |---|---|
-| `5db21ab` | One separator width through the new `ui/style.py`. The inventory counted **11 widths** across 389 literal sites; 382 literals in 16 files now call `major_rule()`/`minor_rule()` and the inventory reports **zero** remaining distinct widths. |
-| `b1fa927` | `[0]` means one thing - leave the screen - as Back, Cancel or Exit (**7 meanings → 3**). Message prefixes unified to `ERROR:`/`WARNING:`/`NOTE:`/`OK:`. `docs/TERMINAL_UI_STANDARD.md` written; `tests/test_terminal_ui.py` enforces the standard project-wide. |
-| `10431d6` | The BLAST menu renumbered: its SEARCH block read 1, 2, 3, 14 after the resume entry was added, and now reads 1-4, with the whole menu running 1-14. |
-| `f803577` | S24 measured rather than assumed, and every outstanding audit item classified against the Master Prompt. |
+| `57a250c` | One separator width through the new `ui/style.py`. The inventory counted **11 widths** across 389 literal sites; 382 literals in 16 files now call `major_rule()`/`minor_rule()` and the inventory reports **zero** remaining distinct widths. |
+| `c996922` | `[0]` means one thing - leave the screen - as Back, Cancel or Exit (**7 meanings → 3**). Message prefixes unified to `ERROR:`/`WARNING:`/`NOTE:`/`OK:`. `docs/TERMINAL_UI_STANDARD.md` written; `tests/test_terminal_ui.py` enforces the standard project-wide. |
+| `5177b1c` | The BLAST menu renumbered: its SEARCH block read 1, 2, 3, 14 after the resume entry was added, and now reads 1-4, with the whole menu running 1-14. |
+| `d7250e1` | S24 measured rather than assumed, and every outstanding audit item classified against the Master Prompt. |
 
 ### What Stage F deliberately did not do
 
@@ -391,28 +391,28 @@ clean, ReadOnly restored on exactly the original 15 files.
 
 ## 11. Addendum: Stages G and H (2026-11-02, Opus 5.5)
 
-Resumed from `aa5703b` on the owner's instruction to complete Stage G
+Resumed from `739c235` on the owner's instruction to complete Stage G
 (with D18), Stage H and Stage I. No external request was made; S11 stays
 pending the owner's approval.
 
-### Commits (oldest first, after `aa5703b`)
+### Commits (oldest first, after `739c235`)
 
 | Commit | Package |
 |---|---|
-| `317097d` | D18: heuristic scores renamed from "confidence" in data, exports and messages; ORF golden key renamed, values proven identical |
-| `bc89394` | D18 part 2: the sequence-type classifier reports an `evidence` level |
-| `ebf4d52` | One notation per unit (%, °C, cal/(mol·K), Da); primer positions shown and read 1-based |
-| `cef464a` | A result's own warnings reach the exported summary (6.4) |
-| `81ccc55` | Restriction parameters and the enzyme data version recorded (6.4) |
-| `1a8f2bc` | Editorial review part 1: American spelling, one wording per message, tone |
-| `4e5dbdc` | BLAST E-values with three significant figures everywhere |
-| `97086ad` | `docs/STYLE_GUIDE.md` with a checked enforcement table |
-| `ccf4ccb` | README rewritten to 15.1 |
-| `1269335` | "Sequence complexity" defined with its limit; METHODS section for the sequence overview |
+| `d0b84bd` | D18: heuristic scores renamed from "confidence" in data, exports and messages; ORF golden key renamed, values proven identical |
+| `7169bda` | D18 part 2: the sequence-type classifier reports an `evidence` level |
+| `48a01b9` | One notation per unit (%, °C, cal/(mol·K), Da); primer positions shown and read 1-based |
+| `1e52111` | A result's own warnings reach the exported summary (6.4) |
+| `ef84127` | Restriction parameters and the enzyme data version recorded (6.4) |
+| `b315a6f` | Editorial review part 1: American spelling, one wording per message, tone |
+| `2760c0c` | BLAST E-values with three significant figures everywhere |
+| `93ebe86` | `docs/STYLE_GUIDE.md` with a checked enforcement table |
+| `f20d600` | README rewritten to 15.1 |
+| `47ddea3` | "Sequence complexity" defined with its limit; METHODS section for the sequence overview |
 
 ### Golden master
 
-One intentional change (`317097d`): in `orf.json` and
+One intentional change (`d0b84bd`): in `orf.json` and
 `orf_legacy_baseline.json` the key `confidence` became `heuristic_score`
 (6 and 23 occurrences). With the key mapped back the files equal the
 previous ones, and the unmodified golden test confirmed the code
@@ -450,19 +450,19 @@ Phase 6 is complete as far as the environment and the owner's
 restrictions allow. `docs/PHASE6_FINAL_REPORT.md` is the A-K completion
 report; this section only records the handover facts.
 
-### Commits after the Stage G/H checkpoint (`4c31602`)
+### Commits after the Stage G/H checkpoint (`8815363`)
 
 | Commit | Package |
 |---|---|
-| `2851e11` | Primer Tm vs primer3-py: 2,916 comparisons, max 0.0032 °C, kept in the suite |
-| `835744e` | Biopython reference tests; **IG instability weight corrected** (-7.49 -> 1.0) |
-| `999f77a` | Integration workflow tests (10.1-10.4, 10.7) |
-| `82ae2e9` | AUDIT_STATUS at the end-of-phase state |
-| `70cf362` | FEATURE_STATUS at the end-of-phase state; broken tables repaired |
-| `db74504` | **CRISPR module unimportable on Python 3.10/3.11** fixed; static 3.10 check |
+| `f2f640d` | Primer Tm vs primer3-py: 2,916 comparisons, max 0.0032 °C, kept in the suite |
+| `16acff9` | Biopython reference tests; **IG instability weight corrected** (-7.49 -> 1.0) |
+| `17c25d3` | Integration workflow tests (10.1-10.4, 10.7) |
+| `6df65cb` | AUDIT_STATUS at the end-of-phase state |
+| `54fb37d` | FEATURE_STATUS at the end-of-phase state; broken tables repaired |
+| `9d54b3a` | **CRISPR module unimportable on Python 3.10/3.11** fixed; static 3.10 check |
 | (this commit) | Final report, this addendum, S7 status in the audit |
 
-The `2851e11` message says the P1-3 criterion "had never been run"; the
+The `f2f640d` message says the P1-3 criterion "had never been run"; the
 audit had run 40 comparisons that no document recorded. `docs/CHANGES.md`
 corrects this.
 
@@ -470,7 +470,7 @@ corrects this.
 
 - Suite: 314 run, 314 passed, 0 failed, 0 skipped.
 - Golden master: 13 snapshots match; one intentional change in Phase 6
-  (D18, `317097d`).
+  (D18, `d0b84bd`).
 - pyright 1.1.414 at Python 3.10: 112 against the baseline of 134, no new
   diagnostics.
 - Working tree clean; ReadOnly on exactly the original 15 files.

@@ -1,6 +1,6 @@
 # Phase 6 closing review
 
-Review of the Phase 6 end state at `1f0c0f5`, requested by the owner on
+Review of the Phase 6 end state at `4845a5c`, requested by the owner on
 2026-11-02 before accepting the project state. No source file was changed
 for this review, no external request was made, and the original project
 was not touched. Every check below was run against the repository; the
@@ -19,13 +19,13 @@ the open items.
 does not depend on the reviewer's memory of the work:
 
 - **Cross-run of test suites.** Two scratch trees were built with
-  `git archive` (outside the repository): the `aa5703b` code with the
-  current tests, and the current code with the `aa5703b` tests. Every
+  `git archive` (outside the repository): the `739c235` code with the
+  current tests, and the current code with the `739c235` tests. Every
   failure in either direction was classified.
 - **Interface diff.** The top-level functions, classes, constants, class
   fields and argument lists of every changed source file were compared by
-  AST between `aa5703b` and `HEAD`.
-- **Golden master.** Both changed snapshots were loaded at `aa5703b` and
+  AST between `739c235` and `HEAD`.
+- **Golden master.** Both changed snapshots were loaded at `739c235` and
   `HEAD`; the key set and the values with the key mapped back were
   compared.
 - **Commit audit.** Files touched per commit, word-level diff counts and
@@ -64,7 +64,7 @@ traceability rules of sections 1.3, 1.3.1 and 11.8.
 
 ### Q2. The last 18 commits against the final report
 
-**Confirmed.** All 18 commits since `aa5703b` exist as listed in report
+**Confirmed.** All 18 commits since `739c235` exist as listed in report
 section I and handover section 12, each is one package, each carries the
 Opus 5.5 trailer, and the files each touched match its described scope.
 No commit changed a source file outside its stated purpose.
@@ -73,13 +73,13 @@ No commit changed a source file outside its stated purpose.
 
 | Location | Statement | Actual |
 |---|---|---|
-| `CHANGES.md` (Stage H), `PHASE6_PROGRESS.md` row 35, `PHASE6_FINAL_REPORT.md` G | "92 words in 10 documents and 6 code text sites" | Word-level diff of `1a8f2bc`: 86 words in 8 documents; 9 sites in 4 source files (`crispr.py` 6, `api.py` 1, `loader.py` 1, `orf_context.py` 1) plus 6 in tests. |
-| `PHASE6_FINAL_REPORT.md` A | "Stage I found and corrected three further defects (items 25-27)" | Item 27 (primer coordinates) was found and fixed in Stage G (`ebf4d52`); Stage I found two. |
+| `CHANGES.md` (Stage H), `PHASE6_PROGRESS.md` row 35, `PHASE6_FINAL_REPORT.md` G | "92 words in 10 documents and 6 code text sites" | Word-level diff of `b315a6f`: 86 words in 8 documents; 9 sites in 4 source files (`crispr.py` 6, `api.py` 1, `loader.py` 1, `orf_context.py` 1) plus 6 in tests. |
+| `PHASE6_FINAL_REPORT.md` A | "Stage I found and corrected three further defects (items 25-27)" | Item 27 (primer coordinates) was found and fixed in Stage G (`48a01b9`); Stage I found two. |
 | `PHASE6_FINAL_REPORT.md` A | "109 at the start of the previous cycle" | `AUDIT_STATUS.md` records 109 at the **end** of the 2026-10 cycle. |
 | `PHASE6_FINAL_REPORT.md` A | "every S item is assessed: confirmed ones are corrected" | S9 is confirmed and only quantified; S14 is partly resolved (menus remain, P2-2); S5 is partly confirmed and addressed. |
-| `AUDIT_STATUS.md` P1-1 | "312 at the end of Phase 6" | 314 (two tests were added afterwards in `db74504`). |
-| `PHASE6_FINAL_REPORT.md` header | "Work by Claude Opus 5 and Claude Opus 5.5, as recorded per commit" | 5 of the 63 Phase 6 commits (`824ca5f`, `d4544ad`, `5c098e3`, `47146b0`, `7334296`) carry no model attribution. |
-| Commit message `2851e11` | P1-3 criterion "had never been run" | Already corrected in `CHANGES.md`; history unchanged by design. |
+| `AUDIT_STATUS.md` P1-1 | "312 at the end of Phase 6" | 314 (two tests were added afterwards in `9d54b3a`). |
+| `PHASE6_FINAL_REPORT.md` header | "Work by Claude Opus 5 and Claude Opus 5.5, as recorded per commit" | 5 of the 63 Phase 6 commits (`8a10cdc`, `fd2fab1`, `0a22bcb`, `67671ae`, `a71f17b`) carry no model attribution. |
+| Commit message `f2f640d` | P1-3 criterion "had never been run" | Already corrected in `CHANGES.md`; history unchanged by design. |
 
 ### Q3. The instability-index correction
 
@@ -87,7 +87,7 @@ No commit changed a source file outside its stated purpose.
 
 - The change is one value in `INSTABILITY_ROWS["I"]`, column G (column
   order `ACEDGFIHKMLNQPSRTWVY`): -7.49 -> 1.0. The value -7.49 had been
-  present since the baseline commit `e4395ed`.
+  present since the baseline commit `05222ea`.
 - Table orientation matches Biopython's documented convention
   (`DIWV['D']['G']` is the dipeptide DG): the other 398 of the 400 weights
   equal Biopython's, and FY differs only slightly (33.6 vs 33.601).
@@ -124,14 +124,14 @@ No commit changed a source file outside its stated purpose.
 **Confirmed: only the intended rename.**
 
 - In the last 18 commits only `tests/golden/orf.json` and
-  `orf_legacy_baseline.json` changed, both in `317097d`.
+  `orf_legacy_baseline.json` changed, both in `d0b84bd`.
 - Key sets differ only by `confidence` (old) vs `heuristic_score` (new),
   6 and 23 occurrences. With the key mapped back, both files are equal to
-  their `aa5703b` versions. SHA-256 prefixes before (`e5fe5dd9`,
+  their `739c235` versions. SHA-256 prefixes before (`e5fe5dd9`,
   `67fef456`) match those recorded in `CHANGES.md`.
 - The insertion/deletion counts (458/458) come from the sorted-keys
   writer.
-- In `analyses/orf.py`, the diff of `317097d` reduces, after mapping the
+- In `analyses/orf.py`, the diff of `d0b84bd` reduces, after mapping the
   new names back, to the section heading, two comments, the alias line,
   one docstring word and one interpretation sentence. No logic changed.
 - The view key in `tests/golden_scenarios.py` was renamed in the same
@@ -141,9 +141,9 @@ No commit changed a source file outside its stated purpose.
 
 **Confirmed.**
 
-- 314 run, 314 pass, 0 skipped, 0 failed at `1f0c0f5`. BLAST+,
+- 314 run, 314 pass, 0 skipped, 0 failed at `4845a5c`. BLAST+,
   Biopython and primer3-py are present, so no test was skipped.
-- The current tests on the `aa5703b` code: 63 failures, all in tests
+- The current tests on the `739c235` code: 63 failures, all in tests
   added for a Stage G-I change (D18 vocabulary, notation, primer
   coordinates, exported warnings, restriction parameters, IG weight,
   Python 3.10 f-string, spelling, style guide, golden key). This confirms
@@ -151,7 +151,7 @@ No commit changed a source file outside its stated purpose.
 - The characterization tests pass on both code states, as they should:
   the primer3-py Tm comparison, the restriction and end-compatibility
   references, and five of the seven workflow tests (the two that fail
-  on the old code check the restriction parameters added in `81ccc55`).
+  on the old code check the restriction parameters added in `ef84127`).
 - Every test named in the style guide's enforcement table exists
   (itself tested).
 
@@ -172,17 +172,17 @@ No commit changed a source file outside its stated purpose.
 
 **No unintended damage found.**
 
-- The `aa5703b` suite on the current code: 283 run, 23 fail, every one
+- The `739c235` suite on the current code: 283 run, 23 fail, every one
   traceable to an intended change. 22 are D18 renames
   (`SequenceClassification.confidence`, `SequenceRecord.type_confidence`,
   the `confidence` and `sequence_type_confidence` keys); 1 is the exit
   message ("Thank you for using Synapse!" -> "...Synapse."). Every other
   old test passes, including the end-to-end menu runs, the golden master
   apart from the renamed key, and all module self-tests.
-- AST interface diff `aa5703b..HEAD`:
+- AST interface diff `739c235..HEAD`:
   - Removed without an alias: `core.alphabets.CONFIDENCE_LEVELS`,
     `SequenceClassification.confidence`, `SequenceRecord.type_confidence`.
-    All three were introduced in Phase 6 (`d057ac1`, `776de4a`), so no
+    All three were introduced in Phase 6 (`2a6a979`, `fb95b4a`), so no
     pre-Phase-6 caller can depend on them. They are documented in
     `CHANGES.md`.
   - `calculate_orf_confidence` remains callable as an alias.
@@ -206,14 +206,14 @@ contradict the end state:
 
 - `PHASE6_HANDOVER.md` opens with "Phase 6 is **not complete**. Stages
   F-H ... and Stage I ... have not been started", and its section 1
-  table gives HEAD `f803577` and 283 tests. The later addenda correct
+  table gives HEAD `d7250e1` and 283 tests. The later addenda correct
   this, but a reader starting at the top is misled.
 - `PHASE6_PROGRESS.md` "Paused (2026-10-31)" still says "Stages F-I have
   not started", and "Open after the current package" still lists D17 and
   D18 as open.
 - `PHASE6_PROGRESS.md` classification row P2-5 still says the complexity
   renaming "belongs with Stage G terminology"; it was resolved by
-  documentation in `1269335`.
+  documentation in `47ddea3`.
 
 **Open items listed elsewhere but missing from report section J:**
 
@@ -237,7 +237,7 @@ contradict the end state:
 
 ### Confirmed results
 
-1. The 18 commits after `aa5703b` match their documented scope. Each is
+1. The 18 commits after `739c235` match their documented scope. Each is
    one package, attributed to Opus 5.5, and touches no source file
    outside its purpose.
 2. The golden-master change is exactly the `confidence` ->
