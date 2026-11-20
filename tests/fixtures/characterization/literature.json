@@ -1,0 +1,837 @@
+{
+ "literature": {
+  "author_dedup": [
+   "Ann Smith",
+   "Bo Li"
+  ],
+  "clean_text": [
+   "A b&c",
+   "",
+   "12",
+   "\u00dcn\u00efcode x"
+  ],
+  "combined_pubmed_europe_pmc_oa": {
+   "message": "Retrieved 1 unique articles from 2 selected source(s).",
+   "run": {
+    "__type__": "LiteratureSearchRun",
+    "articles": [
+     {
+      "__type__": "LiteratureArticle",
+      "abstract": "Why. How.",
+      "article_id": "europepmc:111",
+      "authors": [
+       "Smith A",
+       "Consortium T."
+      ],
+      "citation_count": 12,
+      "doi": "10.1000/abc",
+      "is_open_access": true,
+      "journal": "J Tests",
+      "keywords": [],
+      "metadata": {
+       "abstract_available": true,
+       "date_validation": "NOT_FLAGGED",
+       "metadata_completeness": "0.857",
+       "metadata_enriched": true,
+       "metadata_enrichment_sources": [
+        "Europe PMC",
+        "PubMed"
+       ],
+       "missing_core_metadata": [],
+       "source": "Europe PMC"
+      },
+      "pmcid": "PMC9",
+      "pmid": "111",
+      "publication_date": "2020-03-04",
+      "publication_types": [
+       "Journal Article"
+      ],
+      "relevance_components": {
+       "abstract_coverage": "0.0",
+       "biological_context_coverage": "0.0",
+       "exact_phrase_bonus": "5.0",
+       "keyword_coverage": "0.0",
+       "matched_context_terms": [],
+       "matched_query_terms": [
+        "lactase",
+        "persistence"
+       ],
+       "missing_query_terms": [],
+       "query_term_coverage": "1.0",
+       "ranking_method": "title 50%, abstract 35%, keywords 15%, phrase bonus up to 5, context bonus up to 5; capped at 100",
+       "title_coverage": "1.0"
+      },
+      "relevance_score": "55.0",
+      "source_ids": {
+       "Europe PMC": "111"
+      },
+      "source_urls": [
+       "https://pubmed.ncbi.nlm.nih.gov/111/",
+       "https://pmc.ncbi.nlm.nih.gov/articles/PMC9/",
+       "https://doi.org/10.1000/abc"
+      ],
+      "title": "Lactase persistence in Europe."
+     }
+    ],
+    "errors": [],
+    "query": {
+     "__type__": "LiteratureQuery",
+     "biological_context": {},
+     "date_from": null,
+     "date_to": null,
+     "max_results": 10,
+     "open_access_only": true,
+     "query": "lactase persistence",
+     "sort_by": "relevance",
+     "sources": [
+      "pubmed",
+      "europe_pmc"
+     ]
+    },
+    "source_status": {
+     "europe_pmc": "OK (1 records)",
+     "pubmed": "OK (0 records)"
+    },
+    "total_results_after_deduplication": 1,
+    "total_results_before_deduplication": 1,
+    "warnings": [
+     "Metadata enrichment filled missing fields for 1 record(s) using Europe PMC and/or Crossref."
+    ]
+   },
+   "success": true
+  },
+  "combined_pubmed_europe_pmc_openalex_crossref": {
+   "message": "Retrieved 5 unique articles from 4 selected source(s).",
+   "run": {
+    "__type__": "LiteratureSearchRun",
+    "articles": [
+     {
+      "__type__": "LiteratureArticle",
+      "abstract": "BACKGROUND: Why.\nHow.",
+      "article_id": "pubmed:111",
+      "authors": [
+       "Ann Smith",
+       "Test Consortium"
+      ],
+      "citation_count": 12,
+      "doi": "10.1000/ABC",
+      "is_open_access": true,
+      "journal": "Journal of Tests",
+      "keywords": [],
+      "metadata": {
+       "abstract_available": true,
+       "date_validation": "NOT_FLAGGED",
+       "metadata_completeness": "0.857",
+       "metadata_enriched": true,
+       "metadata_enrichment_sources": [
+        "Europe PMC",
+        "PubMed"
+       ],
+       "missing_core_metadata": [],
+       "openalex_id": "https://openalex.org/W1",
+       "source": "PubMed"
+      },
+      "pmcid": "PMC9",
+      "pmid": "111",
+      "publication_date": "2020 Mar 04",
+      "publication_types": [
+       "Journal Article"
+      ],
+      "relevance_components": {
+       "abstract_coverage": "0.0",
+       "biological_context_coverage": "0.0",
+       "exact_phrase_bonus": "5.0",
+       "keyword_coverage": "0.0",
+       "matched_context_terms": [],
+       "matched_query_terms": [
+        "lactase",
+        "persistence"
+       ],
+       "missing_query_terms": [],
+       "query_term_coverage": "1.0",
+       "ranking_method": "title 50%, abstract 35%, keywords 15%, phrase bonus up to 5, context bonus up to 5; capped at 100",
+       "title_coverage": "1.0"
+      },
+      "relevance_score": "55.0",
+      "source_ids": {
+       "Europe PMC": "111",
+       "OpenAlex": "https://openalex.org/W1",
+       "PubMed": "111"
+      },
+      "source_urls": [
+       "https://pubmed.ncbi.nlm.nih.gov/111/",
+       "https://doi.org/10.1000/abc",
+       "https://pmc.ncbi.nlm.nih.gov/articles/PMC9/"
+      ],
+      "title": "Lactase persistence in Europe."
+     },
+     {
+      "__type__": "LiteratureArticle",
+      "abstract": "From Crossref.",
+      "article_id": "crossref:10.1000/xyz",
+      "authors": [
+       "Cy Ross"
+      ],
+      "citation_count": null,
+      "doi": "10.1000/xyz",
+      "is_open_access": true,
+      "journal": "Crossref Journal",
+      "keywords": [],
+      "metadata": {
+       "abstract_available": true,
+       "date_validation": "NOT_FLAGGED",
+       "metadata_completeness": "0.857",
+       "metadata_enriched": true,
+       "metadata_enrichment_sources": [
+        "Europe PMC"
+       ],
+       "missing_core_metadata": [],
+       "source": "Crossref"
+      },
+      "pmcid": "PMC9",
+      "pmid": null,
+      "publication_date": "2019-07-01",
+      "publication_types": [
+       "journal-article"
+      ],
+      "relevance_components": {
+       "abstract_coverage": "0.0",
+       "biological_context_coverage": "0.0",
+       "exact_phrase_bonus": "0.0",
+       "keyword_coverage": "0.0",
+       "matched_context_terms": [],
+       "matched_query_terms": [
+        "lactase"
+       ],
+       "missing_query_terms": [
+        "persistence"
+       ],
+       "query_term_coverage": "0.5",
+       "ranking_method": "title 50%, abstract 35%, keywords 15%, phrase bonus up to 5, context bonus up to 5; capped at 100",
+       "title_coverage": "0.5"
+      },
+      "relevance_score": "25.0",
+      "source_ids": {
+       "Crossref": "10.1000/xyz"
+      },
+      "source_urls": [
+       "https://doi.org/10.1000/xyz",
+       "https://pmc.ncbi.nlm.nih.gov/articles/PMC9/"
+      ],
+      "title": "Milk & lactase: 100% of the story"
+     },
+     {
+      "__type__": "LiteratureArticle",
+      "abstract": "Why. How.",
+      "article_id": "europepmc:10.1101/2021.01.01.000001",
+      "authors": [
+       "Doe J"
+      ],
+      "citation_count": 0,
+      "doi": "10.1101/2021.01.01.000001",
+      "is_open_access": false,
+      "journal": "J Tests",
+      "keywords": [],
+      "metadata": {
+       "abstract_available": false,
+       "date_validation": "NOT_FLAGGED",
+       "metadata_completeness": "0.857",
+       "metadata_enriched": true,
+       "metadata_enrichment_sources": [
+        "Europe PMC"
+       ],
+       "missing_core_metadata": [],
+       "source": "Europe PMC"
+      },
+      "pmcid": "PMC9",
+      "pmid": null,
+      "publication_date": "2021-01-02",
+      "publication_types": [],
+      "relevance_components": {
+       "abstract_coverage": "0.0",
+       "biological_context_coverage": "0.0",
+       "exact_phrase_bonus": "0.0",
+       "keyword_coverage": "0.0",
+       "matched_context_terms": [],
+       "matched_query_terms": [
+        "lactase"
+       ],
+       "missing_query_terms": [
+        "persistence"
+       ],
+       "query_term_coverage": "0.5",
+       "ranking_method": "title 50%, abstract 35%, keywords 15%, phrase bonus up to 5, context bonus up to 5; capped at 100",
+       "title_coverage": "0.5"
+      },
+      "relevance_score": "25.0",
+      "source_ids": {
+       "Europe PMC": "10.1101/2021.01.01.000001"
+      },
+      "source_urls": [
+       "https://doi.org/10.1101/2021.01.01.000001",
+       "https://pmc.ncbi.nlm.nih.gov/articles/PMC9/"
+      ],
+      "title": "Lactase genetics preprint"
+     },
+     {
+      "__type__": "LiteratureArticle",
+      "abstract": null,
+      "article_id": "openalex:W2",
+      "authors": [],
+      "citation_count": 3,
+      "doi": null,
+      "is_open_access": false,
+      "journal": null,
+      "keywords": [],
+      "metadata": {
+       "abstract_available": false,
+       "date_validation": "NOT_FLAGGED",
+       "metadata_completeness": "0.286",
+       "missing_core_metadata": [
+        "authors",
+        "journal",
+        "abstract",
+        "DOI/PMID"
+       ],
+       "openalex_id": "https://openalex.org/W2",
+       "source": "OpenAlex"
+      },
+      "pmcid": null,
+      "pmid": null,
+      "publication_date": "2018-06-01",
+      "publication_types": [],
+      "relevance_components": {
+       "abstract_coverage": "0.0",
+       "biological_context_coverage": "0.0",
+       "exact_phrase_bonus": "0.0",
+       "keyword_coverage": "0.0",
+       "matched_context_terms": [],
+       "matched_query_terms": [],
+       "missing_query_terms": [
+        "lactase",
+        "persistence"
+       ],
+       "query_term_coverage": "0.0",
+       "ranking_method": "title 50%, abstract 35%, keywords 15%, phrase bonus up to 5, context bonus up to 5; capped at 100",
+       "title_coverage": "0.0"
+      },
+      "relevance_score": "0.0",
+      "source_ids": {
+       "OpenAlex": "https://openalex.org/W2"
+      },
+      "source_urls": [
+       "https://openalex.org/W2"
+      ],
+      "title": "Dairy and evolution"
+     },
+     {
+      "__type__": "LiteratureArticle",
+      "abstract": "Why. How.",
+      "article_id": "pubmed:222",
+      "authors": [
+       "Smith A",
+       "Consortium T."
+      ],
+      "citation_count": null,
+      "doi": null,
+      "is_open_access": true,
+      "journal": "Future Journal",
+      "keywords": [],
+      "metadata": {
+       "abstract_available": false,
+       "date_validation": "FUTURE_DATE_REVIEW",
+       "date_validation_note": "Source reports a publication date after the current year; original metadata retained pending publisher verification.",
+       "metadata_completeness": "0.857",
+       "metadata_enriched": true,
+       "metadata_enrichment_sources": [
+        "Europe PMC",
+        "PubMed"
+       ],
+       "missing_core_metadata": [],
+       "source": "PubMed"
+      },
+      "pmcid": "PMC9",
+      "pmid": "222",
+      "publication_date": "2031",
+      "publication_types": [
+       "Journal Article"
+      ],
+      "relevance_components": {
+       "abstract_coverage": "0.0",
+       "biological_context_coverage": "0.0",
+       "exact_phrase_bonus": "0.0",
+       "keyword_coverage": "0.0",
+       "matched_context_terms": [],
+       "matched_query_terms": [],
+       "missing_query_terms": [
+        "lactase",
+        "persistence"
+       ],
+       "query_term_coverage": "0.0",
+       "ranking_method": "title 50%, abstract 35%, keywords 15%, phrase bonus up to 5, context bonus up to 5; capped at 100",
+       "title_coverage": "0.0"
+      },
+      "relevance_score": "0.0",
+      "source_ids": {
+       "PubMed": "222"
+      },
+      "source_urls": [
+       "https://pubmed.ncbi.nlm.nih.gov/222/",
+       "https://pmc.ncbi.nlm.nih.gov/articles/PMC9/"
+      ],
+      "title": "A record dated in the future"
+     }
+    ],
+    "errors": [],
+    "query": {
+     "__type__": "LiteratureQuery",
+     "biological_context": {},
+     "date_from": null,
+     "date_to": null,
+     "max_results": 10,
+     "open_access_only": false,
+     "query": "lactase persistence",
+     "sort_by": "relevance",
+     "sources": [
+      "pubmed",
+      "europe_pmc",
+      "openalex",
+      "crossref"
+     ]
+    },
+    "source_status": {
+     "crossref": "OK (1 records)",
+     "europe_pmc": "OK (2 records)",
+     "openalex": "OK (2 records)",
+     "pubmed": "OK (2 records)"
+    },
+    "total_results_after_deduplication": 5,
+    "total_results_before_deduplication": 7,
+    "warnings": [
+     "Metadata enrichment filled missing fields for 4 record(s) using Europe PMC and/or Crossref.",
+     "1 record(s) report a publication date later than today: A record dated in the future [2031]. Each record is flagged [REVIEW: FUTURE DATE]; source-provided dates were not changed. Check the publisher record and source metadata."
+    ]
+   },
+   "success": true
+  },
+  "context": {
+   "orf": "rank ? frame 1",
+   "sequence_header": "NM_002299.4 LCT lactase",
+   "suggested_query": "NM 002299.4 LCT lactase"
+  },
+  "crossref": [
+   {
+    "__type__": "LiteratureArticle",
+    "abstract": "From Crossref.",
+    "article_id": "crossref:10.1000/xyz",
+    "authors": [
+     "Cy Ross"
+    ],
+    "citation_count": null,
+    "doi": "10.1000/xyz",
+    "is_open_access": null,
+    "journal": "Crossref Journal",
+    "keywords": [],
+    "metadata": {
+     "abstract_available": true,
+     "source": "Crossref"
+    },
+    "pmcid": null,
+    "pmid": null,
+    "publication_date": "2019-07-01",
+    "publication_types": [
+     "journal-article"
+    ],
+    "relevance_components": {},
+    "relevance_score": null,
+    "source_ids": {
+     "Crossref": "10.1000/xyz"
+    },
+    "source_urls": [
+     "https://doi.org/10.1000/xyz"
+    ],
+    "title": "Milk & lactase: 100% of the story"
+   }
+  ],
+  "date_bounds": [
+   "2020-01-01",
+   "2020-12-31",
+   "2020-02-01",
+   "2020-02-29",
+   "2020-02-03",
+   "2020-02-03",
+   null,
+   null
+  ],
+  "date_in_range": [
+   true,
+   true,
+   false,
+   false,
+   false,
+   false
+  ],
+  "europe_pmc": [
+   {
+    "__type__": "LiteratureArticle",
+    "abstract": "Why. How.",
+    "article_id": "europepmc:111",
+    "authors": [
+     "Smith A",
+     "Consortium T."
+    ],
+    "citation_count": 12,
+    "doi": "10.1000/abc",
+    "is_open_access": true,
+    "journal": "J Tests",
+    "keywords": [],
+    "metadata": {
+     "abstract_available": true,
+     "source": "Europe PMC"
+    },
+    "pmcid": "PMC9",
+    "pmid": "111",
+    "publication_date": "2020-03-04",
+    "publication_types": [],
+    "relevance_components": {},
+    "relevance_score": null,
+    "source_ids": {
+     "Europe PMC": "111"
+    },
+    "source_urls": [
+     "https://pubmed.ncbi.nlm.nih.gov/111/"
+    ],
+    "title": "Lactase persistence in Europe."
+   },
+   {
+    "__type__": "LiteratureArticle",
+    "abstract": null,
+    "article_id": "europepmc:10.1101/2021.01.01.000001",
+    "authors": [
+     "Doe J"
+    ],
+    "citation_count": 0,
+    "doi": "10.1101/2021.01.01.000001",
+    "is_open_access": false,
+    "journal": null,
+    "keywords": [],
+    "metadata": {
+     "abstract_available": false,
+     "source": "Europe PMC"
+    },
+    "pmcid": null,
+    "pmid": null,
+    "publication_date": "2021-01-02",
+    "publication_types": [],
+    "relevance_components": {},
+    "relevance_score": null,
+    "source_ids": {
+     "Europe PMC": "10.1101/2021.01.01.000001"
+    },
+    "source_urls": [
+     "https://doi.org/10.1101/2021.01.01.000001"
+    ],
+    "title": "Lactase genetics preprint"
+   }
+  ],
+  "export.bib": "@article{Smith20201,\n  title = {Lactase persistence in Europe.},\n  author = {Ann Smith and Test Consortium},\n  journal = {Journal of Tests},\n  year = {2020},\n  doi = {10.1000/ABC},\n  abstract = {BACKGROUND: Why.\nHow.}\n}\n\n@article{Ross20192,\n  title = {Milk \\& lactase: 100\\% of the story},\n  author = {Cy Ross},\n  journal = {Crossref Journal},\n  year = {2019},\n  doi = {10.1000/xyz},\n  abstract = {From Crossref.}\n}\n\n@article{J20213,\n  title = {Lactase genetics preprint},\n  author = {Doe J},\n  journal = {J Tests},\n  year = {2021},\n  doi = {10.1101/2021.01.01.000001},\n  abstract = {Why. How.}\n}\n\n@article{article20184,\n  title = {Dairy and evolution},\n  year = {2018}\n}\n\n@article{A20315,\n  title = {A record dated in the future},\n  author = {Smith A and Consortium T.},\n  journal = {Future Journal},\n  year = {2031},\n  abstract = {Why. How.},\n  note = {REVIEW: FUTURE PUBLICATION DATE. Source reports a publication date after the current year; original metadata retained pending publisher verification.}\n}",
+  "export.csv": "\ufefftitle,doi,pmid,pmcid,authors,journal,publication_date,abstract,keywords,publication_types,source_ids,source_urls,is_open_access,citation_count,relevance_score,relevance_components,metadata\nLactase persistence in Europe.,10.1000/ABC,111,PMC9,\"[\"\"Ann Smith\"\", \"\"Test Consortium\"\"]\",Journal of Tests,2020 Mar 04,\"BACKGROUND: Why.\nHow.\",[],\"[\"\"Journal Article\"\"]\",\"{\"\"PubMed\"\": \"\"111\"\", \"\"Europe PMC\"\": \"\"111\"\", \"\"OpenAlex\"\": \"\"https://openalex.org/W1\"\"}\",\"[\"\"https://pubmed.ncbi.nlm.nih.gov/111/\"\", \"\"https://doi.org/10.1000/abc\"\", \"\"https://pmc.ncbi.nlm.nih.gov/articles/PMC9/\"\"]\",True,12,55.0,\"{\"\"title_coverage\"\": 1.0, \"\"abstract_coverage\"\": 0.0, \"\"keyword_coverage\"\": 0.0, \"\"query_term_coverage\"\": 1.0, \"\"exact_phrase_bonus\"\": 5.0, \"\"biological_context_coverage\"\": 0.0, \"\"matched_query_terms\"\": [\"\"lactase\"\", \"\"persistence\"\"], \"\"missing_query_terms\"\": [], \"\"matched_context_terms\"\": [], \"\"ranking_method\"\": \"\"title 50%, abstract 35%, keywords 15%, phrase bonus up to 5, context bonus up to 5; capped at 100\"\"}\",\"{\"\"source\"\": \"\"PubMed\"\", \"\"abstract_available\"\": true, \"\"openalex_id\"\": \"\"https://openalex.org/W1\"\", \"\"metadata_enriched\"\": true, \"\"metadata_enrichment_sources\"\": [\"\"Europe PMC\"\", \"\"PubMed\"\"], \"\"metadata_completeness\"\": 0.857, \"\"missing_core_metadata\"\": [], \"\"date_validation\"\": \"\"NOT_FLAGGED\"\"}\"\nMilk & lactase: 100% of the story,10.1000/xyz,,PMC9,\"[\"\"Cy Ross\"\"]\",Crossref Journal,2019-07-01,From Crossref.,[],\"[\"\"journal-article\"\"]\",\"{\"\"Crossref\"\": \"\"10.1000/xyz\"\"}\",\"[\"\"https://doi.org/10.1000/xyz\"\", \"\"https://pmc.ncbi.nlm.nih.gov/articles/PMC9/\"\"]\",True,,25.0,\"{\"\"title_coverage\"\": 0.5, \"\"abstract_coverage\"\": 0.0, \"\"keyword_coverage\"\": 0.0, \"\"query_term_coverage\"\": 0.5, \"\"exact_phrase_bonus\"\": 0.0, \"\"biological_context_coverage\"\": 0.0, \"\"matched_query_terms\"\": [\"\"lactase\"\"], \"\"missing_query_terms\"\": [\"\"persistence\"\"], \"\"matched_context_terms\"\": [], \"\"ranking_method\"\": \"\"title 50%, abstract 35%, keywords 15%, phrase bonus up to 5, context bonus up to 5; capped at 100\"\"}\",\"{\"\"source\"\": \"\"Crossref\"\", \"\"abstract_available\"\": true, \"\"metadata_enriched\"\": true, \"\"metadata_enrichment_sources\"\": [\"\"Europe PMC\"\"], \"\"metadata_completeness\"\": 0.857, \"\"missing_core_metadata\"\": [], \"\"date_validation\"\": \"\"NOT_FLAGGED\"\"}\"\nLactase genetics preprint,10.1101/2021.01.01.000001,,PMC9,\"[\"\"Doe J\"\"]\",J Tests,2021-01-02,Why. How.,[],[],\"{\"\"Europe PMC\"\": \"\"10.1101/2021.01.01.000001\"\"}\",\"[\"\"https://doi.org/10.1101/2021.01.01.000001\"\", \"\"https://pmc.ncbi.nlm.nih.gov/articles/PMC9/\"\"]\",False,0,25.0,\"{\"\"title_coverage\"\": 0.5, \"\"abstract_coverage\"\": 0.0, \"\"keyword_coverage\"\": 0.0, \"\"query_term_coverage\"\": 0.5, \"\"exact_phrase_bonus\"\": 0.0, \"\"biological_context_coverage\"\": 0.0, \"\"matched_query_terms\"\": [\"\"lactase\"\"], \"\"missing_query_terms\"\": [\"\"persistence\"\"], \"\"matched_context_terms\"\": [], \"\"ranking_method\"\": \"\"title 50%, abstract 35%, keywords 15%, phrase bonus up to 5, context bonus up to 5; capped at 100\"\"}\",\"{\"\"source\"\": \"\"Europe PMC\"\", \"\"abstract_available\"\": false, \"\"metadata_enriched\"\": true, \"\"metadata_enrichment_sources\"\": [\"\"Europe PMC\"\"], \"\"metadata_completeness\"\": 0.857, \"\"missing_core_metadata\"\": [], \"\"date_validation\"\": \"\"NOT_FLAGGED\"\"}\"\nDairy and evolution,,,,[],,2018-06-01,,[],[],\"{\"\"OpenAlex\"\": \"\"https://openalex.org/W2\"\"}\",\"[\"\"https://openalex.org/W2\"\"]\",False,3,0.0,\"{\"\"title_coverage\"\": 0.0, \"\"abstract_coverage\"\": 0.0, \"\"keyword_coverage\"\": 0.0, \"\"query_term_coverage\"\": 0.0, \"\"exact_phrase_bonus\"\": 0.0, \"\"biological_context_coverage\"\": 0.0, \"\"matched_query_terms\"\": [], \"\"missing_query_terms\"\": [\"\"lactase\"\", \"\"persistence\"\"], \"\"matched_context_terms\"\": [], \"\"ranking_method\"\": \"\"title 50%, abstract 35%, keywords 15%, phrase bonus up to 5, context bonus up to 5; capped at 100\"\"}\",\"{\"\"source\"\": \"\"OpenAlex\"\", \"\"openalex_id\"\": \"\"https://openalex.org/W2\"\", \"\"abstract_available\"\": false, \"\"metadata_completeness\"\": 0.286, \"\"missing_core_metadata\"\": [\"\"authors\"\", \"\"journal\"\", \"\"abstract\"\", \"\"DOI/PMID\"\"], \"\"date_validation\"\": \"\"NOT_FLAGGED\"\"}\"\nA record dated in the future,,222,PMC9,\"[\"\"Smith A\"\", \"\"Consortium T.\"\"]\",Future Journal,2031,Why. How.,[],\"[\"\"Journal Article\"\"]\",\"{\"\"PubMed\"\": \"\"222\"\"}\",\"[\"\"https://pubmed.ncbi.nlm.nih.gov/222/\"\", \"\"https://pmc.ncbi.nlm.nih.gov/articles/PMC9/\"\"]\",True,,0.0,\"{\"\"title_coverage\"\": 0.0, \"\"abstract_coverage\"\": 0.0, \"\"keyword_coverage\"\": 0.0, \"\"query_term_coverage\"\": 0.0, \"\"exact_phrase_bonus\"\": 0.0, \"\"biological_context_coverage\"\": 0.0, \"\"matched_query_terms\"\": [], \"\"missing_query_terms\"\": [\"\"lactase\"\", \"\"persistence\"\"], \"\"matched_context_terms\"\": [], \"\"ranking_method\"\": \"\"title 50%, abstract 35%, keywords 15%, phrase bonus up to 5, context bonus up to 5; capped at 100\"\"}\",\"{\"\"source\"\": \"\"PubMed\"\", \"\"abstract_available\"\": false, \"\"metadata_enriched\"\": true, \"\"metadata_enrichment_sources\"\": [\"\"Europe PMC\"\", \"\"PubMed\"\"], \"\"metadata_completeness\"\": 0.857, \"\"missing_core_metadata\"\": [], \"\"date_validation\"\": \"\"FUTURE_DATE_REVIEW\"\", \"\"date_validation_note\"\": \"\"Source reports a publication date after the current year; original metadata retained pending publisher verification.\"\"}\"\n",
+  "export.json": "{\"module\": \"Synapse Literature Intelligence\", \"module_version\": \"2.1.1\", \"run\": {\"articles\": [{\"abstract\": \"BACKGROUND: Why.\\nHow.\", \"article_id\": \"pubmed:111\", \"authors\": [\"Ann Smith\", \"Test Consortium\"], \"citation_count\": 12, \"doi\": \"10.1000/ABC\", \"is_open_access\": true, \"journal\": \"Journal of Tests\", \"keywords\": [], \"metadata\": {\"abstract_available\": true, \"date_validation\": \"NOT_FLAGGED\", \"metadata_completeness\": 0.857, \"metadata_enriched\": true, \"metadata_enrichment_sources\": [\"Europe PMC\", \"PubMed\"], \"missing_core_metadata\": [], \"openalex_id\": \"https://openalex.org/W1\", \"source\": \"PubMed\"}, \"pmcid\": \"PMC9\", \"pmid\": \"111\", \"publication_date\": \"2020 Mar 04\", \"publication_types\": [\"Journal Article\"], \"relevance_components\": {\"abstract_coverage\": 0.0, \"biological_context_coverage\": 0.0, \"exact_phrase_bonus\": 5.0, \"keyword_coverage\": 0.0, \"matched_context_terms\": [], \"matched_query_terms\": [\"lactase\", \"persistence\"], \"missing_query_terms\": [], \"query_term_coverage\": 1.0, \"ranking_method\": \"title 50%, abstract 35%, keywords 15%, phrase bonus up to 5, context bonus up to 5; capped at 100\", \"title_coverage\": 1.0}, \"relevance_score\": 55.0, \"source_ids\": {\"Europe PMC\": \"111\", \"OpenAlex\": \"https://openalex.org/W1\", \"PubMed\": \"111\"}, \"source_urls\": [\"https://pubmed.ncbi.nlm.nih.gov/111/\", \"https://doi.org/10.1000/abc\", \"https://pmc.ncbi.nlm.nih.gov/articles/PMC9/\"], \"title\": \"Lactase persistence in Europe.\"}, {\"abstract\": \"From Crossref.\", \"article_id\": \"crossref:10.1000/xyz\", \"authors\": [\"Cy Ross\"], \"citation_count\": null, \"doi\": \"10.1000/xyz\", \"is_open_access\": true, \"journal\": \"Crossref Journal\", \"keywords\": [], \"metadata\": {\"abstract_available\": true, \"date_validation\": \"NOT_FLAGGED\", \"metadata_completeness\": 0.857, \"metadata_enriched\": true, \"metadata_enrichment_sources\": [\"Europe PMC\"], \"missing_core_metadata\": [], \"source\": \"Crossref\"}, \"pmcid\": \"PMC9\", \"pmid\": null, \"publication_date\": \"2019-07-01\", \"publication_types\": [\"journal-article\"], \"relevance_components\": {\"abstract_coverage\": 0.0, \"biological_context_coverage\": 0.0, \"exact_phrase_bonus\": 0.0, \"keyword_coverage\": 0.0, \"matched_context_terms\": [], \"matched_query_terms\": [\"lactase\"], \"missing_query_terms\": [\"persistence\"], \"query_term_coverage\": 0.5, \"ranking_method\": \"title 50%, abstract 35%, keywords 15%, phrase bonus up to 5, context bonus up to 5; capped at 100\", \"title_coverage\": 0.5}, \"relevance_score\": 25.0, \"source_ids\": {\"Crossref\": \"10.1000/xyz\"}, \"source_urls\": [\"https://doi.org/10.1000/xyz\", \"https://pmc.ncbi.nlm.nih.gov/articles/PMC9/\"], \"title\": \"Milk & lactase: 100% of the story\"}, {\"abstract\": \"Why. How.\", \"article_id\": \"europepmc:10.1101/2021.01.01.000001\", \"authors\": [\"Doe J\"], \"citation_count\": 0, \"doi\": \"10.1101/2021.01.01.000001\", \"is_open_access\": false, \"journal\": \"J Tests\", \"keywords\": [], \"metadata\": {\"abstract_available\": false, \"date_validation\": \"NOT_FLAGGED\", \"metadata_completeness\": 0.857, \"metadata_enriched\": true, \"metadata_enrichment_sources\": [\"Europe PMC\"], \"missing_core_metadata\": [], \"source\": \"Europe PMC\"}, \"pmcid\": \"PMC9\", \"pmid\": null, \"publication_date\": \"2021-01-02\", \"publication_types\": [], \"relevance_components\": {\"abstract_coverage\": 0.0, \"biological_context_coverage\": 0.0, \"exact_phrase_bonus\": 0.0, \"keyword_coverage\": 0.0, \"matched_context_terms\": [], \"matched_query_terms\": [\"lactase\"], \"missing_query_terms\": [\"persistence\"], \"query_term_coverage\": 0.5, \"ranking_method\": \"title 50%, abstract 35%, keywords 15%, phrase bonus up to 5, context bonus up to 5; capped at 100\", \"title_coverage\": 0.5}, \"relevance_score\": 25.0, \"source_ids\": {\"Europe PMC\": \"10.1101/2021.01.01.000001\"}, \"source_urls\": [\"https://doi.org/10.1101/2021.01.01.000001\", \"https://pmc.ncbi.nlm.nih.gov/articles/PMC9/\"], \"title\": \"Lactase genetics preprint\"}, {\"abstract\": null, \"article_id\": \"openalex:W2\", \"authors\": [], \"citation_count\": 3, \"doi\": null, \"is_open_access\": false, \"journal\": null, \"keywords\": [], \"metadata\": {\"abstract_available\": false, \"date_validation\": \"NOT_FLAGGED\", \"metadata_completeness\": 0.286, \"missing_core_metadata\": [\"authors\", \"journal\", \"abstract\", \"DOI/PMID\"], \"openalex_id\": \"https://openalex.org/W2\", \"source\": \"OpenAlex\"}, \"pmcid\": null, \"pmid\": null, \"publication_date\": \"2018-06-01\", \"publication_types\": [], \"relevance_components\": {\"abstract_coverage\": 0.0, \"biological_context_coverage\": 0.0, \"exact_phrase_bonus\": 0.0, \"keyword_coverage\": 0.0, \"matched_context_terms\": [], \"matched_query_terms\": [], \"missing_query_terms\": [\"lactase\", \"persistence\"], \"query_term_coverage\": 0.0, \"ranking_method\": \"title 50%, abstract 35%, keywords 15%, phrase bonus up to 5, context bonus up to 5; capped at 100\", \"title_coverage\": 0.0}, \"relevance_score\": 0.0, \"source_ids\": {\"OpenAlex\": \"https://openalex.org/W2\"}, \"source_urls\": [\"https://openalex.org/W2\"], \"title\": \"Dairy and evolution\"}, {\"abstract\": \"Why. How.\", \"article_id\": \"pubmed:222\", \"authors\": [\"Smith A\", \"Consortium T.\"], \"citation_count\": null, \"doi\": null, \"is_open_access\": true, \"journal\": \"Future Journal\", \"keywords\": [], \"metadata\": {\"abstract_available\": false, \"date_validation\": \"FUTURE_DATE_REVIEW\", \"date_validation_note\": \"Source reports a publication date after the current year; original metadata retained pending publisher verification.\", \"metadata_completeness\": 0.857, \"metadata_enriched\": true, \"metadata_enrichment_sources\": [\"Europe PMC\", \"PubMed\"], \"missing_core_metadata\": [], \"source\": \"PubMed\"}, \"pmcid\": \"PMC9\", \"pmid\": \"222\", \"publication_date\": \"2031\", \"publication_types\": [\"Journal Article\"], \"relevance_components\": {\"abstract_coverage\": 0.0, \"biological_context_coverage\": 0.0, \"exact_phrase_bonus\": 0.0, \"keyword_coverage\": 0.0, \"matched_context_terms\": [], \"matched_query_terms\": [], \"missing_query_terms\": [\"lactase\", \"persistence\"], \"query_term_coverage\": 0.0, \"ranking_method\": \"title 50%, abstract 35%, keywords 15%, phrase bonus up to 5, context bonus up to 5; capped at 100\", \"title_coverage\": 0.0}, \"relevance_score\": 0.0, \"source_ids\": {\"PubMed\": \"222\"}, \"source_urls\": [\"https://pubmed.ncbi.nlm.nih.gov/222/\", \"https://pmc.ncbi.nlm.nih.gov/articles/PMC9/\"], \"title\": \"A record dated in the future\"}], \"errors\": [], \"query\": {\"biological_context\": {}, \"date_from\": null, \"date_to\": null, \"max_results\": 10, \"open_access_only\": false, \"query\": \"lactase persistence\", \"sort_by\": \"relevance\", \"sources\": [\"pubmed\", \"europe_pmc\", \"openalex\", \"crossref\"]}, \"ranking_method\": \"Transparent weighted text overlap: title 50%, abstract 35%, keywords 15%, phrase bonus up to 5 points, optional biological-context bonus up to 5 points; capped at 100. Citation counts are not score inputs.\", \"scientific_note\": \"Relevance scores estimate query matching, not evidence quality or truth.\", \"source_status\": {\"crossref\": \"OK (1 records)\", \"europe_pmc\": \"OK (2 records)\", \"openalex\": \"OK (2 records)\", \"pubmed\": \"OK (2 records)\"}, \"total_results_after_deduplication\": 5, \"total_results_before_deduplication\": 7, \"warnings\": [\"Metadata enrichment filled missing fields for 4 record(s) using Europe PMC and/or Crossref.\", \"1 record(s) report a publication date later than today: A record dated in the future [2031]. Each record is flagged [REVIEW: FUTURE DATE]; source-provided dates were not changed. Check the publisher record and source metadata.\"]}}",
+  "export.ris": "TY  - JOUR\nTI  - Lactase persistence in Europe.\nAU  - Ann Smith\nAU  - Test Consortium\nJO  - Journal of Tests\nPY  - 2020\nDO  - 10.1000/ABC\nAN  - PMID:111\nAB  - BACKGROUND: Why. How.\nUR  - https://pubmed.ncbi.nlm.nih.gov/111/\nUR  - https://doi.org/10.1000/abc\nUR  - https://pmc.ncbi.nlm.nih.gov/articles/PMC9/\nER  - \n\nTY  - JOUR\nTI  - Milk & lactase: 100% of the story\nAU  - Cy Ross\nJO  - Crossref Journal\nPY  - 2019\nDO  - 10.1000/xyz\nAB  - From Crossref.\nUR  - https://doi.org/10.1000/xyz\nUR  - https://pmc.ncbi.nlm.nih.gov/articles/PMC9/\nER  - \n\nTY  - JOUR\nTI  - Lactase genetics preprint\nAU  - Doe J\nJO  - J Tests\nPY  - 2021\nDO  - 10.1101/2021.01.01.000001\nAB  - Why. How.\nUR  - https://doi.org/10.1101/2021.01.01.000001\nUR  - https://pmc.ncbi.nlm.nih.gov/articles/PMC9/\nER  - \n\nTY  - JOUR\nTI  - Dairy and evolution\nPY  - 2018\nUR  - https://openalex.org/W2\nER  - \n\nTY  - JOUR\nTI  - A record dated in the future\nAU  - Smith A\nAU  - Consortium T.\nJO  - Future Journal\nPY  - 2031\nAN  - PMID:222\nAB  - Why. How.\nN1  - REVIEW: FUTURE PUBLICATION DATE. Source reports a publication date after the current year; original metadata retained pending publisher verification.\nUR  - https://pubmed.ncbi.nlm.nih.gov/222/\nUR  - https://pmc.ncbi.nlm.nih.gov/articles/PMC9/\nER  - \n",
+  "export.txt": "Synapse Literature Intelligence\nRun ID:                LIT-<run id>\nQuery:                 lactase persistence\nSources:               pubmed, europe_pmc, openalex, crossref\nUnique articles:       5\n\nSCIENTIFIC NOTE: Relevance scores are not evidence-quality scores.\n\n1. Lactase persistence in Europe.\n   Authors: Ann Smith, Test Consortium\n   Journal/date: Journal of Tests / 2020 Mar 04\n   DOI: 10.1000/ABC | PMID: 111\n   Relevance: 55.0\n   URL: https://pubmed.ncbi.nlm.nih.gov/111/\n   Abstract: BACKGROUND: Why.\nHow.\n\n2. Milk & lactase: 100% of the story\n   Authors: Cy Ross\n   Journal/date: Crossref Journal / 2019-07-01\n   DOI: 10.1000/xyz | PMID: Not available\n   Relevance: 25.0\n   URL: https://doi.org/10.1000/xyz\n   Abstract: From Crossref.\n\n3. Lactase genetics preprint\n   Authors: Doe J\n   Journal/date: J Tests / 2021-01-02\n   DOI: 10.1101/2021.01.01.000001 | PMID: Not available\n   Relevance: 25.0\n   URL: https://doi.org/10.1101/2021.01.01.000001\n   Abstract: Why. How.\n\n4. Dairy and evolution\n   Authors: Not available\n   Journal/date: Unknown / 2018-06-01\n   DOI: Not available | PMID: Not available\n   Relevance: 0.0\n   URL: https://openalex.org/W2\n   Abstract: Not available\n\n5. A record dated in the future\n   Authors: Smith A, Consortium T.\n   Journal/date: Future Journal / 2031 [REVIEW: FUTURE DATE]\n   DOI: Not available | PMID: 222\n   Relevance: 0.0\n   URL: https://pubmed.ncbi.nlm.nih.gov/222/\n   Abstract: Why. How.\n",
+  "future_note": [
+   "Source reports a publication date after the current year; original metadata retained pending publisher verification.",
+   null,
+   null,
+   null
+  ],
+  "keywords": [
+   "Lactase",
+   "LCT gene"
+  ],
+  "openalex": [
+   {
+    "__type__": "LiteratureArticle",
+    "abstract": "Why. How.",
+    "article_id": "openalex:W1",
+    "authors": [
+     "Ann Smith"
+    ],
+    "citation_count": 15,
+    "doi": "10.1000/abc",
+    "is_open_access": true,
+    "journal": "Journal of Tests",
+    "keywords": [],
+    "metadata": {
+     "abstract_available": true,
+     "openalex_id": "https://openalex.org/W1",
+     "source": "OpenAlex"
+    },
+    "pmcid": null,
+    "pmid": null,
+    "publication_date": "2020-03-04",
+    "publication_types": [],
+    "relevance_components": {},
+    "relevance_score": null,
+    "source_ids": {
+     "OpenAlex": "https://openalex.org/W1"
+    },
+    "source_urls": [
+     "https://doi.org/10.1000/abc"
+    ],
+    "title": "Lactase persistence in Europe"
+   },
+   {
+    "__type__": "LiteratureArticle",
+    "abstract": null,
+    "article_id": "openalex:W2",
+    "authors": [],
+    "citation_count": 3,
+    "doi": null,
+    "is_open_access": false,
+    "journal": null,
+    "keywords": [],
+    "metadata": {
+     "abstract_available": false,
+     "openalex_id": "https://openalex.org/W2",
+     "source": "OpenAlex"
+    },
+    "pmcid": null,
+    "pmid": null,
+    "publication_date": "2018-06-01",
+    "publication_types": [],
+    "relevance_components": {},
+    "relevance_score": null,
+    "source_ids": {
+     "OpenAlex": "https://openalex.org/W2"
+    },
+    "source_urls": [
+     "https://openalex.org/W2"
+    ],
+    "title": "Dairy and evolution"
+   }
+  ],
+  "person_names": [
+   "smith ann",
+   "ann smith",
+   "van der berg j"
+  ],
+  "pubmed": [
+   {
+    "__type__": "LiteratureArticle",
+    "abstract": "BACKGROUND: Why.\nHow.",
+    "article_id": "pubmed:111",
+    "authors": [
+     "Ann Smith",
+     "Test Consortium"
+    ],
+    "citation_count": null,
+    "doi": "10.1000/ABC",
+    "is_open_access": null,
+    "journal": "Journal of Tests",
+    "keywords": [],
+    "metadata": {
+     "abstract_available": true,
+     "source": "PubMed"
+    },
+    "pmcid": "PMC9",
+    "pmid": "111",
+    "publication_date": "2020 Mar 04",
+    "publication_types": [],
+    "relevance_components": {},
+    "relevance_score": null,
+    "source_ids": {
+     "PubMed": "111"
+    },
+    "source_urls": [
+     "https://pubmed.ncbi.nlm.nih.gov/111/"
+    ],
+    "title": "Lactase persistence in Europe"
+   },
+   {
+    "__type__": "LiteratureArticle",
+    "abstract": null,
+    "article_id": "pubmed:222",
+    "authors": [],
+    "citation_count": null,
+    "doi": null,
+    "is_open_access": null,
+    "journal": "Future Journal",
+    "keywords": [],
+    "metadata": {
+     "abstract_available": false,
+     "source": "PubMed"
+    },
+    "pmcid": null,
+    "pmid": "222",
+    "publication_date": "2031",
+    "publication_types": [],
+    "relevance_components": {},
+    "relevance_score": null,
+    "source_ids": {
+     "PubMed": "222"
+    },
+    "source_urls": [
+     "https://pubmed.ncbi.nlm.nih.gov/222/"
+    ],
+    "title": "A record dated in the future"
+   }
+  ],
+  "query_errors": [
+   "ValueError: Search query cannot be empty.",
+   "ValueError: max_results must be between 1 and 200.",
+   "ValueError: date_from must not be later than date_to.",
+   "ValueError: Unsupported source(s): nowhere"
+  ],
+  "ranking": [
+   {
+    "__type__": "LiteratureArticle",
+    "abstract": "From Crossref.",
+    "article_id": "crossref:10.1000/xyz",
+    "authors": [
+     "Cy Ross"
+    ],
+    "citation_count": null,
+    "doi": "10.1000/xyz",
+    "is_open_access": null,
+    "journal": "Crossref Journal",
+    "keywords": [],
+    "metadata": {
+     "abstract_available": true,
+     "metadata_completeness": "0.857",
+     "missing_core_metadata": [],
+     "source": "Crossref"
+    },
+    "pmcid": null,
+    "pmid": null,
+    "publication_date": "2019-07-01",
+    "publication_types": [
+     "journal-article"
+    ],
+    "relevance_components": {
+     "abstract_coverage": "0.0",
+     "biological_context_coverage": "0.0",
+     "exact_phrase_bonus": "0.0",
+     "keyword_coverage": "0.0",
+     "matched_context_terms": [],
+     "matched_query_terms": [
+      "lactase"
+     ],
+     "missing_query_terms": [
+      "evolution"
+     ],
+     "query_term_coverage": "0.5",
+     "ranking_method": "title 50%, abstract 35%, keywords 15%, phrase bonus up to 5, context bonus up to 5; capped at 100",
+     "title_coverage": "0.5"
+    },
+    "relevance_score": "25.0",
+    "source_ids": {
+     "Crossref": "10.1000/xyz"
+    },
+    "source_urls": [
+     "https://doi.org/10.1000/xyz"
+    ],
+    "title": "Milk & lactase: 100% of the story"
+   },
+   {
+    "__type__": "LiteratureArticle",
+    "abstract": "Why. How.",
+    "article_id": "openalex:W1",
+    "authors": [
+     "Ann Smith"
+    ],
+    "citation_count": 15,
+    "doi": "10.1000/abc",
+    "is_open_access": true,
+    "journal": "Journal of Tests",
+    "keywords": [],
+    "metadata": {
+     "abstract_available": true,
+     "metadata_completeness": "0.857",
+     "missing_core_metadata": [],
+     "openalex_id": "https://openalex.org/W1",
+     "source": "OpenAlex"
+    },
+    "pmcid": null,
+    "pmid": null,
+    "publication_date": "2020-03-04",
+    "publication_types": [],
+    "relevance_components": {
+     "abstract_coverage": "0.0",
+     "biological_context_coverage": "0.0",
+     "exact_phrase_bonus": "0.0",
+     "keyword_coverage": "0.0",
+     "matched_context_terms": [],
+     "matched_query_terms": [
+      "lactase"
+     ],
+     "missing_query_terms": [
+      "evolution"
+     ],
+     "query_term_coverage": "0.5",
+     "ranking_method": "title 50%, abstract 35%, keywords 15%, phrase bonus up to 5, context bonus up to 5; capped at 100",
+     "title_coverage": "0.5"
+    },
+    "relevance_score": "25.0",
+    "source_ids": {
+     "OpenAlex": "https://openalex.org/W1"
+    },
+    "source_urls": [
+     "https://doi.org/10.1000/abc"
+    ],
+    "title": "Lactase persistence in Europe"
+   },
+   {
+    "__type__": "LiteratureArticle",
+    "abstract": null,
+    "article_id": "openalex:W2",
+    "authors": [],
+    "citation_count": 3,
+    "doi": null,
+    "is_open_access": false,
+    "journal": null,
+    "keywords": [],
+    "metadata": {
+     "abstract_available": false,
+     "metadata_completeness": "0.286",
+     "missing_core_metadata": [
+      "authors",
+      "journal",
+      "abstract",
+      "DOI/PMID"
+     ],
+     "openalex_id": "https://openalex.org/W2",
+     "source": "OpenAlex"
+    },
+    "pmcid": null,
+    "pmid": null,
+    "publication_date": "2018-06-01",
+    "publication_types": [],
+    "relevance_components": {
+     "abstract_coverage": "0.0",
+     "biological_context_coverage": "0.0",
+     "exact_phrase_bonus": "0.0",
+     "keyword_coverage": "0.0",
+     "matched_context_terms": [],
+     "matched_query_terms": [
+      "evolution"
+     ],
+     "missing_query_terms": [
+      "lactase"
+     ],
+     "query_term_coverage": "0.5",
+     "ranking_method": "title 50%, abstract 35%, keywords 15%, phrase bonus up to 5, context bonus up to 5; capped at 100",
+     "title_coverage": "0.5"
+    },
+    "relevance_score": "25.0",
+    "source_ids": {
+     "OpenAlex": "https://openalex.org/W2"
+    },
+    "source_urls": [
+     "https://openalex.org/W2"
+    ],
+    "title": "Dairy and evolution"
+   }
+  ]
+ }
+}

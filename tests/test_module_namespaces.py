@@ -334,6 +334,25 @@ RENAMED_PRIMER_NAMES = {
 }
 
 
+# Recorded from 713a1d4 (Phase 10) before analyses/literature.py was split;
+# urllib and time are reached through the module by tests.
+LITERATURE_NAMES = (
+    'urllib', 'time', 'RelevanceComponents', 'MODULE_NAME', 'MODULE_VERSION', 'USER_AGENT',
+    'DEFAULT_TIMEOUT', 'MAX_RESULTS_LIMIT', 'LiteratureError', 'LiteratureSourceError',
+    'LiteratureQuery', 'LiteratureArticle', 'LiteratureSearchRun', 'LiteratureSearchResult',
+    'MIN_REQUEST_INTERVAL_SECONDS', 'RETRY_STATUS_CODES', 'MAX_REQUEST_ATTEMPTS',
+    '_LAST_REQUEST_AT', '_ncbi_api_key', '_throttle', '_retry_delay', '_request_text',
+    '_date_bound', '_request_json', '_url', '_clean_text', '_normalize_person_name',
+    '_deduplicate_author_names', '_keyword_identity', '_normalize_keywords',
+    '_http_error_is_not_found', '_date_in_range', '_future_date_note',
+    '_apply_date_validation', 'search_pubmed', 'search_europe_pmc', 'search_openalex',
+    'search_crossref', '_is_placeholder_journal', 'deduplicate_articles', '_tokenize',
+    '_coverage', '_query_phrase', 'rank_articles', '_journal_from_pubmed_xml',
+    '_publication_types_from_pubmed_xml', '_enrich_missing_metadata', 'run_literature_search',
+    'article_to_dict', 'export_results', 'self_test', 'build_sequence_literature_context',
+)
+
+
 class PublicModuleNamespaceTests(unittest.TestCase):
     def _check(self, module, names):
         missing = [name for name in names if not hasattr(module, name)]
@@ -378,6 +397,10 @@ class PublicModuleNamespaceTests(unittest.TestCase):
     def test_restriction_namespace(self):
         from analyses import restriction
         self._check(restriction, RESTRICTION_NAMES)
+
+    def test_literature_namespace(self):
+        from analyses import literature
+        self._check(literature, LITERATURE_NAMES)
 
     def test_rna_namespace(self):
         from analyses import rna

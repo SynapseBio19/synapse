@@ -542,6 +542,180 @@ def rna_scenarios() -> dict:
     return out
 
 
+# ----------------------------------------------------------------------
+# Literature (Phase 10, recorded from 713a1d4 before the split)
+# ----------------------------------------------------------------------
+# The network is replaced at urllib.request.urlopen, below every Synapse
+# function, so the same scenarios run before and after the module is split
+# (a stand-in for a module-level helper would no longer reach the moved
+# code). Responses are synthetic and keyed by host and path.
+
+_LIT_PUBMED_XML = """<?xml version="1.0"?>
+<PubmedArticleSet>
+ <PubmedArticle>
+  <MedlineCitation><PMID>111</PMID>
+   <Article>
+    <Journal><Title>Journal of Tests</Title><JournalIssue><PubDate><Year>2020</Year><Month>Mar</Month><Day>04</Day></PubDate></JournalIssue></Journal>
+    <ArticleTitle>Lactase <i>persistence</i> in Europe</ArticleTitle>
+    <Abstract><AbstractText Label="BACKGROUND">Why.</AbstractText><AbstractText>How.</AbstractText></Abstract>
+    <AuthorList><Author><LastName>Smith</LastName><ForeName>Ann</ForeName></Author><Author><CollectiveName>Test Consortium</CollectiveName></Author></AuthorList>
+    <PublicationTypeList><PublicationType>Journal Article</PublicationType></PublicationTypeList>
+    <KeywordList><Keyword>lactase</Keyword><Keyword>Lactase</Keyword></KeywordList>
+   </Article>
+  </MedlineCitation>
+  <PubmedData><ArticleIdList><ArticleId IdType="doi">10.1000/ABC</ArticleId><ArticleId IdType="pmc">PMC9</ArticleId></ArticleIdList></PubmedData>
+ </PubmedArticle>
+ <PubmedArticle>
+  <MedlineCitation><PMID>222</PMID>
+   <Article>
+    <Journal><Title>Future Journal</Title><JournalIssue><PubDate><Year>2031</Year></PubDate></JournalIssue></Journal>
+    <ArticleTitle>A record dated in the future</ArticleTitle>
+   </Article>
+  </MedlineCitation>
+ </PubmedArticle>
+</PubmedArticleSet>"""
+
+_LIT_RESPONSES = {
+    ("eutils.ncbi.nlm.nih.gov", "esearch"): {"esearchresult": {"idlist": ["111", "222"]}},
+    ("eutils.ncbi.nlm.nih.gov", "efetch"): _LIT_PUBMED_XML,
+    ("www.ebi.ac.uk", "search"): {"resultList": {"result": [
+        {"id": "33", "source": "MED", "pmid": "111", "pmcid": "PMC9", "doi": "10.1000/abc",
+         "title": "Lactase persistence in Europe.", "authorString": "Smith A, Consortium T.",
+         "journalTitle": "J Tests", "firstPublicationDate": "2020-03-04", "isOpenAccess": "Y",
+         "abstractText": "Why. How.", "citedByCount": 12},
+        {"id": "44", "source": "PPR", "doi": "10.1101/2021.01.01.000001",
+         "title": "Lactase genetics preprint", "authorString": "Doe J",
+         "firstPublicationDate": "2021-01-02", "isOpenAccess": "N", "citedByCount": 0},
+    ]}},
+    ("api.openalex.org", "works"): {"results": [
+        {"id": "https://openalex.org/W1", "doi": "https://doi.org/10.1000/abc",
+         "title": "Lactase persistence in Europe", "publication_date": "2020-03-04",
+         "authorships": [{"author": {"display_name": "Ann Smith"}}],
+         "primary_location": {"source": {"display_name": "Journal of Tests"}},
+         "open_access": {"is_oa": True}, "cited_by_count": 15,
+         "abstract_inverted_index": {"Why.": [0], "How.": [1]}, "type": "article",
+         "concepts": [{"display_name": "Lactase"}]},
+        {"id": "https://openalex.org/W2", "doi": None, "title": "Dairy and evolution",
+         "publication_date": "2018-06-01", "authorships": [], "open_access": {"is_oa": False},
+         "cited_by_count": 3, "type": "review"},
+    ]},
+    ("api.crossref.org", "works"): {"message": {"items": [
+        {"DOI": "10.1000/xyz", "title": ["Milk & lactase: 100% of the story"],
+         "author": [{"given": "Cy", "family": "Ross"}], "container-title": ["Crossref Journal"],
+         "published-online": {"date-parts": [[2019, 7, 1]]}, "type": "journal-article",
+         "is-referenced-by-count": 4, "abstract": "<jats:p>From Crossref.</jats:p>"},
+    ]}},
+}
+
+
+class _LitResponse:
+    def __init__(self, body: str):
+        self._body = body.encode("utf-8")
+
+        class _Headers:
+            @staticmethod
+            def get_content_charset():
+                return "utf-8"
+
+        self.headers = _Headers()
+
+    def read(self):
+        return self._body
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+
+def _lit_urlopen(request, timeout=None):
+    import urllib.parse
+    url = request.full_url if hasattr(request, "full_url") else str(request)
+    parts = urllib.parse.urlsplit(url)
+    for (host, marker), body in _LIT_RESPONSES.items():
+        if parts.netloc == host and marker in parts.path:
+            return _LitResponse(body if isinstance(body, str) else json.dumps(body))
+    if parts.netloc == "api.crossref.org":
+        # A DOI lookup during metadata enrichment.
+        return _LitResponse(json.dumps({"message": {"container-title": ["Crossref Journal"],
+                                                    "published-online": {"date-parts": [[2019, 7, 1]]}}}))
+    if parts.netloc == "www.ebi.ac.uk":
+        return _LitResponse(json.dumps({"resultList": {"result": []}}))
+    raise OSError(f"no recorded response for {url}")
+
+
+def _lit_offline():
+    import time
+    import urllib.request
+    return mock.patch.object(urllib.request, "urlopen", _lit_urlopen), mock.patch.object(time, "sleep", lambda s: None)
+
+
+def _lit_run_plain(run) -> Any:
+    data = _plain(run)
+    for key in ("run_id", "started_at_utc", "completed_at_utc"):
+        data.pop(key, None)
+    return data
+
+
+def literature_scenarios() -> dict:
+    from datetime import datetime, timezone
+    from analyses import literature as L
+
+    out: dict = {}
+    today = datetime(2026, 11, 20, tzinfo=timezone.utc)
+    out["clean_text"] = [L._clean_text(v) for v in ("  <i>A</i>  b&amp;c\n", None, 12, "Ünïcode  x")]
+    out["person_names"] = [L._normalize_person_name(v) for v in ("smith, ann", " Ann  SMITH ", "van der Berg, J.")]
+    out["author_dedup"] = L._deduplicate_author_names(["Ann Smith", "A. Smith", "Smith A", "Bo Li", "bo li"])
+    out["keywords"] = L._normalize_keywords(["Lactase", "lactase ", "LCT gene", "", "lct-gene"])
+    out["date_bounds"] = [L._date_bound(v, upper) for v in ("2020", "2020-02", "2020-02-03", None)
+                          for upper in (False, True)]
+    query = L.LiteratureQuery("lactase", date_from="2019", date_to="2021-06")
+    out["date_in_range"] = [L._date_in_range(v, query) for v in ("2019-01-01", "2021-06-30", "2021-07", "2018", None, "garbage")]
+    out["future_note"] = [L._future_date_note(v, today) for v in ("2031", "2026-11", "2020-01-01", None)]
+    bad_queries: list[dict[str, Any]] = [{"query": " "}, {"query": "x", "max_results": 0},
+                                         {"query": "x", "date_from": "2021", "date_to": "2020"},
+                                         {"query": "x", "sources": ["nowhere"]}]
+    for bad in bad_queries:
+        try:
+            L.LiteratureQuery(**bad).validate()
+            out.setdefault("query_errors", []).append(None)
+        except Exception as error:  # the message is the behavior under test
+            out.setdefault("query_errors", []).append(f"{type(error).__name__}: {error}")
+    urlopen_patch, sleep_patch = _lit_offline()
+    with urlopen_patch, sleep_patch:
+        out["pubmed"] = _plain(L.search_pubmed("lactase", 5, date_from="2019", date_to="2032"))
+        out["europe_pmc"] = _plain(L.search_europe_pmc("lactase", 5))
+        out["openalex"] = _plain(L.search_openalex("lactase", 5, date_from="2015"))
+        out["crossref"] = _plain(L.search_crossref("lactase", 5))
+        for sources, open_access in ((["pubmed", "europe_pmc", "openalex", "crossref"], False),
+                                     (["pubmed", "europe_pmc"], True)):
+            result = L.run_literature_search(L.LiteratureQuery("lactase persistence", sources=sources,
+                                                               max_results=10, open_access_only=open_access))
+            key = "combined_" + "_".join(sources) + ("_oa" if open_access else "")
+            out[key] = {"success": result.success, "message": result.message,
+                        "run": _lit_run_plain(result.run) if result.run else None}
+            if result.run and not open_access:
+                with tempfile.TemporaryDirectory() as folder:
+                    for suffix in (".json", ".csv", ".txt", ".ris", ".bib"):
+                        path = L.export_results(result.run, Path(folder) / f"export{suffix}")
+                        text = path.read_text(encoding="utf-8")
+                        if suffix == ".json":
+                            payload = json.loads(text)
+                            for name in ("run_id", "started_at_utc", "completed_at_utc", "exported_at_utc"):
+                                payload.pop(name, None)
+                                payload.get("run", {}).pop(name, None) if isinstance(payload.get("run"), dict) else None
+                            text = json.dumps(payload, sort_keys=True)
+                        # The run ID is the start time; it is the only volatile value.
+                        text = text.replace(result.run.run_id, "LIT-<run id>")
+                        out[f"export{suffix}"] = text.replace(folder, "<folder>")
+        out["ranking"] = _plain(L.rank_articles(L.deduplicate_articles(
+            L.search_openalex("lactase", 5) + L.search_crossref("lactase", 5)), "lactase evolution"))
+    out["context"] = _plain(L.build_sequence_literature_context("NM_002299.4 LCT lactase",
+                                                                {"length": 300, "strand": "+", "frame": 1}))
+    return out
+
+
 SECTIONS = {
     SNAPSHOT: {"primer": primer_scenarios, "blast": blast_scenarios},
     PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "mutation.json": {"mutation": mutation_scenarios},
@@ -553,6 +727,7 @@ SECTIONS = {
     PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "restriction.json": {
         "restriction": restriction_scenarios},
     PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "rna.json": {"rna": rna_scenarios},
+    PROJECT_ROOT / "tests" / "fixtures" / "characterization" / "literature.json": {"literature": literature_scenarios},
 }
 
 
