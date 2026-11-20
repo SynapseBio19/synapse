@@ -30,6 +30,10 @@ dependencies = []
 
 [project.urls]
 Homepage = "https://synapse-gen.com"
+Repository = "https://github.com/SynapseBio19/synapse"
+Issues = "https://github.com/SynapseBio19/synapse/issues"
+Documentation = "https://github.com/SynapseBio19/synapse/blob/main/docs/USER_GUIDE.md"
+Changelog = "https://github.com/SynapseBio19/synapse/blob/main/docs/CHANGES.md"
 
 [project.scripts]
 # The interactive session (synapse_gen/app.py; from the source folder also `python main.py`).

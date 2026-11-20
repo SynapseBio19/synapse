@@ -86,7 +86,8 @@ Selected from docs/CHANGES.md; each fix has a test that failed before it.
 1. ~~Choose the licence.~~ Done 2026-11-20: AGPL-3.0-or-later, copyright
    Ali Onur Bayraktar (`LICENSE`, `pyproject.toml`, `CITATION.cff`,
    README).
-2. Create the GitHub repository and push `main`. The workflow
+2. ~~Create the GitHub repository and push `main`.~~ Done 2026-11-20:
+   <https://github.com/SynapseBio19/synapse>. The workflow
    `.github/workflows/ci.yml` then runs the tests on Linux (Python
    3.10-3.14) and Windows. Fix what the first run finds before tagging.
 3. Set the version to `0.3.0` in `pyproject.toml`, `core/models.py`

@@ -202,7 +202,12 @@ class LocalEngineTests(unittest.TestCase):
         for flag, value in (("-num_threads", "2"), ("-task", "megablast"), ("-word_size", "11"),
                             ("-gapopen", "5"), ("-gapextend", "2"), ("-dust", "yes"), ("-outfmt", "5")):
             self.assertEqual(command[command.index(flag) + 1], value)
-        self.assertEqual(calls[0][1]["env"]["BLASTDB"].split(os.pathsep)[0], tempfile.gettempdir())
+        # The same folder, compared as a folder: on Windows the path can be
+        # spelled with 8.3 short names (C:\Users\RUNNER~1\...), as on the
+        # GitHub runners, while Synapse resolves it to the long names.
+        blastdb = calls[0][1]["env"]["BLASTDB"].split(os.pathsep)[0]
+        self.assertTrue(os.path.samefile(blastdb, tempfile.gettempdir()),
+                        f"{blastdb!r} is not {tempfile.gettempdir()!r}")
         self.assertEqual(run.metadata.engine, "Local BLAST+")
         self.assertEqual(run.metadata.warnings[-1], "warning text")
         self.assertEqual(len(calls), 1)
