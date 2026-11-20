@@ -1131,10 +1131,7 @@ def run_protein_analysis_from_orf(
         str
     ):
 
-        print(
-            "Protein analysis error: "
-            "selected ORF sequence must be a string."
-        )
+        style.error("Protein analysis: the selected ORF sequence must be a string.")
 
         return
 
@@ -1156,11 +1153,7 @@ def run_protein_analysis_from_orf(
         )
     ):
 
-        print(
-            "Protein analysis error: "
-            "selected ORF contains invalid "
-            "nucleotide symbols."
-        )
+        style.error("Protein analysis: the selected ORF contains invalid nucleotide symbols.")
 
         return
 
@@ -1191,11 +1184,7 @@ def run_protein_analysis_from_orf(
 
     if not protein:
 
-        print(
-            "Protein analysis error: "
-            "selected ORF produced no "
-            "resolvable protein sequence."
-        )
+        style.error("Protein analysis: the selected ORF produced no resolvable protein sequence.")
 
         return
 

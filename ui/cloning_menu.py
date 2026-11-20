@@ -1071,40 +1071,40 @@ def run_cloning_analysis_ui(
             return None
 
         if choice == "1":
-            result = _cloning_ui_automatic_planner(
+            _cloning_ui_automatic_planner(
                 vector_sequence,
                 insert_sequence,
                 pipeline=pipeline,
                 vector_topology=vector_topology,
                 insert_topology=insert_topology,
             )
-            if result is not None:
-                continue
-            return None
+            # Back (0) inside the analysis returns to this menu, as in the
+            # restriction menu; it used to leave cloning altogether.
+            continue
 
         if choice == "2":
-            result = _cloning_ui_single_enzyme(
+            _cloning_ui_single_enzyme(
                 vector_sequence,
                 insert_sequence,
                 pipeline=pipeline,
                 vector_topology=vector_topology,
                 insert_topology=insert_topology,
             )
-            if result is not None:
-                continue
-            return None
+            # Back (0) inside the analysis returns to this menu, as in the
+            # restriction menu; it used to leave cloning altogether.
+            continue
 
         if choice == "3":
-            result = _cloning_ui_two_enzyme_strategy(
+            _cloning_ui_two_enzyme_strategy(
                 vector_sequence,
                 insert_sequence,
                 pipeline=pipeline,
                 vector_topology=vector_topology,
                 insert_topology=insert_topology,
             )
-            if result is not None:
-                continue
-            return None
+            # Back (0) inside the analysis returns to this menu, as in the
+            # restriction menu; it used to leave cloning altogether.
+            continue
 
         style.invalid_selection()
 
