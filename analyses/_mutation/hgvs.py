@@ -14,6 +14,8 @@ from analyses._mutation.models import Mutation
 def mutation_hgvs_c(
     mutation: Mutation,
     reference_sequence: Optional[str] = None,
+    *,
+    shift_limit: Optional[int] = None,
 ) -> str:
     """HGVS DNA description of one mutation ("c." + HGVS syntax).
 
@@ -31,6 +33,12 @@ def mutation_hgvs_c(
     docs/METHODS.md. Position 1 is the first base of the supplied sequence,
     which equals HGVS c. numbering only if that sequence is the CDS starting
     at the A of the start codon.
+
+    ``shift_limit`` is the last reference position (1-based) the shifted
+    change may reach; hgvs_c_allele sets it so that a change does not move
+    past the next change of the same allele (HGVS applies the 3' rule per
+    variant, without passing a neighbouring variant). The change is never
+    moved 5' of the position where it was detected.
     """
 
     sequence = (
@@ -49,6 +57,7 @@ def mutation_hgvs_c(
             while (
                 after <= len(sequence)
                 and inserted[0] == sequence[after - 1]
+                and (shift_limit is None or after + 1 <= shift_limit)
             ):
                 inserted = inserted[1:] + inserted[0]
                 after += 1
@@ -76,6 +85,7 @@ def mutation_hgvs_c(
             while (
                 last < len(sequence)
                 and sequence[first - 1] == sequence[last]
+                and (shift_limit is None or last + 1 <= shift_limit)
             ):
                 first += 1
                 last += 1
@@ -123,9 +133,19 @@ def hgvs_c_allele(
         else:
             groups.append([mutation])
     descriptions = []
-    for group in groups:
+    for index, group in enumerate(groups):
         if len(group) == 1:
-            descriptions.append(mutation_hgvs_c(group[0], sequence)[2:])
+            # The 3' shift stops one unchanged base before the next change,
+            # so the changes stay separate and in order (found with the
+            # ClinVar benchmark: PTEN c.528_534delinsA, docs/BENCHMARKS.md).
+            limit = None
+            if index + 1 < len(groups):
+                next_item = groups[index + 1][0]
+                next_start = _reference_span(next_item)[0]
+                # An insertion before p lies between p - 1 and p.
+                next_touch = next_start - 1 if next_item.mutation_type == "Insertion" else next_start
+                limit = next_touch - 2
+            descriptions.append(mutation_hgvs_c(group[0], sequence, shift_limit=limit)[2:])
             continue
         first = min(_reference_span(item)[0] for item in group)
         last = max(_reference_span(item)[1] for item in group)

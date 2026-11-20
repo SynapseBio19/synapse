@@ -1,0 +1,10541 @@
+{
+ "source": "NCBI ClinVar (E-utilities esearch/esummary) and RefSeq (efetch fasta_cds_na)",
+ "licence": "public domain (U.S. government work, NCBI)",
+ "retrieved": "2026-11-20",
+ "query": "<gene>[gene], lowest ClinVar UIDs first",
+ "selection": "exonic coding changes on the gene's most frequent transcript; at most 250 per gene",
+ "transcripts": {
+  "NM_000518.5": {
+   "gene": "HBB",
+   "cds_length": 444,
+   "cds": "ATGGTGCATCTGACTCCTGAGGAGAAGTCTGCCGTTACTGCCCTGTGGGGCAAGGTGAACGTGGATGAAGTTGGTGGTGAGGCCCTGGGCAGGCTGCTGGTGGTCTACCCTTGGACCCAGAGGTTCTTTGAGTCCTTTGGGGATCTGTCCACTCCTGATGCTGTTATGGGCAACCCTAAGGTGAAGGCTCATGGCAAGAAAGTGCTCGGTGCCTTTAGTGATGGCCTGGCTCACCTGGACAACCTCAAGGGCACCTTTGCCACACTGAGTGAGCTGCACTGTGACAAGCTGCACGTGGATCCTGAGAACTTCAGGCTCCTGGGCAACGTGCTGGTCTGTGTGCTGGCCCATCACTTTGGCAAAGAATTCACCCCACCAGTGCAGGCTGCCTATCAGAAAGTGGTGGCTGGTGTGGCTAATGCCCTGGCCCACAAGTATCACTAA"
+  },
+  "NM_004985.5": {
+   "gene": "KRAS",
+   "cds_length": 567,
+   "cds": "ATGACTGAATATAAACTTGTGGTAGTTGGAGCTGGTGGCGTAGGCAAGAGTGCCTTGACGATACAGCTAATTCAGAATCATTTTGTGGACGAATATGATCCAACAATAGAGGATTCCTACAGGAAGCAAGTAGTAATTGATGGAGAAACCTGTCTCTTGGATATTCTCGACACAGCAGGTCAAGAGGAGTACAGTGCAATGAGGGACCAGTACATGAGGACTGGGGAGGGCTTTCTTTGTGTATTTGCCATAAATAATACTAAATCATTTGAAGATATTCACCATTATAGAGAACAAATTAAAAGAGTTAAGGACTCTGAAGATGTACCTATGGTCCTAGTAGGAAATAAATGTGATTTGCCTTCTAGAACAGTAGACACAAAACAGGCTCAGGACTTAGCAAGAAGTTATGGAATTCCTTTTATTGAAACATCAGCAAAGACAAGACAGGGTGTTGATGATGCCTTCTATACATTAGTTCGAGAAATTCGAAAACATAAAGAAAAGATGAGCAAAGATGGTAAAAAGAAGAAAAAGAAGTCAAAGACAAAGTGTGTAATTATGTAA"
+  },
+  "NM_000551.4": {
+   "gene": "VHL",
+   "cds_length": 642,
+   "cds": "ATGCCCCGGAGGGCGGAGAACTGGGACGAGGCCGAGGTAGGCGCGGAGGAGGCAGGCGTCGAAGAGTACGGCCCTGAAGAAGACGGCGGGGAGGAGTCGGGCGCCGAGGAGTCCGGCCCGGAAGAGTCCGGCCCGGAGGAACTGGGCGCCGAGGAGGAGATGGAGGCCGGGCGGCCGCGGCCCGTGCTGCGCTCGGTGAACTCGCGCGAGCCCTCCCAGGTCATCTTCTGCAATCGCAGTCCGCGCGTCGTGCTGCCCGTATGGCTCAACTTCGACGGCGAGCCGCAGCCCTACCCAACGCTGCCGCCTGGCACGGGCCGCCGCATCCACAGCTACCGAGGTCACCTTTGGCTCTTCAGAGATGCAGGGACACACGATGGGCTTCTGGTTAACCAAACTGAATTATTTGTGCCATCTCTCAATGTTGACGGACAGCCTATTTTTGCCAATATCACACTGCCAGTGTATACTCTGAAAGAGCGATGCCTCCAGGTTGTCCGGAGCCTAGTCAAGCCTGAGAATTACAGGAGACTGGACATCGTCAGGTCGCTCTACGAAGATCTGGAAGACCACCCAAATGTGCAGAAAGACCTGGAGCGGCTGACACAGGAGCGCATTGCACATCAACGGATGGGAGATTGA"
+  },
+  "NM_000546.6": {
+   "gene": "TP53",
+   "cds_length": 1182,
+   "cds": "ATGGAGGAGCCGCAGTCAGATCCTAGCGTCGAGCCCCCTCTGAGTCAGGAAACATTTTCAGACCTATGGAAACTACTTCCTGAAAACAACGTTCTGTCCCCCTTGCCGTCCCAAGCAATGGATGATTTGATGCTGTCCCCGGACGATATTGAACAATGGTTCACTGAAGACCCAGGTCCAGATGAAGCTCCCAGAATGCCAGAGGCTGCTCCCCCCGTGGCCCCTGCACCAGCAGCTCCTACACCGGCGGCCCCTGCACCAGCCCCCTCCTGGCCCCTGTCATCTTCTGTCCCTTCCCAGAAAACCTACCAGGGCAGCTACGGTTTCCGTCTGGGCTTCTTGCATTCTGGGACAGCCAAGTCTGTGACTTGCACGTACTCCCCTGCCCTCAACAAGATGTTTTGCCAACTGGCCAAGACCTGCCCTGTGCAGCTGTGGGTTGATTCCACACCCCCGCCCGGCACCCGCGTCCGCGCCATGGCCATCTACAAGCAGTCACAGCACATGACGGAGGTTGTGAGGCGCTGCCCCCACCATGAGCGCTGCTCAGATAGCGATGGTCTGGCCCCTCCTCAGCATCTTATCCGAGTGGAAGGAAATTTGCGTGTGGAGTATTTGGATGACAGAAACACTTTTCGACATAGTGTGGTGGTGCCCTATGAGCCGCCTGAGGTTGGCTCTGACTGTACCACCATCCACTACAACTACATGTGTAACAGTTCCTGCATGGGCGGCATGAACCGGAGGCCCATCCTCACCATCATCACACTGGAAGACTCCAGTGGTAATCTACTGGGACGGAACAGCTTTGAGGTGCGTGTTTGTGCCTGTCCTGGGAGAGACCGGCGCACAGAGGAAGAGAATCTCCGCAAGAAAGGGGAGCCTCACCACGAGCTGCCCCCAGGGAGCACTAAGCGAGCACTGCCCAACAACACCAGCTCCTCTCCCCAGCCAAAGAAGAAACCACTGGATGGAGAATATTTCACCCTTCAGATCCGTGGGCGTGAGCGCTTCGAGATGTTCCGAGAGCTGAATGAGGCCTTGGAACTCAAGGATGCCCAGGCTGGGAAGGAGCCAGGGGGGAGCAGGGCTCACTCCAGCCACCTGAAGTCCAAAAAGGGTCAGTCTACCTCCCGCCATAAAAAACTCATGTTCAAGACAGAAGGGCCTGACTCAGACTGA"
+  },
+  "NM_000314.8": {
+   "gene": "PTEN",
+   "cds_length": 1212,
+   "cds": "ATGACAGCCATCATCAAAGAGATCGTTAGCAGAAACAAAAGGAGATATCAAGAGGATGGATTCGACTTAGACTTGACCTATATTTATCCAAACATTATTGCTATGGGATTTCCTGCAGAAAGACTTGAAGGCGTATACAGGAACAATATTGATGATGTAGTAAGGTTTTTGGATTCAAAGCATAAAAACCATTACAAGATATACAATCTTTGTGCTGAAAGACATTATGACACCGCCAAATTTAATTGCAGAGTTGCACAATATCCTTTTGAAGACCATAACCCACCACAGCTAGAACTTATCAAACCCTTTTGTGAAGATCTTGACCAATGGCTAAGTGAAGATGACAATCATGTTGCAGCAATTCACTGTAAAGCTGGAAAGGGACGAACTGGTGTAATGATATGTGCATATTTATTACATCGGGGCAAATTTTTAAAGGCACAAGAGGCCCTAGATTTCTATGGGGAAGTAAGGACCAGAGACAAAAAGGGAGTAACTATTCCCAGTCAGAGGCGCTATGTGTATTATTATAGCTACCTGTTAAAGAATCATCTGGATTATAGACCAGTGGCACTGTTGTTTCACAAGATGATGTTTGAAACTATTCCAATGTTCAGTGGCGGAACTTGCAATCCTCAGTTTGTGGTCTGCCAGCTAAAGGTGAAGATATATTCCTCCAATTCAGGACCCACACGACGGGAAGACAAGTTCATGTACTTTGAGTTCCCTCAGCCGTTACCTGTGTGTGGTGATATCAAAGTAGAGTTCTTCCACAAACAGAACAAGATGCTAAAAAAGGACAAAATGTTTCACTTTTGGGTAAATACATTCTTCATACCAGGACCAGAGGAAACCTCAGAAAAAGTAGAAAATGGAAGTCTATGTGATCAAGAAATCGATAGCATTTGCAGTATAGAGCGTGCAGATAATGACAAGGAATATCTAGTACTTACTTTAACAAAAAATGATCTTGACAAAGCAAATAAAGACAAAGCCAACCGATACTTTTCTCCAAATTTTAAGGTGAAGCTGTACTTCACAAAAACAGTAGAGGAGCCGTCAAATCCAGAGGCTAGCAGTTCAACTTCTGTAACACCAGATGTTAGTGACAATGAACCTGATCATTATAGATATTCTGACACCACTGACTCTGATCCAGAGAATGAACCTTTTGATGAAGATCAGCATACACAAATTACAAAAGTCTGA"
+  },
+  "NM_001110792.2": {
+   "gene": "MECP2",
+   "cds_length": 1497,
+   "cds": "ATGGCCGCCGCCGCCGCCGCCGCGCCGAGCGGAGGAGGAGGAGGAGGCGAGGAGGAGAGACTGGAAGAAAAGTCAGAAGACCAGGACCTCCAGGGCCTCAAGGACAAACCCCTCAAGTTTAAAAAGGTGAAGAAAGATAAGAAAGAAGAGAAAGAGGGCAAGCATGAGCCCGTGCAGCCATCAGCCCACCACTCTGCTGAGCCCGCAGAGGCAGGCAAAGCAGAGACATCAGAAGGGTCAGGCTCCGCCCCGGCTGTGCCGGAAGCTTCTGCCTCCCCCAAACAGCGGCGCTCCATCATCCGTGACCGGGGACCCATGTATGATGACCCCACCCTGCCTGAAGGCTGGACACGGAAGCTTAAGCAAAGGAAATCTGGCCGCTCTGCTGGGAAGTATGATGTGTATTTGATCAATCCCCAGGGAAAAGCCTTTCGCTCTAAAGTGGAGTTGATTGCGTACTTCGAAAAGGTAGGCGACACATCCCTGGACCCTAATGATTTTGACTTCACGGTAACTGGGAGAGGGAGCCCCTCCCGGCGAGAGCAGAAACCACCTAAGAAGCCCAAATCTCCCAAAGCTCCAGGAACTGGCAGAGGCCGGGGACGCCCCAAAGGGAGCGGCACCACGAGACCCAAGGCGGCCACGTCAGAGGGTGTGCAGGTGAAAAGGGTCCTGGAGAAAAGTCCTGGGAAGCTCCTTGTCAAGATGCCTTTTCAAACTTCGCCAGGGGGCAAGGCTGAGGGGGGTGGGGCCACCACATCCACCCAGGTCATGGTGATCAAACGCCCCGGCAGGAAGCGAAAAGCTGAGGCCGACCCTCAGGCCATTCCCAAGAAACGGGGCCGAAAGCCGGGGAGTGTGGTGGCAGCCGCTGCCGCCGAGGCCAAAAAGAAAGCCGTGAAGGAGTCTTCTATCCGATCTGTGCAGGAGACCGTACTCCCCATCAAGAAGCGCAAGACCCGGGAGACGGTCAGCATCGAGGTCAAGGAAGTGGTGAAGCCCCTGCTGGTGTCCACCCTCGGTGAGAAGAGCGGGAAAGGACTGAAGACCTGTAAGAGCCCTGGGCGGAAAAGCAAGGAGAGCAGCCCCAAGGGGCGCAGCAGCAGCGCCTCCTCACCCCCCAAGAAGGAGCACCACCACCATCACCACCACTCAGAGTCCCCAAAGGCCCCCGTGCCACTGCTCCCACCCCTGCCCCCACCTCCACCTGAGCCCGAGAGCTCCGAGGACCCCACCAGCCCCCCTGAGCCCCAGGACTTGAGCAGCAGCGTCTGCAAAGAGGAGAAGATGCCCAGAGGAGGCTCACTGGAGAGCGACGGCTGCCCCAAGGAGCCAGCTAAGACTCAGCCCGCGGTTGCCACCGCCGCCACGGCCGCAGAAAAGTACAAACACCGAGGGGAGGGAGAGCGCAAAGACATTGTTTCATCCTCCATGCCAAGGCCAAACAGAGAGGAGCCTGTGGACAGCCGGACGCCCGTGACCGAGAGAGTTAGCTGA"
+  }
+ },
+ "variants": [
+  {
+   "uid": 15089,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.223G>C",
+   "p": "p.Gly75Arg"
+  },
+  {
+   "uid": 15090,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.431A>G",
+   "p": "p.His144Arg"
+  },
+  {
+   "uid": 15093,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.58A>G",
+   "p": "p.Asn20Asp"
+  },
+  {
+   "uid": 15094,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.305A>G",
+   "p": "p.Glu102Gly"
+  },
+  {
+   "uid": 15095,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.406G>C",
+   "p": "p.Ala136Pro"
+  },
+  {
+   "uid": 15096,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.435G>C",
+   "p": "p.Lys145Asn"
+  },
+  {
+   "uid": 15099,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.122G>A",
+   "p": "p.Arg41Lys"
+  },
+  {
+   "uid": 15102,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.123G>C",
+   "p": "p.Arg41Ser"
+  },
+  {
+   "uid": 15106,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.380T>C",
+   "p": "p.Val127Ala"
+  },
+  {
+   "uid": 15107,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.46T>A",
+   "p": "p.Trp16Arg"
+  },
+  {
+   "uid": 15112,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.436T>C",
+   "p": "p.Tyr146His"
+  },
+  {
+   "uid": 15114,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.185A>T",
+   "p": "p.Lys62Met"
+  },
+  {
+   "uid": 15121,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.127_129del",
+   "p": "p.Phe43del"
+  },
+  {
+   "uid": 15122,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.257T>C",
+   "p": "p.Phe86Ser"
+  },
+  {
+   "uid": 15124,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.322G>C",
+   "p": "p.Gly108Arg"
+  },
+  {
+   "uid": 15133,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.284A>G",
+   "p": "p.Asp95Gly"
+  },
+  {
+   "uid": 15136,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.200A>C",
+   "p": "p.Lys67Thr"
+  },
+  {
+   "uid": 15137,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.215T>C",
+   "p": "p.Phe72Ser"
+  },
+  {
+   "uid": 15142,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.65A>G",
+   "p": "p.Asp22Gly"
+  },
+  {
+   "uid": 15143,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.424_426del",
+   "p": "p.Leu142del"
+  },
+  {
+   "uid": 15145,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.436_437insCT",
+   "p": "p.Tyr146fs"
+  },
+  {
+   "uid": 15148,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.49G>C",
+   "p": "p.Gly17Arg"
+  },
+  {
+   "uid": 15153,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.60C>A",
+   "p": "p.Asn20Lys"
+  },
+  {
+   "uid": 15157,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.288G>C",
+   "p": "p.Lys96Asn"
+  },
+  {
+   "uid": 15159,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.5T>A",
+   "p": "p.Val2Glu"
+  },
+  {
+   "uid": 15160,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.187G>C",
+   "p": "p.Ala63Pro"
+  },
+  {
+   "uid": 15161,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.79G>A",
+   "p": "p.Glu27Lys"
+  },
+  {
+   "uid": 15164,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.400G>C",
+   "p": "p.Val134Leu"
+  },
+  {
+   "uid": 15166,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.71_73del",
+   "p": "p.Val24del"
+  },
+  {
+   "uid": 15167,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.7C>T",
+   "p": "p.His3Tyr"
+  },
+  {
+   "uid": 15172,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.174C>A",
+   "p": "p.Asn58Lys"
+  },
+  {
+   "uid": 15173,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.131A>C",
+   "p": "p.Glu44Ala"
+  },
+  {
+   "uid": 15174,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.239A>G",
+   "p": "p.Asp80Gly"
+  },
+  {
+   "uid": 15177,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.243C>A",
+   "p": "p.Asn81Lys"
+  },
+  {
+   "uid": 15180,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.139G>A",
+   "p": "p.Gly47Arg"
+  },
+  {
+   "uid": 15185,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.280_294del",
+   "p": "p.Cys94_His98del"
+  },
+  {
+   "uid": 15188,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.169G>C",
+   "p": "p.Gly57Arg"
+  },
+  {
+   "uid": 15190,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.128T>C",
+   "p": "p.Phe43Ser"
+  },
+  {
+   "uid": 15191,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.115A>C",
+   "p": "p.Thr39Pro"
+  },
+  {
+   "uid": 15192,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.312C>G",
+   "p": "p.Phe104Leu"
+  },
+  {
+   "uid": 15196,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.186G>C",
+   "p": "p.Lys62Asn"
+  },
+  {
+   "uid": 15198,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.420T>A",
+   "p": "p.Asn140Lys"
+  },
+  {
+   "uid": 15199,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.113G>C",
+   "p": "p.Trp38Ser"
+  },
+  {
+   "uid": 15201,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.380T>A",
+   "p": "p.Val127Glu"
+  },
+  {
+   "uid": 15205,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.178A>G",
+   "p": "p.Lys60Glu"
+  },
+  {
+   "uid": 15206,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.199A>G",
+   "p": "p.Lys67Glu"
+  },
+  {
+   "uid": 15207,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.337T>C",
+   "p": "p.Cys113Arg"
+  },
+  {
+   "uid": 15210,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.54G>C",
+   "p": "p.Lys18Asn"
+  },
+  {
+   "uid": 15211,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.197A>T",
+   "p": "p.Lys66Met"
+  },
+  {
+   "uid": 15212,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.77G>A",
+   "p": "p.Gly26Asp"
+  },
+  {
+   "uid": 15213,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.50G>A",
+   "p": "p.Gly17Asp"
+  },
+  {
+   "uid": 15214,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.170G>A",
+   "p": "p.Gly57Asp"
+  },
+  {
+   "uid": 15215,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.196A>C",
+   "p": "p.Lys66Gln"
+  },
+  {
+   "uid": 15217,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.230C>A",
+   "p": "p.Ala77Asp"
+  },
+  {
+   "uid": 15218,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.287A>T",
+   "p": "p.Lys96Met"
+  },
+  {
+   "uid": 15219,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.172A>G",
+   "p": "p.Asn58Asp"
+  },
+  {
+   "uid": 15222,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.179A>C",
+   "p": "p.Lys60Thr"
+  },
+  {
+   "uid": 15223,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.41C>A",
+   "p": "p.Ala14Asp"
+  },
+  {
+   "uid": 15224,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.180G>C",
+   "p": "p.Lys60Asn"
+  },
+  {
+   "uid": 15226,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.209G>A",
+   "p": "p.Gly70Asp"
+  },
+  {
+   "uid": 15227,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.198G>C",
+   "p": "p.Lys66Asn"
+  },
+  {
+   "uid": 15228,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.389C>A",
+   "p": "p.Ala130Asp"
+  },
+  {
+   "uid": 15229,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.362A>T",
+   "p": "p.Lys121Ile"
+  },
+  {
+   "uid": 15230,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.328G>C",
+   "p": "p.Val110Leu"
+  },
+  {
+   "uid": 15232,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.140G>A",
+   "p": "p.Gly47Glu"
+  },
+  {
+   "uid": 15233,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.397A>C",
+   "p": "p.Lys133Gln"
+  },
+  {
+   "uid": 15239,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.82G>T",
+   "p": "p.Ala28Ser"
+  },
+  {
+   "uid": 15240,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.254C>T",
+   "p": "p.Thr85Ile"
+  },
+  {
+   "uid": 15241,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.295G>A",
+   "p": "p.Val99Met"
+  },
+  {
+   "uid": 15245,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.389C>T",
+   "p": "p.Ala130Val"
+  },
+  {
+   "uid": 15251,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.127T>C",
+   "p": "p.Phe43Leu"
+  },
+  {
+   "uid": 15252,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.89G>A",
+   "p": "p.Gly30Asp"
+  },
+  {
+   "uid": 15253,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.54_59del",
+   "p": "p.Lys18_Val19del"
+  },
+  {
+   "uid": 15256,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.190C>T",
+   "p": "p.His64Tyr"
+  },
+  {
+   "uid": 15257,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.346G>C",
+   "p": "p.Ala116Pro"
+  },
+  {
+   "uid": 15258,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.59A>G",
+   "p": "p.Asn20Ser"
+  },
+  {
+   "uid": 15261,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.8A>C",
+   "p": "p.His3Pro"
+  },
+  {
+   "uid": 15263,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.167T>A",
+   "p": "p.Met56Lys"
+  },
+  {
+   "uid": 15265,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.438T>A",
+   "p": "p.Tyr146Ter"
+  },
+  {
+   "uid": 15267,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.134C>G",
+   "p": "p.Ser45Cys"
+  },
+  {
+   "uid": 15278,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.286A>G",
+   "p": "p.Lys96Glu"
+  },
+  {
+   "uid": 15282,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.52A>G",
+   "p": "p.Lys18Glu"
+  },
+  {
+   "uid": 15284,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.392A>C",
+   "p": "p.Tyr131Ser"
+  },
+  {
+   "uid": 15286,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.341T>A",
+   "p": "p.Val114Glu"
+  },
+  {
+   "uid": 15288,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.131_139del",
+   "p": "p.Glu44_Phe46del"
+  },
+  {
+   "uid": 15290,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.404T>A",
+   "p": "p.Val135Glu"
+  },
+  {
+   "uid": 15296,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.9T>A",
+   "p": "p.His3Gln"
+  },
+  {
+   "uid": 15297,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.280T>C",
+   "p": "p.Cys94Arg"
+  },
+  {
+   "uid": 15298,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.425T>G",
+   "p": "p.Leu142Arg"
+  },
+  {
+   "uid": 15299,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.260C>A",
+   "p": "p.Ala87Asp"
+  },
+  {
+   "uid": 15300,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.61G>A",
+   "p": "p.Val21Met"
+  },
+  {
+   "uid": 15303,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.350A>G",
+   "p": "p.His117Arg"
+  },
+  {
+   "uid": 15310,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.107A>T",
+   "p": "p.Tyr36Phe"
+  },
+  {
+   "uid": 15311,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.273G>C",
+   "p": "p.Glu91Asp"
+  },
+  {
+   "uid": 15312,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.103G>T",
+   "p": "p.Val35Phe"
+  },
+  {
+   "uid": 15314,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.236T>G",
+   "p": "p.Leu79Arg"
+  },
+  {
+   "uid": 15317,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.306G>C",
+   "p": "p.Glu102Asp"
+  },
+  {
+   "uid": 15320,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.251G>A",
+   "p": "p.Gly84Asp"
+  },
+  {
+   "uid": 15322,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.437A>G",
+   "p": "p.Tyr146Cys"
+  },
+  {
+   "uid": 15323,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.5T>C",
+   "p": "p.Val2Ala"
+  },
+  {
+   "uid": 15324,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.46T>G",
+   "p": "p.Trp16Gly"
+  },
+  {
+   "uid": 15325,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.289C>G",
+   "p": "p.Leu97Val"
+  },
+  {
+   "uid": 15328,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.73G>C",
+   "p": "p.Gly25Arg"
+  },
+  {
+   "uid": 15329,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.363A>C",
+   "p": "p.Lys121Asn"
+  },
+  {
+   "uid": 15330,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.272A>G",
+   "p": "p.Glu91Gly"
+  },
+  {
+   "uid": 15331,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.112T>A",
+   "p": "p.Trp38Arg"
+  },
+  {
+   "uid": 15333,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.20A>T",
+   "p": "p.Glu7Val"
+  },
+  {
+   "uid": 15339,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.421G>A",
+   "p": "p.Ala141Thr"
+  },
+  {
+   "uid": 15340,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.350A>C",
+   "p": "p.His117Pro"
+  },
+  {
+   "uid": 15342,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.328G>A",
+   "p": "p.Val110Met"
+  },
+  {
+   "uid": 15345,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.431del",
+   "p": "p.His144fs"
+  },
+  {
+   "uid": 15349,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.394C>A",
+   "p": "p.Gln132Lys"
+  },
+  {
+   "uid": 15351,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.314G>C",
+   "p": "p.Arg105Thr"
+  },
+  {
+   "uid": 15353,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.22G>A",
+   "p": "p.Glu8Lys"
+  },
+  {
+   "uid": 15354,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.307A>T",
+   "p": "p.Asn103Tyr"
+  },
+  {
+   "uid": 15357,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.335T>C",
+   "p": "p.Val112Ala"
+  },
+  {
+   "uid": 15359,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.4G>A",
+   "p": "p.Val2Met"
+  },
+  {
+   "uid": 15360,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.224_229del",
+   "p": "p.Gly75_Leu76del"
+  },
+  {
+   "uid": 15365,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.431A>C",
+   "p": "p.His144Pro"
+  },
+  {
+   "uid": 15367,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.250G>T",
+   "p": "p.Gly84Cys"
+  },
+  {
+   "uid": 15368,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.93G>T",
+   "p": "p.Arg31Ser"
+  },
+  {
+   "uid": 15372,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.119A>G",
+   "p": "p.Gln40Arg"
+  },
+  {
+   "uid": 15374,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.170_181del",
+   "p": "p.Gly57_Lys60del"
+  },
+  {
+   "uid": 15375,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.262_264del",
+   "p": "p.Thr88del"
+  },
+  {
+   "uid": 15376,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.427G>C",
+   "p": "p.Ala143Pro"
+  },
+  {
+   "uid": 15377,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.155C>G",
+   "p": "p.Pro52Arg"
+  },
+  {
+   "uid": 15379,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.373C>T",
+   "p": "p.Pro125Ser"
+  },
+  {
+   "uid": 15381,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.118C>G",
+   "p": "p.Gln40Glu"
+  },
+  {
+   "uid": 15383,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.268A>C",
+   "p": "p.Ser90Arg"
+  },
+  {
+   "uid": 15384,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.226_228del",
+   "p": "p.Leu76del"
+  },
+  {
+   "uid": 15387,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.17C>G",
+   "p": "p.Pro6Arg"
+  },
+  {
+   "uid": 15388,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.391T>G",
+   "p": "p.Tyr131Asp"
+  },
+  {
+   "uid": 15389,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.35T>A",
+   "p": "p.Val12Asp"
+  },
+  {
+   "uid": 15393,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.181G>C",
+   "p": "p.Val61Leu"
+  },
+  {
+   "uid": 15396,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.325A>G",
+   "p": "p.Asn109Asp"
+  },
+  {
+   "uid": 15398,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.176C>G",
+   "p": "p.Pro59Arg"
+  },
+  {
+   "uid": 15401,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.52A>T",
+   "p": "p.Lys18Ter"
+  },
+  {
+   "uid": 15402,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.118C>T",
+   "p": "p.Gln40Ter"
+  },
+  {
+   "uid": 15403,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.47G>A",
+   "p": "p.Trp16Ter"
+  },
+  {
+   "uid": 15404,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.364G>T",
+   "p": "p.Glu122Ter"
+  },
+  {
+   "uid": 15405,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.114G>A",
+   "p": "p.Trp38Ter"
+  },
+  {
+   "uid": 15406,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.130G>T",
+   "p": "p.Glu44Ter"
+  },
+  {
+   "uid": 15407,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.184A>T",
+   "p": "p.Lys62Ter"
+  },
+  {
+   "uid": 15408,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.108C>A",
+   "p": "p.Tyr36Ter"
+  },
+  {
+   "uid": 15409,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.383A>C",
+   "p": "p.Gln128Pro"
+  },
+  {
+   "uid": 15410,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.383_385del",
+   "p": "p.Gln128_Ala129delinsPro"
+  },
+  {
+   "uid": 15413,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.25_26del",
+   "p": "p.Lys9fs"
+  },
+  {
+   "uid": 15414,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.51del",
+   "p": "p.Lys18fs"
+  },
+  {
+   "uid": 15415,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.135del",
+   "p": "p.Phe46fs"
+  },
+  {
+   "uid": 15417,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.126_129del",
+   "p": "p.Phe42fs"
+  },
+  {
+   "uid": 15418,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.20del",
+   "p": "p.Glu7fs"
+  },
+  {
+   "uid": 15419,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.217dup",
+   "p": "p.Ser73fs"
+  },
+  {
+   "uid": 15420,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.230del",
+   "p": "p.Ala77fs"
+  },
+  {
+   "uid": 15422,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.17_18del",
+   "p": "p.Pro6fs"
+  },
+  {
+   "uid": 15423,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.36del",
+   "p": "p.Thr13fs"
+  },
+  {
+   "uid": 15424,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.110del",
+   "p": "p.Pro37fs"
+  },
+  {
+   "uid": 15425,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.343_344delinsG",
+   "p": "p.Leu115fs"
+  },
+  {
+   "uid": 15426,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.45dup",
+   "p": "p.Trp16fs"
+  },
+  {
+   "uid": 15427,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.114_120del",
+   "p": "p.Pro37_Trp38insTer"
+  },
+  {
+   "uid": 15428,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.282_283dup",
+   "p": "p.Asp95fs"
+  },
+  {
+   "uid": 15429,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.194del",
+   "p": "p.Gly65fs"
+  },
+  {
+   "uid": 15430,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.328del",
+   "p": "p.Val110fs"
+  },
+  {
+   "uid": 15431,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.112del",
+   "p": "p.Trp38fs"
+  },
+  {
+   "uid": 15432,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.85dup",
+   "p": "p.Leu29fs"
+  },
+  {
+   "uid": 15433,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.216dup",
+   "p": "p.Ser73Ter"
+  },
+  {
+   "uid": 15434,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.2T>G",
+   "p": "p.Met1Arg"
+  },
+  {
+   "uid": 15459,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.75T>A",
+   "p": "p.Gly25="
+  },
+  {
+   "uid": 15478,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.425_433del",
+   "p": "p.Leu142_Lys145delinsGln"
+  },
+  {
+   "uid": 15479,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.293_295del",
+   "p": "p.His98_Val99delinsLeu"
+  },
+  {
+   "uid": 15480,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.316C>T",
+   "p": "p.Leu106Phe"
+  },
+  {
+   "uid": 15482,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.229G>C",
+   "p": "p.Ala77Pro"
+  },
+  {
+   "uid": 15483,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.380T>G",
+   "p": "p.Val127Gly"
+  },
+  {
+   "uid": 15485,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.143dup",
+   "p": "p.Asp48fs"
+  },
+  {
+   "uid": 15486,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.343C>A",
+   "p": "p.Leu115Met"
+  },
+  {
+   "uid": 15489,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.262A>C",
+   "p": "p.Thr88Pro"
+  },
+  {
+   "uid": 15490,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.164T>A",
+   "p": "p.Val55Asp"
+  },
+  {
+   "uid": 15498,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.441C>A",
+   "p": "p.His147Gln"
+  },
+  {
+   "uid": 15499,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.221_227delinsCTCGGTGCCA",
+   "p": "p.Asp74_Leu76delinsAlaArgCysGln"
+  },
+  {
+   "uid": 15500,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.52A>C",
+   "p": "p.Lys18Gln"
+  },
+  {
+   "uid": 15504,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.271G>T",
+   "p": "p.Glu91Ter"
+  },
+  {
+   "uid": 15508,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.4del",
+   "p": "p.Val2fs"
+  },
+  {
+   "uid": 15509,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.94C>G",
+   "p": "p.Leu32Val"
+  },
+  {
+   "uid": 15513,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.344T>C",
+   "p": "p.Leu115Pro"
+  },
+  {
+   "uid": 15517,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.55G>A",
+   "p": "p.Val19Met"
+  },
+  {
+   "uid": 15519,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.3G>A",
+   "p": "p.Met1Ile"
+  },
+  {
+   "uid": 15521,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.250G>C",
+   "p": "p.Gly84Arg"
+  },
+  {
+   "uid": 15525,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.315G>C",
+   "p": "p.Arg105Ser"
+  },
+  {
+   "uid": 15526,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.347C>A",
+   "p": "p.Ala116Asp"
+  },
+  {
+   "uid": 15529,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.112T>G",
+   "p": "p.Trp38Gly"
+  },
+  {
+   "uid": 15531,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.407C>A",
+   "p": "p.Ala136Asp"
+  },
+  {
+   "uid": 15539,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.62T>A",
+   "p": "p.Val21Glu"
+  },
+  {
+   "uid": 15540,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.16C>T",
+   "p": "p.Pro6Ser"
+  },
+  {
+   "uid": 15544,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.95T>G",
+   "p": "p.Leu32Arg"
+  },
+  {
+   "uid": 15549,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.116C>A",
+   "p": "p.Thr39Asn"
+  },
+  {
+   "uid": 15550,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.290T>C",
+   "p": "p.Leu97Pro"
+  },
+  {
+   "uid": 15551,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.117_118del",
+   "p": "p.Gln40fs"
+  },
+  {
+   "uid": 15553,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.188C>A",
+   "p": "p.Ala63Asp"
+  },
+  {
+   "uid": 15556,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.233A>G",
+   "p": "p.His78Arg"
+  },
+  {
+   "uid": 15558,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.4G>T",
+   "p": "p.Val2Leu"
+  },
+  {
+   "uid": 15560,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.217_221delinsT",
+   "p": "p.Ser73fs"
+  },
+  {
+   "uid": 15563,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.79_80insT",
+   "p": "p.Glu27fs"
+  },
+  {
+   "uid": 15564,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.396G>C",
+   "p": "p.Gln132His"
+  },
+  {
+   "uid": 15566,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.100G>A",
+   "p": "p.Val34Met"
+  },
+  {
+   "uid": 15567,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.415_417del",
+   "p": "p.Ala139del"
+  },
+  {
+   "uid": 15568,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.85C>A",
+   "p": "p.Leu29Met"
+  },
+  {
+   "uid": 15573,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.419A>C",
+   "p": "p.Asn140Thr"
+  },
+  {
+   "uid": 15576,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.434A>T",
+   "p": "p.Lys145Met"
+  },
+  {
+   "uid": 15579,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.253A>G",
+   "p": "p.Thr85Ala"
+  },
+  {
+   "uid": 15580,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.367T>C",
+   "p": "p.Phe123Leu"
+  },
+  {
+   "uid": 15582,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.349C>T",
+   "p": "p.His117Tyr"
+  },
+  {
+   "uid": 15585,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.401T>C",
+   "p": "p.Val134Ala"
+  },
+  {
+   "uid": 15587,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.5T>G",
+   "p": "p.Val2Gly"
+  },
+  {
+   "uid": 15590,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.409G>C",
+   "p": "p.Gly137Arg"
+  },
+  {
+   "uid": 15592,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.17del",
+   "p": "p.Pro6fs"
+  },
+  {
+   "uid": 15593,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.27G>C",
+   "p": "p.Lys9Asn"
+  },
+  {
+   "uid": 15597,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.379G>C",
+   "p": "p.Val127Leu"
+  },
+  {
+   "uid": 15600,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.340del",
+   "p": "p.Val114fs"
+  },
+  {
+   "uid": 15601,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.441C>G",
+   "p": "p.His147Gln"
+  },
+  {
+   "uid": 15604,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.434del",
+   "p": "p.Lys145fs"
+  },
+  {
+   "uid": 15605,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.104T>A",
+   "p": "p.Val35Asp"
+  },
+  {
+   "uid": 15609,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.385_388delinsCCACA",
+   "p": "p.Ala129fs"
+  },
+  {
+   "uid": 15611,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.259G>C",
+   "p": "p.Ala87Pro"
+  },
+  {
+   "uid": 15613,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.205C>T",
+   "p": "p.Leu69Phe"
+  },
+  {
+   "uid": 15615,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.88G>A",
+   "p": "p.Gly30Ser"
+  },
+  {
+   "uid": 15622,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.116C>T",
+   "p": "p.Thr39Ile"
+  },
+  {
+   "uid": 36300,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.171C>T",
+   "p": "p.Gly57="
+  },
+  {
+   "uid": 36301,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.19_20delinsAT",
+   "p": "p.Glu7Met"
+  },
+  {
+   "uid": 36302,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.201del",
+   "p": "p.Val68fs"
+  },
+  {
+   "uid": 36303,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.203_204del",
+   "p": "p.Val68fs"
+  },
+  {
+   "uid": 36305,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.246C>G",
+   "p": "p.Leu82="
+  },
+  {
+   "uid": 36306,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.251del",
+   "p": "p.Gly84fs"
+  },
+  {
+   "uid": 36308,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.27dup",
+   "p": "p.Ser10fs"
+  },
+  {
+   "uid": 36309,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.287dup",
+   "p": "p.Leu97fs"
+  },
+  {
+   "uid": 36310,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.2T>C",
+   "p": "p.Met1Thr"
+  },
+  {
+   "uid": 36311,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.309C>A",
+   "p": "p.Asn103Lys"
+  },
+  {
+   "uid": 36322,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.324C>T",
+   "p": "p.Gly108="
+  },
+  {
+   "uid": 36324,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.353A>G",
+   "p": "p.His118Arg"
+  },
+  {
+   "uid": 36327,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.402G>C",
+   "p": "p.Val134="
+  },
+  {
+   "uid": 36329,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.432C>T",
+   "p": "p.His144="
+  },
+  {
+   "uid": 36337,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.92G>A",
+   "p": "p.Arg31Lys"
+  },
+  {
+   "uid": 38646,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.48G>A",
+   "p": "p.Trp16Ter"
+  },
+  {
+   "uid": 38647,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.46del",
+   "p": "p.Trp16fs"
+  },
+  {
+   "uid": 38650,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.79G>T",
+   "p": "p.Glu27Ter"
+  },
+  {
+   "uid": 38659,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.155del",
+   "p": "p.Pro52fs"
+  },
+  {
+   "uid": 38682,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.90C>T",
+   "p": "p.Gly30="
+  },
+  {
+   "uid": 156328,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.435G>T",
+   "p": "p.Lys145Asn"
+  },
+  {
+   "uid": 193106,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.9T>C",
+   "p": "p.His3="
+  },
+  {
+   "uid": 242712,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.359G>A",
+   "p": "p.Gly120Asp"
+  },
+  {
+   "uid": 256344,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.288G>A",
+   "p": "p.Lys96="
+  },
+  {
+   "uid": 439132,
+   "gene": "HBB",
+   "transcript": "NM_000518.5",
+   "c": "c.11T>A",
+   "p": "p.Leu4Gln"
+  },
+  {
+   "uid": 12578,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.34G>T",
+   "p": "p.Gly12Cys"
+  },
+  {
+   "uid": 12579,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.34G>C",
+   "p": "p.Gly12Arg"
+  },
+  {
+   "uid": 12580,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.38G>A",
+   "p": "p.Gly13Asp"
+  },
+  {
+   "uid": 12582,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.35G>A",
+   "p": "p.Gly12Asp"
+  },
+  {
+   "uid": 12583,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.35G>T",
+   "p": "p.Gly12Val"
+  },
+  {
+   "uid": 12584,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.34G>A",
+   "p": "p.Gly12Ser"
+  },
+  {
+   "uid": 12586,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.178G>C",
+   "p": "p.Gly60Arg"
+  },
+  {
+   "uid": 12587,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.458A>T",
+   "p": "p.Asp153Val"
+  },
+  {
+   "uid": 12588,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.173C>T",
+   "p": "p.Thr58Ile"
+  },
+  {
+   "uid": 12589,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.40G>A",
+   "p": "p.Val14Ile"
+  },
+  {
+   "uid": 12590,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.101C>G",
+   "p": "p.Pro34Arg"
+  },
+  {
+   "uid": 12593,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.37G>C",
+   "p": "p.Gly13Arg"
+  },
+  {
+   "uid": 12596,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.13A>G",
+   "p": "p.Lys5Glu"
+  },
+  {
+   "uid": 40452,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.65A>G",
+   "p": "p.Gln22Arg"
+  },
+  {
+   "uid": 40454,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.101C>T",
+   "p": "p.Pro34Leu"
+  },
+  {
+   "uid": 40465,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.458A>G",
+   "p": "p.Asp153Gly"
+  },
+  {
+   "uid": 41449,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.519T>C",
+   "p": "p.Asp173="
+  },
+  {
+   "uid": 45114,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.180T>A",
+   "p": "p.Gly60="
+  },
+  {
+   "uid": 45115,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.182A>G",
+   "p": "p.Gln61Arg"
+  },
+  {
+   "uid": 45116,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.182A>T",
+   "p": "p.Gln61Leu"
+  },
+  {
+   "uid": 45117,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.183A>T",
+   "p": "p.Gln61His"
+  },
+  {
+   "uid": 45118,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.198A>G",
+   "p": "p.Ala66="
+  },
+  {
+   "uid": 45119,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.24A>G",
+   "p": "p.Val8="
+  },
+  {
+   "uid": 45121,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.33T>C",
+   "p": "p.Ala11="
+  },
+  {
+   "uid": 45122,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.35G>C",
+   "p": "p.Gly12Ala"
+  },
+  {
+   "uid": 45123,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.37G>T",
+   "p": "p.Gly13Cys"
+  },
+  {
+   "uid": 45124,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.38G>T",
+   "p": "p.Gly13Val"
+  },
+  {
+   "uid": 45125,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.39C>T",
+   "p": "p.Gly13="
+  },
+  {
+   "uid": 45126,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.454G>T",
+   "p": "p.Val152Phe"
+  },
+  {
+   "uid": 45127,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.466T>G",
+   "p": "p.Phe156Val"
+  },
+  {
+   "uid": 45128,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.491G>A",
+   "p": "p.Arg164Gln"
+  },
+  {
+   "uid": 163758,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.466T>A",
+   "p": "p.Phe156Ile"
+  },
+  {
+   "uid": 163761,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.290G>A",
+   "p": "p.Arg97Lys"
+  },
+  {
+   "uid": 163762,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.228G>A",
+   "p": "p.Glu76="
+  },
+  {
+   "uid": 163766,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.179G>T",
+   "p": "p.Gly60Val"
+  },
+  {
+   "uid": 163768,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.108A>G",
+   "p": "p.Ile36Met"
+  },
+  {
+   "uid": 163769,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.39C>A",
+   "p": "p.Gly13="
+  },
+  {
+   "uid": 177777,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.181C>A",
+   "p": "p.Gln61Lys"
+  },
+  {
+   "uid": 177881,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.183A>C",
+   "p": "p.Gln61His"
+  },
+  {
+   "uid": 179141,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.214A>T",
+   "p": "p.Met72Leu"
+  },
+  {
+   "uid": 180859,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.508A>T",
+   "p": "p.Met170Leu"
+  },
+  {
+   "uid": 197243,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.436G>A",
+   "p": "p.Ala146Thr"
+  },
+  {
+   "uid": 197769,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.470A>G",
+   "p": "p.Tyr157Cys"
+  },
+  {
+   "uid": 217822,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.57G>C",
+   "p": "p.Leu19Phe"
+  },
+  {
+   "uid": 227471,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.264A>G",
+   "p": "p.Lys88="
+  },
+  {
+   "uid": 228267,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.211T>G",
+   "p": "p.Tyr71Asp"
+  },
+  {
+   "uid": 375962,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.437C>T",
+   "p": "p.Ala146Val"
+  },
+  {
+   "uid": 503538,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.407G>A",
+   "p": "p.Ser136Asn"
+  },
+  {
+   "uid": 929160,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.220A>C",
+   "p": "p.Thr74Pro"
+  },
+  {
+   "uid": 931154,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.534_536del",
+   "p": "p.Lys180del"
+  },
+  {
+   "uid": 935432,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.487A>G",
+   "p": "p.Ile163Val"
+  },
+  {
+   "uid": 981549,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.164T>G",
+   "p": "p.Ile55Ser"
+  },
+  {
+   "uid": 981550,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.221C>T",
+   "p": "p.Thr74Ile"
+  },
+  {
+   "uid": 981803,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.461A>G",
+   "p": "p.Asp154Gly"
+  },
+  {
+   "uid": 984504,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.149C>T",
+   "p": "p.Thr50Ile"
+  },
+  {
+   "uid": 984644,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.202_204del",
+   "p": "p.Arg68del"
+  },
+  {
+   "uid": 985491,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.191A>C",
+   "p": "p.Tyr64Ser"
+  },
+  {
+   "uid": 985492,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.196G>T",
+   "p": "p.Ala66Ser"
+  },
+  {
+   "uid": 986027,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.190T>A",
+   "p": "p.Tyr64Asn"
+  },
+  {
+   "uid": 1016209,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.214A>C",
+   "p": "p.Met72Leu"
+  },
+  {
+   "uid": 1038615,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.16C>G",
+   "p": "p.Leu6Val"
+  },
+  {
+   "uid": 1046139,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.388_389delinsAT",
+   "p": "p.Ala130Ile"
+  },
+  {
+   "uid": 1047419,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.352T>C",
+   "p": "p.Cys118Arg"
+  },
+  {
+   "uid": 1049055,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.30A>G",
+   "p": "p.Gly10="
+  },
+  {
+   "uid": 1049331,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.19G>A",
+   "p": "p.Val7Met"
+  },
+  {
+   "uid": 1049359,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.22G>A",
+   "p": "p.Val8Ile"
+  },
+  {
+   "uid": 1049563,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.18T>C",
+   "p": "p.Leu6="
+  },
+  {
+   "uid": 1049753,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.45C>T",
+   "p": "p.Gly15="
+  },
+  {
+   "uid": 1050425,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.75_80del",
+   "p": "p.Gln25_Asn26del"
+  },
+  {
+   "uid": 1050562,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.74A>G",
+   "p": "p.Gln25Arg"
+  },
+  {
+   "uid": 1079653,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.481C>A",
+   "p": "p.Arg161="
+  },
+  {
+   "uid": 1098601,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.58A>G",
+   "p": "p.Thr20Ala"
+  },
+  {
+   "uid": 1163347,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.322G>T",
+   "p": "p.Asp108Tyr"
+  },
+  {
+   "uid": 1172833,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.197_198insTGACCTGCT",
+   "p": "p.Ala66_Met67insAspLeuLeu"
+  },
+  {
+   "uid": 1177293,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.197_223dup",
+   "p": "p.Ala66_Thr74dup"
+  },
+  {
+   "uid": 1191328,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.229G>A",
+   "p": "p.Gly77Ser"
+  },
+  {
+   "uid": 1218871,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.411T>C",
+   "p": "p.Tyr137="
+  },
+  {
+   "uid": 1219824,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.346A>C",
+   "p": "p.Asn116His"
+  },
+  {
+   "uid": 1239850,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.456T>G",
+   "p": "p.Val152="
+  },
+  {
+   "uid": 1264725,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.453T>C",
+   "p": "p.Gly151="
+  },
+  {
+   "uid": 1298542,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.516A>C",
+   "p": "p.Lys172Asn"
+  },
+  {
+   "uid": 1318518,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.250A>G",
+   "p": "p.Ile84Val"
+  },
+  {
+   "uid": 1327505,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.445A>T",
+   "p": "p.Arg149Ter"
+  },
+  {
+   "uid": 1333392,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.76A>C",
+   "p": "p.Asn26His"
+  },
+  {
+   "uid": 1372540,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.482G>A",
+   "p": "p.Arg161Gln"
+  },
+  {
+   "uid": 1419488,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.536A>G",
+   "p": "p.Lys179Arg"
+  },
+  {
+   "uid": 1512544,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.332T>C",
+   "p": "p.Met111Thr"
+  },
+  {
+   "uid": 1518585,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.324T>G",
+   "p": "p.Asp108Glu"
+  },
+  {
+   "uid": 1531075,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.186G>A",
+   "p": "p.Glu62="
+  },
+  {
+   "uid": 1574667,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.372A>G",
+   "p": "p.Thr124="
+  },
+  {
+   "uid": 1623396,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.60G>A",
+   "p": "p.Thr20="
+  },
+  {
+   "uid": 1654412,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.171C>T",
+   "p": "p.Asp57="
+  },
+  {
+   "uid": 1670481,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.15A>G",
+   "p": "p.Lys5="
+  },
+  {
+   "uid": 1676497,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.229G>T",
+   "p": "p.Gly77Cys"
+  },
+  {
+   "uid": 1677688,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.401C>G",
+   "p": "p.Ala134Gly"
+  },
+  {
+   "uid": 1691380,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.173_214dup",
+   "p": "p.Thr58_Tyr71dup"
+  },
+  {
+   "uid": 1691382,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.36_37delinsGC",
+   "p": "p.Gly13Arg"
+  },
+  {
+   "uid": 1695421,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.53C>T",
+   "p": "p.Ala18Val"
+  },
+  {
+   "uid": 1695422,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.194_195insGGCAATGAGGGACCAGTACAG",
+   "p": "p.Tyr64_Ser65insArgAlaMetArgAspGlnTyr"
+  },
+  {
+   "uid": 1701193,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.33_34delinsCT",
+   "p": "p.Gly12Cys"
+  },
+  {
+   "uid": 1704608,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.179G>A",
+   "p": "p.Gly60Asp"
+  },
+  {
+   "uid": 1710976,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.107T>A",
+   "p": "p.Ile36Lys"
+  },
+  {
+   "uid": 1710987,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.108delinsCC",
+   "p": "p.Glu37fs"
+  },
+  {
+   "uid": 1710998,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.109_110insC",
+   "p": "p.Glu37fs"
+  },
+  {
+   "uid": 1711001,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.11A>T",
+   "p": "p.Tyr4Phe"
+  },
+  {
+   "uid": 1711004,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.12T>A",
+   "p": "p.Tyr4Ter"
+  },
+  {
+   "uid": 1711005,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.13A>T",
+   "p": "p.Lys5Ter"
+  },
+  {
+   "uid": 1711006,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.16C>T",
+   "p": "p.Leu6Phe"
+  },
+  {
+   "uid": 1711007,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.1del",
+   "p": "p.Met1*"
+  },
+  {
+   "uid": 1711008,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.109G>T",
+   "p": "p.Glu37Ter"
+  },
+  {
+   "uid": 1711009,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.21_22insT",
+   "p": "p.Val8fs"
+  },
+  {
+   "uid": 1711010,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.24dup",
+   "p": "p.Val9fs"
+  },
+  {
+   "uid": 1711011,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.27_28insCTC",
+   "p": "p.Val9_Gly10insLeu"
+  },
+  {
+   "uid": 1711012,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.27T>A",
+   "p": "p.Val9="
+  },
+  {
+   "uid": 1711013,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.27T>G",
+   "p": "p.Val9="
+  },
+  {
+   "uid": 1711014,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.29_30insT",
+   "p": "p.Ala11fs"
+  },
+  {
+   "uid": 1711015,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.29_31del",
+   "p": "p.Gly10del"
+  },
+  {
+   "uid": 1711016,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.31G>T",
+   "p": "p.Ala11Ser"
+  },
+  {
+   "uid": 1711017,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.33T>A",
+   "p": "p.Ala11="
+  },
+  {
+   "uid": 1711019,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.42A>T",
+   "p": "p.Val14="
+  },
+  {
+   "uid": 1711020,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.43G>T",
+   "p": "p.Gly15Cys"
+  },
+  {
+   "uid": 1711021,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.4del",
+   "p": "p.Thr2fs"
+  },
+  {
+   "uid": 1711022,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.50G>T",
+   "p": "p.Ser17Ile"
+  },
+  {
+   "uid": 1711023,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.5C>G",
+   "p": "p.Thr2Ser"
+  },
+  {
+   "uid": 1711024,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.62T>A",
+   "p": "p.Ile21Lys"
+  },
+  {
+   "uid": 1711025,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.65A>C",
+   "p": "p.Gln22Pro"
+  },
+  {
+   "uid": 1711027,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.6T>G",
+   "p": "p.Thr2="
+  },
+  {
+   "uid": 1711028,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.10T>A",
+   "p": "p.Tyr4Asn"
+  },
+  {
+   "uid": 1711029,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.74A>T",
+   "p": "p.Gln25Leu"
+  },
+  {
+   "uid": 1711030,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.75G>A",
+   "p": "p.Gln25="
+  },
+  {
+   "uid": 1711031,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.77A>C",
+   "p": "p.Asn26Thr"
+  },
+  {
+   "uid": 1711032,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.80A>G",
+   "p": "p.His27Arg"
+  },
+  {
+   "uid": 1711033,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.80A>T",
+   "p": "p.His27Leu"
+  },
+  {
+   "uid": 1711034,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.84del",
+   "p": "p.Phe28fs"
+  },
+  {
+   "uid": 1711035,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.84T>A",
+   "p": "p.Phe28Leu"
+  },
+  {
+   "uid": 1711036,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.9dup",
+   "p": "p.Tyr4fs"
+  },
+  {
+   "uid": 1711037,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.90C>A",
+   "p": "p.Asp30Glu"
+  },
+  {
+   "uid": 1711039,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.91G>T",
+   "p": "p.Glu31Ter"
+  },
+  {
+   "uid": 1711040,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.95A>C",
+   "p": "p.Tyr32Ser"
+  },
+  {
+   "uid": 1711041,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.99T>C",
+   "p": "p.Asp33="
+  },
+  {
+   "uid": 1714092,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.230G>T",
+   "p": "p.Gly77Val"
+  },
+  {
+   "uid": 1717054,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.365C>G",
+   "p": "p.Ser122Cys"
+  },
+  {
+   "uid": 1729613,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.326T>A",
+   "p": "p.Val109Glu"
+  },
+  {
+   "uid": 1732986,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.358T>C",
+   "p": "p.Leu120="
+  },
+  {
+   "uid": 1734090,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.36T>A",
+   "p": "p.Gly12="
+  },
+  {
+   "uid": 1734094,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.36T>G",
+   "p": "p.Gly12="
+  },
+  {
+   "uid": 1742817,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.474A>G",
+   "p": "p.Thr158="
+  },
+  {
+   "uid": 1744676,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.4A>C",
+   "p": "p.Thr2Pro"
+  },
+  {
+   "uid": 1774834,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.153T>G",
+   "p": "p.Cys51Trp"
+  },
+  {
+   "uid": 1775477,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.156C>T",
+   "p": "p.Leu52="
+  },
+  {
+   "uid": 1803471,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.481C>T",
+   "p": "p.Arg161Ter"
+  },
+  {
+   "uid": 1803539,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.283C>T",
+   "p": "p.His95Tyr"
+  },
+  {
+   "uid": 1803998,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.440A>T",
+   "p": "p.Lys147Met"
+  },
+  {
+   "uid": 1908428,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.325G>A",
+   "p": "p.Val109Ile"
+  },
+  {
+   "uid": 1965797,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.269T>A",
+   "p": "p.Phe90Tyr"
+  },
+  {
+   "uid": 1990132,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.105A>C",
+   "p": "p.Thr35="
+  },
+  {
+   "uid": 2010214,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.13A>C",
+   "p": "p.Lys5Gln"
+  },
+  {
+   "uid": 2023985,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.432A>G",
+   "p": "p.Thr144="
+  },
+  {
+   "uid": 2036506,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.418C>T",
+   "p": "p.Pro140Ser"
+  },
+  {
+   "uid": 2061689,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.283C>A",
+   "p": "p.His95Asn"
+  },
+  {
+   "uid": 2086297,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.563T>C",
+   "p": "p.Met188Thr"
+  },
+  {
+   "uid": 2089677,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.443C>G",
+   "p": "p.Thr148Arg"
+  },
+  {
+   "uid": 2107036,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.120C>T",
+   "p": "p.Tyr40="
+  },
+  {
+   "uid": 2156411,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.141T>C",
+   "p": "p.Asp47="
+  },
+  {
+   "uid": 2177432,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.498T>C",
+   "p": "p.His166="
+  },
+  {
+   "uid": 2177694,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.375A>G",
+   "p": "p.Val125="
+  },
+  {
+   "uid": 2189790,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.438A>G",
+   "p": "p.Ala146="
+  },
+  {
+   "uid": 2195758,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.66G>A",
+   "p": "p.Gln22="
+  },
+  {
+   "uid": 2431456,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.175_176delinsTT",
+   "p": "p.Ala59Leu"
+  },
+  {
+   "uid": 2444789,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.121A>G",
+   "p": "p.Arg41Gly"
+  },
+  {
+   "uid": 2454057,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.168C>T",
+   "p": "p.Leu56="
+  },
+  {
+   "uid": 2454058,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.348T>C",
+   "p": "p.Asn116="
+  },
+  {
+   "uid": 2478131,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.506A>G",
+   "p": "p.Lys169Arg"
+  },
+  {
+   "uid": 2498003,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.380C>G",
+   "p": "p.Thr127Arg"
+  },
+  {
+   "uid": 2498256,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.187G>A",
+   "p": "p.Glu63Lys"
+  },
+  {
+   "uid": 2503842,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.20T>A",
+   "p": "p.Val7Glu"
+  },
+  {
+   "uid": 2505054,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.106A>G",
+   "p": "p.Ile36Val"
+  },
+  {
+   "uid": 2506804,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.98A>G",
+   "p": "p.Asp33Gly"
+  },
+  {
+   "uid": 2568296,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.69A>G",
+   "p": "p.Leu23="
+  },
+  {
+   "uid": 2575733,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.148A>C",
+   "p": "p.Thr50Pro"
+  },
+  {
+   "uid": 2630513,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.101C>A",
+   "p": "p.Pro34Gln"
+  },
+  {
+   "uid": 2662065,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.479T>G",
+   "p": "p.Val160Gly"
+  },
+  {
+   "uid": 2672092,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.178_198dup",
+   "p": "p.Ala66_Met67insGlyGlnGluGluTyrSerAla"
+  },
+  {
+   "uid": 2689336,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.152G>C",
+   "p": "p.Cys51Ser"
+  },
+  {
+   "uid": 2697277,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.507G>A",
+   "p": "p.Lys169="
+  },
+  {
+   "uid": 2714298,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.547A>G",
+   "p": "p.Thr183Ala"
+  },
+  {
+   "uid": 2716407,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.467T>C",
+   "p": "p.Phe156Ser"
+  },
+  {
+   "uid": 2752227,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.441G>T",
+   "p": "p.Lys147Asn"
+  },
+  {
+   "uid": 2755102,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.465C>G",
+   "p": "p.Ala155="
+  },
+  {
+   "uid": 2758762,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.54C>T",
+   "p": "p.Ala18="
+  },
+  {
+   "uid": 2759640,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.548C>A",
+   "p": "p.Thr183Lys"
+  },
+  {
+   "uid": 2764234,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.435A>T",
+   "p": "p.Ser145="
+  },
+  {
+   "uid": 2772438,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.373G>A",
+   "p": "p.Val125Ile"
+  },
+  {
+   "uid": 2799402,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.225G>C",
+   "p": "p.Gly75="
+  },
+  {
+   "uid": 2818268,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.556G>A",
+   "p": "p.Val186Ile"
+  },
+  {
+   "uid": 2819836,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.510G>C",
+   "p": "p.Met170Ile"
+  },
+  {
+   "uid": 2828010,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.202A>G",
+   "p": "p.Arg68Gly"
+  },
+  {
+   "uid": 2857742,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.132A>G",
+   "p": "p.Val44="
+  },
+  {
+   "uid": 2896377,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.136A>G",
+   "p": "p.Ile46Val"
+  },
+  {
+   "uid": 2898010,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.426T>A",
+   "p": "p.Ile142="
+  },
+  {
+   "uid": 2909102,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.331A>G",
+   "p": "p.Met111Val"
+  },
+  {
+   "uid": 2914356,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.550_551del",
+   "p": "p.Lys184fs"
+  },
+  {
+   "uid": 2994655,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.261T>G",
+   "p": "p.Thr87="
+  },
+  {
+   "uid": 3009878,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.548C>G",
+   "p": "p.Thr183Arg"
+  },
+  {
+   "uid": 3116215,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.180_181delinsAA",
+   "p": "p.Gln61Lys"
+  },
+  {
+   "uid": 3224558,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.234T>C",
+   "p": "p.Phe78="
+  },
+  {
+   "uid": 3224559,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.350A>C",
+   "p": "p.Lys117Thr"
+  },
+  {
+   "uid": 3236463,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.21G>A",
+   "p": "p.Val7="
+  },
+  {
+   "uid": 3236464,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.32C>A",
+   "p": "p.Ala11Asp"
+  },
+  {
+   "uid": 3238829,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.202A>T",
+   "p": "p.Arg68Trp"
+  },
+  {
+   "uid": 3373678,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.488T>C",
+   "p": "p.Ile163Thr"
+  },
+  {
+   "uid": 3378021,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.413G>C",
+   "p": "p.Gly138Ala"
+  },
+  {
+   "uid": 3535700,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.126G>A",
+   "p": "p.Lys42="
+  },
+  {
+   "uid": 3535701,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.81T>C",
+   "p": "p.His27="
+  },
+  {
+   "uid": 3535702,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.102A>T",
+   "p": "p.Pro34="
+  },
+  {
+   "uid": 3535703,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.105A>G",
+   "p": "p.Thr35="
+  },
+  {
+   "uid": 3535704,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.336C>T",
+   "p": "p.Val112="
+  },
+  {
+   "uid": 3535705,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.261T>A",
+   "p": "p.Thr87="
+  },
+  {
+   "uid": 3623825,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.259A>G",
+   "p": "p.Thr87Ala"
+  },
+  {
+   "uid": 3632113,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.45C>G",
+   "p": "p.Gly15="
+  },
+  {
+   "uid": 3635066,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.368G>T",
+   "p": "p.Arg123Ile"
+  },
+  {
+   "uid": 3635067,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.307G>T",
+   "p": "p.Val103Phe"
+  },
+  {
+   "uid": 3635068,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.151T>G",
+   "p": "p.Cys51Gly"
+  },
+  {
+   "uid": 3681099,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.297A>G",
+   "p": "p.Gln99="
+  },
+  {
+   "uid": 3687821,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.274G>A",
+   "p": "p.Asp92Asn"
+  },
+  {
+   "uid": 3718849,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.502_505del",
+   "p": "p.Glu168fs"
+  },
+  {
+   "uid": 3721954,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.112G>A",
+   "p": "p.Asp38Asn"
+  },
+  {
+   "uid": 3764812,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.34_35delinsTT",
+   "p": "p.Gly12Phe"
+  },
+  {
+   "uid": 3764892,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.204G>T",
+   "p": "p.Arg68Ser"
+  },
+  {
+   "uid": 3774507,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.187_207dup",
+   "p": "p.Asp69_Gln70insGluTyrSerAlaMetArgAsp"
+  },
+  {
+   "uid": 3774511,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.183_215dup",
+   "p": "p.Tyr71_Met72insIleGluGluTyrSerAlaMetArgAspGlnTyr"
+  },
+  {
+   "uid": 3774529,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.50G>C",
+   "p": "p.Ser17Thr"
+  },
+  {
+   "uid": 3775823,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.158T>G",
+   "p": "p.Leu53Trp"
+  },
+  {
+   "uid": 3865293,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.351A>G",
+   "p": "p.Lys117="
+  },
+  {
+   "uid": 3865294,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.150C>G",
+   "p": "p.Thr50="
+  },
+  {
+   "uid": 3865295,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.480T>A",
+   "p": "p.Val160="
+  },
+  {
+   "uid": 3865296,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.315C>T",
+   "p": "p.Asp105="
+  },
+  {
+   "uid": 3865297,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.558A>G",
+   "p": "p.Val186="
+  },
+  {
+   "uid": 3865298,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.150C>A",
+   "p": "p.Thr50="
+  },
+  {
+   "uid": 3865299,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.144A>G",
+   "p": "p.Gly48="
+  },
+  {
+   "uid": 3865300,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.444A>C",
+   "p": "p.Thr148="
+  },
+  {
+   "uid": 3865301,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.477A>G",
+   "p": "p.Leu159="
+  },
+  {
+   "uid": 3865303,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.366T>C",
+   "p": "p.Ser122="
+  },
+  {
+   "uid": 3865304,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.243A>G",
+   "p": "p.Val81="
+  },
+  {
+   "uid": 4044686,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.18T>G",
+   "p": "p.Leu6="
+  },
+  {
+   "uid": 4044687,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.402A>C",
+   "p": "p.Ala134="
+  },
+  {
+   "uid": 4088110,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.95A>G",
+   "p": "p.Tyr32Cys"
+  },
+  {
+   "uid": 4094593,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.339A>G",
+   "p": "p.Leu113="
+  },
+  {
+   "uid": 4094594,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.249C>A",
+   "p": "p.Ala83="
+  },
+  {
+   "uid": 4094595,
+   "gene": "KRAS",
+   "transcript": "NM_004985.5",
+   "c": "c.26T>C",
+   "p": "p.Val9Ala"
+  },
+  {
+   "uid": 2214,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.223_225del",
+   "p": "p.Ile75del"
+  },
+  {
+   "uid": 2215,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.548C>A",
+   "p": "p.Ser183Ter"
+  },
+  {
+   "uid": 2216,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.500G>A",
+   "p": "p.Arg167Gln"
+  },
+  {
+   "uid": 2217,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.481C>T",
+   "p": "p.Arg161Ter"
+  },
+  {
+   "uid": 2218,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.499C>T",
+   "p": "p.Arg167Trp"
+  },
+  {
+   "uid": 2219,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.499C>G",
+   "p": "p.Arg167Gly"
+  },
+  {
+   "uid": 2220,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.263G>C",
+   "p": "p.Trp88Ser"
+  },
+  {
+   "uid": 2221,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.405A>C",
+   "p": "p.Leu135Phe"
+  },
+  {
+   "uid": 2222,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.334T>C",
+   "p": "p.Tyr112His"
+  },
+  {
+   "uid": 2223,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.292T>C",
+   "p": "p.Tyr98His"
+  },
+  {
+   "uid": 2224,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.496G>T",
+   "p": "p.Val166Phe"
+  },
+  {
+   "uid": 2225,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.562C>G",
+   "p": "p.Leu188Val"
+  },
+  {
+   "uid": 2226,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.191G>C",
+   "p": "p.Arg64Pro"
+  },
+  {
+   "uid": 2227,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.188T>C",
+   "p": "p.Leu63Pro"
+  },
+  {
+   "uid": 2228,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.334T>A",
+   "p": "p.Tyr112Asn"
+  },
+  {
+   "uid": 2229,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.388G>C",
+   "p": "p.Val130Leu"
+  },
+  {
+   "uid": 2230,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.376G>T",
+   "p": "p.Asp126Tyr"
+  },
+  {
+   "uid": 2231,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.488T>C",
+   "p": "p.Leu163Pro"
+  },
+  {
+   "uid": 2232,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.598C>T",
+   "p": "p.Arg200Trp"
+  },
+  {
+   "uid": 2233,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.241C>T",
+   "p": "p.Pro81Ser"
+  },
+  {
+   "uid": 2234,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.574C>T",
+   "p": "p.Pro192Ser"
+  },
+  {
+   "uid": 2235,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.571C>G",
+   "p": "p.His191Asp"
+  },
+  {
+   "uid": 2236,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.250G>T",
+   "p": "p.Val84Leu"
+  },
+  {
+   "uid": 2237,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.277G>A",
+   "p": "p.Gly93Ser"
+  },
+  {
+   "uid": 2238,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.491A>G",
+   "p": "p.Gln164Arg"
+  },
+  {
+   "uid": 36899,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.242C>T",
+   "p": "p.Pro81Leu"
+  },
+  {
+   "uid": 36900,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.320G>C",
+   "p": "p.Arg107Pro"
+  },
+  {
+   "uid": 36902,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.371C>T",
+   "p": "p.Thr124Ile"
+  },
+  {
+   "uid": 36903,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.458T>A",
+   "p": "p.Leu153Gln"
+  },
+  {
+   "uid": 36905,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.524A>G",
+   "p": "p.Tyr175Cys"
+  },
+  {
+   "uid": 36906,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.549G>A",
+   "p": "p.Ser183="
+  },
+  {
+   "uid": 41865,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.269A>G",
+   "p": "p.Asn90Ser"
+  },
+  {
+   "uid": 43596,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.150C>G",
+   "p": "p.Ala50="
+  },
+  {
+   "uid": 43597,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.194C>G",
+   "p": "p.Ser65Trp"
+  },
+  {
+   "uid": 43598,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.208G>A",
+   "p": "p.Glu70Lys"
+  },
+  {
+   "uid": 43599,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.319C>G",
+   "p": "p.Arg107Gly"
+  },
+  {
+   "uid": 43600,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.467A>G",
+   "p": "p.Tyr156Cys"
+  },
+  {
+   "uid": 43601,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.408del",
+   "p": "p.Phe136fs"
+  },
+  {
+   "uid": 43604,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.485G>T",
+   "p": "p.Cys162Phe"
+  },
+  {
+   "uid": 43605,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.497T>C",
+   "p": "p.Val166Ala"
+  },
+  {
+   "uid": 93326,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.233A>G",
+   "p": "p.Asn78Ser"
+  },
+  {
+   "uid": 93327,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.256C>G",
+   "p": "p.Pro86Ala"
+  },
+  {
+   "uid": 93328,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.326T>A",
+   "p": "p.Ile109Asn"
+  },
+  {
+   "uid": 93329,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.501_502insTTGTCCGT",
+   "p": "p.Ser168fs"
+  },
+  {
+   "uid": 93330,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.74C>T",
+   "p": "p.Pro25Leu"
+  },
+  {
+   "uid": 127828,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.629G>A",
+   "p": "p.Arg210Gln"
+  },
+  {
+   "uid": 127829,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.445G>T",
+   "p": "p.Ala149Ser"
+  },
+  {
+   "uid": 132707,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.104C>A",
+   "p": "p.Ala35Asp"
+  },
+  {
+   "uid": 135405,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.119C>T",
+   "p": "p.Pro40Leu"
+  },
+  {
+   "uid": 135406,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.3G>A",
+   "p": "p.Met1Ile"
+  },
+  {
+   "uid": 135407,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.558A>C",
+   "p": "p.Glu186Asp"
+  },
+  {
+   "uid": 135951,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.183C>G",
+   "p": "p.Pro61="
+  },
+  {
+   "uid": 135952,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.191G>A",
+   "p": "p.Arg64His"
+  },
+  {
+   "uid": 135953,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.25G>A",
+   "p": "p.Asp9Asn"
+  },
+  {
+   "uid": 135954,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.274G>T",
+   "p": "p.Asp92Tyr"
+  },
+  {
+   "uid": 135955,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.280G>A",
+   "p": "p.Glu94Lys"
+  },
+  {
+   "uid": 135956,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.416C>G",
+   "p": "p.Ser139Cys"
+  },
+  {
+   "uid": 137905,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.246C>T",
+   "p": "p.Arg82="
+  },
+  {
+   "uid": 141044,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.376G>A",
+   "p": "p.Asp126Asn"
+  },
+  {
+   "uid": 161400,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.235C>T",
+   "p": "p.Arg79Cys"
+  },
+  {
+   "uid": 161401,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.538A>G",
+   "p": "p.Ile180Val"
+  },
+  {
+   "uid": 161402,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.154G>A",
+   "p": "p.Glu52Lys"
+  },
+  {
+   "uid": 161403,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.556G>A",
+   "p": "p.Glu186Lys"
+  },
+  {
+   "uid": 167827,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.351G>T",
+   "p": "p.Trp117Cys"
+  },
+  {
+   "uid": 178692,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.256C>T",
+   "p": "p.Pro86Ser"
+  },
+  {
+   "uid": 182959,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.477del",
+   "p": "p.Glu160fs"
+  },
+  {
+   "uid": 182971,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.614_615del",
+   "p": "p.Arg205fs"
+  },
+  {
+   "uid": 182972,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.192del",
+   "p": "p.Ser65fs"
+  },
+  {
+   "uid": 182974,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.525C>G",
+   "p": "p.Tyr175Ter"
+  },
+  {
+   "uid": 182975,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.194C>T",
+   "p": "p.Ser65Leu"
+  },
+  {
+   "uid": 182976,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.227T>C",
+   "p": "p.Phe76Ser"
+  },
+  {
+   "uid": 182977,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.257C>T",
+   "p": "p.Pro86Leu"
+  },
+  {
+   "uid": 182978,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.263G>A",
+   "p": "p.Trp88Ter"
+  },
+  {
+   "uid": 182979,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.266T>C",
+   "p": "p.Leu89Pro"
+  },
+  {
+   "uid": 182980,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.473T>C",
+   "p": "p.Leu158Pro"
+  },
+  {
+   "uid": 182981,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.5C>T",
+   "p": "p.Pro2Leu"
+  },
+  {
+   "uid": 182982,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.154G>T",
+   "p": "p.Glu52Ter"
+  },
+  {
+   "uid": 182983,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.482G>A",
+   "p": "p.Arg161Gln"
+  },
+  {
+   "uid": 182984,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.572A>C",
+   "p": "p.His191Pro"
+  },
+  {
+   "uid": 182986,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.180del",
+   "p": "p.Val62fs"
+  },
+  {
+   "uid": 182988,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.219_220del",
+   "p": "p.Gln73fs"
+  },
+  {
+   "uid": 182990,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.631A>C",
+   "p": "p.Met211Leu"
+  },
+  {
+   "uid": 184592,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.601C>T",
+   "p": "p.Leu201="
+  },
+  {
+   "uid": 184664,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.275A>T",
+   "p": "p.Asp92Val"
+  },
+  {
+   "uid": 186220,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.238A>G",
+   "p": "p.Ser80Gly"
+  },
+  {
+   "uid": 186316,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.209A>G",
+   "p": "p.Glu70Gly"
+  },
+  {
+   "uid": 186635,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.95A>G",
+   "p": "p.Glu32Gly"
+  },
+  {
+   "uid": 188098,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.29A>T",
+   "p": "p.Glu10Val"
+  },
+  {
+   "uid": 188263,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.167C>T",
+   "p": "p.Ala56Val"
+  },
+  {
+   "uid": 193118,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.245G>C",
+   "p": "p.Arg82Pro"
+  },
+  {
+   "uid": 195093,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.449del",
+   "p": "p.Asn150fs"
+  },
+  {
+   "uid": 196284,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.586A>T",
+   "p": "p.Lys196Ter"
+  },
+  {
+   "uid": 215765,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.135G>A",
+   "p": "p.Pro45="
+  },
+  {
+   "uid": 215766,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.213C>T",
+   "p": "p.Pro71="
+  },
+  {
+   "uid": 215767,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.327C>T",
+   "p": "p.Ile109="
+  },
+  {
+   "uid": 215768,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.375C>T",
+   "p": "p.His125="
+  },
+  {
+   "uid": 215769,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.552C>T",
+   "p": "p.Leu184="
+  },
+  {
+   "uid": 216476,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.14C>T",
+   "p": "p.Ala5Val"
+  },
+  {
+   "uid": 216477,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.289C>T",
+   "p": "p.Pro97Ser"
+  },
+  {
+   "uid": 216478,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.416C>T",
+   "p": "p.Ser139Phe"
+  },
+  {
+   "uid": 216479,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.435G>C",
+   "p": "p.Gln145His"
+  },
+  {
+   "uid": 216870,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.123_137del",
+   "p": "p.38SGPEE[1]"
+  },
+  {
+   "uid": 219156,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.588dup",
+   "p": "p.Asp197fs"
+  },
+  {
+   "uid": 219157,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.479A>T",
+   "p": "p.Glu160Val"
+  },
+  {
+   "uid": 219158,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.548C>G",
+   "p": "p.Ser183Trp"
+  },
+  {
+   "uid": 219159,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.509T>C",
+   "p": "p.Val170Ala"
+  },
+  {
+   "uid": 219160,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.293A>C",
+   "p": "p.Tyr98Ser"
+  },
+  {
+   "uid": 219470,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.387G>T",
+   "p": "p.Leu129="
+  },
+  {
+   "uid": 219472,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.555C>T",
+   "p": "p.Tyr185="
+  },
+  {
+   "uid": 219823,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.307C>G",
+   "p": "p.Pro103Ala"
+  },
+  {
+   "uid": 219886,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.549G>T",
+   "p": "p.Ser183="
+  },
+  {
+   "uid": 219929,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.434A>T",
+   "p": "p.Gln145Leu"
+  },
+  {
+   "uid": 219995,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.321C>T",
+   "p": "p.Arg107="
+  },
+  {
+   "uid": 220099,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.47A>C",
+   "p": "p.Glu16Ala"
+  },
+  {
+   "uid": 220414,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.337C>T",
+   "p": "p.Arg113Ter"
+  },
+  {
+   "uid": 220487,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.258del",
+   "p": "p.Val87fs"
+  },
+  {
+   "uid": 220627,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.628C>T",
+   "p": "p.Arg210Trp"
+  },
+  {
+   "uid": 220655,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.544A>G",
+   "p": "p.Arg182Gly"
+  },
+  {
+   "uid": 220750,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.129C>T",
+   "p": "p.Ser43="
+  },
+  {
+   "uid": 220751,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.345C>T",
+   "p": "p.His115="
+  },
+  {
+   "uid": 220918,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.114C>T",
+   "p": "p.Ser38="
+  },
+  {
+   "uid": 220989,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.168C>G",
+   "p": "p.Ala56="
+  },
+  {
+   "uid": 223159,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.163dup",
+   "p": "p.Glu55fs"
+  },
+  {
+   "uid": 223160,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.193T>G",
+   "p": "p.Ser65Ala"
+  },
+  {
+   "uid": 223161,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.194C>A",
+   "p": "p.Ser65Ter"
+  },
+  {
+   "uid": 223162,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.203C>A",
+   "p": "p.Ser68Ter"
+  },
+  {
+   "uid": 223163,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.214T>C",
+   "p": "p.Ser72Pro"
+  },
+  {
+   "uid": 223164,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.217C>T",
+   "p": "p.Gln73Ter"
+  },
+  {
+   "uid": 223165,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.221del",
+   "p": "p.Val74fs"
+  },
+  {
+   "uid": 223167,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.232A>T",
+   "p": "p.Asn78Tyr"
+  },
+  {
+   "uid": 223168,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.233A>C",
+   "p": "p.Asn78Thr"
+  },
+  {
+   "uid": 223169,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.233A>T",
+   "p": "p.Asn78Ile"
+  },
+  {
+   "uid": 223170,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.257C>G",
+   "p": "p.Pro86Arg"
+  },
+  {
+   "uid": 223171,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.264G>T",
+   "p": "p.Trp88Cys"
+  },
+  {
+   "uid": 223172,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.269A>T",
+   "p": "p.Asn90Ile"
+  },
+  {
+   "uid": 223173,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.269del",
+   "p": "p.Asn90fs"
+  },
+  {
+   "uid": 223174,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.277G>C",
+   "p": "p.Gly93Arg"
+  },
+  {
+   "uid": 223175,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.277G>T",
+   "p": "p.Gly93Cys"
+  },
+  {
+   "uid": 223176,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.293A>G",
+   "p": "p.Tyr98Cys"
+  },
+  {
+   "uid": 223177,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.293dup",
+   "p": "p.Tyr98Ter"
+  },
+  {
+   "uid": 223178,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.296dup",
+   "p": "p.Thr100fs"
+  },
+  {
+   "uid": 223179,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.300dup",
+   "p": "p.Leu101fs"
+  },
+  {
+   "uid": 223180,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.309del",
+   "p": "p.Gly104fs"
+  },
+  {
+   "uid": 223181,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.309dup",
+   "p": "p.Gly104fs"
+  },
+  {
+   "uid": 223183,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.311G>T",
+   "p": "p.Gly104Val"
+  },
+  {
+   "uid": 223184,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.320G>A",
+   "p": "p.Arg107His"
+  },
+  {
+   "uid": 223185,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.332G>T",
+   "p": "p.Ser111Ile"
+  },
+  {
+   "uid": 223186,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.332G>A",
+   "p": "p.Ser111Asn"
+  },
+  {
+   "uid": 223187,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.333C>G",
+   "p": "p.Ser111Arg"
+  },
+  {
+   "uid": 223189,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.335A>G",
+   "p": "p.Tyr112Cys"
+  },
+  {
+   "uid": 223193,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.340G>C",
+   "p": "p.Gly114Arg"
+  },
+  {
+   "uid": 223197,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.351del",
+   "p": "p.Trp117fs"
+  },
+  {
+   "uid": 223198,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.352_353insA",
+   "p": "p.Leu118fs"
+  },
+  {
+   "uid": 223199,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.358A>G",
+   "p": "p.Arg120Gly"
+  },
+  {
+   "uid": 223200,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.362A>G",
+   "p": "p.Asp121Gly"
+  },
+  {
+   "uid": 223201,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.374A>C",
+   "p": "p.His125Pro"
+  },
+  {
+   "uid": 223202,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.374_375del",
+   "p": "p.His125fs"
+  },
+  {
+   "uid": 223203,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.381_382delinsTT",
+   "p": "p.Leu128Phe"
+  },
+  {
+   "uid": 223204,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.402del",
+   "p": "p.Glu134fs"
+  },
+  {
+   "uid": 223205,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.189_192del",
+   "p": "p.Arg64_Ser65insTer"
+  },
+  {
+   "uid": 223206,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.414A>G",
+   "p": "p.Pro138="
+  },
+  {
+   "uid": 223207,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.419_420del",
+   "p": "p.Leu140fs"
+  },
+  {
+   "uid": 223208,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.430G>T",
+   "p": "p.Gly144Ter"
+  },
+  {
+   "uid": 223209,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.431del",
+   "p": "p.Gly144fs"
+  },
+  {
+   "uid": 223210,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.435_436del",
+   "p": "p.Gln145fs"
+  },
+  {
+   "uid": 223211,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.444dup",
+   "p": "p.Ala149fs"
+  },
+  {
+   "uid": 223212,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.444del",
+   "p": "p.Phe148fs"
+  },
+  {
+   "uid": 223213,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.445G>A",
+   "p": "p.Ala149Thr"
+  },
+  {
+   "uid": 223214,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.445G>C",
+   "p": "p.Ala149Pro"
+  },
+  {
+   "uid": 223215,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.452T>G",
+   "p": "p.Ile151Ser"
+  },
+  {
+   "uid": 223219,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.463G>A",
+   "p": "p.Val155Met"
+  },
+  {
+   "uid": 223223,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.470C>T",
+   "p": "p.Thr157Ile"
+  },
+  {
+   "uid": 223224,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.471dup",
+   "p": "p.Leu158fs"
+  },
+  {
+   "uid": 223225,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.485G>A",
+   "p": "p.Cys162Tyr"
+  },
+  {
+   "uid": 223226,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.486C>A",
+   "p": "p.Cys162Ter"
+  },
+  {
+   "uid": 223227,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.486C>G",
+   "p": "p.Cys162Trp"
+  },
+  {
+   "uid": 223228,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.490C>T",
+   "p": "p.Gln164Ter"
+  },
+  {
+   "uid": 223229,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.496_506del",
+   "p": "p.Val166fs"
+  },
+  {
+   "uid": 223230,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.540_543del",
+   "p": "p.Val181fs"
+  },
+  {
+   "uid": 223231,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.546del",
+   "p": "p.Arg182fs"
+  },
+  {
+   "uid": 223232,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.554A>G",
+   "p": "p.Tyr185Cys"
+  },
+  {
+   "uid": 223233,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.555C>G",
+   "p": "p.Tyr185Ter"
+  },
+  {
+   "uid": 223234,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.587_590dup",
+   "p": "p.Asp197fs"
+  },
+  {
+   "uid": 223235,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.593T>C",
+   "p": "p.Leu198Pro"
+  },
+  {
+   "uid": 223236,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.641G>T",
+   "p": "p.Ter214Leu"
+  },
+  {
+   "uid": 229860,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.250G>C",
+   "p": "p.Val84Leu"
+  },
+  {
+   "uid": 230334,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.255G>A",
+   "p": "p.Leu85="
+  },
+  {
+   "uid": 231233,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.175C>T",
+   "p": "p.Pro59Ser"
+  },
+  {
+   "uid": 231711,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.451A>C",
+   "p": "p.Ile151Leu"
+  },
+  {
+   "uid": 231869,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.545G>A",
+   "p": "p.Arg182Lys"
+  },
+  {
+   "uid": 238100,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.134C>G",
+   "p": "p.Pro45Arg"
+  },
+  {
+   "uid": 238101,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.150C>A",
+   "p": "p.Ala50="
+  },
+  {
+   "uid": 238102,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.172C>T",
+   "p": "p.Arg58Trp"
+  },
+  {
+   "uid": 238103,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.181C>G",
+   "p": "p.Pro61Ala"
+  },
+  {
+   "uid": 238104,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.258C>G",
+   "p": "p.Pro86="
+  },
+  {
+   "uid": 238105,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.324C>T",
+   "p": "p.Arg108="
+  },
+  {
+   "uid": 238106,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.3G>T",
+   "p": "p.Met1Ile"
+  },
+  {
+   "uid": 238107,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.408T>G",
+   "p": "p.Phe136Leu"
+  },
+  {
+   "uid": 238108,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.427G>C",
+   "p": "p.Asp143His"
+  },
+  {
+   "uid": 238110,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.507A>C",
+   "p": "p.Leu169="
+  },
+  {
+   "uid": 238111,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.541G>A",
+   "p": "p.Val181Ile"
+  },
+  {
+   "uid": 238112,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.585G>C",
+   "p": "p.Gln195His"
+  },
+  {
+   "uid": 238113,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.71G>A",
+   "p": "p.Gly24Asp"
+  },
+  {
+   "uid": 238114,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.7C>T",
+   "p": "p.Arg3Trp"
+  },
+  {
+   "uid": 246132,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.86_87delinsTT",
+   "p": "p.Gly29Val"
+  },
+  {
+   "uid": 246368,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.578A>G",
+   "p": "p.Asn193Ser"
+  },
+  {
+   "uid": 246383,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.347T>G",
+   "p": "p.Leu116Arg"
+  },
+  {
+   "uid": 280053,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.164_171dup",
+   "p": "p.Arg60fs"
+  },
+  {
+   "uid": 288749,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.394C>T",
+   "p": "p.Gln132Ter"
+  },
+  {
+   "uid": 342402,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.10A>T",
+   "p": "p.Arg4Trp"
+  },
+  {
+   "uid": 342403,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.11G>T",
+   "p": "p.Arg4Met"
+  },
+  {
+   "uid": 342404,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.639T>C",
+   "p": "p.Asp213="
+  },
+  {
+   "uid": 371800,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.167C>G",
+   "p": "p.Ala56Gly"
+  },
+  {
+   "uid": 371833,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.439A>G",
+   "p": "p.Ile147Val"
+  },
+  {
+   "uid": 371945,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.83_100dup",
+   "p": "p.Asp28_Ser33dup"
+  },
+  {
+   "uid": 371992,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.449A>G",
+   "p": "p.Asn150Ser"
+  },
+  {
+   "uid": 374982,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.28G>A",
+   "p": "p.Glu10Lys"
+  },
+  {
+   "uid": 376222,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.254T>C",
+   "p": "p.Leu85Pro"
+  },
+  {
+   "uid": 378853,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.336C>T",
+   "p": "p.Tyr112="
+  },
+  {
+   "uid": 379039,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.183C>T",
+   "p": "p.Pro61="
+  },
+  {
+   "uid": 380651,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.301C>T",
+   "p": "p.Leu101="
+  },
+  {
+   "uid": 381572,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.420C>A",
+   "p": "p.Leu140="
+  },
+  {
+   "uid": 381602,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.556G>T",
+   "p": "p.Glu186Ter"
+  },
+  {
+   "uid": 382260,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.225C>T",
+   "p": "p.Ile75="
+  },
+  {
+   "uid": 382828,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.192C>T",
+   "p": "p.Arg64="
+  },
+  {
+   "uid": 383196,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.117C>T",
+   "p": "p.Gly39="
+  },
+  {
+   "uid": 384098,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.612G>A",
+   "p": "p.Glu204="
+  },
+  {
+   "uid": 385167,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.48G>A",
+   "p": "p.Glu16="
+  },
+  {
+   "uid": 386669,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.540C>T",
+   "p": "p.Ile180="
+  },
+  {
+   "uid": 386791,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.315G>A",
+   "p": "p.Thr105="
+  },
+  {
+   "uid": 387734,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.315G>C",
+   "p": "p.Thr105="
+  },
+  {
+   "uid": 389023,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.66G>A",
+   "p": "p.Glu22="
+  },
+  {
+   "uid": 390882,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.522T>C",
+   "p": "p.Asn174="
+  },
+  {
+   "uid": 411955,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.488T>G",
+   "p": "p.Leu163Arg"
+  },
+  {
+   "uid": 411956,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.178C>G",
+   "p": "p.Arg60Gly"
+  },
+  {
+   "uid": 411957,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.62A>C",
+   "p": "p.Glu21Ala"
+  },
+  {
+   "uid": 411958,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.620C>T",
+   "p": "p.Ala207Val"
+  },
+  {
+   "uid": 411959,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.207C>T",
+   "p": "p.Arg69="
+  },
+  {
+   "uid": 411960,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.23G>A",
+   "p": "p.Trp8Ter"
+  },
+  {
+   "uid": 411961,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.226_227del",
+   "p": "p.Phe76fs"
+  },
+  {
+   "uid": 411963,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.223A>C",
+   "p": "p.Ile75Leu"
+  },
+  {
+   "uid": 411964,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.440T>C",
+   "p": "p.Ile147Thr"
+  },
+  {
+   "uid": 411965,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.46G>C",
+   "p": "p.Glu16Gln"
+  },
+  {
+   "uid": 411966,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.311G>C",
+   "p": "p.Gly104Ala"
+  },
+  {
+   "uid": 411967,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.1A>T",
+   "p": "p.Met1Leu"
+  },
+  {
+   "uid": 411968,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.579T>A",
+   "p": "p.Asn193Lys"
+  },
+  {
+   "uid": 411969,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.40G>C",
+   "p": "p.Gly14Arg"
+  },
+  {
+   "uid": 411970,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.373C>T",
+   "p": "p.His125Tyr"
+  },
+  {
+   "uid": 411971,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.26A>C",
+   "p": "p.Asp9Ala"
+  },
+  {
+   "uid": 411972,
+   "gene": "VHL",
+   "transcript": "NM_000551.4",
+   "c": "c.323G>A",
+   "p": "p.Arg108His"
+  },
+  {
+   "uid": 127816,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.572C>G",
+   "p": "p.Pro191Arg"
+  },
+  {
+   "uid": 127817,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.580C>T",
+   "p": "p.Leu194Phe"
+  },
+  {
+   "uid": 127818,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.604C>T",
+   "p": "p.Arg202Cys"
+  },
+  {
+   "uid": 127819,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.659A>G",
+   "p": "p.Tyr220Cys"
+  },
+  {
+   "uid": 127820,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.701A>G",
+   "p": "p.Tyr234Cys"
+  },
+  {
+   "uid": 127821,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.704A>G",
+   "p": "p.Asn235Ser"
+  },
+  {
+   "uid": 127822,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.737T>G",
+   "p": "p.Met246Arg"
+  },
+  {
+   "uid": 127823,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.800G>A",
+   "p": "p.Arg267Gln"
+  },
+  {
+   "uid": 127824,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.847C>T",
+   "p": "p.Arg283Cys"
+  },
+  {
+   "uid": 127825,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.869G>A",
+   "p": "p.Arg290His"
+  },
+  {
+   "uid": 127826,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.877G>T",
+   "p": "p.Gly293Trp"
+  },
+  {
+   "uid": 127827,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.91G>A",
+   "p": "p.Val31Ile"
+  },
+  {
+   "uid": 132708,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.108G>A",
+   "p": "p.Pro36="
+  },
+  {
+   "uid": 132754,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.885T>C",
+   "p": "p.Pro295="
+  },
+  {
+   "uid": 132972,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.666G>T",
+   "p": "p.Pro222="
+  },
+  {
+   "uid": 132973,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.886C>T",
+   "p": "p.His296Tyr"
+  },
+  {
+   "uid": 132974,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.969G>A",
+   "p": "p.Leu323="
+  },
+  {
+   "uid": 133280,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.386C>T",
+   "p": "p.Ala129Val"
+  },
+  {
+   "uid": 133281,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.414del",
+   "p": "p.Lys139fs"
+  },
+  {
+   "uid": 133282,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.448_459del",
+   "p": "p.Thr150_Pro153del"
+  },
+  {
+   "uid": 133283,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.450_459del",
+   "p": "p.Pro151fs"
+  },
+  {
+   "uid": 133284,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.460G>A",
+   "p": "p.Gly154Ser"
+  },
+  {
+   "uid": 133285,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.462C>T",
+   "p": "p.Gly154="
+  },
+  {
+   "uid": 135358,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.605G>A",
+   "p": "p.Arg202His"
+  },
+  {
+   "uid": 135359,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.638G>A",
+   "p": "p.Arg213Gln"
+  },
+  {
+   "uid": 135360,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1096T>G",
+   "p": "p.Ser366Ala"
+  },
+  {
+   "uid": 135948,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.145G>C",
+   "p": "p.Asp49His"
+  },
+  {
+   "uid": 135949,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.508A>G",
+   "p": "p.Thr170Ala"
+  },
+  {
+   "uid": 135950,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.582T>C",
+   "p": "p.Leu194="
+  },
+  {
+   "uid": 140782,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.21T>A",
+   "p": "p.Asp7Glu"
+  },
+  {
+   "uid": 140801,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.422G>A",
+   "p": "p.Cys141Tyr"
+  },
+  {
+   "uid": 140821,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.844C>G",
+   "p": "p.Arg282Gly"
+  },
+  {
+   "uid": 140833,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.250G>A",
+   "p": "p.Ala84Thr"
+  },
+  {
+   "uid": 140921,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.328C>A",
+   "p": "p.Arg110Ser"
+  },
+  {
+   "uid": 140943,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.642T>G",
+   "p": "p.His214Gln"
+  },
+  {
+   "uid": 141011,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.766A>G",
+   "p": "p.Thr256Ala"
+  },
+  {
+   "uid": 141056,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.144C>A",
+   "p": "p.Asp48Glu"
+  },
+  {
+   "uid": 141098,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.358A>G",
+   "p": "p.Lys120Glu"
+  },
+  {
+   "uid": 141101,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.364G>A",
+   "p": "p.Val122Met"
+  },
+  {
+   "uid": 141102,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.935C>G",
+   "p": "p.Thr312Ser"
+  },
+  {
+   "uid": 141114,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.314G>A",
+   "p": "p.Gly105Asp"
+  },
+  {
+   "uid": 141141,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.842A>G",
+   "p": "p.Asp281Gly"
+  },
+  {
+   "uid": 141159,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1003C>T",
+   "p": "p.Arg335Cys"
+  },
+  {
+   "uid": 141193,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.838_848delinsCA",
+   "p": "p.Arg280_Arg283delinsHis"
+  },
+  {
+   "uid": 141224,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.695T>C",
+   "p": "p.Ile232Thr"
+  },
+  {
+   "uid": 141228,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.784G>A",
+   "p": "p.Gly262Ser"
+  },
+  {
+   "uid": 141302,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.337T>G",
+   "p": "p.Phe113Val"
+  },
+  {
+   "uid": 141331,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1082G>A",
+   "p": "p.Gly361Glu"
+  },
+  {
+   "uid": 141359,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.554G>A",
+   "p": "p.Ser185Asn"
+  },
+  {
+   "uid": 141425,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1163A>C",
+   "p": "p.Glu388Ala"
+  },
+  {
+   "uid": 141464,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.125A>G",
+   "p": "p.Asp42Gly"
+  },
+  {
+   "uid": 141483,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.892G>A",
+   "p": "p.Glu298Lys"
+  },
+  {
+   "uid": 141547,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.221C>T",
+   "p": "p.Ala74Val"
+  },
+  {
+   "uid": 141566,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.511G>A",
+   "p": "p.Glu171Lys"
+  },
+  {
+   "uid": 141583,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1120G>A",
+   "p": "p.Gly374Ser"
+  },
+  {
+   "uid": 141597,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.107C>A",
+   "p": "p.Pro36Gln"
+  },
+  {
+   "uid": 141756,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.808_817del",
+   "p": "p.Phe270fs"
+  },
+  {
+   "uid": 141762,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.404G>A",
+   "p": "p.Cys135Tyr"
+  },
+  {
+   "uid": 141764,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.799C>T",
+   "p": "p.Arg267Trp"
+  },
+  {
+   "uid": 141781,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.859G>A",
+   "p": "p.Glu287Lys"
+  },
+  {
+   "uid": 141881,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.745A>T",
+   "p": "p.Arg249Trp"
+  },
+  {
+   "uid": 141893,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1015G>C",
+   "p": "p.Glu339Gln"
+  },
+  {
+   "uid": 141956,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.248C>A",
+   "p": "p.Ala83Glu"
+  },
+  {
+   "uid": 141963,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.473G>A",
+   "p": "p.Arg158His"
+  },
+  {
+   "uid": 141967,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.256G>A",
+   "p": "p.Ala86Thr"
+  },
+  {
+   "uid": 141988,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.391A>T",
+   "p": "p.Asn131Tyr"
+  },
+  {
+   "uid": 142003,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1079G>C",
+   "p": "p.Gly360Ala"
+  },
+  {
+   "uid": 142012,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.644G>C",
+   "p": "p.Ser215Thr"
+  },
+  {
+   "uid": 142050,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.434T>C",
+   "p": "p.Leu145Pro"
+  },
+  {
+   "uid": 142105,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1072G>A",
+   "p": "p.Glu358Lys"
+  },
+  {
+   "uid": 142134,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.770T>G",
+   "p": "p.Leu257Arg"
+  },
+  {
+   "uid": 142144,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.916C>T",
+   "p": "p.Arg306Ter"
+  },
+  {
+   "uid": 142183,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.706T>G",
+   "p": "p.Tyr236Asp"
+  },
+  {
+   "uid": 142206,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.328C>T",
+   "p": "p.Arg110Cys"
+  },
+  {
+   "uid": 142241,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.746G>A",
+   "p": "p.Arg249Lys"
+  },
+  {
+   "uid": 142273,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.998G>A",
+   "p": "p.Arg333His"
+  },
+  {
+   "uid": 142320,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.542G>A",
+   "p": "p.Arg181His"
+  },
+  {
+   "uid": 142324,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.848G>A",
+   "p": "p.Arg283His"
+  },
+  {
+   "uid": 142332,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.907A>G",
+   "p": "p.Ser303Gly"
+  },
+  {
+   "uid": 142337,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.447_459del",
+   "p": "p.Thr150fs"
+  },
+  {
+   "uid": 142386,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.217G>A",
+   "p": "p.Val73Met"
+  },
+  {
+   "uid": 142414,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.320A>C",
+   "p": "p.Tyr107Ser"
+  },
+  {
+   "uid": 142431,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.322G>A",
+   "p": "p.Gly108Ser"
+  },
+  {
+   "uid": 142480,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.328_339del",
+   "p": "p.Arg110_Phe113del"
+  },
+  {
+   "uid": 142536,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1009C>T",
+   "p": "p.Arg337Cys"
+  },
+  {
+   "uid": 142552,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1079G>T",
+   "p": "p.Gly360Val"
+  },
+  {
+   "uid": 142562,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.105G>C",
+   "p": "p.Leu35Phe"
+  },
+  {
+   "uid": 142624,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.541C>T",
+   "p": "p.Arg181Cys"
+  },
+  {
+   "uid": 142643,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.155_157dup",
+   "p": "p.Trp53Ter"
+  },
+  {
+   "uid": 142657,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.427G>A",
+   "p": "p.Val143Met"
+  },
+  {
+   "uid": 142689,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.19G>C",
+   "p": "p.Asp7His"
+  },
+  {
+   "uid": 142691,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.320A>G",
+   "p": "p.Tyr107Cys"
+  },
+  {
+   "uid": 142697,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.137delinsGT",
+   "p": "p.Ser46fs"
+  },
+  {
+   "uid": 142702,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.910A>G",
+   "p": "p.Thr304Ala"
+  },
+  {
+   "uid": 142714,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.711G>A",
+   "p": "p.Met237Ile"
+  },
+  {
+   "uid": 142766,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.455C>T",
+   "p": "p.Pro152Leu"
+  },
+  {
+   "uid": 142828,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1010G>T",
+   "p": "p.Arg337Leu"
+  },
+  {
+   "uid": 142846,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1015G>A",
+   "p": "p.Glu339Lys"
+  },
+  {
+   "uid": 142854,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.214C>G",
+   "p": "p.Pro72Ala"
+  },
+  {
+   "uid": 142863,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.171C>A",
+   "p": "p.Asp57Glu"
+  },
+  {
+   "uid": 142916,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.787A>G",
+   "p": "p.Asn263Asp"
+  },
+  {
+   "uid": 142995,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.119T>C",
+   "p": "p.Met40Thr"
+  },
+  {
+   "uid": 156515,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.267del",
+   "p": "p.Ser90fs"
+  },
+  {
+   "uid": 156516,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.322_324del",
+   "p": "p.Gly108del"
+  },
+  {
+   "uid": 156517,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1165G>T",
+   "p": "p.Gly389Trp"
+  },
+  {
+   "uid": 161397,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.665C>T",
+   "p": "p.Pro222Leu"
+  },
+  {
+   "uid": 161515,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.714T>G",
+   "p": "p.Cys238Trp"
+  },
+  {
+   "uid": 161516,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.797G>A",
+   "p": "p.Gly266Glu"
+  },
+  {
+   "uid": 161517,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.839G>T",
+   "p": "p.Arg280Ile"
+  },
+  {
+   "uid": 161518,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.481G>A",
+   "p": "p.Ala161Thr"
+  },
+  {
+   "uid": 177791,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.722C>G",
+   "p": "p.Ser241Cys"
+  },
+  {
+   "uid": 177825,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.375G>A",
+   "p": "p.Thr125="
+  },
+  {
+   "uid": 177879,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1010G>C",
+   "p": "p.Arg337Pro"
+  },
+  {
+   "uid": 182921,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.106C>T",
+   "p": "p.Pro36Ser"
+  },
+  {
+   "uid": 182922,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.188C>T",
+   "p": "p.Ala63Val"
+  },
+  {
+   "uid": 182923,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.266C>T",
+   "p": "p.Pro89Leu"
+  },
+  {
+   "uid": 182924,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.290T>A",
+   "p": "p.Val97Asp"
+  },
+  {
+   "uid": 182925,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.344A>G",
+   "p": "p.His115Arg"
+  },
+  {
+   "uid": 182926,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.370T>A",
+   "p": "p.Cys124Ser"
+  },
+  {
+   "uid": 182928,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.380C>T",
+   "p": "p.Ser127Phe"
+  },
+  {
+   "uid": 182929,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.475G>C",
+   "p": "p.Ala159Pro"
+  },
+  {
+   "uid": 182930,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.493C>T",
+   "p": "p.Gln165Ter"
+  },
+  {
+   "uid": 182931,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.575A>G",
+   "p": "p.Gln192Arg"
+  },
+  {
+   "uid": 182932,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.605G>T",
+   "p": "p.Arg202Leu"
+  },
+  {
+   "uid": 182933,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.607G>A",
+   "p": "p.Val203Met"
+  },
+  {
+   "uid": 182934,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.709A>G",
+   "p": "p.Met237Val"
+  },
+  {
+   "uid": 182935,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.713G>A",
+   "p": "p.Cys238Tyr"
+  },
+  {
+   "uid": 182936,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.728T>C",
+   "p": "p.Met243Thr"
+  },
+  {
+   "uid": 182937,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.751A>C",
+   "p": "p.Ile251Leu"
+  },
+  {
+   "uid": 182938,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.845G>T",
+   "p": "p.Arg282Leu"
+  },
+  {
+   "uid": 182939,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1150A>G",
+   "p": "p.Met384Val"
+  },
+  {
+   "uid": 182940,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.18A>C",
+   "p": "p.Ser6="
+  },
+  {
+   "uid": 182946,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.245C>T",
+   "p": "p.Pro82Leu"
+  },
+  {
+   "uid": 182952,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1014C>T",
+   "p": "p.Phe338="
+  },
+  {
+   "uid": 182953,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.214_215delinsTG",
+   "p": "p.Pro72Cys"
+  },
+  {
+   "uid": 182954,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.294_297del",
+   "p": "p.Ser99fs"
+  },
+  {
+   "uid": 182955,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.685_692del",
+   "p": "p.Cys229fs"
+  },
+  {
+   "uid": 182956,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1125del",
+   "p": "p.Gln375fs"
+  },
+  {
+   "uid": 182957,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.216dup",
+   "p": "p.Val73fs"
+  },
+  {
+   "uid": 182958,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.455dup",
+   "p": "p.Pro153fs"
+  },
+  {
+   "uid": 182961,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.475_476delinsTT",
+   "p": "p.Ala159Phe"
+  },
+  {
+   "uid": 182962,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.289G>C",
+   "p": "p.Val97Leu"
+  },
+  {
+   "uid": 182963,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.524G>T",
+   "p": "p.Arg175Leu"
+  },
+  {
+   "uid": 182965,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.646G>A",
+   "p": "p.Val216Met"
+  },
+  {
+   "uid": 182966,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.707A>C",
+   "p": "p.Tyr236Ser"
+  },
+  {
+   "uid": 182967,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.752T>G",
+   "p": "p.Ile251Ser"
+  },
+  {
+   "uid": 182968,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.842A>T",
+   "p": "p.Asp281Val"
+  },
+  {
+   "uid": 182969,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1000G>C",
+   "p": "p.Gly334Arg"
+  },
+  {
+   "uid": 182970,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1024C>T",
+   "p": "p.Arg342Ter"
+  },
+  {
+   "uid": 183071,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.649G>A",
+   "p": "p.Val217Met"
+  },
+  {
+   "uid": 183721,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.123T>C",
+   "p": "p.Asp41="
+  },
+  {
+   "uid": 183740,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1149C>T",
+   "p": "p.Leu383="
+  },
+  {
+   "uid": 183748,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.374C>T",
+   "p": "p.Thr125Met"
+  },
+  {
+   "uid": 183752,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.856G>A",
+   "p": "p.Glu286Lys"
+  },
+  {
+   "uid": 183835,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.234A>G",
+   "p": "p.Ala78="
+  },
+  {
+   "uid": 183836,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.6G>A",
+   "p": "p.Glu2="
+  },
+  {
+   "uid": 183849,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.891C>T",
+   "p": "p.His297="
+  },
+  {
+   "uid": 183901,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.147T>C",
+   "p": "p.Asp49="
+  },
+  {
+   "uid": 183903,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.618G>A",
+   "p": "p.Leu206="
+  },
+  {
+   "uid": 183945,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.468C>T",
+   "p": "p.Arg156="
+  },
+  {
+   "uid": 183952,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.30C>T",
+   "p": "p.Val10="
+  },
+  {
+   "uid": 184014,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.509C>T",
+   "p": "p.Thr170Met"
+  },
+  {
+   "uid": 184042,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.474C>T",
+   "p": "p.Arg158="
+  },
+  {
+   "uid": 184048,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.558T>C",
+   "p": "p.Asp186="
+  },
+  {
+   "uid": 184097,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.255T>C",
+   "p": "p.Pro85="
+  },
+  {
+   "uid": 184112,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.63C>T",
+   "p": "p.Asp21="
+  },
+  {
+   "uid": 184179,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.903A>G",
+   "p": "p.Pro301="
+  },
+  {
+   "uid": 184183,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.66A>G",
+   "p": "p.Leu22="
+  },
+  {
+   "uid": 184190,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.837G>A",
+   "p": "p.Gly279="
+  },
+  {
+   "uid": 184317,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.354A>T",
+   "p": "p.Thr118="
+  },
+  {
+   "uid": 184357,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.432G>A",
+   "p": "p.Gln144="
+  },
+  {
+   "uid": 184372,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.216C>T",
+   "p": "p.Pro72="
+  },
+  {
+   "uid": 184403,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.267C>T",
+   "p": "p.Pro89="
+  },
+  {
+   "uid": 184625,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.222C>T",
+   "p": "p.Ala74="
+  },
+  {
+   "uid": 184647,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.661G>A",
+   "p": "p.Glu221Lys"
+  },
+  {
+   "uid": 184650,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.555C>T",
+   "p": "p.Ser185="
+  },
+  {
+   "uid": 184717,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.510G>A",
+   "p": "p.Thr170="
+  },
+  {
+   "uid": 184721,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.246G>A",
+   "p": "p.Pro82="
+  },
+  {
+   "uid": 184745,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.997C>T",
+   "p": "p.Arg333Cys"
+  },
+  {
+   "uid": 184839,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.141G>A",
+   "p": "p.Pro47="
+  },
+  {
+   "uid": 184863,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.413C>T",
+   "p": "p.Ala138Val"
+  },
+  {
+   "uid": 184872,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.60A>G",
+   "p": "p.Ser20="
+  },
+  {
+   "uid": 184873,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.612G>A",
+   "p": "p.Glu204="
+  },
+  {
+   "uid": 184882,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.740A>T",
+   "p": "p.Asn247Ile"
+  },
+  {
+   "uid": 184979,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.578A>G",
+   "p": "p.His193Arg"
+  },
+  {
+   "uid": 185002,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.657C>A",
+   "p": "p.Pro219="
+  },
+  {
+   "uid": 185003,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.204G>A",
+   "p": "p.Glu68="
+  },
+  {
+   "uid": 185120,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.215C>A",
+   "p": "p.Pro72His"
+  },
+  {
+   "uid": 185157,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.100C>A",
+   "p": "p.Pro34Thr"
+  },
+  {
+   "uid": 185212,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.943T>A",
+   "p": "p.Ser315Thr"
+  },
+  {
+   "uid": 185285,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.906del",
+   "p": "p.Ser303fs"
+  },
+  {
+   "uid": 185319,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.827C>G",
+   "p": "p.Ala276Gly"
+  },
+  {
+   "uid": 185404,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.469G>A",
+   "p": "p.Val157Ile"
+  },
+  {
+   "uid": 185409,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.408A>G",
+   "p": "p.Gln136="
+  },
+  {
+   "uid": 185498,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.615T>A",
+   "p": "p.Tyr205Ter"
+  },
+  {
+   "uid": 185581,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.83A>T",
+   "p": "p.Glu28Val"
+  },
+  {
+   "uid": 185612,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.651_666del",
+   "p": "p.Val218fs"
+  },
+  {
+   "uid": 185679,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1137C>T",
+   "p": "p.Arg379="
+  },
+  {
+   "uid": 185722,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.830G>A",
+   "p": "p.Cys277Tyr"
+  },
+  {
+   "uid": 185729,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.427G>T",
+   "p": "p.Val143Leu"
+  },
+  {
+   "uid": 185778,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.741C>T",
+   "p": "p.Asn247="
+  },
+  {
+   "uid": 185814,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.814G>A",
+   "p": "p.Val272Met"
+  },
+  {
+   "uid": 185822,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.578A>T",
+   "p": "p.His193Leu"
+  },
+  {
+   "uid": 185834,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.180A>C",
+   "p": "p.Pro60="
+  },
+  {
+   "uid": 185860,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.511_515dup",
+   "p": "p.Val173fs"
+  },
+  {
+   "uid": 185873,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.530_532dup",
+   "p": "p.Pro177dup"
+  },
+  {
+   "uid": 185901,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.924G>A",
+   "p": "p.Leu308="
+  },
+  {
+   "uid": 185918,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.419C>A",
+   "p": "p.Thr140Asn"
+  },
+  {
+   "uid": 186003,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.249G>A",
+   "p": "p.Ala83="
+  },
+  {
+   "uid": 186048,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.654G>A",
+   "p": "p.Val218="
+  },
+  {
+   "uid": 186063,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.255T>A",
+   "p": "p.Pro85="
+  },
+  {
+   "uid": 186086,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1000G>A",
+   "p": "p.Gly334Arg"
+  },
+  {
+   "uid": 186132,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.305C>T",
+   "p": "p.Thr102Ile"
+  },
+  {
+   "uid": 186179,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.464C>G",
+   "p": "p.Thr155Ser"
+  },
+  {
+   "uid": 186290,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.102C>G",
+   "p": "p.Pro34="
+  },
+  {
+   "uid": 186301,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.408A>C",
+   "p": "p.Gln136His"
+  },
+  {
+   "uid": 186313,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.100C>G",
+   "p": "p.Pro34Ala"
+  },
+  {
+   "uid": 186360,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.696C>T",
+   "p": "p.Ile232="
+  },
+  {
+   "uid": 186363,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.145G>A",
+   "p": "p.Asp49Asn"
+  },
+  {
+   "uid": 186451,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.527G>A",
+   "p": "p.Cys176Tyr"
+  },
+  {
+   "uid": 186490,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.465C>A",
+   "p": "p.Thr155="
+  },
+  {
+   "uid": 186498,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.390C>T",
+   "p": "p.Leu130="
+  },
+  {
+   "uid": 186509,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.852A>C",
+   "p": "p.Thr284="
+  },
+  {
+   "uid": 186587,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.436T>G",
+   "p": "p.Trp146Gly"
+  },
+  {
+   "uid": 186594,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.431A>C",
+   "p": "p.Gln144Pro"
+  },
+  {
+   "uid": 186611,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1135C>T",
+   "p": "p.Arg379Cys"
+  },
+  {
+   "uid": 186653,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.727A>C",
+   "p": "p.Met243Leu"
+  },
+  {
+   "uid": 186737,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.736A>C",
+   "p": "p.Met246Leu"
+  },
+  {
+   "uid": 186762,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1135C>A",
+   "p": "p.Arg379Ser"
+  },
+  {
+   "uid": 186887,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1078G>A",
+   "p": "p.Gly360Arg"
+  },
+  {
+   "uid": 187005,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.782G>C",
+   "p": "p.Ser261Thr"
+  },
+  {
+   "uid": 187052,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.487T>G",
+   "p": "p.Tyr163Asp"
+  },
+  {
+   "uid": 187075,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.42G>C",
+   "p": "p.Leu14="
+  },
+  {
+   "uid": 187153,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.210T>C",
+   "p": "p.Ala70="
+  },
+  {
+   "uid": 187180,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1002G>A",
+   "p": "p.Gly334="
+  },
+  {
+   "uid": 187222,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.768A>G",
+   "p": "p.Thr256="
+  },
+  {
+   "uid": 187254,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.394_409del",
+   "p": "p.Lys132fs"
+  },
+  {
+   "uid": 187302,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.149T>A",
+   "p": "p.Ile50Asn"
+  },
+  {
+   "uid": 187675,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.201A>G",
+   "p": "p.Pro67="
+  },
+  {
+   "uid": 187696,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.433C>T",
+   "p": "p.Leu145="
+  },
+  {
+   "uid": 187706,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.8A>G",
+   "p": "p.Glu3Gly"
+  },
+  {
+   "uid": 187714,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.666G>A",
+   "p": "p.Pro222="
+  },
+  {
+   "uid": 188060,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.589G>A",
+   "p": "p.Val197Met"
+  },
+  {
+   "uid": 188088,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.831_848dup",
+   "p": "p.Pro278_Arg283dup"
+  },
+  {
+   "uid": 188151,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1087A>G",
+   "p": "p.Arg363Gly"
+  },
+  {
+   "uid": 188206,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.703A>T",
+   "p": "p.Asn235Tyr"
+  },
+  {
+   "uid": 188342,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.1102C>T",
+   "p": "p.His368Tyr"
+  },
+  {
+   "uid": 188349,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.776A>G",
+   "p": "p.Asp259Gly"
+  },
+  {
+   "uid": 215760,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.168A>G",
+   "p": "p.Glu56="
+  },
+  {
+   "uid": 215761,
+   "gene": "TP53",
+   "transcript": "NM_000546.6",
+   "c": "c.270C>T",
+   "p": "p.Ser90="
+  },
+  {
+   "uid": 189474,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.202T>C",
+   "p": "p.Tyr68His"
+  },
+  {
+   "uid": 189476,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.206A>G",
+   "p": "p.Asn69Ser"
+  },
+  {
+   "uid": 189482,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.277C>G",
+   "p": "p.His93Asp"
+  },
+  {
+   "uid": 189483,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.289C>T",
+   "p": "p.Gln97Ter"
+  },
+  {
+   "uid": 189484,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.385G>A",
+   "p": "p.Gly129Arg"
+  },
+  {
+   "uid": 189485,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.358G>A",
+   "p": "p.Ala120Thr"
+  },
+  {
+   "uid": 189486,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.367C>T",
+   "p": "p.His123Tyr"
+  },
+  {
+   "uid": 189488,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.437T>A",
+   "p": "p.Leu146Ter"
+  },
+  {
+   "uid": 189489,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.448G>T",
+   "p": "p.Glu150Ter"
+  },
+  {
+   "uid": 189500,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.517C>T",
+   "p": "p.Arg173Cys"
+  },
+  {
+   "uid": 189501,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.560A>G",
+   "p": "p.Asp187Gly"
+  },
+  {
+   "uid": 189502,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.604A>T",
+   "p": "p.Thr202Ser"
+  },
+  {
+   "uid": 189505,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.672A>G",
+   "p": "p.Ile224Met"
+  },
+  {
+   "uid": 189510,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1018A>C",
+   "p": "p.Asn340His"
+  },
+  {
+   "uid": 192224,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.389del",
+   "p": "p.Arg130fs"
+  },
+  {
+   "uid": 195060,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.88C>A",
+   "p": "p.Pro30Thr"
+  },
+  {
+   "uid": 195061,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.122G>T",
+   "p": "p.Arg41Ile"
+  },
+  {
+   "uid": 196250,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.208C>T",
+   "p": "p.Leu70Phe"
+  },
+  {
+   "uid": 197662,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.424C>T",
+   "p": "p.Arg142Trp"
+  },
+  {
+   "uid": 208723,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.71A>G",
+   "p": "p.Asp24Gly"
+  },
+  {
+   "uid": 209187,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1048dup",
+   "p": "p.Thr350fs"
+  },
+  {
+   "uid": 211972,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.900del",
+   "p": "p.Ile300fs"
+  },
+  {
+   "uid": 215730,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.174T>C",
+   "p": "p.Asp58="
+  },
+  {
+   "uid": 215732,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.48T>C",
+   "p": "p.Tyr16="
+  },
+  {
+   "uid": 215733,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.723T>C",
+   "p": "p.Phe241="
+  },
+  {
+   "uid": 215734,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.738G>A",
+   "p": "p.Pro246="
+  },
+  {
+   "uid": 216068,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.437T>G",
+   "p": "p.Leu146Ter"
+  },
+  {
+   "uid": 216420,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1198A>G",
+   "p": "p.Ile400Val"
+  },
+  {
+   "uid": 216421,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.350A>G",
+   "p": "p.Asn117Ser"
+  },
+  {
+   "uid": 216422,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.422A>C",
+   "p": "p.His141Pro"
+  },
+  {
+   "uid": 216423,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.935A>G",
+   "p": "p.Asp312Gly"
+  },
+  {
+   "uid": 216987,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.860C>G",
+   "p": "p.Ser287Ter"
+  },
+  {
+   "uid": 219453,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.876T>C",
+   "p": "p.Asn292="
+  },
+  {
+   "uid": 220007,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.521A>G",
+   "p": "p.Tyr174Cys"
+  },
+  {
+   "uid": 220115,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.987_996dup",
+   "p": "p.Ala333Ter"
+  },
+  {
+   "uid": 220275,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.845del",
+   "p": "p.Gly282fs"
+  },
+  {
+   "uid": 220596,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1075G>T",
+   "p": "p.Ala359Ser"
+  },
+  {
+   "uid": 220902,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1089T>C",
+   "p": "p.Thr363="
+  },
+  {
+   "uid": 223142,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.740T>C",
+   "p": "p.Leu247Ser"
+  },
+  {
+   "uid": 224542,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.344A>G",
+   "p": "p.Asp115Gly"
+  },
+  {
+   "uid": 224543,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.408T>G",
+   "p": "p.Cys136Trp"
+  },
+  {
+   "uid": 224544,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.486C>G",
+   "p": "p.Asp162Glu"
+  },
+  {
+   "uid": 224545,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.118G>T",
+   "p": "p.Glu40Ter"
+  },
+  {
+   "uid": 224546,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.424del",
+   "p": "p.Arg142fs"
+  },
+  {
+   "uid": 224547,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.767_768del",
+   "p": "p.Glu256fs"
+  },
+  {
+   "uid": 229749,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.97_98del",
+   "p": "p.Ile33fs"
+  },
+  {
+   "uid": 229912,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.112C>A",
+   "p": "p.Pro38Thr"
+  },
+  {
+   "uid": 229962,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.458_461del",
+   "p": "p.Asp153fs"
+  },
+  {
+   "uid": 230040,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.915T>G",
+   "p": "p.Ser305Arg"
+  },
+  {
+   "uid": 230554,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.949G>A",
+   "p": "p.Val317Ile"
+  },
+  {
+   "uid": 230633,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.908T>G",
+   "p": "p.Ile303Ser"
+  },
+  {
+   "uid": 230707,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.780A>G",
+   "p": "p.Lys260="
+  },
+  {
+   "uid": 230727,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.819T>C",
+   "p": "p.Phe273="
+  },
+  {
+   "uid": 230819,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.913A>G",
+   "p": "p.Ser305Gly"
+  },
+  {
+   "uid": 230910,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.949del",
+   "p": "p.Val317fs"
+  },
+  {
+   "uid": 231154,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.847C>T",
+   "p": "p.Pro283Ser"
+  },
+  {
+   "uid": 231341,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1203A>G",
+   "p": "p.Thr401="
+  },
+  {
+   "uid": 231562,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.549G>T",
+   "p": "p.Lys183Asn"
+  },
+  {
+   "uid": 231649,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.17_18del",
+   "p": "p.Lys6fs"
+  },
+  {
+   "uid": 231771,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.144C>G",
+   "p": "p.Asn48Lys"
+  },
+  {
+   "uid": 231805,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.534T>C",
+   "p": "p.Tyr178="
+  },
+  {
+   "uid": 231899,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.673T>C",
+   "p": "p.Tyr225His"
+  },
+  {
+   "uid": 231916,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.103A>G",
+   "p": "p.Met35Val"
+  },
+  {
+   "uid": 231929,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.831A>G",
+   "p": "p.Thr277="
+  },
+  {
+   "uid": 231949,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.585dup",
+   "p": "p.His196fs"
+  },
+  {
+   "uid": 231962,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1074G>C",
+   "p": "p.Glu358Asp"
+  },
+  {
+   "uid": 232432,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.816C>T",
+   "p": "p.His272="
+  },
+  {
+   "uid": 232528,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.750T>A",
+   "p": "p.Cys250Ter"
+  },
+  {
+   "uid": 232679,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1011T>C",
+   "p": "p.Phe337="
+  },
+  {
+   "uid": 232768,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.183T>C",
+   "p": "p.His61="
+  },
+  {
+   "uid": 232796,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.951A>C",
+   "p": "p.Val317="
+  },
+  {
+   "uid": 232812,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.294A>G",
+   "p": "p.Leu98="
+  },
+  {
+   "uid": 233304,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.442G>A",
+   "p": "p.Ala148Thr"
+  },
+  {
+   "uid": 233415,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.18A>G",
+   "p": "p.Lys6="
+  },
+  {
+   "uid": 233456,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.64G>C",
+   "p": "p.Asp22His"
+  },
+  {
+   "uid": 233492,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.858C>G",
+   "p": "p.Thr286="
+  },
+  {
+   "uid": 233590,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.509G>T",
+   "p": "p.Ser170Ile"
+  },
+  {
+   "uid": 233631,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.371G>A",
+   "p": "p.Cys124Tyr"
+  },
+  {
+   "uid": 233644,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.870A>G",
+   "p": "p.Val290="
+  },
+  {
+   "uid": 233741,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.447A>G",
+   "p": "p.Gln149="
+  },
+  {
+   "uid": 233777,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.203A>G",
+   "p": "p.Tyr68Cys"
+  },
+  {
+   "uid": 233963,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.901G>A",
+   "p": "p.Asp301Asn"
+  },
+  {
+   "uid": 234144,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1212A>T",
+   "p": "p.Ter404Cys"
+  },
+  {
+   "uid": 234182,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.906C>G",
+   "p": "p.Ser302Arg"
+  },
+  {
+   "uid": 234409,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.47dup",
+   "p": "p.Tyr16Ter"
+  },
+  {
+   "uid": 234410,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.76A>C",
+   "p": "p.Thr26Pro"
+  },
+  {
+   "uid": 234434,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1190A>G",
+   "p": "p.His397Arg"
+  },
+  {
+   "uid": 234509,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.945T>A",
+   "p": "p.Tyr315Ter"
+  },
+  {
+   "uid": 234514,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.352_353del",
+   "p": "p.His118fs"
+  },
+  {
+   "uid": 234710,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.242T>G",
+   "p": "p.Phe81Cys"
+  },
+  {
+   "uid": 234815,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.869T>C",
+   "p": "p.Val290Ala"
+  },
+  {
+   "uid": 234830,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.67T>G",
+   "p": "p.Leu23Val"
+  },
+  {
+   "uid": 234861,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1069C>A",
+   "p": "p.Pro357Thr"
+  },
+  {
+   "uid": 235334,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.531T>G",
+   "p": "p.Tyr177Ter"
+  },
+  {
+   "uid": 237638,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1058A>G",
+   "p": "p.Glu353Gly"
+  },
+  {
+   "uid": 237639,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1093G>A",
+   "p": "p.Val365Ile"
+  },
+  {
+   "uid": 237640,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.132dup",
+   "p": "p.Val45fs"
+  },
+  {
+   "uid": 237642,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.177A>G",
+   "p": "p.Ser59="
+  },
+  {
+   "uid": 237643,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.195C>G",
+   "p": "p.Tyr65Ter"
+  },
+  {
+   "uid": 237645,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.409_411delinsTTT",
+   "p": "p.Ala137Phe"
+  },
+  {
+   "uid": 237646,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.425G>A",
+   "p": "p.Arg142Gln"
+  },
+  {
+   "uid": 237647,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.426G>C",
+   "p": "p.Arg142="
+  },
+  {
+   "uid": 237648,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.53del",
+   "p": "p.Glu18fs"
+  },
+  {
+   "uid": 237649,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.545dup",
+   "p": "p.Leu182fs"
+  },
+  {
+   "uid": 237650,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.757_758dup",
+   "p": "p.Lys254fs"
+  },
+  {
+   "uid": 237651,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.596T>A",
+   "p": "p.Met199Lys"
+  },
+  {
+   "uid": 237652,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.664G>T",
+   "p": "p.Val222Leu"
+  },
+  {
+   "uid": 237653,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.759C>A",
+   "p": "p.Ile253="
+  },
+  {
+   "uid": 237654,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.877G>T",
+   "p": "p.Gly293Ter"
+  },
+  {
+   "uid": 237655,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.909T>A",
+   "p": "p.Ile303="
+  },
+  {
+   "uid": 237656,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.934G>A",
+   "p": "p.Asp312Asn"
+  },
+  {
+   "uid": 237657,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.939G>A",
+   "p": "p.Lys313="
+  },
+  {
+   "uid": 255814,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.651C>T",
+   "p": "p.Val217="
+  },
+  {
+   "uid": 255815,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.960A>G",
+   "p": "p.Leu320="
+  },
+  {
+   "uid": 279878,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.633C>G",
+   "p": "p.Cys211Trp"
+  },
+  {
+   "uid": 280032,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.870del",
+   "p": "p.Glu291fs"
+  },
+  {
+   "uid": 280630,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.286C>G",
+   "p": "p.Pro96Ala"
+  },
+  {
+   "uid": 280648,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.392_393dup",
+   "p": "p.Gly132fs"
+  },
+  {
+   "uid": 280724,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.80A>C",
+   "p": "p.Tyr27Ser"
+  },
+  {
+   "uid": 291182,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.827del",
+   "p": "p.Asn276fs"
+  },
+  {
+   "uid": 372481,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.320A>T",
+   "p": "p.Asp107Val"
+  },
+  {
+   "uid": 373288,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.95T>C",
+   "p": "p.Ile32Thr"
+  },
+  {
+   "uid": 373446,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.140G>A",
+   "p": "p.Arg47Lys"
+  },
+  {
+   "uid": 373667,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.734A>C",
+   "p": "p.Gln245Pro"
+  },
+  {
+   "uid": 373668,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.984_998dup",
+   "p": "p.Lys330_Asn334dup"
+  },
+  {
+   "uid": 375958,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.388C>G",
+   "p": "p.Arg130Gly"
+  },
+  {
+   "uid": 375959,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.477G>T",
+   "p": "p.Arg159Ser"
+  },
+  {
+   "uid": 376032,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.518G>A",
+   "p": "p.Arg173His"
+  },
+  {
+   "uid": 376509,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.389G>T",
+   "p": "p.Arg130Leu"
+  },
+  {
+   "uid": 376510,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.698G>A",
+   "p": "p.Arg233Gln"
+  },
+  {
+   "uid": 378439,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.444A>C",
+   "p": "p.Ala148="
+  },
+  {
+   "uid": 378918,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.417A>G",
+   "p": "p.Leu139="
+  },
+  {
+   "uid": 379087,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.222A>G",
+   "p": "p.Arg74="
+  },
+  {
+   "uid": 379501,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.430A>T",
+   "p": "p.Lys144Ter"
+  },
+  {
+   "uid": 380538,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.234C>A",
+   "p": "p.Thr78="
+  },
+  {
+   "uid": 380564,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.216T>C",
+   "p": "p.Ala72="
+  },
+  {
+   "uid": 380746,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.675T>C",
+   "p": "p.Tyr225="
+  },
+  {
+   "uid": 385323,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.664G>A",
+   "p": "p.Val222Met"
+  },
+  {
+   "uid": 385643,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.528T>C",
+   "p": "p.Tyr176="
+  },
+  {
+   "uid": 391121,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1161A>G",
+   "p": "p.Pro387="
+  },
+  {
+   "uid": 391233,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1170A>G",
+   "p": "p.Glu390="
+  },
+  {
+   "uid": 392623,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1125T>C",
+   "p": "p.Asp375="
+  },
+  {
+   "uid": 393298,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.44_45dup",
+   "p": "p.Tyr16fs"
+  },
+  {
+   "uid": 404139,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.13A>G",
+   "p": "p.Ile5Val"
+  },
+  {
+   "uid": 404141,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.308C>G",
+   "p": "p.Pro103Arg"
+  },
+  {
+   "uid": 404142,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.517C>A",
+   "p": "p.Arg173Ser"
+  },
+  {
+   "uid": 404143,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.293T>G",
+   "p": "p.Leu98Arg"
+  },
+  {
+   "uid": 404145,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.200dup",
+   "p": "p.Tyr68fs"
+  },
+  {
+   "uid": 404146,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.613A>G",
+   "p": "p.Met205Val"
+  },
+  {
+   "uid": 404147,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.44G>A",
+   "p": "p.Arg15Lys"
+  },
+  {
+   "uid": 404148,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.629del",
+   "p": "p.Thr210fs"
+  },
+  {
+   "uid": 404149,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.723dup",
+   "p": "p.Glu242Ter"
+  },
+  {
+   "uid": 404150,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.346_358dup",
+   "p": "p.Ala120fs"
+  },
+  {
+   "uid": 404151,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.176C>G",
+   "p": "p.Ser59Ter"
+  },
+  {
+   "uid": 404152,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.650T>G",
+   "p": "p.Val217Gly"
+  },
+  {
+   "uid": 404153,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.175T>C",
+   "p": "p.Ser59Pro"
+  },
+  {
+   "uid": 404154,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.683A>G",
+   "p": "p.Asn228Ser"
+  },
+  {
+   "uid": 404155,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.235G>T",
+   "p": "p.Ala79Ser"
+  },
+  {
+   "uid": 404156,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.750_751del",
+   "p": "p.Cys250fs"
+  },
+  {
+   "uid": 404157,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.945T>G",
+   "p": "p.Tyr315Ter"
+  },
+  {
+   "uid": 404159,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.457G>A",
+   "p": "p.Asp153Asn"
+  },
+  {
+   "uid": 404160,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.80A>G",
+   "p": "p.Tyr27Cys"
+  },
+  {
+   "uid": 404161,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1027G>A",
+   "p": "p.Val343Met"
+  },
+  {
+   "uid": 404162,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.675T>G",
+   "p": "p.Tyr225Ter"
+  },
+  {
+   "uid": 404163,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.887G>A",
+   "p": "p.Cys296Tyr"
+  },
+  {
+   "uid": 404164,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.445C>T",
+   "p": "p.Gln149Ter"
+  },
+  {
+   "uid": 404167,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.779A>G",
+   "p": "p.Lys260Arg"
+  },
+  {
+   "uid": 404168,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.464A>G",
+   "p": "p.Tyr155Cys"
+  },
+  {
+   "uid": 404169,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1079G>C",
+   "p": "p.Ser360Thr"
+  },
+  {
+   "uid": 404170,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.478A>C",
+   "p": "p.Thr160Pro"
+  },
+  {
+   "uid": 404171,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.421C>G",
+   "p": "p.His141Asp"
+  },
+  {
+   "uid": 404172,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.889G>C",
+   "p": "p.Asp297His"
+  },
+  {
+   "uid": 404173,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.571G>T",
+   "p": "p.Val191Leu"
+  },
+  {
+   "uid": 412798,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.981A>G",
+   "p": "p.Lys327="
+  },
+  {
+   "uid": 412800,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.747G>A",
+   "p": "p.Val249="
+  },
+  {
+   "uid": 412803,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.879A>C",
+   "p": "p.Gly293="
+  },
+  {
+   "uid": 412804,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.783G>A",
+   "p": "p.Gln261="
+  },
+  {
+   "uid": 412806,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1050A>G",
+   "p": "p.Thr350="
+  },
+  {
+   "uid": 412807,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.759C>T",
+   "p": "p.Ile253="
+  },
+  {
+   "uid": 412809,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1116T>C",
+   "p": "p.Asn372="
+  },
+  {
+   "uid": 418435,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.244A>G",
+   "p": "p.Asn82Asp"
+  },
+  {
+   "uid": 418436,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.323T>C",
+   "p": "p.Leu108Pro"
+  },
+  {
+   "uid": 418438,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.422A>G",
+   "p": "p.His141Arg"
+  },
+  {
+   "uid": 418439,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.889G>T",
+   "p": "p.Asp297Tyr"
+  },
+  {
+   "uid": 418614,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.136T>G",
+   "p": "p.Tyr46Asp"
+  },
+  {
+   "uid": 418653,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.947T>C",
+   "p": "p.Leu316Pro"
+  },
+  {
+   "uid": 419505,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.875del",
+   "p": "p.Asn292fs"
+  },
+  {
+   "uid": 419745,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1025A>C",
+   "p": "p.Lys342Thr"
+  },
+  {
+   "uid": 419769,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.45A>T",
+   "p": "p.Arg15Ser"
+  },
+  {
+   "uid": 419989,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.884dup",
+   "p": "p.Cys296fs"
+  },
+  {
+   "uid": 420367,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.922C>T",
+   "p": "p.Arg308Cys"
+  },
+  {
+   "uid": 420491,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.42G>A",
+   "p": "p.Arg14="
+  },
+  {
+   "uid": 420743,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.730C>T",
+   "p": "p.Pro244Ser"
+  },
+  {
+   "uid": 421055,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1133_1136del",
+   "p": "p.Arg378fs"
+  },
+  {
+   "uid": 421730,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.693C>T",
+   "p": "p.Pro231="
+  },
+  {
+   "uid": 421922,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.454C>T",
+   "p": "p.Leu152="
+  },
+  {
+   "uid": 421963,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.492G>A",
+   "p": "p.Lys164="
+  },
+  {
+   "uid": 422740,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.59G>A",
+   "p": "p.Gly20Glu"
+  },
+  {
+   "uid": 422815,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1206A>C",
+   "p": "p.Lys402Asn"
+  },
+  {
+   "uid": 422884,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.899_903del",
+   "p": "p.Ile300fs"
+  },
+  {
+   "uid": 422899,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.46T>G",
+   "p": "p.Tyr16Asp"
+  },
+  {
+   "uid": 422965,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.944_945del",
+   "p": "p.Tyr315fs"
+  },
+  {
+   "uid": 423079,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.571G>C",
+   "p": "p.Val191Leu"
+  },
+  {
+   "uid": 423112,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1029_1039del",
+   "p": "p.Lys344fs"
+  },
+  {
+   "uid": 424262,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.113C>G",
+   "p": "p.Pro38Arg"
+  },
+  {
+   "uid": 426411,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.947del",
+   "p": "p.Leu316fs"
+  },
+  {
+   "uid": 427001,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.271_272delinsTTT",
+   "p": "p.Glu91fs"
+  },
+  {
+   "uid": 427579,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.316G>T",
+   "p": "p.Glu106Ter"
+  },
+  {
+   "uid": 427580,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1004G>A",
+   "p": "p.Arg335Gln"
+  },
+  {
+   "uid": 427582,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.131G>A",
+   "p": "p.Gly44Asp"
+  },
+  {
+   "uid": 427586,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.35A>C",
+   "p": "p.Asn12Thr"
+  },
+  {
+   "uid": 427587,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.369C>G",
+   "p": "p.His123Gln"
+  },
+  {
+   "uid": 427588,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.401T>C",
+   "p": "p.Met134Thr"
+  },
+  {
+   "uid": 427589,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.40A>G",
+   "p": "p.Arg14Gly"
+  },
+  {
+   "uid": 427590,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.416T>G",
+   "p": "p.Leu139Ter"
+  },
+  {
+   "uid": 427591,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.667A>T",
+   "p": "p.Lys223Ter"
+  },
+  {
+   "uid": 427592,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.420dup",
+   "p": "p.His141fs"
+  },
+  {
+   "uid": 427593,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.470A>G",
+   "p": "p.Glu157Gly"
+  },
+  {
+   "uid": 427594,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.520dup",
+   "p": "p.Tyr174fs"
+  },
+  {
+   "uid": 427595,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.605C>T",
+   "p": "p.Thr202Ile"
+  },
+  {
+   "uid": 427596,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.607_608del",
+   "p": "p.Ile203fs"
+  },
+  {
+   "uid": 427597,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.617_621del",
+   "p": "p.Phe206fs"
+  },
+  {
+   "uid": 427600,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.821G>T",
+   "p": "p.Trp274Leu"
+  },
+  {
+   "uid": 428193,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.355G>T",
+   "p": "p.Val119Phe"
+  },
+  {
+   "uid": 428194,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.45A>C",
+   "p": "p.Arg15Ser"
+  },
+  {
+   "uid": 428195,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.46T>C",
+   "p": "p.Tyr16His"
+  },
+  {
+   "uid": 428196,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.275A>C",
+   "p": "p.Asp92Ala"
+  },
+  {
+   "uid": 428198,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.865A>T",
+   "p": "p.Lys289Ter"
+  },
+  {
+   "uid": 428199,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.39_41del",
+   "p": "p.Arg15del"
+  },
+  {
+   "uid": 428200,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.315del",
+   "p": "p.Cys105fs"
+  },
+  {
+   "uid": 428201,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.437del",
+   "p": "p.Phe145_Leu146insTer"
+  },
+  {
+   "uid": 428202,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.942_949dup",
+   "p": "p.Val317delinsAspIleTer"
+  },
+  {
+   "uid": 428203,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.328C>T",
+   "p": "p.Gln110Ter"
+  },
+  {
+   "uid": 428204,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.283C>A",
+   "p": "p.Pro95Thr"
+  },
+  {
+   "uid": 428205,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.502del",
+   "p": "p.Ile168fs"
+  },
+  {
+   "uid": 428206,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.512dup",
+   "p": "p.Arg172fs"
+  },
+  {
+   "uid": 428207,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.761A>C",
+   "p": "p.Lys254Thr"
+  },
+  {
+   "uid": 428208,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.813del",
+   "p": "p.His272fs"
+  },
+  {
+   "uid": 428209,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.512_515del",
+   "p": "p.Gln171fs"
+  },
+  {
+   "uid": 428210,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.740T>G",
+   "p": "p.Leu247Ter"
+  },
+  {
+   "uid": 428211,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.110_111del",
+   "p": "p.Phe37fs"
+  },
+  {
+   "uid": 428212,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.261del",
+   "p": "p.Gln87fs"
+  },
+  {
+   "uid": 428213,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.993_994dup",
+   "p": "p.Lys332fs"
+  },
+  {
+   "uid": 428214,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.1033C>G",
+   "p": "p.Leu345Val"
+  },
+  {
+   "uid": 428215,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.975_988delinsCGCTT",
+   "p": "p.Asp326_Lys330delinsAlaTer"
+  },
+  {
+   "uid": 428216,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.441_442delinsA",
+   "p": "p.Ala148fs"
+  },
+  {
+   "uid": 428217,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.528_534delinsA",
+   "p": "p.Tyr176_Tyr178delinsTer"
+  },
+  {
+   "uid": 428218,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.886del",
+   "p": "p.Cys296fs"
+  },
+  {
+   "uid": 428219,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.914del",
+   "p": "p.Ser305fs"
+  },
+  {
+   "uid": 428220,
+   "gene": "PTEN",
+   "transcript": "NM_000314.8",
+   "c": "c.384G>C",
+   "p": "p.Lys128Asn"
+  },
+  {
+   "uid": 11809,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.433C>T",
+   "p": "p.Arg145Cys"
+  },
+  {
+   "uid": 11810,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.500T>C",
+   "p": "p.Phe167Ser"
+  },
+  {
+   "uid": 11811,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.509C>T",
+   "p": "p.Thr170Met"
+  },
+  {
+   "uid": 11814,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.352C>T",
+   "p": "p.Arg118Trp"
+  },
+  {
+   "uid": 11815,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.844C>T",
+   "p": "p.Arg282Ter"
+  },
+  {
+   "uid": 11817,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1216G>T",
+   "p": "p.Glu406Ter"
+  },
+  {
+   "uid": 11818,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.203_204del",
+   "p": "p.Pro68fs"
+  },
+  {
+   "uid": 11819,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.916C>T",
+   "p": "p.Arg306Ter"
+  },
+  {
+   "uid": 11823,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.455C>T",
+   "p": "p.Ala152Val"
+  },
+  {
+   "uid": 11824,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.952C>T",
+   "p": "p.Arg318Cys"
+  },
+  {
+   "uid": 11825,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.446A>G",
+   "p": "p.Glu149Gly"
+  },
+  {
+   "uid": 11828,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.538C>T",
+   "p": "p.Arg180Ter"
+  },
+  {
+   "uid": 11829,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.799C>T",
+   "p": "p.Arg267Ter"
+  },
+  {
+   "uid": 11831,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1318G>A",
+   "p": "p.Gly440Ser"
+  },
+  {
+   "uid": 11833,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.459C>G",
+   "p": "p.Tyr153Ter"
+  },
+  {
+   "uid": 11834,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1399G>T",
+   "p": "p.Glu467Ter"
+  },
+  {
+   "uid": 11835,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.334C>G",
+   "p": "p.Leu112Val"
+  },
+  {
+   "uid": 11841,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.710C>T",
+   "p": "p.Pro237Leu"
+  },
+  {
+   "uid": 11842,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1192_1224del",
+   "p": "p.Leu398_Ser408del"
+  },
+  {
+   "uid": 11843,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1000C>T",
+   "p": "p.Pro334Ser"
+  },
+  {
+   "uid": 11844,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.490C>G",
+   "p": "p.Pro164Ala"
+  },
+  {
+   "uid": 11845,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.5C>T",
+   "p": "p.Ala2Val"
+  },
+  {
+   "uid": 11846,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.746del",
+   "p": "p.Gly249fs"
+  },
+  {
+   "uid": 36489,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1108G>A",
+   "p": "p.Ala370Thr"
+  },
+  {
+   "uid": 36490,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1187C>T",
+   "p": "p.Pro396Leu"
+  },
+  {
+   "uid": 36491,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1363G>A",
+   "p": "p.Ala455Thr"
+  },
+  {
+   "uid": 36492,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1477G>A",
+   "p": "p.Val493Met"
+  },
+  {
+   "uid": 36493,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.610A>T",
+   "p": "p.Lys204Ter"
+  },
+  {
+   "uid": 36494,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.934G>A",
+   "p": "p.Val312Ile"
+  },
+  {
+   "uid": 36495,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.945C>G",
+   "p": "p.Ile315Met"
+  },
+  {
+   "uid": 36496,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.968C>T",
+   "p": "p.Thr323Met"
+  },
+  {
+   "uid": 95183,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1107C>T",
+   "p": "p.Ser369="
+  },
+  {
+   "uid": 95184,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1162C>T",
+   "p": "p.Pro388Ser"
+  },
+  {
+   "uid": 95185,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1173C>T",
+   "p": "p.Pro391="
+  },
+  {
+   "uid": 95186,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1197C>T",
+   "p": "p.Pro399="
+  },
+  {
+   "uid": 95187,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1225G>A",
+   "p": "p.Glu409Lys"
+  },
+  {
+   "uid": 95188,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1233C>T",
+   "p": "p.Pro411="
+  },
+  {
+   "uid": 95189,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1269C>T",
+   "p": "p.Ser423="
+  },
+  {
+   "uid": 95190,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1351G>T",
+   "p": "p.Ala451Ser"
+  },
+  {
+   "uid": 95191,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1366G>A",
+   "p": "p.Ala456Thr"
+  },
+  {
+   "uid": 95192,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1371G>A",
+   "p": "p.Thr457="
+  },
+  {
+   "uid": 95193,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1409G>A",
+   "p": "p.Arg470His"
+  },
+  {
+   "uid": 95194,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.411C>A",
+   "p": "p.Ile137="
+  },
+  {
+   "uid": 95195,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.462C>T",
+   "p": "p.Phe154="
+  },
+  {
+   "uid": 95196,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.504C>G",
+   "p": "p.Asp168Glu"
+  },
+  {
+   "uid": 95197,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.618C>T",
+   "p": "p.Ser206="
+  },
+  {
+   "uid": 95198,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.644C>T",
+   "p": "p.Thr215Met"
+  },
+  {
+   "uid": 95199,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.647C>G",
+   "p": "p.Ser216Ter"
+  },
+  {
+   "uid": 95200,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.766C>T",
+   "p": "p.Gln256Ter"
+  },
+  {
+   "uid": 95201,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.813C>T",
+   "p": "p.Ala271="
+  },
+  {
+   "uid": 95202,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.842del",
+   "p": "p.Gly281fs"
+  },
+  {
+   "uid": 95203,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.851C>T",
+   "p": "p.Pro284Leu"
+  },
+  {
+   "uid": 95204,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.897C>T",
+   "p": "p.Ala299="
+  },
+  {
+   "uid": 95205,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.933C>T",
+   "p": "p.Thr311="
+  },
+  {
+   "uid": 95206,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.126G>A",
+   "p": "p.Lys42="
+  },
+  {
+   "uid": 95207,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.972C>T",
+   "p": "p.Val324="
+  },
+  {
+   "uid": 133342,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1483G>T",
+   "p": "p.Glu495Ter"
+  },
+  {
+   "uid": 138186,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.246C>T",
+   "p": "p.Ser82="
+  },
+  {
+   "uid": 138187,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.626C>T",
+   "p": "p.Thr209Met"
+  },
+  {
+   "uid": 138188,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.638C>T",
+   "p": "p.Ala213Val"
+  },
+  {
+   "uid": 138189,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.639G>A",
+   "p": "p.Ala213="
+  },
+  {
+   "uid": 138190,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.876C>T",
+   "p": "p.Ala292="
+  },
+  {
+   "uid": 138191,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.879C>T",
+   "p": "p.Ala293="
+  },
+  {
+   "uid": 138192,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.906G>A",
+   "p": "p.Glu302="
+  },
+  {
+   "uid": 138193,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1071A>G",
+   "p": "p.Lys357="
+  },
+  {
+   "uid": 138194,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1176G>A",
+   "p": "p.Val392="
+  },
+  {
+   "uid": 138195,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1241C>T",
+   "p": "p.Pro414Leu"
+  },
+  {
+   "uid": 138196,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1440G>A",
+   "p": "p.Arg480="
+  },
+  {
+   "uid": 138197,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1473G>A",
+   "p": "p.Thr491="
+  },
+  {
+   "uid": 143302,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1040_1073del",
+   "p": "p.Gly347fs"
+  },
+  {
+   "uid": 143303,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1045_1063del",
+   "p": "p.Lys349fs"
+  },
+  {
+   "uid": 143304,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.136_139del",
+   "p": "p.Asp46fs"
+  },
+  {
+   "uid": 143305,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1050C>T",
+   "p": "p.Thr350="
+  },
+  {
+   "uid": 143306,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1051T>C",
+   "p": "p.Cys351Arg"
+  },
+  {
+   "uid": 143307,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1065del",
+   "p": "p.Arg356fs"
+  },
+  {
+   "uid": 143308,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1065dup",
+   "p": "p.Arg356fs"
+  },
+  {
+   "uid": 143309,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1066C>T",
+   "p": "p.Arg356Trp"
+  },
+  {
+   "uid": 143310,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1074C>G",
+   "p": "p.Ser358Arg"
+  },
+  {
+   "uid": 143311,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1079_1092del",
+   "p": "p.Glu360fs"
+  },
+  {
+   "uid": 143312,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1084_1131del",
+   "p": "p.Ser362_Glu377del"
+  },
+  {
+   "uid": 143313,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1087_1090del",
+   "p": "p.Pro363fs"
+  },
+  {
+   "uid": 143314,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1087_1101del",
+   "p": "p.Pro363_Ser367del"
+  },
+  {
+   "uid": 143315,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1095_1108del",
+   "p": "p.Arg366fs"
+  },
+  {
+   "uid": 143316,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1097G>A",
+   "p": "p.Arg366His"
+  },
+  {
+   "uid": 143317,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1097G>T",
+   "p": "p.Arg366Leu"
+  },
+  {
+   "uid": 143318,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1097_1110del",
+   "p": "p.Arg366fs"
+  },
+  {
+   "uid": 143319,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1101C>T",
+   "p": "p.Ser367="
+  },
+  {
+   "uid": 143321,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1111T>C",
+   "p": "p.Ser371Pro"
+  },
+  {
+   "uid": 143322,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1115C>A",
+   "p": "p.Ser372Ter"
+  },
+  {
+   "uid": 143323,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.143_144del",
+   "p": "p.Lys48fs"
+  },
+  {
+   "uid": 143324,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.143_149del",
+   "p": "p.Lys48fs"
+  },
+  {
+   "uid": 143325,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1117C>G",
+   "p": "p.Pro373Ala"
+  },
+  {
+   "uid": 143326,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1123A>T",
+   "p": "p.Lys375Ter"
+  },
+  {
+   "uid": 143327,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1124_1151del",
+   "p": "p.Lys375fs"
+  },
+  {
+   "uid": 143328,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.144_147del",
+   "p": "p.Glu49fs"
+  },
+  {
+   "uid": 143329,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1135_1154del",
+   "p": "p.His379fs"
+  },
+  {
+   "uid": 143330,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1140C>T",
+   "p": "p.His380="
+  },
+  {
+   "uid": 143332,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1141_1152del",
+   "p": "p.His381_His384del"
+  },
+  {
+   "uid": 143333,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1141del",
+   "p": "p.His381fs"
+  },
+  {
+   "uid": 143334,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1154C>G",
+   "p": "p.Ser385Ter"
+  },
+  {
+   "uid": 143335,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1161_1173del",
+   "p": "p.Pro388fs"
+  },
+  {
+   "uid": 143336,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1163C>G",
+   "p": "p.Pro388Arg"
+  },
+  {
+   "uid": 143337,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1163_1173del",
+   "p": "p.Pro388fs"
+  },
+  {
+   "uid": 143338,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1165_1169delinsGAGT",
+   "p": "p.Lys389fs"
+  },
+  {
+   "uid": 143339,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1168_1195del",
+   "p": "p.Ala390fs"
+  },
+  {
+   "uid": 143340,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1169C>G",
+   "p": "p.Ala390Gly"
+  },
+  {
+   "uid": 143341,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1169C>T",
+   "p": "p.Ala390Val"
+  },
+  {
+   "uid": 143342,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1171_1178del",
+   "p": "p.Pro391fs"
+  },
+  {
+   "uid": 143343,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1172_1178del",
+   "p": "p.Pro391fs"
+  },
+  {
+   "uid": 143344,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1174G>A",
+   "p": "p.Val392Met"
+  },
+  {
+   "uid": 143345,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1174_1199del",
+   "p": "p.Val392fs"
+  },
+  {
+   "uid": 143346,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1177C>G",
+   "p": "p.Pro393Ala"
+  },
+  {
+   "uid": 143347,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1181_1230del",
+   "p": "p.Leu394fs"
+  },
+  {
+   "uid": 143348,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1184_1213del",
+   "p": "p.Leu395_Glu404del"
+  },
+  {
+   "uid": 143349,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1186_1228del",
+   "p": "p.Pro396fs"
+  },
+  {
+   "uid": 143350,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1187_1219del",
+   "p": "p.Pro396_Ser407delinsArg"
+  },
+  {
+   "uid": 143351,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1187_1224del",
+   "p": "p.Pro396fs"
+  },
+  {
+   "uid": 143352,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1187_1227del",
+   "p": "p.Pro396fs"
+  },
+  {
+   "uid": 143353,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1188_1191del",
+   "p": "p.Pro397fs"
+  },
+  {
+   "uid": 143354,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1188_1231del",
+   "p": "p.Pro397fs"
+  },
+  {
+   "uid": 143355,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1189_1226del",
+   "p": "p.Pro397fs"
+  },
+  {
+   "uid": 143356,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1190_1221del",
+   "p": "p.Pro397fs"
+  },
+  {
+   "uid": 143357,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1190_1233del",
+   "p": "p.Pro397fs"
+  },
+  {
+   "uid": 143358,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1191_1208del",
+   "p": "p.Leu398_Pro403del"
+  },
+  {
+   "uid": 143359,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1191_1219del",
+   "p": "p.Pro399fs"
+  },
+  {
+   "uid": 143360,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1191_1236del",
+   "p": "p.Leu398fs"
+  },
+  {
+   "uid": 143361,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1192_1193dup",
+   "p": "p.Pro399fs"
+  },
+  {
+   "uid": 143362,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1192_1208del",
+   "p": "p.Pro397_Leu398insTer"
+  },
+  {
+   "uid": 143363,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1192_1233del",
+   "p": "p.Leu398_Pro411del"
+  },
+  {
+   "uid": 143364,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1192_1236del",
+   "p": "p.Leu398_Thr412del"
+  },
+  {
+   "uid": 143365,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1193_1223del",
+   "p": "p.Leu398fs"
+  },
+  {
+   "uid": 143366,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1193_1224del",
+   "p": "p.Leu398fs"
+  },
+  {
+   "uid": 143367,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1193_1227del",
+   "p": "p.Leu398fs"
+  },
+  {
+   "uid": 143368,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1193_1228del",
+   "p": "p.Leu398_Asp410delinsHis"
+  },
+  {
+   "uid": 143369,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1193_1233del",
+   "p": "p.Leu398fs"
+  },
+  {
+   "uid": 143371,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1193_1235del",
+   "p": "p.Leu398fs"
+  },
+  {
+   "uid": 143372,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1193_1236del",
+   "p": "p.Leu398fs"
+  },
+  {
+   "uid": 143373,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1194_1203del",
+   "p": "p.Pro399fs"
+  },
+  {
+   "uid": 143374,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1194_1222del",
+   "p": "p.Pro399fs"
+  },
+  {
+   "uid": 143375,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1194_1222delinsCCA",
+   "p": "p.Pro399fs"
+  },
+  {
+   "uid": 143376,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1194_1234del",
+   "p": "p.Pro399fs"
+  },
+  {
+   "uid": 143377,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1194_1236del",
+   "p": "p.Pro399fs"
+  },
+  {
+   "uid": 143379,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1195_1196delinsT",
+   "p": "p.Pro399fs"
+  },
+  {
+   "uid": 143380,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1195_1210del",
+   "p": "p.Pro399fs"
+  },
+  {
+   "uid": 143382,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1195_1237del",
+   "p": "p.Pro399fs"
+  },
+  {
+   "uid": 143383,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1196C>T",
+   "p": "p.Pro399Leu"
+  },
+  {
+   "uid": 143384,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1196_1202del",
+   "p": "p.Pro399fs"
+  },
+  {
+   "uid": 143385,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1196_1216del",
+   "p": "p.Pro399_Glu406delinsGln"
+  },
+  {
+   "uid": 143386,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1196_1221del",
+   "p": "p.Pro399fs"
+  },
+  {
+   "uid": 143387,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1196_1224del",
+   "p": "p.Pro399fs"
+  },
+  {
+   "uid": 143388,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1196_1236del",
+   "p": "p.Pro399fs"
+  },
+  {
+   "uid": 143389,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1197_1199del",
+   "p": "p.Pro403del"
+  },
+  {
+   "uid": 143390,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1197_1202del",
+   "p": "p.Pro402_Pro403del"
+  },
+  {
+   "uid": 143391,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1197_1205del",
+   "p": "p.Pro401_Pro403del"
+  },
+  {
+   "uid": 143392,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1197_1241delinsA",
+   "p": "p.Pro400_Pro401insTer"
+  },
+  {
+   "uid": 143393,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1198C>T",
+   "p": "p.Pro400Ser"
+  },
+  {
+   "uid": 143394,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1198_1199del",
+   "p": "p.Pro400fs"
+  },
+  {
+   "uid": 143395,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1198_1199delinsTA",
+   "p": "p.Pro400Ter"
+  },
+  {
+   "uid": 143396,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1198_1215del",
+   "p": "p.Pro400_Pro405del"
+  },
+  {
+   "uid": 143397,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1198_1227del",
+   "p": "p.Pro400_Glu409del"
+  },
+  {
+   "uid": 143398,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1199C>T",
+   "p": "p.Pro400Leu"
+  },
+  {
+   "uid": 143399,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1199_1209del",
+   "p": "p.Pro400fs"
+  },
+  {
+   "uid": 143400,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1199_1215del",
+   "p": "p.Pro400fs"
+  },
+  {
+   "uid": 143401,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1199_1224del",
+   "p": "p.Pro400fs"
+  },
+  {
+   "uid": 143402,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1199_1233del",
+   "p": "p.Pro400fs"
+  },
+  {
+   "uid": 143403,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1199_1237del",
+   "p": "p.Pro400_Ser413delinsArg"
+  },
+  {
+   "uid": 143404,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1200_1208del",
+   "p": "p.Pro401_Pro403del"
+  },
+  {
+   "uid": 143405,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1200_1242del",
+   "p": "p.Pro401fs"
+  },
+  {
+   "uid": 143406,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1200_1243del",
+   "p": "p.Pro400_Pro401insTer"
+  },
+  {
+   "uid": 143407,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1200_1244del",
+   "p": "p.Pro401_Pro415del"
+  },
+  {
+   "uid": 143408,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1200del",
+   "p": "p.Pro401fs"
+  },
+  {
+   "uid": 143409,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1201_1226del",
+   "p": "p.Pro401fs"
+  },
+  {
+   "uid": 143410,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1203_1212del",
+   "p": "p.Pro403fs"
+  },
+  {
+   "uid": 143411,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1203_1236del",
+   "p": "p.Pro402fs"
+  },
+  {
+   "uid": 143414,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1206_1243del",
+   "p": "p.Pro402_Pro403insTer"
+  },
+  {
+   "uid": 143415,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1209_1224del",
+   "p": "p.Glu404fs"
+  },
+  {
+   "uid": 143416,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1212G>A",
+   "p": "p.Glu404="
+  },
+  {
+   "uid": 143417,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1212_1229del",
+   "p": "p.Glu404_Glu409del"
+  },
+  {
+   "uid": 143418,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1214C>T",
+   "p": "p.Pro405Leu"
+  },
+  {
+   "uid": 143419,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1214_1221del",
+   "p": "p.Pro405fs"
+  },
+  {
+   "uid": 143420,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.153dup",
+   "p": "p.Glu52fs"
+  },
+  {
+   "uid": 143421,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1216G>A",
+   "p": "p.Glu406Lys"
+  },
+  {
+   "uid": 143422,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1216_1241del",
+   "p": "p.Glu406fs"
+  },
+  {
+   "uid": 143423,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1217_1227del",
+   "p": "p.Glu406fs"
+  },
+  {
+   "uid": 143424,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1221_1227del",
+   "p": "p.Ser407fs"
+  },
+  {
+   "uid": 143425,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1225G>T",
+   "p": "p.Glu409Ter"
+  },
+  {
+   "uid": 143426,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1225_1232del",
+   "p": "p.Glu409fs"
+  },
+  {
+   "uid": 143428,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1226dup",
+   "p": "p.Asp410fs"
+  },
+  {
+   "uid": 143429,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1230_1231insT",
+   "p": "p.Pro411fs"
+  },
+  {
+   "uid": 143430,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1232C>T",
+   "p": "p.Pro411Leu"
+  },
+  {
+   "uid": 143432,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1233dup",
+   "p": "p.Thr412fs"
+  },
+  {
+   "uid": 143433,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.155_156del",
+   "p": "p.Glu52fs"
+  },
+  {
+   "uid": 143434,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1236dup",
+   "p": "p.Ser413fs"
+  },
+  {
+   "uid": 143435,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1238G>A",
+   "p": "p.Ser413Asn"
+  },
+  {
+   "uid": 143436,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1238dup",
+   "p": "p.Ser413fs"
+  },
+  {
+   "uid": 143437,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1242C>T",
+   "p": "p.Pro414="
+  },
+  {
+   "uid": 143438,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1250C>T",
+   "p": "p.Pro417Leu"
+  },
+  {
+   "uid": 143439,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1250_1266del",
+   "p": "p.Pro417fs"
+  },
+  {
+   "uid": 143440,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1251C>T",
+   "p": "p.Pro417="
+  },
+  {
+   "uid": 143441,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1252C>T",
+   "p": "p.Gln418Ter"
+  },
+  {
+   "uid": 143442,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1259_1301del",
+   "p": "p.Leu420fs"
+  },
+  {
+   "uid": 143443,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1265G>A",
+   "p": "p.Ser422Asn"
+  },
+  {
+   "uid": 143444,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1268_1272del",
+   "p": "p.Ser423fs"
+  },
+  {
+   "uid": 143445,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1268_1276del",
+   "p": "p.Ser423_Cys425del"
+  },
+  {
+   "uid": 143446,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1270G>A",
+   "p": "p.Val424Ile"
+  },
+  {
+   "uid": 143447,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1271_1296del",
+   "p": "p.Val424fs"
+  },
+  {
+   "uid": 143448,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1274_1302del",
+   "p": "p.Cys425fs"
+  },
+  {
+   "uid": 143449,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1275C>T",
+   "p": "p.Cys425="
+  },
+  {
+   "uid": 143450,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1286A>T",
+   "p": "p.Lys429Met"
+  },
+  {
+   "uid": 143451,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1301_1325delinsAGCGGCCG",
+   "p": "p.Gly434fs"
+  },
+  {
+   "uid": 143452,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1302C>T",
+   "p": "p.Gly434="
+  },
+  {
+   "uid": 143453,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.162dup",
+   "p": "p.His55fs"
+  },
+  {
+   "uid": 143454,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1314C>T",
+   "p": "p.Ser438="
+  },
+  {
+   "uid": 143455,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1320C>T",
+   "p": "p.Gly440="
+  },
+  {
+   "uid": 143456,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1324C>T",
+   "p": "p.Pro442Ser"
+  },
+  {
+   "uid": 143457,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1344_1345del",
+   "p": "p.Gln449fs"
+  },
+  {
+   "uid": 143458,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1351G>A",
+   "p": "p.Ala451Thr"
+  },
+  {
+   "uid": 143459,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1356dup",
+   "p": "p.Ala453fs"
+  },
+  {
+   "uid": 143460,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1362_1370del",
+   "p": "p.454TAA[1]"
+  },
+  {
+   "uid": 143461,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1360A>G",
+   "p": "p.Thr454Ala"
+  },
+  {
+   "uid": 143462,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1360_1400del",
+   "p": "p.Thr454fs"
+  },
+  {
+   "uid": 143463,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1362C>T",
+   "p": "p.Thr454="
+  },
+  {
+   "uid": 143464,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1366_1378del",
+   "p": "p.Ala456fs"
+  },
+  {
+   "uid": 143465,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1375G>A",
+   "p": "p.Ala459Thr"
+  },
+  {
+   "uid": 143466,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1376C>T",
+   "p": "p.Ala459Val"
+  },
+  {
+   "uid": 143467,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1393C>T",
+   "p": "p.Arg465Ter"
+  },
+  {
+   "uid": 143468,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1394G>A",
+   "p": "p.Arg465Gln"
+  },
+  {
+   "uid": 143469,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1400_1401insC",
+   "p": "p.Glu467fs"
+  },
+  {
+   "uid": 143470,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1408C>T",
+   "p": "p.Arg470Cys"
+  },
+  {
+   "uid": 143472,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1439_1444del",
+   "p": "p.Arg480_Pro481del"
+  },
+  {
+   "uid": 143473,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.176dup",
+   "p": "p.Pro60fs"
+  },
+  {
+   "uid": 143474,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1451_1452del",
+   "p": "p.Glu484fs"
+  },
+  {
+   "uid": 143475,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1466G>C",
+   "p": "p.Ser489Thr"
+  },
+  {
+   "uid": 143476,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1472C>T",
+   "p": "p.Thr491Met"
+  },
+  {
+   "uid": 143477,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1474C>T",
+   "p": "p.Pro492Ser"
+  },
+  {
+   "uid": 143478,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1482C>T",
+   "p": "p.Thr494="
+  },
+  {
+   "uid": 143480,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1485G>C",
+   "p": "p.Glu495Asp"
+  },
+  {
+   "uid": 143482,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1486_1489del",
+   "p": "p.Arg496fs"
+  },
+  {
+   "uid": 143483,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1487G>C",
+   "p": "p.Arg496Thr"
+  },
+  {
+   "uid": 143484,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1488_1489dup",
+   "p": "p.Val497fs"
+  },
+  {
+   "uid": 143485,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1490_1493del",
+   "p": "p.Val497fs"
+  },
+  {
+   "uid": 143486,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1491_1492dup",
+   "p": "p.Ser498fs"
+  },
+  {
+   "uid": 143487,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1495T>C",
+   "p": "p.Ter499Arg"
+  },
+  {
+   "uid": 143488,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1496G>T",
+   "p": "p.Ter499Leu"
+  },
+  {
+   "uid": 143489,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1497A>C",
+   "p": "p.Ter499Cys"
+  },
+  {
+   "uid": 143490,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.1497A>G",
+   "p": "p.Ter499Trp"
+  },
+  {
+   "uid": 143491,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.182C>A",
+   "p": "p.Ser61Ter"
+  },
+  {
+   "uid": 143492,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.182C>G",
+   "p": "p.Ser61Ter"
+  },
+  {
+   "uid": 143493,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.189C>G",
+   "p": "p.His63Gln"
+  },
+  {
+   "uid": 143494,
+   "gene": "MECP2",
+   "transcript": "NM_001110792.2",
+   "c": "c.191A>G",
+   "p": "p.His64Arg"
+  }
+ ]
+}

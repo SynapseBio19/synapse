@@ -16,3 +16,6 @@ tests/fixtures/ncbi_gc/gc.prt -text
 
 # NCBI BLAST database metadata stored verbatim (tests/test_blast_download_plan.py).
 tests/fixtures/ncbi_blastdb/*.json -text
+
+# ClinVar benchmark set: keep byte-exact (checksum in SOURCE.md).
+tests/fixtures/clinvar/*.json -text
