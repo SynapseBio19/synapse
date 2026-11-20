@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from bisect import bisect_left, bisect_right
+
 from analyses._orf.codes import (
     codon_table_for,
     DEFAULT_MIN_ORF_LENGTH,
@@ -426,13 +428,27 @@ def analyze_orf_relationships(orfs):
     overlap_pairs = []
     nested_pairs = []
 
+    # Interval sweep instead of testing all n(n-1)/2 pairs: ORF b can only
+    # overlap a if b starts in [a_start - widest span, a_end]. The candidates
+    # are then visited in the original index order (j > i ascending), so the
+    # records and their order are exactly those of the all-pairs loop; a
+    # genome with 32,000 ORFs took 8 minutes before (docs/BENCHMARKS.md).
+    intervals = [_orf_genomic_interval(orf) for orf in orfs]
+    by_start = sorted(range(len(orfs)), key=lambda index: intervals[index][0])
+    sorted_starts = [intervals[index][0] for index in by_start]
+    widest = max((end - start for start, end in intervals), default=0)
+
     for i in range(len(orfs)):
         a = orfs[i]
-        a_start, a_end = _orf_genomic_interval(a)
+        a_start, a_end = intervals[i]
 
-        for j in range(i + 1, len(orfs)):
+        low = bisect_left(sorted_starts, a_start - widest)
+        high = bisect_right(sorted_starts, a_end)
+        candidates = sorted(index for index in by_start[low:high] if index > i)
+
+        for j in candidates:
             b = orfs[j]
-            b_start, b_end = _orf_genomic_interval(b)
+            b_start, b_end = intervals[j]
 
             overlap_start = max(a_start, b_start)
             overlap_end = min(a_end, b_end)

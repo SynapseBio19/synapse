@@ -332,58 +332,39 @@ def perform_digest(sequence, enzyme_names, topology="linear", include_possible=F
         fragment["cut_events"] = []
 
     # Each fragment is bounded by cut coordinates. Store the enzyme events
-    # touching either boundary for UI/reporting purposes.
-    if topology == "linear":
-        for fragment in fragments:
-            boundaries = {
-                fragment["start_0based"],
-                fragment["end_0based_exclusive"],
+    # touching either boundary for UI/reporting purposes. The cuts are
+    # indexed by coordinate, so each fragment looks up its two boundaries
+    # instead of scanning every cut (fragments x cuts: the full enzyme panel
+    # on a 4.6 Mb genome did not finish in 15 minutes; docs/BENCHMARKS.md).
+    # Events keep the order of the cut list, as before. (In a circular
+    # digest a cut at coordinate 0 that bounds a fragment across the origin
+    # is a boundary of that fragment like any other.)
+    cuts_at = {}
+    for index, cut in enumerate(cuts):
+        cuts_at.setdefault(cut["position_0based"], []).append(index)
+
+    for fragment in fragments:
+        boundaries = {
+            fragment["start_0based"],
+            fragment["end_0based_exclusive"],
+        }
+        event_indices = sorted(
+            index
+            for boundary in boundaries
+            for index in cuts_at.get(boundary, ())
+        )
+        events = [cuts[index] for index in event_indices]
+        fragment["cut_events"] = [
+            {
+                "enzyme": cut["enzyme"],
+                "position_1based": cut["position_1based"],
             }
-            events = [
-                cut
-                for cut in cuts
-                if cut["position_0based"] in boundaries
-            ]
-            fragment["cut_events"] = [
-                {
-                    "enzyme": cut["enzyme"],
-                    "position_1based": cut["position_1based"],
-                }
-                for cut in events
-            ]
-            fragment["enzymes"] = sorted({
-                cut["enzyme"]
-                for cut in events
-            })
-    else:
-        for fragment in fragments:
-            boundaries = {
-                fragment["start_0based"],
-                fragment["end_0based_exclusive"],
-            }
-            events = [
-                cut
-                for cut in cuts
-                if (
-                    cut["position_0based"] in boundaries
-                    or (
-                        fragment["wraps_origin"]
-                        and cut["position_0based"] == 0
-                        and 0 in boundaries
-                    )
-                )
-            ]
-            fragment["cut_events"] = [
-                {
-                    "enzyme": cut["enzyme"],
-                    "position_1based": cut["position_1based"],
-                }
-                for cut in events
-            ]
-            fragment["enzymes"] = sorted({
-                cut["enzyme"]
-                for cut in events
-            })
+            for cut in events
+        ]
+        fragment["enzymes"] = sorted({
+            cut["enzyme"]
+            for cut in events
+        })
 
     return {
         "sequence_length": len(sequence),

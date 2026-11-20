@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from functools import lru_cache
 
 from analyses._rna.bases import (
     count_rna_bases,
@@ -11,6 +12,7 @@ from analyses._rna.bases import (
     RNA_NUCLEOTIDE_RESIDUE_MASSES,
     RNA_STANDARD_BASES,
 )
+from core.windows import base_prefix_counts, nonstandard_prefix_count
 
 
 def calculate_rna_base_percentages(
@@ -235,6 +237,12 @@ def calculate_rna_gc_profile(
     ):
         return profile
 
+    # Prefix counts instead of slicing every window: the same integer
+    # counts and formula, in O(length) (core/windows.py).
+    counts = base_prefix_counts(rna, ("G", "C"))
+    g_prefix, c_prefix = counts["G"], counts["C"]
+    invalid_prefix = nonstandard_prefix_count(rna, RNA_STANDARD_BASES)
+
     for start in range(
         0,
         len(rna) - window_size + 1,
@@ -245,19 +253,12 @@ def calculate_rna_gc_profile(
             start + window_size
         )
 
-        window = rna[
-            start:end
-        ]
-
-        if all(
-            base in RNA_STANDARD_BASES
-            for base in window
-        ):
+        if invalid_prefix[end] == invalid_prefix[start]:
 
             gc = (
                 (
-                    window.count("G")
-                    + window.count("C")
+                    (g_prefix[end] - g_prefix[start])
+                    + (c_prefix[end] - c_prefix[start])
                 )
                 / window_size
             ) * 100
@@ -508,8 +509,16 @@ def calculate_rna_complexity(rna):
 
     counts = count_rna_bases(rna)
 
+    # Counts in the order A, U, C, G (count_rna_bases), as before.
+    return _rna_complexity_from_counts(tuple(counts.values()))
+
+
+@lru_cache(maxsize=65536)
+def _rna_complexity_from_counts(counts):
+    """Normalized Shannon entropy from the A, U, C, G counts (cached; same arithmetic)."""
+
     total = sum(
-        counts.values()
+        counts
     )
 
     if total == 0:
@@ -517,7 +526,7 @@ def calculate_rna_complexity(rna):
 
     entropy = 0.0
 
-    for count in counts.values():
+    for count in counts:
 
         if count == 0:
             continue
@@ -553,6 +562,11 @@ def calculate_rna_complexity_profile(
     ):
         return profile
 
+    # Per-window counts of A, U, C, G by prefix subtraction: the counts
+    # count_rna_bases takes from the slice, in the same order.
+    counts = base_prefix_counts(rna, ("A", "U", "C", "G"))
+    prefixes = [counts[base] for base in ("A", "U", "C", "G")]
+
     for start in range(
         0,
         len(rna) - window_size + 1,
@@ -562,10 +576,6 @@ def calculate_rna_complexity_profile(
         end = (
             start + window_size
         )
-
-        window = rna[
-            start:end
-        ]
 
         profile.append({
             "start":
@@ -581,9 +591,10 @@ def calculate_rna_complexity_profile(
                 end,
 
             "complexity":
-                calculate_rna_complexity(
-                    window
-                )
+                _rna_complexity_from_counts(tuple(
+                    prefix[end] - prefix[start]
+                    for prefix in prefixes
+                ))
         })
 
     return profile

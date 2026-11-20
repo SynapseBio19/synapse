@@ -24,6 +24,7 @@ from analyses._sequence.profiles import (
     analyze_complexity_profile,
     analyze_gc_profile,
     calculate_sequence_complexity,
+    DEFAULT_MAX_PROFILE_POINTS,
     describe_profile_availability,
     find_homopolymers,
 )
@@ -440,17 +441,21 @@ def analyze_sequence(
     # PROFILES
     # --------------------------------------------------------
 
+    # Statistics always use every window; above DEFAULT_MAX_PROFILE_POINTS
+    # windows the stored profiles are thinned (see "profile_resolution").
     gc_profile = analyze_gc_profile(
         dna,
         profile_window,
-        profile_step
+        profile_step,
+        max_points=DEFAULT_MAX_PROFILE_POINTS
     )
 
     complexity_profile = (
         analyze_complexity_profile(
             dna,
             profile_window,
-            profile_step
+            profile_step,
+            max_points=DEFAULT_MAX_PROFILE_POINTS
         )
     )
 
@@ -534,7 +539,7 @@ def analyze_sequence(
     # FINAL RESULT
     # --------------------------------------------------------
 
-    return {
+    result = {
 
         # ====================================================
         # SEQUENCE INFORMATION
@@ -713,3 +718,21 @@ def analyze_sequence(
         "summary":
             summary
     }
+
+    # Only for long sequences, so shorter results keep their exact form.
+    if "profile_stride" in gc_profile:
+        stride = gc_profile["profile_stride"]
+        result["profile_resolution"] = {
+            "windows_total": gc_profile["profile_windows_total"],
+            "stored_every_nth_window": stride,
+            "stored_step": profile_step * stride,
+            "max_points": DEFAULT_MAX_PROFILE_POINTS,
+            "note": (
+                f"The sequence has {gc_profile['profile_windows_total']} profile windows; "
+                f"the stored GC and complexity profiles keep every {stride}th window "
+                f"(step {profile_step * stride}). The profile statistics (minimum, maximum, "
+                "average and their positions) are computed over every window."
+            ),
+        }
+
+    return result

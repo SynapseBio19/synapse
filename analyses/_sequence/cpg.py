@@ -2,7 +2,12 @@
 
 from __future__ import annotations
 
-from analyses._sequence.bases import DNA_IUPAC_BASES, DNA_STANDARD_BASES, _get_valid_iupac_bases
+from analyses._sequence.bases import DNA_IUPAC_BASES, _get_valid_iupac_bases
+from core.windows import (
+    base_prefix_counts,
+    dinucleotide_prefix_count,
+    nonstandard_prefix_count,
+)
 
 
 # ============================================================
@@ -169,6 +174,14 @@ def find_cpg_islands(
     if len(dna) < window_size:
         return []
 
+    # Prefix counts give each window's counts by subtraction; the same
+    # integers as slicing and str.count, in O(length) instead of
+    # O(length x window) (core/windows.py).
+    counts = base_prefix_counts(dna, ("C", "G"))
+    c_prefix, g_prefix = counts["C"], counts["G"]
+    cg_prefix = dinucleotide_prefix_count(dna, "CG")
+    invalid_prefix = nonstandard_prefix_count(dna)
+
     for start in range(
         len(dna) - window_size + 1
     ):
@@ -177,19 +190,12 @@ def find_cpg_islands(
             start + window_size
         )
 
-        window = dna[
-            start:end
-        ]
-
-        if any(
-            base not in DNA_STANDARD_BASES
-            for base in window
-        ):
+        if invalid_prefix[end] != invalid_prefix[start]:
             continue
 
-        c_count = window.count("C")
-        g_count = window.count("G")
-        cpg_count = window.count("CG")
+        c_count = c_prefix[end] - c_prefix[start]
+        g_count = g_prefix[end] - g_prefix[start]
+        cpg_count = cg_prefix[end - 1] - cg_prefix[start]
 
         gc_content = (
             (c_count + g_count)

@@ -33,6 +33,7 @@ from analyses._rna.coding import (
     find_rna_start_stop_landscape,
 )
 from analyses._rna.structure import summarize_rna_structure
+from core.windows import DEFAULT_MAX_PROFILE_POINTS, window_count
 
 
 # ============================================================
@@ -255,6 +256,16 @@ def analyze_rna(
         )
     )
 
+    # Above DEFAULT_MAX_PROFILE_POINTS windows the stored profiles keep every
+    # k-th window, as in the DNA overview (a 4.6 Mb sequence otherwise needs
+    # gigabytes for them; docs/BENCHMARKS.md). Shorter input is unchanged.
+    windows_total = window_count(len(rna), profile_window, profile_step)
+    profile_stride = (
+        -(-windows_total // DEFAULT_MAX_PROFILE_POINTS)
+        if windows_total > DEFAULT_MAX_PROFILE_POINTS
+        else 1
+    )
+
     # Build the core analysis first so the heuristic feature
     # score can use all previously calculated sequence features.
     analysis = {
@@ -297,7 +308,7 @@ def analyze_rna(
             calculate_rna_gc_profile(
                 rna,
                 profile_window,
-                profile_step
+                profile_step * profile_stride
             ),
 
         "complexity":
@@ -309,7 +320,7 @@ def analyze_rna(
             calculate_rna_complexity_profile(
                 rna,
                 profile_window,
-                profile_step
+                profile_step * profile_stride
             ),
 
         "ambiguity":
@@ -395,6 +406,19 @@ def analyze_rna(
             genetic_code=genetic_code,
         )
     )
+
+    if profile_stride > 1:
+        analysis["profile_resolution"] = {
+            "windows_total": windows_total,
+            "stored_every_nth_window": profile_stride,
+            "stored_step": profile_step * profile_stride,
+            "max_points": DEFAULT_MAX_PROFILE_POINTS,
+            "note": (
+                f"The sequence has {windows_total} profile windows; the stored GC and "
+                f"complexity profiles keep every {profile_stride}th window "
+                f"(step {profile_step * profile_stride})."
+            ),
+        }
 
     return analysis
 

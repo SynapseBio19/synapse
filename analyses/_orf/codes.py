@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from core.seqtools import codon_dict
+from functools import lru_cache
 from itertools import product
 
 
@@ -99,28 +100,37 @@ GENETIC_CODE = codon_dict(1, stop_symbol="STOP")
 
 def expand_iupac_codon(codon):
 
+    # A fresh list per call: callers may change it; the expansion itself
+    # is cached (a genome-wide ORF search classifies millions of codons
+    # drawn from a few hundred distinct strings).
+    return list(_expanded_codon(codon))
+
+
+@lru_cache(maxsize=4096)
+def _expanded_codon(codon):
+
     codon = codon.upper()
 
     if len(codon) != 3:
-        return []
+        return ()
 
     possibilities = []
 
     for base in codon:
 
         if base not in DNA_IUPAC:
-            return []
+            return ()
 
         possibilities.append(
             DNA_IUPAC[base]
         )
 
-    return [
+    return tuple(
         "".join(combination)
         for combination in product(
             *possibilities
         )
-    ]
+    )
 
 
 def _stop_codons_of(codon_table):
@@ -207,7 +217,7 @@ def analyze_codon_identity(
     target_codons
 ):
 
-    expanded = expand_iupac_codon(
+    expanded = _expanded_codon(
         codon
     )
 

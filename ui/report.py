@@ -1,7 +1,10 @@
 from analyses.sequence import (
     calculate_gc_content_profile,
     calculate_complexity_profile,
-    calculate_profile_statistics,
+    complexity_window_values,
+    gc_window_values,
+    profile_statistics_from_values,
+    window_count,
 )
 from ui.style import major_rule
 from ui import style
@@ -196,31 +199,33 @@ def print_results(
     profile_window = 100
     profile_step = 1
 
-    gc_profile = calculate_gc_content_profile(
+    # The statistics run over every window without building the profiles
+    # (a 4.6 Mb genome needed gigabytes for them); the preview shows the
+    # same ten windows as before: every k-th of the full profile, k = n // 10.
+    window_total = window_count(len(dna), profile_window, profile_step)
+    preview_stride = max(1, window_total // 10)
+
+    gc_profile_statistics = profile_statistics_from_values(
+        gc_window_values(dna, profile_window, profile_step),
+        profile_window
+    )
+
+    complexity_profile_statistics = profile_statistics_from_values(
+        complexity_window_values(dna, profile_window, profile_step),
+        profile_window
+    )
+
+    gc_preview = calculate_gc_content_profile(
         dna,
         window_size=profile_window,
-        step=profile_step
-    )
+        step=profile_step * preview_stride
+    )[:10]
 
-    complexity_profile = calculate_complexity_profile(
+    complexity_preview = calculate_complexity_profile(
         dna,
         window_size=profile_window,
-        step=profile_step
-    )
-
-    gc_profile_statistics = (
-        calculate_profile_statistics(
-            gc_profile,
-            "gc_content"
-        )
-    )
-
-    complexity_profile_statistics = (
-        calculate_profile_statistics(
-            complexity_profile,
-            "complexity"
-        )
-    )
+        step=profile_step * preview_stride
+    )[:10]
 
     # ========================================================
     # HEADER
@@ -400,12 +405,7 @@ def print_results(
 
         style.section('Profile Preview')
 
-        preview_points = (
-            gc_profile[::max(
-                1,
-                len(gc_profile) // 10
-            )][:10]
-        )
+        preview_points = gc_preview
 
         for item in preview_points:
 
@@ -452,12 +452,7 @@ def print_results(
 
         style.section('Profile Preview')
 
-        preview_points = (
-            complexity_profile[::max(
-                1,
-                len(complexity_profile) // 10
-            )][:10]
-        )
+        preview_points = complexity_preview
 
         for item in preview_points:
 

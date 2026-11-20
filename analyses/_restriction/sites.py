@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
-from data.restriction_enzymes import get_restriction_enzyme, get_type_iis_enzyme
+import re
 from functools import lru_cache
+
+from data.restriction_enzymes import get_restriction_enzyme, get_type_iis_enzyme
 
 
 # ============================================================
@@ -46,7 +48,12 @@ def _normalize_restriction_sequence(sequence):
 def _restriction_sequence_status(sequence):
     normalized = _normalize_restriction_sequence(sequence)
 
-    invalid_positions = [
+    # The position lists are built only when such a symbol occurs; for a
+    # plain ACGT sequence both are empty (the digest checks the sequence
+    # once per enzyme, 47 times for the full panel on a genome).
+    symbols = set(normalized)
+
+    invalid_positions = [] if symbols <= IUPAC_BASES.keys() else [
         index + 1
         for index, base in enumerate(normalized)
         if base not in IUPAC_BASES
@@ -61,7 +68,7 @@ def _restriction_sequence_status(sequence):
             normalized[position - 1]
             for position in invalid_positions
         }),
-        "ambiguous_positions": [
+        "ambiguous_positions": [] if symbols <= {"A", "C", "G", "T"} else [
             index + 1
             for index, base in enumerate(normalized)
             if base not in {"A", "C", "G", "T"}
@@ -106,6 +113,30 @@ def bases_match(sequence_base, recognition_base):
         return False
 
     return bool(sequence_options & recognition_options)
+
+
+@lru_cache(maxsize=512)
+def _recognition_pattern(recognition):
+    """Regular expression for the windows that match ``recognition`` base by base.
+
+    Each recognition symbol becomes the class of every symbol for which
+    bases_match(symbol, recognition symbol) is true: the IUPAC symbols whose
+    base sets overlap, in upper and lower case (bases_match compares
+    upper-cased symbols). A zero-width lookahead reports overlapping
+    windows. None when a recognition symbol is not IUPAC (no window can
+    match then).
+    """
+    classes = []
+    for symbol in recognition:
+        options = IUPAC_BASES.get(str(symbol).upper())
+        if options is None:
+            return None
+        compatible = sorted(
+            other for other, other_options in IUPAC_BASES.items()
+            if other_options & options
+        )
+        classes.append("[" + "".join(compatible) + "".join(c.lower() for c in compatible) + "]")
+    return re.compile("(?=" + "".join(classes) + ")")
 
 
 def recognition_site_matches(sequence, position, recognition_sequence):
@@ -191,18 +222,22 @@ def _scan_recognition_sites(sequence, recognition, circular):
         search_space = sequence + sequence[:len(recognition) - 1]
         last_start = len(sequence) - 1
 
-    for position in range(
-        last_start + 1
-    ):
+    pattern = _recognition_pattern(recognition)
+    if pattern is None:
+        return ()
+
+    # The regular expression finds exactly the windows in which every base
+    # passes bases_match (see _recognition_pattern), overlapping ones
+    # included, in position order. Calling bases_match per base and
+    # position took about 2 minutes for 22 enzymes on 1 Mb; this takes
+    # seconds (docs/BENCHMARKS.md).
+    for found in pattern.finditer(search_space):
+        position = found.start()
+        if position > last_start:
+            break
         fragment = search_space[
             position:position + len(recognition)
         ]
-
-        if not all(
-            bases_match(a, b)
-            for a, b in zip(fragment, recognition)
-        ):
-            continue
 
         ambiguous_offsets = [
             index + 1

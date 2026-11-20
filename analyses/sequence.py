@@ -44,8 +44,13 @@ from analyses._sequence.profiles import (
     calculate_gc_content_profile,
     calculate_profile_statistics,
     calculate_sequence_complexity,
+    complexity_window_values,
+    DEFAULT_MAX_PROFILE_POINTS,
     describe_profile_availability,
     find_homopolymers,
+    gc_window_values,
+    profile_statistics_from_values,
+    window_count,
 )
 from analyses._sequence.cpg import analyze_cpg, DEFAULT_CPG_ISLAND_CRITERIA, find_cpg_islands
 from analyses._sequence.summary import (
