@@ -1,0 +1,21 @@
+name: Feature request
+description: A new analysis, option or workflow.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: need
+    attributes:
+      label: Scientific or practical need
+      description: What you want to do, and why existing modules do not cover it.
+    validations:
+      required: true
+  - type: textarea
+    id: method
+    attributes:
+      label: Method and references
+      description: The published method or reference tool the feature should follow, so it can be validated.
+  - type: markdown
+    attributes:
+      value: >-
+        The AI Experiment Planner is planned but not available ("Coming
+        Soon"); CRISPR development is paused by the project owner.

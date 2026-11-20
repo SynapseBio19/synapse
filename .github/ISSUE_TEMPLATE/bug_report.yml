@@ -1,0 +1,33 @@
+name: Bug report
+description: Synapse crashes, hangs, shows a wrong menu or cannot read a file.
+labels: ["bug"]
+body:
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: The menu choices or the Python calls, starting from the file you loaded.
+      placeholder: |
+        1. Load data/examples/pUC19.fasta, record 1
+        2. Main menu 5, then 1
+        3. Enter EcoRI,HindIII ...
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened
+      description: The output or error message. Log files are in logs/ (or in SYNAPSE_HOME).
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: "Windows 11, Python 3.14.6, Synapse 0.2.0.dev0 (git commit)"
+    validations:
+      required: true

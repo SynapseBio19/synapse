@@ -1,0 +1,33 @@
+# Citation metadata for Synapse (Citation File Format 1.2.0,
+# https://citation-file-format.github.io/). GitHub shows it as
+# "Cite this repository". When the project is published, add
+# "repository-code", "license" and "date-released" (see
+# docs/RELEASE_NOTES.md, "Before the first release").
+cff-version: 1.2.0
+message: "If you use Synapse in your research or teaching, please cite it as below."
+type: software
+title: "Synapse: a transparent, sequence-centric DNA analysis workbench"
+abstract: >-
+  Synapse is a terminal and Python workbench for DNA, RNA and protein
+  sequence analysis: sequence statistics, open reading frames under all
+  27 NCBI genetic codes, RNA and protein properties, restriction digests
+  and cloning, primer design, mutation and variant analysis with HGVS
+  notation, BLAST and literature search. Every result records its method,
+  parameters and limitations. The calculations are compared with
+  established tools and curated data (Primer3, NCBI ORFfinder, bcftools,
+  Mutalyzer, ExPASy ProtParam, ViennaRNA, the RefSeq annotation of
+  Escherichia coli K-12 and ClinVar). Synapse is research and teaching
+  software and is not experimentally or clinically validated.
+authors:
+  - given-names: Onur
+    family-names: Bayraktar
+version: 0.2.0.dev0
+url: "https://synapse-gen.com"
+keywords:
+  - bioinformatics
+  - sequence analysis
+  - open reading frame
+  - primer design
+  - restriction analysis
+  - HGVS
+  - BLAST

@@ -1,0 +1,8 @@
+# Keeps the GitHub Actions used by .github/workflows/ci.yml up to date.
+# Python dependencies are pinned in pyproject.toml and changed by hand.
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"

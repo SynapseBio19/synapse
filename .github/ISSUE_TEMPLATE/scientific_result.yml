@@ -1,0 +1,55 @@
+name: Incorrect scientific result
+description: A result that disagrees with a reference tool, a publication or curated data.
+labels: ["scientific correctness"]
+body:
+  - type: markdown
+    attributes:
+      value: >-
+        Scientific errors have the highest priority. Please give enough
+        information to reproduce the result. Do not paste unpublished or
+        confidential sequences; a public accession or a synthetic sequence
+        is enough.
+  - type: dropdown
+    id: module
+    attributes:
+      label: Module
+      options:
+        - Sequence overview
+        - ORF analysis
+        - RNA analysis
+        - Protein analysis
+        - Restriction / cloning
+        - Primer design
+        - Mutation / variant analysis (HGVS, VCF)
+        - CRISPR guide design
+        - BLAST
+        - Literature search
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: input
+    attributes:
+      label: Input
+      description: Accession (e.g. NM_000546.6) or a short synthetic sequence, and the settings (genetic code, enzymes, buffer, ...).
+    validations:
+      required: true
+  - type: textarea
+    id: synapse
+    attributes:
+      label: Synapse's result
+      description: What Synapse reported. The JSON report (menu R) records every parameter and the input checksum.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result and its source
+      description: The reference value and where it comes from (tool and version, publication, database release).
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Synapse version or commit
+      placeholder: "0.2.0.dev0 / git commit"
