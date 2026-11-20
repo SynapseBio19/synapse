@@ -8,8 +8,10 @@ import io
 import json
 import math
 import tempfile
+import time
 import unittest
 import urllib.error
+import urllib.request
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from unittest import mock
@@ -252,16 +254,16 @@ class LiteratureTests(unittest.TestCase):
             return item
 
         sleeps = []
-        with mock.patch.object(L.urllib.request, "urlopen", fake_urlopen), \
-                mock.patch.object(L.time, "sleep", sleeps.append):
+        with mock.patch.object(urllib.request, "urlopen", fake_urlopen), \
+                mock.patch.object(time, "sleep", sleeps.append):
             self.assertEqual(L._request_text("https://example.org/x"), "ok")
         self.assertIn(1.0, sleeps)
 
     def test_non_retryable_error_is_reported(self):
         from analyses import literature as L
         error = urllib.error.HTTPError("https://example.org/y", 404, "nf", email.message.Message(), None)
-        with mock.patch.object(L.urllib.request, "urlopen", side_effect=error), \
-                mock.patch.object(L.time, "sleep", lambda s: None):
+        with mock.patch.object(urllib.request, "urlopen", side_effect=error), \
+                mock.patch.object(time, "sleep", lambda s: None):
             with self.assertRaises(L.LiteratureSourceError):
                 L._request_text("https://example.org/y")
 
@@ -278,8 +280,8 @@ class LiteratureTests(unittest.TestCase):
         def fake_urlopen(request, timeout=None):
             raise errors.pop(0)
 
-        with mock.patch.object(L.urllib.request, "urlopen", fake_urlopen), \
-                mock.patch.object(L.time, "sleep", lambda s: None):
+        with mock.patch.object(urllib.request, "urlopen", fake_urlopen), \
+                mock.patch.object(time, "sleep", lambda s: None):
             with self.assertRaises(L.LiteratureSourceError):
                 L._request_text("https://example.org/z")
         self.assertTrue(all(body.closed for body in bodies))

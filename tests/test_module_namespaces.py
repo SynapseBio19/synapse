@@ -334,10 +334,11 @@ RENAMED_PRIMER_NAMES = {
 }
 
 
-# Recorded from 713a1d4 (Phase 10) before analyses/literature.py was split;
-# urllib and time are reached through the module by tests.
+# Recorded from 713a1d4 (Phase 10) before analyses/literature.py was split.
+# (The standard modules urllib and time, which tests reached through it,
+# are patched directly since the split.)
 LITERATURE_NAMES = (
-    'urllib', 'time', 'RelevanceComponents', 'MODULE_NAME', 'MODULE_VERSION', 'USER_AGENT',
+    'RelevanceComponents', 'MODULE_NAME', 'MODULE_VERSION', 'USER_AGENT',
     'DEFAULT_TIMEOUT', 'MAX_RESULTS_LIMIT', 'LiteratureError', 'LiteratureSourceError',
     'LiteratureQuery', 'LiteratureArticle', 'LiteratureSearchRun', 'LiteratureSearchResult',
     'MIN_REQUEST_INTERVAL_SECONDS', 'RETRY_STATUS_CODES', 'MAX_REQUEST_ATTEMPTS',
@@ -430,16 +431,17 @@ class InternalModuleIndependenceTests(unittest.TestCase):
 
     PROBE = textwrap.dedent('''
         import importlib, json, pkgutil, sys
-        import analyses._blast, analyses._cloning, analyses._mutation, analyses._primer, analyses._protein, analyses._variant, analyses._sequence, analyses._orf, analyses._restriction, analyses._rna
+        import analyses._blast, analyses._cloning, analyses._mutation, analyses._primer, analyses._protein, analyses._variant, analyses._sequence, analyses._orf, analyses._restriction, analyses._rna, analyses._literature
         failures = {}
         OWN_PUBLIC = {"analyses._blast": "analyses.blast", "analyses._primer": "analyses.primer",
                       "analyses._mutation": "analyses.mutation", "analyses._cloning": "analyses.cloning",
                       "analyses._protein": "analyses.protein", "analyses._variant": "analyses.variant_analysis",
                       "analyses._sequence": "analyses.sequence", "analyses._orf": "analyses.orf",
-                      "analyses._restriction": "analyses.restriction", "analyses._rna": "analyses.rna"}
+                      "analyses._restriction": "analyses.restriction", "analyses._rna": "analyses.rna",
+                      "analyses._literature": "analyses.literature"}
         for package in (analyses._blast, analyses._primer, analyses._mutation, analyses._cloning,
                         analyses._protein, analyses._variant, analyses._sequence, analyses._orf,
-                        analyses._restriction, analyses._rna):
+                        analyses._restriction, analyses._rna, analyses._literature):
             for info in pkgutil.iter_modules(package.__path__):
                 name = package.__name__ + "." + info.name
                 for loaded in [m for m in sys.modules if m.startswith("analyses")]:

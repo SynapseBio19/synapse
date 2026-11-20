@@ -17,6 +17,9 @@ from urllib.parse import parse_qs, urlparse
 
 from tests import _support  # noqa: F401  (blocks network and input())
 from analyses import literature as L
+# Since Phase 10 the implementation lives in analyses._literature; a stand-in
+# must replace a helper in the module that calls it.
+from analyses._literature import enrichment, providers, search
 
 PUBMED_XML = """<?xml version="1.0"?>
 <PubmedArticleSet>
@@ -44,8 +47,8 @@ class PubMedSearchTests(unittest.TestCase):
             urls.append(url)
             return {"esearchresult": {"idlist": ["111", "222"]}}
 
-        with mock.patch.object(L, "_request_json", side_effect=fake_json), \
-                mock.patch.object(L, "_request_text", return_value=PUBMED_XML):
+        with mock.patch.object(providers, "_request_json", side_effect=fake_json), \
+                mock.patch.object(providers, "_request_text", return_value=PUBMED_XML):
             articles = L.search_pubmed("lactase", 5, date_from="2019-01", date_to="2021")
         self.assertEqual(len(articles), 1)                 # the record without a PMID is skipped
         article = articles[0]
@@ -58,10 +61,10 @@ class PubMedSearchTests(unittest.TestCase):
         self.assertEqual((query["mindate"], query["maxdate"], query["datetype"]), (["2019/01"], ["2021"], ["pdat"]))
 
     def test_no_hits_bad_xml_and_bad_arguments(self):
-        with mock.patch.object(L, "_request_json", return_value={"esearchresult": {"idlist": []}}):
+        with mock.patch.object(providers, "_request_json", return_value={"esearchresult": {"idlist": []}}):
             self.assertEqual(L.search_pubmed("nothing"), [])
-        with mock.patch.object(L, "_request_json", return_value={"esearchresult": {"idlist": ["1"]}}), \
-                mock.patch.object(L, "_request_text", return_value="<not xml"):
+        with mock.patch.object(providers, "_request_json", return_value={"esearchresult": {"idlist": ["1"]}}), \
+                mock.patch.object(providers, "_request_text", return_value="<not xml"):
             with self.assertRaises(L.LiteratureSourceError):
                 L.search_pubmed("broken")
         with self.assertRaises(ValueError):
@@ -85,10 +88,10 @@ class CombinedSearchTests(unittest.TestCase):
                            is_open_access=False)]
         query = L.LiteratureQuery("lactase", sources=["pubmed", "europe_pmc", "openalex"],
                                   max_results=5, date_from="2010", open_access_only=True)
-        with mock.patch.object(L, "search_pubmed", return_value=pubmed), \
-                mock.patch.object(L, "search_europe_pmc", return_value=europe), \
-                mock.patch.object(L, "search_openalex", side_effect=L.LiteratureSourceError("HTTP 503")), \
-                mock.patch.object(L, "_enrich_missing_metadata", return_value=(0, [])):
+        with mock.patch.object(search, "search_pubmed", return_value=pubmed), \
+                mock.patch.object(search, "search_europe_pmc", return_value=europe), \
+                mock.patch.object(search, "search_openalex", side_effect=L.LiteratureSourceError("HTTP 503")), \
+                mock.patch.object(search, "_enrich_missing_metadata", return_value=(0, [])):
             result = L.run_literature_search(query)
         run = result.run
         assert run is not None
@@ -125,8 +128,8 @@ class EnrichmentTests(unittest.TestCase):
             raise AssertionError(url)
 
         pubmed_xml = PUBMED_XML.replace("Journal of Tests", "PubMed Journal")
-        with mock.patch.object(L, "_request_json", side_effect=fake_json), \
-                mock.patch.object(L, "_request_text", return_value=pubmed_xml):
+        with mock.patch.object(enrichment, "_request_json", side_effect=fake_json), \
+                mock.patch.object(enrichment, "_request_text", return_value=pubmed_xml):
             enriched, warnings = L._enrich_missing_metadata([by_pmid, by_doi])
         self.assertEqual(enriched, 2)
         self.assertEqual(warnings, [])
@@ -140,8 +143,8 @@ class EnrichmentTests(unittest.TestCase):
 
     def test_failures_become_warnings_and_keep_the_record(self):
         record = _article(title="Record whose lookups fail", pmid="5", doi="10.1000/fail")
-        with mock.patch.object(L, "_request_json", side_effect=L.LiteratureSourceError("HTTP 500")), \
-                mock.patch.object(L, "_request_text", side_effect=L.LiteratureSourceError("HTTP 500")):
+        with mock.patch.object(enrichment, "_request_json", side_effect=L.LiteratureSourceError("HTTP 500")), \
+                mock.patch.object(enrichment, "_request_text", side_effect=L.LiteratureSourceError("HTTP 500")):
             enriched, warnings = L._enrich_missing_metadata([record])
         self.assertEqual(enriched, 0)
         self.assertEqual(len(warnings), 3)

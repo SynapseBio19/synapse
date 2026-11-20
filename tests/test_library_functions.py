@@ -17,6 +17,7 @@ from urllib.parse import parse_qs, urlparse
 
 from tests import _support  # noqa: F401  (blocks network and input())
 from analyses import literature as L
+from analyses._literature import providers
 from analyses import mutation as M
 from analyses import primer as P
 from analyses import restriction as R
@@ -112,7 +113,8 @@ class LiteratureProviderTests(unittest.TestCase):
         def fake(url, *a, **k):
             seen.append(url)
             return response
-        with mock.patch.object(L, "_request_json", side_effect=fake):
+        # The providers call _request_json in analyses._literature.providers.
+        with mock.patch.object(providers, "_request_json", side_effect=fake):
             articles = function(*args, **kwargs)
         query = parse_qs(urlparse(seen[0]).query)
         return articles, query

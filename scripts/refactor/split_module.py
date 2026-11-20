@@ -28,6 +28,8 @@ import sys
 from collections import defaultdict
 
 ROOT = os.getcwd()
+# Bound name -> every dotted module imported under it ("urllib" -> urllib.error, ...).
+SUBMODULES: dict = {}
 
 
 def load_plan(path):
@@ -115,6 +117,10 @@ def main():
                     imports[local] = ("from", node.module, a.name, a.asname)
                 else:
                     imports[local] = ("import", a.name, None, a.asname)
+                    if not a.asname:
+                        # "import urllib.error" and "import urllib.parse" both
+                        # bind "urllib"; every one of them is kept (Phase 10).
+                        SUBMODULES.setdefault(local, set()).add(a.name)
         else:
             if isinstance(node, (ast.Import, ast.ImportFrom)):
                 sys.exit(f"import after code at line {node.lineno}; handle it in the plan")
@@ -251,7 +257,13 @@ def import_lines(names, imports):
             froms[module].append(name if not asname else f"{name} as {asname}")
     out = []
     for _k, module, _n, asname in plain:
-        out.append(f"import {module}" + (f" as {asname}" if asname else "") + "\n")
+        if asname:
+            out.append(f"import {module} as {asname}\n")
+            continue
+        for full in sorted(SUBMODULES.get(module.split(".")[0], {module})):
+            line = f"import {full}\n"
+            if line not in out:
+                out.append(line)
     for module in sorted(froms):
         out += from_lines(module, sorted(froms[module], key=sort_key))
     return out
