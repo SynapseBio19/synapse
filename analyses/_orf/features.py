@@ -16,8 +16,31 @@ from analyses._orf.codes import (
 # ORF AMBIGUITY ANALYSIS
 # ============================================================
 
+_UNAMBIGUOUS = frozenset("ATCG")
+
+
+def _empty_ambiguity():
+    return {
+        "ambiguous_codon_count": 0,
+        "ambiguous_codons": [],
+        "deterministic_ambiguous_count": 0,
+        "deterministic_ambiguous_codons": [],
+        "uncertain_codon_count": 0,
+        "uncertain_codons": [],
+        "possible_stop_codon_count": 0,
+        "possible_stop_codons": [],
+        "translation_safe": True,
+    }
+
+
 def analyze_orf_ambiguity(orf_sequence, codon_table=None):
     codon_table = GENETIC_CODE if codon_table is None else codon_table
+
+    # A sequence of A, C, G and T only has no ambiguous codon: the loop
+    # below would find none, so the empty result is returned directly (a
+    # genome-wide search evaluates about 100,000 ORF candidates per Mb).
+    if not set(orf_sequence) - _UNAMBIGUOUS:
+        return _empty_ambiguity()
 
     ambiguous_codons = []
     deterministic_ambiguous_codons = []
@@ -168,60 +191,44 @@ def analyze_orf_ambiguity(orf_sequence, codon_table=None):
 # ============================================================
 
 def analyze_codon_usage(coding_sequence, codon_table=None):
+    """Codon counts and GC3 of the codons before the first stop codon.
+
+    Rewritten on 2026-11-20 for speed with the same result: the codons
+    are the full triplets from position 0, cut at the first codon that is
+    a stop of the table; GC3 counts the codons of A, C, G and T only (the
+    integer counts and the division are unchanged). Checked against the
+    former loop in tests/test_orf_feature_speed.py.
+    """
     stop_codons = _stop_codons_of(codon_table)
 
-    codons = []
+    codons = [
+        coding_sequence[position:position + 3]
+        for position in range(0, len(coding_sequence) - 2, 3)
+    ]
 
-    for position in range(
-        0,
-        len(coding_sequence) - 2,
-        3
-    ):
-
-        codon = coding_sequence[
-            position:
-            position + 3
-        ]
-
-        if len(codon) < 3:
-            continue
-
+    for index, codon in enumerate(codons):
         if codon in stop_codons:
+            del codons[index:]
             break
-
-        codons.append(codon)
 
     counts = Counter(codons)
 
-    standard_codons = [
-        codon
-        for codon in counts
-        if all(
-            base in "ATCG"
-            for base in codon
-        )
-    ]
+    standard_codon_count = 0
+    standard_total = 0
+    gc3_total = 0
 
-    gc3_values = []
+    for codon, count in counts.items():
+        if not set(codon) - _UNAMBIGUOUS:
+            standard_codon_count += 1
+            standard_total += count
+            if codon[2] in "GC":
+                gc3_total += count
 
-    for codon in codons:
-
-        if all(
-            base in "ATCG"
-            for base in codon
-        ):
-
-            gc3_values.append(
-                1
-                if codon[2] in "GC"
-                else 0
-            )
-
-    if gc3_values:
+    if standard_total:
 
         gc3_content = (
-            sum(gc3_values)
-            / len(gc3_values)
+            gc3_total
+            / standard_total
             * 100
         )
 
@@ -240,11 +247,19 @@ def analyze_codon_usage(coding_sequence, codon_table=None):
             dict(counts),
 
         "standard_codon_count":
-            len(standard_codons),
+            standard_codon_count,
 
         "gc3_content":
             gc3_content
     }
+
+
+def codon_diversity_from_usage(usage):
+    """calculate_codon_diversity from an analyze_codon_usage result."""
+    total = usage["total_codons"]
+    if total == 0:
+        return 0.0
+    return usage["unique_codons"] / total
 
 
 # ============================================================

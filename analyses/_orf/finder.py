@@ -21,6 +21,7 @@ from analyses._orf.features import (
     analyze_start_context,
     calculate_cds_quality,
     calculate_codon_diversity,
+    codon_diversity_from_usage,
     calculate_orf_heuristic_score,
 )
 
@@ -291,6 +292,9 @@ def find_orfs(
 
     orfs = []
 
+    start_status_of = {}
+    stop_status_of = {}
+
     for strand, sequence in strands:
 
         for frame_offset in range(3):
@@ -313,12 +317,12 @@ def find_orfs(
                     position + 3
                 ]
 
-                start_status = (
-                    analyze_codon_identity(
-                        codon,
-                        start_codons
-                    )
-                )
+                # analyze_codon_identity depends only on the codon and the
+                # set, so each distinct codon is classified once per search.
+                start_status = start_status_of.get(codon)
+                if start_status is None:
+                    start_status = analyze_codon_identity(codon, start_codons)
+                    start_status_of[codon] = start_status
 
                 if start_status == "definite":
 
@@ -342,12 +346,10 @@ def find_orfs(
                             ]
                         )
 
-                        stop_status = (
-                            analyze_codon_identity(
-                                current_codon,
-                                stop_codons
-                            )
-                        )
+                        stop_status = stop_status_of.get(current_codon)
+                        if stop_status is None:
+                            stop_status = analyze_codon_identity(current_codon, stop_codons)
+                            stop_status_of[current_codon] = stop_status
 
                         if (
                             stop_status
@@ -533,9 +535,7 @@ def find_orfs(
                                     codon_usage,
 
                                 "codon_diversity":
-                                    calculate_codon_diversity(
-                                        orf_sequence, codon_table=codon_table
-                                    )
+                                    codon_diversity_from_usage(codon_usage)
                             }
 
                             orf["cds_quality"] = (
@@ -731,9 +731,7 @@ def find_orfs(
                                         codon_usage,
 
                                     "codon_diversity":
-                                        calculate_codon_diversity(
-                                            orf_sequence, codon_table=codon_table
-                                        )
+                                        codon_diversity_from_usage(codon_usage)
                                 }
 
                                 orf["cds_quality"] = (
