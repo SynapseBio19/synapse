@@ -1,10 +1,11 @@
 # Synapse architecture
 
-This describes the code as it is now (last updated 2026-11-18, Phase 8).
+This describes the code as it is now (last updated 2026-11-20, Phase 10).
 It was written in Phase 7.1 as `docs/PHASE71_ARCHITECTURE.md` and is kept
 up to date here.
 - Findings that led to the changes: `docs/PHASE71_ARCHITECTURE_AUDIT.md`.
-- Change records: `docs/CHANGES.md`, sections "Phase 7.1" and "Phase 8".
+- Change records: `docs/CHANGES.md`, sections "Phase 7.1" to "Phase 10".
+- Performance on genome-length input: `docs/BENCHMARKS.md`.
 
 ## 1. Layers
 
@@ -13,7 +14,8 @@ main.py                 launcher from the source folder (python main.py)
 synapse_gen/            the terminal session (app.py) and the `synapse` command
 ui/                     dialogs and reports (draw through ui/style.py)
 core/                   data model, pipeline and provenance, public API, alphabets,
-                        storage locations (paths.py)
+                        storage locations (paths.py), prefix counts for window
+                        scans (windows.py)
 analyses/               the scientific modules (one public module per analysis)
   _blast/, _primer/     internal implementation packages (Phase 7.1)
 fileio/                 FASTA and GenBank reading
@@ -210,12 +212,19 @@ entry block, and an internal package that holds the code. Plans:
 | `analyses/orf.py` | `analyses/_orf/` | `codes`, `features`, `finder`, `summary`, `selection` |
 | `analyses/restriction.py` | `analyses/_restriction/` | `sites`, `digest`, `compatibility`, `api`, `selftest` (also re-exports `RESTRICTION_ENZYMES`, `get_restriction_enzyme`, `get_type_iis_enzyme`) |
 | `analyses/rna.py` | `analyses/_rna/` | `bases`, `composition`, `coding`, `structure`, `summary`, `pipeline` |
+| `analyses/literature.py` (Phase 10) | `analyses/_literature/` | `models`, `normalize`, `http`, `providers`, `ranking`, `enrichment`, `search`, `export`, `context`, `selftest` |
+
+**The literature split (Phase 10).** Phase 9 kept `analyses/literature.py`
+whole, because its tests replaced helpers on the module itself. Phase 10
+first recorded a characterization section that replaces the network at
+`urllib.request.urlopen`, below every Synapse function, then split the
+module and pointed every stand-in at the module that calls the helper
+(`analyses._literature.providers`, `.search`, `.enrichment`). The
+providers' throttle state `_LAST_REQUEST_AT` is a shared dictionary in
+`analyses._literature.http`. A stand-in on the public module fails
+loudly, because the suite blocks the network.
 
 **Not split.**
-- `analyses/literature.py` (2,095 lines): its tests replace module
-  functions 20 times, and the providers share one module-level throttle,
-  so a split would let those tests pass without reaching the code (see
-  `docs/CHANGES.md`, Phase 9 L).
 - `analyses/crispr.py` is excluded by owner decision.
 - Smaller single-file modules stay as they are: `rna_structure`,
   `core/*`, `fileio/*`.
@@ -225,7 +234,7 @@ entry block, and an internal package that holds the code. Plans:
 | Layer | Test | Guards |
 |---|---|---|
 | Names | `tests/test_module_namespaces.py` | every name of `analyses.blast` (125), `analyses.primer`, `analyses.mutation` (97, and `__all__`) and `analyses.cloning` (61) stays reachable; renamed primer helpers are gone; each internal module of the four packages imports alone and complete; public names are the implementation objects |
-| Results | `tests/test_characterization.py` + `tests/fixtures/characterization/` | ten sections, each recorded before its module moved: `blast_primer.json` (78 scenarios, from `9077f1e`), `mutation.json` (79), `cloning.json` (25), `protein.json` (103), `variant.json` (45), `sequence.json` (111), `orf.json` (27), `restriction.json` (46), `rna.json` (101). Compared exactly, except floats within a relative 1e-12, the last-digit difference of `math.log2` between CPython 3.10 and 3.14 |
+| Results | `tests/test_characterization.py` + `tests/fixtures/characterization/` | eleven sections, each recorded before its module moved: `blast_primer.json` (78 scenarios, from `9077f1e`), `mutation.json` (79), `cloning.json` (25), `protein.json` (103), `variant.json` (45), `sequence.json` (111), `orf.json` (27), `restriction.json` (46), `rna.json` (101), `literature.json` (21, from `713a1d4`). Compared exactly, except floats within a relative 1e-12, the last-digit difference of `math.log2` between CPython 3.10 and 3.14 |
 | Science | golden master, primer3-py, ViennaRNA, bcftools, ORFfinder, Mutalyzer and ExPASy comparisons | unchanged reference agreement |
 | Components | `tests/test_blast_components.py`, `tests/test_primer_components.py`, `tests/test_primer_screen_configuration.py` | rejected-input messages, executable discovery, local-execution failures and rescue, condition validation, specificity screen, workflow messages, the explicit screen configuration |
 | Interface | rendered-menu, dialog and session tests | byte-identical terminal output |
@@ -241,7 +250,6 @@ entry block, and an internal package that holds the code. Plans:
 
 ## 9. Remaining architectural limitations
 
-- `analyses/literature.py` stays one module, on purpose (section 7).
 - Large but cohesive:
   - `LocalBlastDatabaseManager` (985 lines);
   - `_primer/thermodynamics` (1,581);
@@ -256,7 +264,7 @@ entry block, and an internal package that holds the code. Plans:
 - CRISPR code (`analyses/crispr.py`, `ui/crispr_menu.py`) is excluded from
   all of this by owner decision. It does not depend on the split modules.
   `analyses._mutation.impact.crispr_mutation_overlap` was moved unchanged.
-- Determinism: all ten characterization sections are bit-identical under
+- Determinism: all eleven characterization sections are bit-identical under
   different hash seeds (`tests/test_determinism.py` keeps the sequence
   analysis that way). Floats may differ in the last digit between Python
   versions (`math.log2`, compensated `sum()` since 3.12); the snapshot

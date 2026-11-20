@@ -12,6 +12,9 @@ for the next modules (`docs/ARCHITECTURE.md` §8).
     and the plan's `FACADE_NAMES` (such as `__all__`) stay in the public
     module.
   - The imports of every new module are generated from the names it uses.
+    Several dotted imports under one name (`import urllib.error`,
+    `import urllib.parse`) are all kept (fixed in Phase 10; before, only
+    one was generated).
   - With `--check` it only prints the module graph and stops on a cycle.
   - It writes the package with LF line endings and rewrites the public
     module as docstring + re-exports + entry block, keeping that file's
@@ -20,9 +23,14 @@ for the next modules (`docs/ARCHITECTURE.md` §8).
   checks that every top-level statement of the original occurs verbatim
   in exactly one of the new files. The optional `old=>new` pairs are the
   plan's `REWRITES`.
-- `plans/` holds the four plans as they were run. They are records: their
-  `SOURCE` modules have since been split, so running them again would
-  fail.
+- `plans/` holds the eleven plans as they were run (the last one,
+  `literature.py`, in Phase 10). They are records: their `SOURCE` modules
+  have since been split, so running them again would fail.
+- A module whose tests replace helpers on it can still be split: record
+  its characterization with the network or the operating system replaced
+  below every Synapse function (the literature section replaces
+  `urllib.request.urlopen`), so the snapshot reaches the code after the
+  move as well.
 
 **The procedure.** Each step was one commit, in this order:
 

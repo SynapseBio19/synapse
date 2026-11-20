@@ -192,3 +192,23 @@ behavior, not by tests written for the percentage:
 - the genetic-code, ORF-differential and determinism tests;
 - the download check;
 - the command and path tests.
+
+## Remeasured 2026-11-20 (Phase 10)
+
+Same tool and command (`--branch`, sources `analyses,core,ui,fileio,data,synapse_gen`),
+CPython 3.14.6. Suite: 722 tests, all passing, 5 opt-in skips. For a fair
+comparison the code of `ca6d941` (end of Phase 9) was measured again with
+the same command on the same day.
+
+| Scope | `ca6d941` | Phase 10 |
+|---|---:|---:|
+| `ui/cloning_menu.py` | 74 % | 82 % |
+| `ui/restriction_menu.py` | 75 % | 85 % |
+| `ui/protein_menu.py` | 83 % | 87 % |
+| `analyses/_literature/` (new) | – | 81-100 % per module |
+| `core/windows.py` (new) | – | 100 % |
+| **Total (combined)** | **85.0 %** | **86.1 %** |
+
+The gain comes from the dialog scenarios of
+`tests/test_protein_restriction_cloning_dialogs.py` and the differential,
+benchmark and user-guide tests; no test was written for the percentage.

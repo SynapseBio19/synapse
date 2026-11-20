@@ -110,3 +110,14 @@ on a DNS error, see D25).
 The checksums of files in Git change when the files change; the Git
 history is their authoritative record. They are given here as of
 2026-11-12 so that a copy can be checked without Git.
+
+## Reference data and tools added in Phase 10 (2026-11-20)
+
+| Resource | Version / accession | Source | Obtained | Licence / terms | Checksum | Used by |
+|---|---|---|---|---|---|---|
+| *Escherichia coli* K-12 substr. MG1655, complete genome (4,641,652 bp) | RefSeq NC_000913.3 | NCBI E-utilities `efetch.fcgi?db=nuccore&id=NC_000913.3&rettype=fasta&retmode=text` | 2026-11-20 | U.S. government work (NCBI), public domain | SHA-256 `6b195feda4c66140f6762742eb8b30c2652f02b45878b174f5b00ef85ecc95d7`, checked by the script | `scripts/benchmarks/genome_scale.py`, `orf_refseq.py`; cached in `.cache/benchmarks/` (not in Git) |
+| RefSeq annotation of NC_000913.3 (4,340 CDS) | GFF3 from NCBI's sequence viewer (`report=gff3`) | <https://www.ncbi.nlm.nih.gov/sviewer/viewer.cgi?db=nuccore&report=gff3&id=NC_000913.3> | 2026-11-20 | public domain (NCBI) | SHA-256 `f0c966bed5c950e6325fe1f885a1fbacee9144c30f5cd43feedf446768935617` | `scripts/benchmarks/orf_refseq.py` (not in Git) |
+| ClinVar variant names (1,500) and RefSeq CDS of 6 transcripts | ClinVar via E-utilities `esearch`/`esummary`, nuccore `efetch` (`fasta_cds_na`) | <https://eutils.ncbi.nlm.nih.gov/entrez/eutils/> | 2026-11-20 | public domain (NCBI) | SHA-256 `0348314292321b9646ff921505625a92b461e724718f53b18578d74e8df4a0c4` of `tests/fixtures/clinvar/hgvs_benchmark.json` (see its `SOURCE.md`) | `tests/test_hgvs_clinvar_benchmark.py` |
+| pUC19 as the second bundled example | L09137.2, the sequence of `tests/fixtures/pUC19_L09137.2.fasta` with `topology=circular` in the header | as above | 2026-11-20 | as above | SHA-256 `0276e5032405ca725aee6e13f71097ae66e453b33e2d0f5128b50a5336d907ba` of `data/examples/pUC19.fasta` | `docs/USER_GUIDE.md`, `tests/test_user_guide_examples.py` |
+| NCBI BLAST URL API, live search against `refseq_rna` | as reported by NCBI | <https://blast.ncbi.nlm.nih.gov/Blast.cgi>, RID FZ5HPRV0014 (public human GAPDH, NM_002046.7 nt 301-700) | 2026-11-20 | public service | – | Attempted live confirmation of the remote search path; NCBI did not finish within 45 minutes (`docs/BENCHMARKS.md`) |
+| cffconvert (Python package, project `.venv`) | 2.0.0 | PyPI | 2026-11-20 | Apache-2.0 (per its repository; the wheel metadata says UNKNOWN) | – | Validation of `CITATION.cff` against the CFF 1.2.0 schema; not a dependency of Synapse |

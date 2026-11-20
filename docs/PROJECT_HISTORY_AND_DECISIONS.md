@@ -216,3 +216,42 @@ and `docs/PHASE6_CONTINUATION.md`.
 - Three tests that patched the public module after a split would have
   passed without testing anything; they were found and corrected.
 - Details: `docs/PHASE8_REPORT.md`, `docs/ARCHITECTURE.md`.
+
+## 12. Phase 9 (2026-11-19): completion under the owner's mandate
+
+- The owner switched Windows Smart App Control off (2026-11-19), so
+  primer3-py and ViennaRNA load; the 82-GB BLAST database moved out of
+  OneDrive to `C:\SynapseData\blast_db` (`SYNAPSE_BLAST_DB_ROOT`).
+- Done: all 27 NCBI genetic codes; the `synapse` command and per-user
+  storage when installed; size and free-space check before database
+  downloads; seven more modules split; seven defects fixed (among them
+  BLAST's E = 0 read as infinity). `analyses/literature.py` stayed whole.
+- Details: `docs/PHASE9_REPORT.md`.
+
+## 13. Phase 10 (2026-11-20): genome scale, curated benchmarks, release preparation
+
+- **Owner's request (2026-11-20):** do everything that can still be done
+  in the project, as professionally as possible, and report when Synapse
+  is finished on the AI side; then the owner takes over the licence and
+  GitHub. The mandate of 2026-11-18 and the exclusions (CRISPR/CFD, AI
+  Experiment Planner) are unchanged.
+- **Done:** every analysis runs on the 4.6 Mb *E. coli* genome (four
+  scaling defects removed, results bit-identical to the code of
+  `ca6d941`); benchmarks against the RefSeq annotation (every CDS of at
+  least 90 nt found) and 1,500 ClinVar variants (one allele defect fixed);
+  dialog tests for protein, restriction and cloning (two defects fixed);
+  the literature author de-duplication fixed; `analyses/literature.py`
+  split after all, with a snapshot that replaces the network below every
+  Synapse function; user guide, benchmarks document, release notes,
+  `CITATION.cff`, issue and pull-request templates.
+- **Deliberately not done, and why:**
+  - Tm against measured values: no measured dataset with a clear licence
+    was obtained; nothing was reconstructed from memory.
+  - Affine gap costs for the mutation alignment (would remove the 11
+    split delins of the ClinVar benchmark): a change of the alignment
+    model, left for a separate decision.
+  - Licence, `LICENSE`, repository, version 0.3.0 and the tag: the
+    owner's (`docs/RELEASE_NOTES.md`, "Before the first release").
+  - CRISPR/CFD and the AI Experiment Planner: excluded by the owner.
+- Details: `docs/CHANGES.md` (Phase 10), `docs/BENCHMARKS.md`,
+  `docs/PHASE10_REPORT.md`.

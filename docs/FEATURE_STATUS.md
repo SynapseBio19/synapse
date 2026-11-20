@@ -276,7 +276,7 @@ Test coverage: 8 test references, incl. the 5 Stage-5 positional tests.
 | — | CDS from the selected ORF | `orf_reference_cds`, `assess_coding_frame` | Implemented | Integration-tested | Not applicable | Both strands; variant CDS derived only at equal length. |
 | 2 | Mutation Statistics | `calculate_mutation_statistics` | Implemented | Execution-tested | Not applicable | |
 | — | Mutation spectrum, hotspots | `build_mutation_spectrum`, `find_mutation_hotspots` | Implemented | Execution-tested | Not applicable | |
-| — | HGVS-style notation | `mutation_hgvs_c`, `mutation_hgvs_p`, `_mutation_notation` | Implemented | Execution-tested | **Independently validated** (Mutalyzer 3, synthetic sequences) | Predicted protein changes `p.(R12C)`, `p.(R12=)`, `p.(W24*)`, `p.(M1?)`, `p.(*110Qext*?)` since 2026-11-11, parsed by Mutalyzer without error. DNA changes in HGVS syntax with the 3′ rule, dup and delins since 2026-11-13 (`hgvs_c_allele`); 11/11 identical to Mutalyzer's `description_extract` (`test_hgvs_mutalyzer_reference.py`). Not checked against RefSeq transcripts. |
+| — | HGVS-style notation | `mutation_hgvs_c`, `mutation_hgvs_p`, `_mutation_notation` | Implemented | Execution-tested | **Independently validated** (Mutalyzer 3, synthetic sequences) | Predicted protein changes `p.(R12C)`, `p.(R12=)`, `p.(W24*)`, `p.(M1?)`, `p.(*110Qext*?)` since 2026-11-11, parsed by Mutalyzer without error. DNA changes in HGVS syntax with the 3′ rule, dup and delins since 2026-11-13 (`hgvs_c_allele`); 11/11 identical to Mutalyzer's `description_extract` (`test_hgvs_mutalyzer_reference.py`). On 1,500 ClinVar variants of six RefSeq transcripts (2026-11-20, `test_hgvs_clinvar_benchmark.py`): c. 1,489 identical and 11 equivalent, p. 1,186/1,186. Since 2026-11-20 a change of a multi-change allele is not shifted past the next one (`test_hgvs_allele_shift.py`). |
 | — | Indel left-normalization | `normalize_indel_left` | Implemented | Execution-tested since 2026-11-17 (`test_library_functions`) | Not applicable | Module function without a menu caller; separate from the variant module's implementation (duplication). The row said "Execution-tested" although no test ran it (verified 2026-11-17, Phase 7). |
 | — | Context extraction | `extract_mutation_context` | Implemented | Execution-tested | Not applicable | |
 | — | Restriction-site impact | `restriction_site_impact` | Implemented | Execution-tested | Not applicable | Cross-module check. |
@@ -385,7 +385,7 @@ relative to size; the 28 self-tests are the module's own fixtures.
 
 ---
 
-## 13. Literature search — `analyses/literature.py`
+## 13. Literature search — `analyses/literature.py` (implementation in `analyses/_literature/` since Phase 10)
 
 | Menu | Feature | Function | Implementation | Execution | Validation | Notes |
 |---|---|---|---|---|---|---|
@@ -397,7 +397,7 @@ relative to size; the 28 self-tests are the module's own fixtures.
 | — | Throttling and retry | `_throttle`, `_retry_delay`, `_request_text`, `_request_json` | Implemented | Execution-tested | Not applicable | Up to 3 attempts on 429/5xx, honours `Retry-After`; a simulated 503 is tested. |
 | — | Date handling | `_date_bound`, `_date_in_range`, `_apply_date_validation`, `_future_date_note` | Implemented | **Execution-tested** | Not applicable | `2020-03` → 2020-03-01 / 2020-03-31; `2020` → 2020-12-31. Correct. |
 | — | Deduplication | `deduplicate_articles`, `_is_placeholder_journal` | Implemented | Execution-tested (fixtures) | Not applicable | **S11**: cross-source duplicates unverified live (needs the owner's approval for external requests). |
-| — | Author-name handling | `_normalize_person_name`, `_deduplicate_author_names` | Implemented | Execution-tested | Not applicable | |
+| — | Author-name handling | `_normalize_person_name`, `_deduplicate_author_names` | Implemented | Execution-tested (`test_literature_authors`) | Not applicable | Since 2026-11-20 Europe PMC's "Smith A" matches PubMed's "Ann Smith"; merged records listed such authors twice before. |
 | — | Relevance ranking | `rank_articles`, `_coverage`, `_tokenize`, `_query_phrase` | Implemented | Execution-tested | Not applicable | Text matching only — correctly stated not to measure evidence quality. |
 | — | Metadata enrichment | `_enrich_missing_metadata` | Implemented | Execution-tested (fixtures) | Not applicable | |
 | 2 | Search Configuration | `_interactive_menu` | Implemented | Execution-tested (`test_dialog_paths`) | Not applicable | Parameters entered per search (verified 2026-11-17, Phase 7). |
@@ -497,8 +497,12 @@ explicitly not implemented.
 | 22 | Instability-index weights | ExPASy ProtParam, 420 probes (2026-11-13) | 399/400; KQ 24.68 there, 24.64 here |
 | 23 | Python 3.10 runtime | CPython 3.10.11 embeddable (2026-11-12, again 2026-11-17) | Full suite, 0 failures |
 | 24 | Local custom BLAST database | BLAST+ 2.17.0 `makeblastdb` and `blastp` | Built and searched in the suite |
+| 25 | ORF calls against curated gene models | RefSeq annotation of *E. coli* K-12 MG1655, NC_000913.3, 4,294 CDS (2026-11-20, `scripts/benchmarks/orf_refseq.py`) | 4,250 found at their stop codon (98.98 %); all 44 misses shorter than the 90-nt minimum |
+| 26 | HGVS on curated variants | 1,500 ClinVar names on 6 RefSeq transcripts (2026-11-20, `test_hgvs_clinvar_benchmark`) | c. 1,489 identical, 11 equivalent split delins; p. 1,186/1,186 |
+| 27 | Genome-length input | *E. coli* K-12 genome, every analysis (2026-11-20, `scripts/benchmarks/genome_scale.py`, docs/BENCHMARKS.md) | All complete; results identical to the code of `ca6d941` on 400-kb segments |
+| 28 | Live remote BLAST against `refseq_rna` | NCBI, public GAPDH NM_002046.7 nt 301-700 (2026-11-20, RID FZ5HPRV0014) | Not completed: still queued at NCBI after 45 minutes; the time-out and RID resume behaved as designed (docs/BENCHMARKS.md) |
 
-### Still open (2026-11-17)
+### Still open (2026-11-20)
 
 | Validation | Blocker | Route |
 |---|---|---|

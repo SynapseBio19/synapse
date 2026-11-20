@@ -11,6 +11,10 @@ angles, keep every result with its parameters, and export a reproducible
 report. It is designed to be transparent about what each analysis
 computes and what it does not.
 
+New users start with the user guide, `docs/USER_GUIDE.md`: concepts,
+every menu, and a tutorial that takes the plasmid pUC19 from loading to
+report.
+
 Synapse is research and teaching software under active correction.
 **Its results are computational; none has been validated
 experimentally**, and it is not a substitute for established, validated
@@ -106,7 +110,8 @@ calculation is visible in this repository.
 python main.py
 ```
 
-Load a FASTA or GenBank file (Enter loads the example `data/examples/dna.fasta`), choose a
+Load a FASTA or GenBank file (Enter loads the example `data/examples/dna.fasta`;
+`data/examples/pUC19.fasta` is the circular cloning vector pUC19), choose a
 record, then an analysis. A record's type (DNA, RNA or protein) is taken
 from the file when it states one and otherwise from its letters; when the
 letters cannot decide, Synapse asks rather than guesses. Positions shown
@@ -216,14 +221,18 @@ The full list, per module, is in `docs/METHODS.md`. The most important:
   scores, signal-peptide and structure screens are model predictions or
   heuristics, and are labeled as such.
 - Off-target search covers only the sequences supplied, never a genome.
-- ORF calls were compared with NCBI ORFfinder on one plasmid (pUC19,
-  69 ORFs identical); Synapse counts the stop codon in the minimum length,
-  ORFfinder does not. ORFs across the origin were not part of that
-  comparison.
+- ORF calls were compared with NCBI ORFfinder on pUC19 (69 ORFs
+  identical; Synapse counts the stop codon in the minimum length,
+  ORFfinder does not) and with the RefSeq annotation of *E. coli* K-12
+  (every annotated gene of at least 90 nt found at its stop codon). ORFs
+  across the origin were not part of either comparison. An ORF search is
+  not a gene predictor.
 - The RNA hairpin screen has no energy model of its own; the optional
   MFE view (ViennaRNA) supplies one.
 - HGVS descriptions number the supplied sequence; they equal HGVS c./p.
-  numbering only if that sequence is the CDS.
+  numbering only if that sequence is the CDS. On 1,500 ClinVar variants,
+  11 long deletion-insertions are written as an equivalent multi-change
+  allele instead of ClinVar's single delins (docs/BENCHMARKS.md).
 - Restriction analysis covers 22 palindromic and 4 Type IIS enzymes;
   methylation blocking and star activity are not modeled. Golden Gate
   assembly is not planned.
@@ -242,8 +251,15 @@ reserved. The options and the decisions they need are in
 
 ## Documentation
 
+- `docs/USER_GUIDE.md`: the user guide (concepts, menus, tutorial,
+  interpretation, troubleshooting)
 - `docs/METHODS.md`: algorithms, equations, defaults, references,
   assumptions, limitations and validation evidence
+- `docs/BENCHMARKS.md`: genome-scale performance and the benchmarks on
+  curated data (RefSeq gene models, ClinVar)
+- `docs/RELEASE_NOTES.md`: the prepared release 0.3.0 and the steps before
+  it
+- `CITATION.cff`: how to cite Synapse
 - `docs/FEATURE_STATUS.md`: every feature with its status
 - `docs/CHANGES.md`: every change to behavior, with reasons
 - `docs/AUDIT_STATUS.md`: the status of every audit recommendation

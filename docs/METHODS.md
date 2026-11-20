@@ -115,6 +115,19 @@ use 0-based inclusive `start <= stop` on the forward strand.
   and the average mass on small constructed sequences, and the golden
   master guards the outputs. CpG-island windows and the residue masses
   are not compared with an external tool (not independently validated).
+- Long sequences (2026-11-20). The window scans (CpG islands, GC and
+  complexity profiles) take each window's base counts from prefix counts
+  (`core/windows.py`) instead of recounting the slice: the same integers
+  and formulas, so the same floats (tests/test_window_scans.py compares
+  with the former loops). Above 200,000 profile windows
+  (`DEFAULT_MAX_PROFILE_POINTS`, about 200 kb at step 1) `analyze_sequence`
+  stores every k-th window of the two profiles, with k chosen so that at
+  most 200,000 remain, and adds `profile_resolution` (total windows, k,
+  stored step). The profile statistics (minimum, maximum, average and
+  their positions) are still computed over every window, by a streaming
+  pass that gives the same values as before. A 4.6 Mb genome needed
+  3.5 GB for the two full profiles; it now needs about 0.6 GB
+  (docs/BENCHMARKS.md). Shorter input is unchanged.
 
 ## ORF search (`analyses/orf.py`)
 
@@ -124,7 +137,7 @@ use 0-based inclusive `start <= stop` on the forward strand.
 | Start codons | ATG only | ATG/GTG/TTG (`atg_and_alternative`); NCBI starts of the table (`table_starts`) |
 | Nested ORFs | longest ORF per stop codon | every in-frame start |
 | Ranking | length | legacy heuristic score |
-| Genetic code | NCBI table 1 | tables 2, 4, 11 |
+| Genetic code | NCBI table 1 | any of the 27 NCBI tables |
 
 - Defaults follow the conventions of NCBI ORFfinder (minimal length 75 nt,
   ATG only, outermost start per stop), with one difference in counting:
@@ -193,6 +206,17 @@ use 0-based inclusive `start <= stop` on the forward strand.
   as `tests/fixtures/orffinder/pUC19_L09137.2_orffinder.json`. Not covered:
   ORFs across the origin (ORFfinder's web form treats the sequence as
   linear) and 5′-partial ORFs (none on pUC19 at these settings).
+- Benchmark against curated gene models (2026-11-20,
+  `scripts/benchmarks/orf_refseq.py`, docs/BENCHMARKS.md): *E. coli* K-12
+  MG1655 (NC_000913.3) against its RefSeq annotation, code 11, ATG/GTG/TTG,
+  one ORF per stop, minimum 90 nt. Of 4,294 single-segment, non-pseudo
+  CDS, 4,250 (98.98 %) are found at their stop codon; all 44 misses are
+  shorter than 90 nt, so every annotated CDS of at least 90 nt is found.
+  The ORF starts at the annotated start for 1,470 CDS and upstream of it
+  for 2,780 (the outermost in-frame start), never downstream. The three
+  selenoprotein genes end at the internal UGA, as a plain ORF search must.
+  This measures sensitivity; an ORF search is not a gene predictor, and
+  precision against an annotation is not a meaningful measure for it.
 - Organism mode (P1-9) is not implemented as a separate switch: the genetic
   code and the start-codon policy cover the cases (e.g. table 11 with
   `table_starts` for bacteria), and a preset would only bundle them.
@@ -242,6 +266,14 @@ use 0-based inclusive `start <= stop` on the forward strand.
 - RNA hairpin screen: stems of 4-7 nt around loops of 3-12 nt are reported
   when at least 75 % of the stem positions form Watson-Crick pairs. It is a
   sequence screen without free energies; the optional MFE view below adds them.
+  Since 2026-11-20 each stem is extended outward from its innermost pair
+  once for all four stem lengths and abandoned at the first mismatch
+  beyond (min_stem + 3) // 4, which no candidate can exceed; the
+  candidates and their order are those of pairing every stem in full
+  (tests/test_rna_window_scans.py). The G-U figure is counted without
+  building its list. Above 200,000 profile windows the stored RNA GC and
+  complexity profiles are thinned as in the sequence overview
+  (`profile_resolution`).
   G·U wobble pairs (P2-5, 2026-11-11) are counted in a second figure,
   "Including G-U pairs" (`hairpin_count_with_gu`, `allow_gu=True`), not in
   the screen itself: treating G·U like G·C without an energy model raises
@@ -283,6 +315,15 @@ use 0-based inclusive `start <= stop` on the forward strand.
   no values for U and O.
 
 ## Restriction and cloning (`analyses/restriction.py`, `analyses/cloning.py`)
+
+- Genome-length input (2026-11-20). Recognition sites are found with a
+  regular expression whose classes are exactly the symbols that
+  `bases_match` accepts at each position (IUPAC overlap, both cases), and
+  each fragment's boundary events are looked up by coordinate instead of
+  scanning every cut. The digest of the 4.6 Mb *E. coli* genome with all
+  22 enzymes took more than 15 minutes and now takes about 25 s, with the
+  same 119,067 cuts and 93,240 fragments (tests/test_restriction_fragment_index.py
+  compares with the former loops).
 
 - Sites are CONFIRMED (exact bases) or POSSIBLE (match only through IUPAC
   ambiguity). Digests use CONFIRMED sites by default
@@ -492,6 +533,28 @@ therefore upper estimates.
   unknown), `p.(*110Qext*?)` for a lost stop whose new stop is not
   determined. The mutation report shows the notation next to the effect,
   and the variant bridge stores it as `protein_change` (2026-11-11).
+- Alleles with several changes (2026-11-20). The 3′ rule is applied to each
+  change without moving it past the next change of the same allele: the
+  shift stops one unchanged base before the next change
+  (`mutation_hgvs_c(..., shift_limit=...)`). Before, each change was
+  shifted as if it were alone, and for PTEN NM_000314.8 c.528_534delinsA
+  the first of three called deletions moved through a TATTATTAT repeat
+  onto the others (`c.[532_534del;531_532del;534del]`, which describes no
+  sequence; tests/test_hgvs_allele_shift.py).
+- Benchmark on curated variants (2026-11-20,
+  `tests/test_hgvs_clinvar_benchmark.py`, fixture from
+  `scripts/benchmarks/clinvar_hgvs.py`): 1,500 ClinVar variant names on six
+  RefSeq transcripts (HBB, KRAS, VHL, TP53, PTEN, MECP2; 250 each, exonic
+  coding changes). For each, the observed CDS is rebuilt from ClinVar's c.
+  name and compared with the reference as a user would. c.: 1,489
+  identical; 11 deletion-insertions are split by the alignment (linear gap
+  costs) into several changes, written as an equivalent allele such as
+  `c.[217_218del;220_221del]` for ClinVar's `c.217_221delinsT` (every
+  description rebuilds the observed sequence). p.: all 1,186 codon
+  substitutions agree; ClinVar's `p.Met1Arg` and `p.Ter214Leu` are the
+  HGVS forms `p.(M1?)` and `p.(*214Lext*?)` that Synapse writes. Not
+  covered: intronic and UTR positions, and frameshift protein notation
+  (Synapse writes none).
 - The alignment keeps two score rows and a one-byte traceback per cell (P2-6,
   2026-11-11): about 1 byte per cell (4 MB at 2,000 nt, 100 MB at 10,000 nt)
   instead of ~46 for the earlier matrices of Python objects, with an
@@ -667,6 +730,12 @@ therefore upper estimates.
 ## Literature (`analyses/literature.py`)
 
 - PubMed, Europe PMC, OpenAlex, Crossref; each source may fail independently.
+- Author names of merged records are de-duplicated conservatively. Since
+  2026-11-20 a name ending in one to three capital initials (Europe PMC's
+  "Smith A") is also read as family name plus initials, so it matches
+  PubMed's "Ann Smith"; before, such a record listed its authors twice
+  (tests/test_literature_authors.py). Distinct people with the same family
+  name and different initials stay distinct.
 - Requests are throttled per host (NCBI 3/s, 10/s with an API key) and
   retried on HTTP 429/5xx (max. 3 attempts, `Retry-After` honored).
 - Relevance scores measure text matching only, not evidence quality.

@@ -3313,3 +3313,105 @@ values). No defect found:
     is the failure this phase found three times.
   - The module is cohesive: one search pipeline over four providers. The
     expected gain does not justify the risk.
+
+## Phase 10 – genome scale, curated benchmarks, release preparation (2026-11-20)
+
+The owner's mandate of 2026-11-18 holds (fix every defect, complete the
+project; CRISPR and the AI Experiment Planner stay excluded; the licence
+and the GitHub repository are the owner's). Seven commits from `6d41d8a`
+to `5b1dc8b`, then the documentation. Measurements are in
+`docs/BENCHMARKS.md`.
+
+### A. Genome-length input (`6d41d8a`)
+
+*E. coli* K-12 MG1655 (NC_000913.3, 4,641,652 bp) through every analysis
+(`scripts/benchmarks/genome_scale.py`). Four analyses did not scale:
+
+- **ORF search, 499 s.** `analyze_orf_relationships` compared all
+  n(n−1)/2 ORF pairs (32,406 ORFs). An interval sweep visits only ORFs
+  whose start can overlap, in the original order.
+- **Restriction digest with all 22 enzymes, more than 15 minutes.** Each
+  fragment scanned every cut for its two boundaries; the cuts are now
+  indexed by coordinate. Sites are found with a regular expression built
+  from exactly the symbols `bases_match` accepts; the sequence check
+  enumerates positions only when an unusual symbol occurs.
+- **Sequence overview, 154 s and 3.5 GB.** CpG islands and the GC and
+  complexity profiles recounted each window; they use prefix counts
+  (`core/windows.py`). Above 200,000 windows the stored profiles keep
+  every k-th window (`profile_resolution` says so); the statistics still
+  use every window.
+- **RNA analysis, more than 10 minutes.** The hairpin screen extends each
+  stem outward from its innermost pair once and stops at the first
+  mismatch no candidate can exceed; the G-U figure is counted without a
+  list; the RNA profiles use prefix counts and the same thinning.
+
+Every change returns the former result: differential tests against the
+former loops (`test_window_scans`, `test_rna_window_scans`,
+`test_orf_relationship_sweep`, `test_restriction_fragment_index`), and an
+end-to-end comparison with the code of `ca6d941` on *E. coli* segments
+(overview, three ORF settings, RNA, two digests): bit-identical results,
+3-23 times faster. Behavior change for long input only: the thinned
+stored profiles (documented in `docs/METHODS.md`).
+
+### B. HGVS benchmark on ClinVar; allele fix (`1fd914f`)
+
+1,500 ClinVar variant names on six RefSeq transcripts
+(`tests/fixtures/clinvar/`, public domain, SHA-256 checked). c.: 1,489
+identical, 11 split delins equivalent; p.: 1,186/1,186.
+
+- **Defect.** `hgvs_c_allele` shifted every change of a multi-change
+  allele to its most 3′ position as if it were alone. For PTEN
+  c.528_534delinsA it wrote `c.[532_534del;531_532del;534del]`,
+  overlapping deletions that describe no sequence. The shift now stops
+  one unchanged base before the next change (`shift_limit`). Single
+  changes are unchanged.
+
+### C. Per-ORF features (`f6a5d92`)
+
+Codon usage is counted once per candidate without a per-codon loop, the
+diversity reuses it, the ambiguity check returns at once for plain ACGT,
+and the scan caches codon status. Genome, default settings: 35 s → 11 s;
+alternative starts at 90 nt: 276 s → 87 s. Same ORFs.
+
+### D. Dialog tests (`8696b1f`)
+
+16 scenarios for the protein, restriction and cloning dialogs. Two
+defects: three protein errors lacked the ERROR prefix; Back inside a
+cloning analysis left the cloning menu.
+
+### E. Literature authors (`713a1d4`)
+
+Europe PMC's "Smith A" did not match PubMed's "Ann Smith", so merged
+records listed authors twice in results and exports. A trailing token of
+one to three capital initials is now also read as initials.
+
+### F. `analyses/literature.py` split (`4bb71d0`, `5b1dc8b`)
+
+Snapshot with the network replaced at `urlopen`, then ten modules in
+`analyses/_literature/`; stand-ins moved to the calling modules. The
+splitting tool kept only one of several `import urllib.x` lines; fixed.
+
+### Benchmarks on curated data
+
+- ORFs against the RefSeq annotation of *E. coli* K-12: 4,250 of 4,294
+  CDS found at their stop codon; every CDS of at least 90 nt
+  (`scripts/benchmarks/orf_refseq.py`).
+- Primer Tm against published measured values: not done. No measured
+  dataset with a clear licence was obtained, and none was reconstructed
+  from memory. The comparison with Primer3 stands.
+
+### Documentation and release preparation
+
+New: `docs/USER_GUIDE.md` (checked by `tests/test_user_guide_examples.py`),
+`docs/BENCHMARKS.md`, `docs/RELEASE_NOTES.md`, `CITATION.cff` (valid CFF
+1.2.0), issue and pull-request templates, Dependabot for the workflow
+actions, `data/examples/pUC19.fasta`. Updated: README, METHODS,
+FEATURE_STATUS, ARCHITECTURE, TOOL_AND_DATA_LEDGER, TEST_COVERAGE,
+PROJECT_HISTORY_AND_DECISIONS, `scripts/refactor/README.md`.
+
+Correction to the commit message of `6d41d8a`: it says the RNA analysis
+became "about 7x faster on 300 kb". Measured without a profiler, a
+300-kb RNA analysis took 29.4 s after the early stop and 10.7 s after the
+outward extension; the time of the unchanged code was not measured
+without a profiler, so the factor is not established. The genome figure
+in `docs/BENCHMARKS.md` (more than 600 s before, 137 s after) is measured.
