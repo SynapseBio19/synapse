@@ -104,11 +104,11 @@ Updated: `README.md`, `docs/METHODS.md`, `docs/FEATURE_STATUS.md`,
 ## H. What is left, and whose it is
 
 **The owner's** (`docs/RELEASE_NOTES.md`, "Before the first release"):
-1. Choose the licence; add `LICENSE`, the `license` fields in
-   `pyproject.toml` and `CITATION.cff`.
-2. Create the GitHub repository and push. The CI has never run on a
-   server; its first run on Linux may find platform differences, which
-   Claude can fix once the repository exists.
+1. ~~Choose the licence.~~ Done 2026-11-20: AGPL-3.0-or-later.
+2. ~~Create the GitHub repository and push.~~ Done 2026-11-20:
+   <https://github.com/SynapseBio19/synapse>. The first CI run found one
+   Windows-only test defect (an 8.3 short temp path); fixed, and all eight
+   jobs pass.
 3. Version 0.3.0, tag, release; optionally Zenodo and PyPI.
 4. A contact address, if a security policy or code of conduct is wanted.
 

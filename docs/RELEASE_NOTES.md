@@ -77,8 +77,8 @@ Selected from docs/CHANGES.md; each fix has a test that failed before it.
   equivalent but not the preferred HGVS description).
 - The hairpin screen has no energy model; the optional ViennaRNA view does.
 - Hairpin and primer-dimer screens are heuristics, not free energies.
-- Tested on Windows with Python 3.10 and 3.14. The CI configuration adds
-  Linux with Python 3.10-3.14 but has not run on GitHub yet; macOS is not
+- Tested on Windows (Python 3.10 and 3.14 locally, 3.14 in the CI) and on
+  Linux (Python 3.10-3.14 in the CI, green since 2026-11-20); macOS is not
   tested.
 
 ### Before the first release (owner)

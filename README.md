@@ -203,8 +203,9 @@ python scripts/ci/pyright_gate.py
 documented allow-list (the findings in the CRISPR module, which was not
 changed in Phase 7). `scripts/ci/check_skips.py` lists skipped tests with
 their reasons. The workflow tests Python 3.10 to 3.14 on Linux and 3.14 on
-Windows, plus a job with every optional package. It has not yet run on a
-hosted service: the repository has no remote.
+Windows, plus a job with every optional package. It runs on GitHub for
+every push (<https://github.com/SynapseBio19/synapse/actions>); all eight
+jobs passed first on 2026-11-20.
 
 The suite blocks all network access, so no test can depend on an external
 service. Golden-master snapshots in `tests/golden/` protect every
