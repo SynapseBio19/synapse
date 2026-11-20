@@ -469,21 +469,33 @@ def _deduplicate_author_names(names: list[str]) -> list[str]:
     to a longer full-name form: that match is ambiguous without an external ID.
     """
     output: list[str] = []
-    keys: list[tuple[str, tuple[str, ...], str]] = []
+    keys: list[list[tuple[str, tuple[str, ...], str]]] = []
 
-    def parts(name: str) -> tuple[str, tuple[str, ...], str]:
-        cleaned = re.sub(r"\s+", " ", str(name or "")).strip(" ,;")
-        if not cleaned:
-            return "", (), ""
-        if "," in cleaned:
-            family, given = [part.strip() for part in cleaned.split(",", 1)]
-        else:
-            tokens = cleaned.split()
-            family, given = tokens[-1], " ".join(tokens[:-1])
+    def key(family: str, given: str) -> tuple[str, tuple[str, ...], str]:
         family_key = _normalize_person_name(family)
         given_tokens = tuple(_normalize_person_name(given).split())
-        normalized = " ".join(given_tokens)
-        return family_key, given_tokens, normalized
+        return family_key, given_tokens, " ".join(given_tokens)
+
+    def readings(name: str) -> list[tuple[str, tuple[str, ...], str]]:
+        """The ways to read a name as (family, given tokens, given text).
+
+        "Smith, Ann" and "Ann Smith" have one reading. A name ending in one
+        to three capital initials ("Smith A", "Smith AB", "Consortium T.",
+        the form of Europe PMC's authorString) is also read as family name
+        followed by initials; the first reading stays, because a family
+        name written in capitals ("Wei LI") looks the same.
+        """
+        cleaned = re.sub(r"\s+", " ", str(name or "")).strip(" ,;")
+        if not cleaned:
+            return [("", (), "")]
+        if "," in cleaned:
+            family, given = [part.strip() for part in cleaned.split(",", 1)]
+            return [key(family, given)]
+        tokens = cleaned.split()
+        found = [key(tokens[-1], " ".join(tokens[:-1]))]
+        if len(tokens) >= 2 and re.fullmatch(r"(?:[A-Z]\.?){1,3}", tokens[-1]):
+            found.append(key(" ".join(tokens[:-1]), " ".join(tokens[-1].replace(".", ""))))
+        return found
 
     def initials_only(tokens: tuple[str, ...]) -> bool:
         return bool(tokens) and all(len(token) == 1 for token in tokens)
@@ -503,26 +515,30 @@ def _deduplicate_author_names(names: list[str]) -> list[str]:
         name = re.sub(r"\s+", " ", str(raw or "")).strip(" ,;")
         if not name:
             continue
-        family_key, given_tokens, normalized_given = parts(name)
-        if not family_key:
+        name_readings = readings(name)
+        if not name_readings[0][0]:
             continue
         duplicate_index = None
-        for index, (existing_family, existing_given_tokens, existing_normalized) in enumerate(keys):
-            if family_key != existing_family:
-                continue
-            if normalized_given == existing_normalized:
-                duplicate_index = index
-                break
-            if compatible_initials(given_tokens, existing_given_tokens):
-                duplicate_index = index
+        for index, existing_readings in enumerate(keys):
+            for family_key, given_tokens, normalized_given in name_readings:
+                for existing_family, existing_given_tokens, existing_normalized in existing_readings:
+                    if family_key != existing_family:
+                        continue
+                    if (normalized_given == existing_normalized
+                            or compatible_initials(given_tokens, existing_given_tokens)):
+                        duplicate_index = index
+                        break
+                if duplicate_index is not None:
+                    break
+            if duplicate_index is not None:
                 break
 
         if duplicate_index is None:
             output.append(name)
-            keys.append((family_key, given_tokens, normalized_given))
+            keys.append(name_readings)
         elif len(name) > len(output[duplicate_index]):
             output[duplicate_index] = name
-            keys[duplicate_index] = parts(name)
+            keys[duplicate_index] = name_readings
 
     return output
 
